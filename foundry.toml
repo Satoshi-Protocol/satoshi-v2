@@ -2,12 +2,12 @@
 src = "src"
 out = "out"
 libs = ["lib"]
-solc_version = "0.8.19"
+solc_version = "0.8.20"
 optimizer = true
 optimizer_runs = 200
 
 remappings = [
-  "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
+  "@solidstate/contracts=lib/solidstate-solidity/contracts",
   "@openzeppelin/contracts-upgradeable=lib/openzeppelin-contracts-upgradeable/contracts",
   "@layerzerolabs/solidity-examples=lib/solidity-examples",
   "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
