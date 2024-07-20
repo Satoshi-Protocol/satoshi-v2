@@ -1,32 +1,44 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {TroveManagerData} from "../interfaces/IBorrowerOperationsFacet.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";
-import {Queue, SunsetIndex} from "../interfaces/IStabilityPoolFacet.sol";
+import {Queue, SunsetIndex, AccountDeposit, Snapshots} from "../interfaces/IStabilityPoolFacet.sol";
+import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
+import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
+import {OracleRecord} from "../interfaces/IPriceFeedAggregatorFacet.sol";
 
 library AppStorage {
     bytes32 internal constant STORAGE_SLOT = bytes32(uint256(keccak256("satoshi.app.storage")) - 1);
 
     struct Layout {
-        address owner;
-        address guardian;
         address feeReceiver;
-        uint256 ownershipTransferDelay;
-        address rewardManager;
+        IRewardManager rewardManager;
+        ICommunityIssuance communityIssuance;
         address pendingOwner;
         uint256 ownershipTransferDeadline;
         bool paused;
         uint256 startTime;
         IDebtToken debtToken;
-        /* Liquidation */
+        uint256 minNetDebt;
+
+            // owner => caller => isApproved
+    mapping(address => mapping(address => bool)) isApprovedDelegate;
+
+        /* Factory */
+            IBeacon sortedTrovesBeacon;
+    IBeacon  troveManagerBeacon;
+
         // troveManager => enabled
         mapping(ITroveManager => bool) enabledTroveManagers;
-        uint256 gasCompensation;
+
+        /* Liquidation */
         mapping(ITroveManager => TroveManagerData) troveManagersData;
         ITroveManager[] troveManagers;
+        
         /* Stability Pool */
         // OSHI reward
         uint128 spRewardRate;
@@ -66,6 +78,28 @@ library AppStorage {
         uint256 lastDebtLossError_Offset;
         // Error tracker for the error correction in the OSHI issuance calculation
         uint256 lastOSHIError;
+        /*
+        * Similarly, the sum 'G' is used to calculate OSHI gains. During it's lifetime, each deposit d_t earns a OSHI gain of
+        *  ( d_t * [G - G_t] )/P_t, where G_t is the depositor's snapshot of G taken at time t when the deposit was made.
+        *
+        *  OSHI reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
+        *  In each case, the OSHI reward is issued (i.e. G is updated), before other state changes are made.
+        */
+        mapping(uint128 => mapping(uint128 => uint256)) epochToScaleToG;
+
+        mapping(address => AccountDeposit) accountDeposits; // depositor address -> initial deposit
+    mapping(address => Snapshots) depositSnapshots; // depositor address -> snapshots struct
+
+    // index values are mapped against the values within `collateralTokens`
+    mapping(address => uint256[256]) depositSums; // depositor address -> sums
+
+    // depositor => gains
+    mapping(address => uint80[256])  collateralGainsByDepositor;
+
+    mapping(address => uint256)  storedPendingReward;
+
+    /* PriceFeedAggregatorFacet */
+    mapping(IERC20 => OracleRecord) oracleRecords;
     }
 
     function layout() internal pure returns (Layout storage s) {

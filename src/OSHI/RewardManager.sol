@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {IAccessControl} from "@solidstate/contracts/access/access_control/IAccessControl.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -12,6 +13,7 @@ import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
 import {ITroveManager} from "../xapp/interfaces/ITroveManager.sol";
 import {IWETH} from "../xapp/extensions/interfaces/IWETH.sol";
 import {ICoreFacet} from "../xapp/interfaces/ICoreFacet.sol";
+import {Config} from "../xapp/Config.sol";
 
 /**
  * @title Reward Manager Contract
@@ -195,7 +197,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         uint256 index = collTokenIndex[collateralToken];
         uint256 collFeePerOSHIStaked;
 
-        collateralToken.safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
 
         if (totalOSHIWeightedStaked > 0) {
             uint256 _amountToStaker = _amount * FEE_TO_STAKER_RATIO / FEE_RATIO_BASE;
@@ -373,10 +375,9 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
 
     function _isVaildCaller() internal view {
         bool isRegistered;
-        ICoreFacet coreFacet = ICoreFacet(satoshiXapp);
         if (
-            msg.sender == satoshiXapp || msg.sender == coreFacet.owner() || msg.sender == address(debtToken)
-                || msg.sender == coreFacet.feeReceiver() || isTroveManagerRegistered[msg.sender]
+            msg.sender == satoshiXapp || IAccessControl(satoshiXapp).hasRole(Config.OWNER_ROLE, msg.sender) || msg.sender == address(debtToken)
+                || msg.sender == ICoreFacet(satoshiXapp).feeReceiver() || isTroveManagerRegistered[msg.sender]
                 || whitelistCaller[msg.sender]
         ) isRegistered = true;
         require(isRegistered, "RewardManager: Caller is not Valid");

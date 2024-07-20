@@ -1,31 +1,31 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.20;
 
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {AppStorage} from "../storages/AppStorage.sol";
-import {SatoshiOwnable} from "../SatoshiOwnable.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";
 import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
 import {DeploymentParams, IFactoryFacet} from "../interfaces/IFactoryFacet.sol";
-import {ICommunityIssuance} from "../interfaces/ICommunityIssuance.sol";
+import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
 import {TroveManagerData} from "../interfaces/IBorrowerOperationsFacet.sol";
 import {Queue, SunsetIndex} from "../interfaces/IStabilityPoolFacet.sol";
 import {Config} from "../Config.sol";
 
-contract FactoryFacet is IFactoryFacet, SatoshiOwnable {
-    IDebtToken public debtToken;
+contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
+    // IDebtToken public debtToken;
     // IGasPool public gasPool;
     // IPriceFeedAggregator public priceFeedAggregatorProxy;
     // IBorrowerOperations public borrowerOperationsProxy;
     // ILiquidationManager public liquidationManagerProxy;
     // IStabilityPool public stabilityPoolProxy;
-    IBeacon public sortedTrovesBeacon;
-    IBeacon public troveManagerBeacon;
-    uint256 public gasCompensation;
+    // IBeacon public sortedTrovesBeacon;
+    // IBeacon public troveManagerBeacon;
+    // uint256 public gasCompensation;
     // ICommunityIssuance public communityIssuance;
     // ITroveManager[] public troveManagers;
 
@@ -75,10 +75,10 @@ contract FactoryFacet is IFactoryFacet, SatoshiOwnable {
         external
         onlyOwner
     {
-        ISortedTroves sortedTrovesBeaconProxy = _deploySortedTrovesBeaconProxy();
-        ITroveManager troveManagerBeaconProxy = _deployTroveManagerBeaconProxy();
-
         AppStorage.Layout storage s = AppStorage.layout();
+        ISortedTroves sortedTrovesBeaconProxy = _deploySortedTrovesBeaconProxy(s);
+        ITroveManager troveManagerBeaconProxy = _deployTroveManagerBeaconProxy(s);
+
         s.troveManagers.push(troveManagerBeaconProxy);
 
         sortedTrovesBeaconProxy.setConfig(troveManagerBeaconProxy);
@@ -87,7 +87,7 @@ contract FactoryFacet is IFactoryFacet, SatoshiOwnable {
         // verify that the oracle is correctly working
         troveManagerBeaconProxy.fetchPrice();
 
-        debtToken.enableTroveManager(troveManagerBeaconProxy);
+        s.debtToken.enableTroveManager(troveManagerBeaconProxy);
         _enableCollateral(s, collateralToken);
         _configureCollateral(s, troveManagerBeaconProxy, collateralToken);
         _enableTroveManager(s, troveManagerBeaconProxy);
@@ -169,14 +169,14 @@ contract FactoryFacet is IFactoryFacet, SatoshiOwnable {
         s.enabledTroveManagers[_troveManager] = true;
     }
 
-    function _deploySortedTrovesBeaconProxy() internal returns (ISortedTroves) {
-        bytes memory data = abi.encodeCall(ISortedTroves.initialize, _owner);
-        return ISortedTroves(address(new BeaconProxy(address(sortedTrovesBeacon), data)));
+    function _deploySortedTrovesBeaconProxy(AppStorage.Layout storage s) internal returns (ISortedTroves) {
+        bytes memory data = abi.encodeCall(ISortedTroves.initialize, _owner());
+        return ISortedTroves(address(new BeaconProxy(address(s.sortedTrovesBeacon), data)));
     }
 
-    function _deployTroveManagerBeaconProxy() internal returns (ITroveManager) {
-        bytes memory data = abi.encodeCall(ITroveManager.initialize, (debtToken, gasCompensation));
-        return ITroveManager(address(new BeaconProxy(address(troveManagerBeacon), data)));
+    function _deployTroveManagerBeaconProxy(AppStorage.Layout storage s) internal returns (ITroveManager) {
+        bytes memory data = abi.encodeCall(ITroveManager.initialize, (_owner(), s.debtToken, s.communityIssuance));
+        return ITroveManager(address(new BeaconProxy(address(s.troveManagerBeacon), data)));
     }
 
     function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external onlyOwner {

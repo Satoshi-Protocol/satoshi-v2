@@ -58,7 +58,7 @@ library StabilityPoolLib {
 
     function _OSHIIssuance(AppStorage.Layout storage s) internal view returns (uint256) {
         uint256 duration = block.timestamp - s.lastUpdate;
-        uint256 releasedToken = duration * s.rewardRate;
+        uint256 releasedToken = duration * s.spRewardRate;
         uint256 allocatedToken = s.communityIssuance.allocated(address(this));
         // check the allocated token in community issuance
         if (releasedToken > allocatedToken) {
@@ -109,13 +109,13 @@ library StabilityPoolLib {
          * 4) Store these errors for use in the next correction when this function is called.
          * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
          */
-        uint256 collateralNumerator = (_collToAdd * Config.DECIMAL_PRECISION) + s.lastCollateralError_Offset[idx];
+        uint256 collateralNumerator = (_collToAdd * SatoshiMath.DECIMAL_PRECISION) + s.lastCollateralError_Offset[idx];
 
         if (_debtToOffset == _totalDebtTokenDeposits) {
-            debtLossPerUnitStaked = Config.DECIMAL_PRECISION; // When the Pool depletes to 0, so does each deposit
+            debtLossPerUnitStaked = SatoshiMath.DECIMAL_PRECISION; // When the Pool depletes to 0, so does each deposit
             s.lastDebtLossError_Offset = 0;
         } else {
-            uint256 debtLossNumerator = (_debtToOffset * Config.DECIMAL_PRECISION) - s.lastDebtLossError_Offset;
+            uint256 debtLossNumerator = (_debtToOffset * SatoshiMath.DECIMAL_PRECISION) - s.lastDebtLossError_Offset;
             /*
              * Add 1 to make error in quotient positive. We want "slightly too much" Debt loss,
              * which ensures the error in any given compoundedDebtDeposit favors the Stability Pool.
@@ -145,7 +145,7 @@ library StabilityPoolLib {
          * The newProductFactor is the factor by which to change all deposits, due to the depletion of Stability Pool Debt in the liquidation.
          * We make the product factor 0 if there was a pool-emptying. Otherwise, it is (1 - DebtLossPerUnitStaked)
          */
-        uint256 newProductFactor = uint256(Config.DECIMAL_PRECISION) - _debtLossPerUnitStaked;
+        uint256 newProductFactor = uint256(SatoshiMath.DECIMAL_PRECISION) - _debtLossPerUnitStaked;
 
         uint128 currentScaleCached = s.currentScale;
         uint128 currentEpochCached = s.currentEpoch;
@@ -169,15 +169,15 @@ library StabilityPoolLib {
             emit EpochUpdated(s.currentEpoch);
             s.currentScale = 0;
             emit ScaleUpdated(s.currentScale);
-            newP = Config.DECIMAL_PRECISION;
+            newP = SatoshiMath.DECIMAL_PRECISION;
 
             // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
-        } else if ((currentP * newProductFactor) / Config.DECIMAL_PRECISION < Config.SCALE_FACTOR) {
-            newP = (currentP * newProductFactor * Config.SCALE_FACTOR) / Config.DECIMAL_PRECISION;
+        } else if ((currentP * newProductFactor) / SatoshiMath.DECIMAL_PRECISION < Config.SCALE_FACTOR) {
+            newP = (currentP * newProductFactor * Config.SCALE_FACTOR) / SatoshiMath.DECIMAL_PRECISION;
             s.currentScale = currentScaleCached + 1;
             emit ScaleUpdated(s.currentScale);
         } else {
-            newP = (currentP * newProductFactor) / Config.DECIMAL_PRECISION;
+            newP = (currentP * newProductFactor) / SatoshiMath.DECIMAL_PRECISION;
         }
 
         require(newP > 0, "NewP");
@@ -207,7 +207,7 @@ library StabilityPoolLib {
         * 4) Store this error for use in the next correction when this function is called.
         * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
         */
-        uint256 OSHINumerator = (OSHIIssuance * Config.DECIMAL_PRECISION) + s.lastOSHIError;
+        uint256 OSHINumerator = (OSHIIssuance * SatoshiMath.DECIMAL_PRECISION) + s.lastOSHIError;
 
         uint256 OSHIPerUnitStaked = OSHINumerator / _totalDebtTokenDeposits;
         s.lastOSHIError = OSHINumerator - (OSHIPerUnitStaked * _totalDebtTokenDeposits);

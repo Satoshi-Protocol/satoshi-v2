@@ -68,4 +68,8 @@ library BorrowerOperationsLib {
             }
         }
     }
+
+    function _isCallerOrDelegated(AppStorage.Layout storage s, address _account) internal view returns (bool) {
+        return msg.sender == _account || s.isApprovedDelegate[_account][msg.sender];
+    }
 }

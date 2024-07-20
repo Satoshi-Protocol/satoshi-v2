@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {ISolidStateERC20} from "@solidstate/contracts/token/ERC20/ISolidStateERC20.sol";
 import {IERC20Metadata} from "@solidstate/contracts/token/ERC20/metadata/IERC20Metadata.sol";
 import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {SatoshiOwnable} from "../SatoshiOwnable.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {IStabilityPoolFacet} from "../interfaces/IStabilityPoolFacet.sol";
 import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
@@ -19,8 +20,9 @@ import {Config} from "../Config.sol";
 import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
 import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 
-contract LiquidationFacet is SatoshiOwnable, ILiquidationFacet {
+contract LiquidationFacet is  ILiquidationFacet, AccessControlInternal, OwnableInternal {
     using StabilityPoolLib for AppStorage.Layout;
+    using BorrowerOperationsLib for AppStorage.Layout;
     // function initialize(
     //     ISatoshiCore _satoshiCore,
     //     IStabilityPool _stabilityPool,
@@ -293,7 +295,7 @@ contract LiquidationFacet is SatoshiOwnable, ILiquidationFacet {
         troveManager.movePendingTroveRewardsToActiveBalances(pendingDebtReward, pendingCollReward);
 
         singleLiquidation.collGasCompensation = SatoshiMath._getCollGasCompensation(singleLiquidation.entireTroveColl);
-        singleLiquidation.debtGasCompensation = AppStorage.layout().DEBT_GAS_COMPENSATION;
+        singleLiquidation.debtGasCompensation = Config.DEBT_GAS_COMPENSATION;
         uint256 collToLiquidate = singleLiquidation.entireTroveColl - singleLiquidation.collGasCompensation;
 
         (
@@ -346,7 +348,7 @@ contract LiquidationFacet is SatoshiOwnable, ILiquidationFacet {
         );
 
         singleLiquidation.collGasCompensation = SatoshiMath._getCollGasCompensation(collToOffset);
-        singleLiquidation.debtGasCompensation = AppStorage.layout().DEBT_GAS_COMPENSATION;
+        singleLiquidation.debtGasCompensation = Config.DEBT_GAS_COMPENSATION;
 
         singleLiquidation.debtToOffset = entireTroveDebt;
         singleLiquidation.collToSendToSP = collToOffset - singleLiquidation.collGasCompensation;
@@ -377,7 +379,7 @@ contract LiquidationFacet is SatoshiOwnable, ILiquidationFacet {
             troveManager.getEntireDebtAndColl(_borrower);
 
         singleLiquidation.collGasCompensation = SatoshiMath._getCollGasCompensation(singleLiquidation.entireTroveColl);
-        singleLiquidation.debtGasCompensation = AppStorage.layout().DEBT_GAS_COMPENSATION;
+        singleLiquidation.debtGasCompensation = Config.DEBT_GAS_COMPENSATION;
         troveManager.movePendingTroveRewardsToActiveBalances(pendingDebtReward, pendingCollReward);
 
         singleLiquidation.debtToOffset = 0;

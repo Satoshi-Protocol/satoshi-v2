@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {AppStorage} from "../storages/AppStorage.sol";
-import {SatoshiOwnable} from "../SatoshiOwnable.sol";
 import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {DelegatedOps} from "../DelegatedOps.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";
 import {
@@ -16,17 +16,17 @@ import {
     TroveManagerData,
     Balances
 } from "../interfaces/IBorrowerOperationsFacet.sol";
-import {IRewardManager} from "../interfaces/IRewardManager.sol";
+import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
 import {Config} from "../Config.sol";
 import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
 
-contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOperationsFacet {
+contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal, OwnableInternal {
     using SafeERC20 for IERC20;
     using SafeERC20 for IDebtToken;
     using BorrowerOperationsLib for *;
 
     // IFactory public factory;
-    uint256 public minNetDebt;
+
 
     struct LocalVariables_adjustTrove {
         uint256 price;
@@ -82,13 +82,24 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
     //     _setMinNetDebt(_minNetDebt);
     // }
 
+    function isApprovedDelegate(address _account, address _delegate) external view returns (bool) {
+        return AppStorage.layout().isApprovedDelegate[_account][_delegate];
+    }
+
+    function setDelegateApproval(address _delegate, bool _isApproved) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        s.isApprovedDelegate[msg.sender][_delegate] = _isApproved;
+        emit DelegateApprovalSet(msg.sender, _delegate, _isApproved);
+    }
+
     function setMinNetDebt(uint256 _minNetDebt) public onlyOwner {
         _setMinNetDebt(_minNetDebt);
     }
 
     function _setMinNetDebt(uint256 _minNetDebt) internal {
         require(_minNetDebt != 0, "BorrowerOps: Min net debt must be greater than 0");
-        minNetDebt = _minNetDebt;
+        AppStorage.Layout storage s = AppStorage.layout();
+        s.minNetDebt = _minNetDebt;
         emit MinNetDebtUpdated(_minNetDebt);
     }
 
@@ -132,9 +143,8 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         return BorrowerOperationsLib._checkRecoveryMode(TCR);
     }
 
-    function getCompositeDebt(uint256 _debt) external view returns (uint256) {
-        AppStorage.Layout storage s = AppStorage.layout();
-        return SatoshiMath._getCompositeDebt(_debt, s.gasCompensation);
+    function getCompositeDebt(uint256 _debt) external pure returns (uint256) {
+        return SatoshiMath._getCompositeDebt(_debt);
     }
 
     // --- Borrower Trove Operations ---
@@ -147,9 +157,10 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external callerOrDelegated(account) {
+    ) external {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Deposits are paused");
+        require(s._isCallerOrDelegated(account), "Caller not approved");
         IERC20 collateralToken;
         LocalVariables_openTrove memory vars;
         bool isRecoveryMode;
@@ -159,16 +170,16 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
 
         _requireValidMaxFeePercentage(_maxFeePercentage);
 
-        vars.netDebt =
-            _debtAmount + _triggerBorrowingFee(troveManager, collateralToken, account, _maxFeePercentage, _debtAmount);
+        vars.netDebt = _debtAmount
+            + _triggerBorrowingFee(s, troveManager, collateralToken, account, _maxFeePercentage, _debtAmount);
 
-        _requireAtLeastMinNetDebt(vars.netDebt);
+        _requireAtLeastMinNetDebt(s, vars.netDebt);
 
         uint8 decimals = IERC20Metadata(address(collateralToken)).decimals();
         uint256 scaledCollateralAmount = SatoshiMath._getScaledCollateralAmount(_collateralAmount, decimals);
 
         // ICR is based on the composite debt, i.e. the requested Debt amount + Debt borrowing fee + Debt gas comp.
-        vars.compositeDebt = SatoshiMath._getCompositeDebt(vars.netDebt, s.gasCompensation);
+        vars.compositeDebt = SatoshiMath._getCompositeDebt(vars.netDebt);
         vars.ICR = SatoshiMath._computeCR(scaledCollateralAmount, vars.compositeDebt, vars.price);
         vars.NICR = SatoshiMath._computeNominalCR(_collateralAmount, vars.compositeDebt);
 
@@ -211,9 +222,11 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         uint256 _collateralAmount,
         address _upperHint,
         address _lowerHint
-    ) external callerOrDelegated(account) {
-        require(!AppStorage.layout().paused, "Trove adjustments are paused");
-        _adjustTrove(troveManager, account, 0, _collateralAmount, 0, 0, false, _upperHint, _lowerHint);
+    ) external  {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(!s.paused, "Trove adjustments are paused");
+        require(s._isCallerOrDelegated(account), "Caller not approved");
+        _adjustTrove(s, troveManager, account, 0, _collateralAmount, 0, 0, false, _upperHint, _lowerHint);
 
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
@@ -228,8 +241,10 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         uint256 _collWithdrawal,
         address _upperHint,
         address _lowerHint
-    ) external callerOrDelegated(account) {
-        _adjustTrove(troveManager, account, 0, 0, _collWithdrawal, 0, false, _upperHint, _lowerHint);
+    ) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(s._isCallerOrDelegated(account), "Caller not approved");
+        _adjustTrove(s, troveManager, account, 0, 0, _collWithdrawal, 0, false, _upperHint, _lowerHint);
 
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
@@ -245,9 +260,11 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external callerOrDelegated(account) {
-        require(!AppStorage.layout().paused(), "Withdrawals are paused");
-        _adjustTrove(troveManager, account, _maxFeePercentage, 0, 0, _debtAmount, true, _upperHint, _lowerHint);
+    ) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(!s.paused, "Withdrawals are paused");
+        require(s._isCallerOrDelegated(account), "Caller not approved");
+        _adjustTrove(s, troveManager, account, _maxFeePercentage, 0, 0, _debtAmount, true, _upperHint, _lowerHint);
 
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
@@ -262,8 +279,10 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external callerOrDelegated(account) {
-        _adjustTrove(troveManager, account, 0, 0, 0, _debtAmount, false, _upperHint, _lowerHint);
+    ) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(s._isCallerOrDelegated(account), "Caller not approved");
+        _adjustTrove(s, troveManager, account, 0, 0, 0, _debtAmount, false, _upperHint, _lowerHint);
 
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
@@ -281,12 +300,13 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint
-    ) external callerOrDelegated(account) {
-        require(
-            (_collDeposit == 0 && !_isDebtIncrease) || !AppStorage.layout().paused(), "Trove adjustments are paused"
-        );
+    ) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require((_collDeposit == 0 && !_isDebtIncrease) || !s.paused, "Trove adjustments are paused");
         require(_collDeposit == 0 || _collWithdrawal == 0, "BorrowerOperations: Cannot withdraw and add coll");
+        require(s._isCallerOrDelegated(account), "Caller not approved");
         _adjustTrove(
+            s,
             troveManager,
             account,
             _maxFeePercentage,
@@ -305,6 +325,7 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
     }
 
     function _adjustTrove(
+        AppStorage.Layout storage s,
         ITroveManager troveManager,
         address account,
         uint256 _maxFeePercentage,
@@ -327,7 +348,6 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
             _getCollateralAndTCRData(troveManager);
 
         (vars.coll, vars.debt) = troveManager.applyPendingRewards(account);
-        uint8 decimals = IERC20Metadata(address(collateralToken)).decimals();
 
         // Get the collChange based on whether or not collateral was sent in the transaction
         (vars.collChange, vars.isCollIncrease) = _getCollChange(_collDeposit, _collWithdrawal);
@@ -341,17 +361,18 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
             _requireValidMaxFeePercentage(_maxFeePercentage);
 
             vars.netDebtChange +=
-                _triggerBorrowingFee(troveManager, collateralToken, msg.sender, _maxFeePercentage, _debtChange);
+                _triggerBorrowingFee(s, troveManager, collateralToken, msg.sender, _maxFeePercentage, _debtChange);
         }
 
         // Calculate old and new ICRs and check if adjustment satisfies all conditions for the current system mode
+                uint8 decimals = IERC20Metadata(address(collateralToken)).decimals();
         _requireValidAdjustmentInCurrentMode(
             vars.totalPricedCollateral, vars.totalDebt, isRecoveryMode, _collWithdrawal, _isDebtIncrease, vars, decimals
         );
 
         // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough Debt
         if (!_isDebtIncrease && _debtChange != 0) {
-            _requireAtLeastMinNetDebt(SatoshiMath._getNetDebt(vars.debt) - vars.netDebtChange);
+            _requireAtLeastMinNetDebt(s, SatoshiMath._getNetDebt(vars.debt) - vars.netDebtChange);
         }
 
         // If we are incrasing collateral, send tokens to the trove manager prior to adjusting the trove
@@ -370,9 +391,11 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         );
     }
 
-    function closeTrove(ITroveManager troveManager, address account) external callerOrDelegated(account) {
+    function closeTrove(ITroveManager troveManager, address account) external {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(s._isCallerOrDelegated(account), "Caller not approved");
+        
         IERC20 collateralToken;
-
         uint256 price;
         bool isRecoveryMode;
         uint256 totalPricedCollateral;
@@ -390,8 +413,7 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         troveManager.closeTrove(account, msg.sender, coll, debt);
 
         // Burn the repaid Debt from the user's balance and the gas compensation from the Gas Pool
-        AppStorage.Layout storage s = AppStorage.layout();
-        s.debtToken.burnWithGasCompensation(msg.sender, debt - s.gasCompensation());
+        s.debtToken.burnWithGasCompensation(msg.sender, debt - Config.DEBT_GAS_COMPENSATION);
 
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
@@ -399,9 +421,22 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         }
     }
 
+    function troveManagersData(ITroveManager _troveManager)
+        external
+        view
+        returns (IERC20, uint16) {
+            TroveManagerData memory _troveManagersData = AppStorage.layout().troveManagersData[_troveManager];
+            return (_troveManagersData.collateralToken, _troveManagersData.index);
+        }
+
+        function minNetDebt() external view returns (uint256) {
+            return AppStorage.layout().minNetDebt;
+        }
+
     // --- Helper functions ---
 
     function _triggerBorrowingFee(
+        AppStorage.Layout storage s,
         ITroveManager _troveManager,
         IERC20 collateralToken,
         address _caller,
@@ -412,8 +447,7 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
 
         SatoshiMath._requireUserAcceptsFee(debtFee, _debtAmount, _maxFeePercentage);
 
-        AppStorage.Layout storage s = AppStorage.layout();
-        address rewardManager = s.rewardManager();
+        address rewardManager = address(s.rewardManager);
         s.debtToken.mint(address(this), debtFee);
         s.debtToken.safeIncreaseAllowance(rewardManager, debtFee);
         IRewardManager(rewardManager).increaseSATPerUintStaked(debtFee);
@@ -513,8 +547,8 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         require(_newTCR >= Config.CCR, "BorrowerOps: An operation that would result in TCR < CCR is not permitted");
     }
 
-    function _requireAtLeastMinNetDebt(uint256 _netDebt) internal view {
-        require(_netDebt >= minNetDebt, "BorrowerOps: Trove's net debt must be greater than minimum");
+    function _requireAtLeastMinNetDebt(AppStorage.Layout storage s, uint256 _netDebt) internal view {
+        require(_netDebt >= s.minNetDebt, "BorrowerOps: Trove's net debt must be greater than minimum");
     }
 
     function _requireValidMaxFeePercentage(uint256 _maxFeePercentage) internal pure {

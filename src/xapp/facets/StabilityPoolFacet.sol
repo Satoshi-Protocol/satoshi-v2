@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {SatoshiOwnable} from "../SatoshiOwnable.sol";
 import {SatoshiMath} from "../../library/SatoshiMath.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";
 import {
@@ -14,29 +15,9 @@ import {Config} from "../Config.sol";
 import {AppStorage} from "../storages/AppStorage.sol";
 import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 
-contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
+contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInternal {
     using SafeERC20 for IERC20;
     using StabilityPoolLib for AppStorage.Layout;
-
-    mapping(address => AccountDeposit) public accountDeposits; // depositor address -> initial deposit
-    mapping(address => Snapshots) public depositSnapshots; // depositor address -> snapshots struct
-
-    // index values are mapped against the values within `collateralTokens`
-    mapping(address => uint256[256]) public depositSums; // depositor address -> sums
-
-    // depositor => gains
-    mapping(address => uint80[256]) public collateralGainsByDepositor;
-
-    mapping(address => uint256) private storedPendingReward;
-
-    /*
-     * Similarly, the sum 'G' is used to calculate OSHI gains. During it's lifetime, each deposit d_t earns a OSHI gain of
-     *  ( d_t * [G - G_t] )/P_t, where G_t is the depositor's snapshot of G taken at time t when the deposit was made.
-     *
-     *  OSHI reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
-     *  In each case, the OSHI reward is issued (i.e. G is updated), before other state changes are made.
-     */
-    mapping(uint128 => mapping(uint128 => uint256)) public epochToScaleToG;
 
     // constructor() {
     //     _disableInitializers();
@@ -134,7 +115,7 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
      */
     function provideToSP(uint256 _amount) external {
         AppStorage.Layout storage s = AppStorage.layout();
-        require(!s.paused(), "Deposits are paused");
+        require(!s.paused, "Deposits are paused");
         require(_amount > 0, "StabilityPool: Amount must be non-zero");
 
         s._triggerOSHIIssuance();
@@ -143,7 +124,7 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
 
         uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(msg.sender);
 
-        _accrueRewards(msg.sender);
+        _accrueRewards(s, msg.sender);
 
         s.debtToken.sendToSP(msg.sender, _amount);
         uint256 newTotalDebtTokenDeposits = s.totalDebtTokenDeposits + _amount;
@@ -151,9 +132,9 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
         emit StabilityPoolLib.StabilityPoolDebtBalanceUpdated(newTotalDebtTokenDeposits);
 
         uint256 newDeposit = compoundedDebtDeposit + _amount;
-        accountDeposits[msg.sender] = AccountDeposit({amount: uint128(newDeposit), timestamp: uint128(block.timestamp)});
+        s.accountDeposits[msg.sender] = AccountDeposit({amount: uint128(newDeposit), timestamp: uint128(block.timestamp)});
 
-        _updateSnapshots(msg.sender, newDeposit);
+        _updateSnapshots(s, msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
     }
 
@@ -168,12 +149,12 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
      * If _amount > userDeposit, the user withdraws all of their compounded deposit.
      */
     function withdrawFromSP(uint256 _amount) external {
-        uint256 initialDeposit = accountDeposits[msg.sender].amount;
-        uint128 depositTimestamp = accountDeposits[msg.sender].timestamp;
+        AppStorage.Layout storage s = AppStorage.layout();
+        uint256 initialDeposit = s.accountDeposits[msg.sender].amount;
+        uint128 depositTimestamp = s.accountDeposits[msg.sender].timestamp;
         require(initialDeposit > 0, "StabilityPool: User must have a non-zero deposit");
         require(depositTimestamp < block.timestamp, "!Deposit and withdraw same block");
 
-        AppStorage.Layout storage s = AppStorage.layout();
         s._triggerOSHIIssuance();
 
         _accrueDepositorCollateralGain(s, msg.sender);
@@ -181,7 +162,7 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
         uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(msg.sender);
         uint256 debtToWithdraw = SatoshiMath._min(_amount, compoundedDebtDeposit);
 
-        _accrueRewards(msg.sender);
+        _accrueRewards(s, msg.sender);
 
         if (debtToWithdraw > 0) {
             s.debtToken.returnFromPool(address(this), msg.sender, debtToWithdraw);
@@ -190,9 +171,9 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
 
         // Update deposit
         uint256 newDeposit = compoundedDebtDeposit - debtToWithdraw;
-        accountDeposits[msg.sender] = AccountDeposit({amount: uint128(newDeposit), timestamp: depositTimestamp});
+        s.accountDeposits[msg.sender] = AccountDeposit({amount: uint128(newDeposit), timestamp: depositTimestamp});
 
-        _updateSnapshots(msg.sender, newDeposit);
+        _updateSnapshots(s, msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
     }
 
@@ -208,19 +189,19 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
     function getDepositorCollateralGain(address _depositor) external view returns (uint256[] memory collateralGains) {
         AppStorage.Layout storage s = AppStorage.layout();
         collateralGains = new uint256[](s.collateralTokens.length);
-        uint80[256] storage depositorGains = collateralGainsByDepositor[_depositor];
+        uint80[256] storage depositorGains = s.collateralGainsByDepositor[_depositor];
         for (uint256 i = 0; i < collateralGains.length; i++) {
             collateralGains[i] = depositorGains[i];
         }
 
-        uint256 P_Snapshot = depositSnapshots[_depositor].P;
+        uint256 P_Snapshot = s.depositSnapshots[_depositor].P;
         if (P_Snapshot == 0) return collateralGains;
-        uint256 initialDeposit = accountDeposits[_depositor].amount;
-        uint128 epochSnapshot = depositSnapshots[_depositor].epoch;
-        uint128 scaleSnapshot = depositSnapshots[_depositor].scale;
+        uint256 initialDeposit = s.accountDeposits[_depositor].amount;
+        uint128 epochSnapshot = s.depositSnapshots[_depositor].epoch;
+        uint128 scaleSnapshot = s.depositSnapshots[_depositor].scale;
         uint256[256] storage sums = s.epochToScaleToSums[epochSnapshot][scaleSnapshot];
         uint256[256] storage nextSums = s.epochToScaleToSums[epochSnapshot][scaleSnapshot + 1];
-        uint256[256] storage depSums = depositSums[_depositor];
+        uint256[256] storage depSums = s.depositSums[_depositor];
 
         for (uint256 i = 0; i < collateralGains.length; i++) {
             if (sums[i] == 0) continue; // Collateral was overwritten or not gains
@@ -229,7 +210,7 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
             uint8 _decimals = IERC20Metadata(address(s.collateralTokens[i])).decimals();
             collateralGains[i] += initialDeposit
                 * SatoshiMath._getOriginalCollateralAmount(firstPortion + secondPortion, _decimals) / P_Snapshot
-                / Config.DECIMAL_PRECISION;
+                / SatoshiMath.DECIMAL_PRECISION;
         }
         return collateralGains;
     }
@@ -238,21 +219,21 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
         private
         returns (bool hasGains)
     {
-        uint80[256] storage depositorGains = collateralGainsByDepositor[_depositor];
+        uint80[256] storage depositorGains = s.collateralGainsByDepositor[_depositor];
         uint256 collaterals = s.collateralTokens.length;
-        uint256 initialDeposit = accountDeposits[_depositor].amount;
+        uint256 initialDeposit = s.accountDeposits[_depositor].amount;
         hasGains = false;
         if (initialDeposit == 0) {
             return hasGains;
         }
 
-        uint128 epochSnapshot = depositSnapshots[_depositor].epoch;
-        uint128 scaleSnapshot = depositSnapshots[_depositor].scale;
-        uint256 P_Snapshot = depositSnapshots[_depositor].P;
+        uint128 epochSnapshot = s.depositSnapshots[_depositor].epoch;
+        uint128 scaleSnapshot = s.depositSnapshots[_depositor].scale;
+        uint256 P_Snapshot = s.depositSnapshots[_depositor].P;
 
         uint256[256] storage sums = s.epochToScaleToSums[epochSnapshot][scaleSnapshot];
         uint256[256] storage nextSums = s.epochToScaleToSums[epochSnapshot][scaleSnapshot + 1];
-        uint256[256] storage depSums = depositSums[_depositor];
+        uint256[256] storage depSums = s.depositSums[_depositor];
 
         for (uint256 i = 0; i < collaterals; i++) {
             if (sums[i] == 0) continue; // Collateral was overwritten or not gains
@@ -263,7 +244,7 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
             depositorGains[i] += uint80(
                 (
                     initialDeposit * SatoshiMath._getOriginalCollateralAmount(firstPortion + secondPortion, _decimals)
-                        / P_Snapshot / Config.DECIMAL_PRECISION
+                        / P_Snapshot / SatoshiMath.DECIMAL_PRECISION
                 )
             );
         }
@@ -279,45 +260,46 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
     function claimableReward(address _depositor) external view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         uint256 totalDebt = s.totalDebtTokenDeposits;
-        uint256 initialDeposit = accountDeposits[_depositor].amount;
+        uint256 initialDeposit = s.accountDeposits[_depositor].amount;
 
         if (totalDebt == 0 || initialDeposit == 0) {
-            return storedPendingReward[_depositor] + _claimableReward(_depositor);
+            return s.storedPendingReward[_depositor] + _claimableReward(s, _depositor);
         }
 
-        Snapshots memory snapshots = depositSnapshots[_depositor];
+        Snapshots memory snapshots = s.depositSnapshots[_depositor];
         uint128 epochSnapshot = snapshots.epoch;
         uint128 scaleSnapshot = snapshots.scale;
-        uint256 oshiNumerator = (s._OSHIIssuance() * Config.DECIMAL_PRECISION) + s.lastOSHIError;
+        uint256 oshiNumerator = (s._OSHIIssuance() * SatoshiMath.DECIMAL_PRECISION) + s.lastOSHIError;
         uint256 oshiPerUnitStaked = oshiNumerator / totalDebt;
         uint256 marginalOSHIGain = (epochSnapshot == s.currentEpoch) ? oshiPerUnitStaked * s.P : 0;
         uint256 firstPortion;
         uint256 secondPortion;
 
         if (scaleSnapshot == s.currentScale) {
-            firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot] - snapshots.G + marginalOSHIGain;
-            secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot + 1] / Config.SCALE_FACTOR;
+            firstPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot] - snapshots.G + marginalOSHIGain;
+            secondPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot + 1] / Config.SCALE_FACTOR;
         } else {
-            firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot] - snapshots.G;
-            secondPortion = (epochToScaleToG[epochSnapshot][scaleSnapshot + 1] + marginalOSHIGain) / Config.SCALE_FACTOR;
+            firstPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot] - snapshots.G;
+            secondPortion =
+                (s.epochToScaleToG[epochSnapshot][scaleSnapshot + 1] + marginalOSHIGain) / Config.SCALE_FACTOR;
         }
 
-        return storedPendingReward[_depositor]
-            + (initialDeposit * (firstPortion + secondPortion)) / snapshots.P / Config.DECIMAL_PRECISION;
+        return s.storedPendingReward[_depositor]
+            + (initialDeposit * (firstPortion + secondPortion)) / snapshots.P / SatoshiMath.DECIMAL_PRECISION;
     }
 
-    function _claimableReward(address _depositor) private view returns (uint256) {
-        uint256 initialDeposit = accountDeposits[_depositor].amount;
+    function _claimableReward(AppStorage.Layout storage s, address _depositor) private view returns (uint256) {
+        uint256 initialDeposit = s.accountDeposits[_depositor].amount;
         if (initialDeposit == 0) {
             return 0;
         }
 
-        Snapshots memory snapshots = depositSnapshots[_depositor];
+        Snapshots memory snapshots = s.depositSnapshots[_depositor];
 
-        return _getOSHIGainFromSnapshots(initialDeposit, snapshots);
+        return _getOSHIGainFromSnapshots(s, initialDeposit, snapshots);
     }
 
-    function _getOSHIGainFromSnapshots(uint256 initialStake, Snapshots memory snapshots)
+    function _getOSHIGainFromSnapshots(AppStorage.Layout storage s, uint256 initialStake, Snapshots memory snapshots)
         internal
         view
         returns (uint256)
@@ -332,10 +314,10 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
         uint256 G_Snapshot = snapshots.G;
         uint256 P_Snapshot = snapshots.P;
 
-        uint256 firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot] - G_Snapshot;
-        uint256 secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot + 1] / Config.SCALE_FACTOR;
+        uint256 firstPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot] - G_Snapshot;
+        uint256 secondPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot + 1] / Config.SCALE_FACTOR;
 
-        uint256 OSHIGain = (initialStake * (firstPortion + secondPortion)) / P_Snapshot / Config.DECIMAL_PRECISION;
+        uint256 OSHIGain = (initialStake * (firstPortion + secondPortion)) / P_Snapshot / SatoshiMath.DECIMAL_PRECISION;
 
         return OSHIGain;
     }
@@ -348,12 +330,12 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
      */
     function getCompoundedDebtDeposit(address _depositor) public view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
-        uint256 initialDeposit = accountDeposits[_depositor].amount;
+        uint256 initialDeposit = s.accountDeposits[_depositor].amount;
         if (initialDeposit == 0) {
             return 0;
         }
 
-        Snapshots memory snapshots = depositSnapshots[_depositor];
+        Snapshots memory snapshots = s.depositSnapshots[_depositor];
 
         uint256 compoundedDeposit = _getCompoundedStakeFromSnapshots(s, initialDeposit, snapshots);
         return compoundedDeposit;
@@ -409,14 +391,14 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
     // --- Sender functions for Debt deposit, collateral gains and Satoshi gains ---
     function claimCollateralGains(address recipient, uint256[] calldata collateralIndexes) public virtual {
         uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(msg.sender);
-        uint128 depositTimestamp = accountDeposits[msg.sender].timestamp;
-        _accrueDepositorCollateralGain(msg.sender);
-
         AppStorage.Layout storage s = AppStorage.layout();
+        uint128 depositTimestamp = s.accountDeposits[msg.sender].timestamp;
+        _accrueDepositorCollateralGain(s, msg.sender);
+
         uint256 loopEnd = collateralIndexes.length;
         uint256[] memory collateralGains = new uint256[](s.collateralTokens.length);
 
-        uint80[256] storage depositorGains = collateralGainsByDepositor[msg.sender];
+        uint80[256] storage depositorGains = s.collateralGainsByDepositor[msg.sender];
         for (uint256 i; i < loopEnd;) {
             uint256 collateralIndex = collateralIndexes[i];
             uint256 gains = depositorGains[collateralIndex];
@@ -429,7 +411,7 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
                 ++i;
             }
         }
-        accountDeposits[msg.sender] =
+        s.accountDeposits[msg.sender] =
             AccountDeposit({amount: uint128(compoundedDebtDeposit), timestamp: depositTimestamp});
         _updateSnapshots(s, msg.sender, compoundedDebtDeposit);
         emit CollateralGainWithdrawn(msg.sender, collateralGains);
@@ -440,11 +422,11 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
     function _updateSnapshots(AppStorage.Layout storage s, address _depositor, uint256 _newValue) internal {
         uint256 length;
         if (_newValue == 0) {
-            delete depositSnapshots[_depositor];
+            delete s.depositSnapshots[_depositor];
 
             length = s.collateralTokens.length;
             for (uint256 i = 0; i < length; i++) {
-                depositSums[_depositor][i] = 0;
+                s.depositSums[_depositor][i] = 0;
             }
             emit DepositSnapshotUpdated(_depositor, 0, 0);
             return;
@@ -455,32 +437,32 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
 
         // Get S and G for the current epoch and current scale
         uint256[256] storage currentS = s.epochToScaleToSums[currentEpochCached][currentScaleCached];
-        uint256 currentG = epochToScaleToG[currentEpochCached][currentScaleCached];
+        uint256 currentG = s.epochToScaleToG[currentEpochCached][currentScaleCached];
 
         // Record new snapshots of the latest running product P, sum S, and sum G, for the depositor
-        depositSnapshots[_depositor].P = currentP;
-        depositSnapshots[_depositor].G = currentG;
-        depositSnapshots[_depositor].scale = currentScaleCached;
-        depositSnapshots[_depositor].epoch = currentEpochCached;
+        s.depositSnapshots[_depositor].P = currentP;
+        s.depositSnapshots[_depositor].G = currentG;
+        s.depositSnapshots[_depositor].scale = currentScaleCached;
+        s.depositSnapshots[_depositor].epoch = currentEpochCached;
 
         length = s.collateralTokens.length;
         for (uint256 i = 0; i < length; i++) {
-            depositSums[_depositor][i] = currentS[i];
+            s.depositSums[_depositor][i] = currentS[i];
         }
 
         emit DepositSnapshotUpdated(_depositor, currentP, currentG);
     }
 
     // --- Reward ---
-    function _accrueRewards(address _depositor) internal {
-        uint256 amount = _claimableReward(_depositor);
-        storedPendingReward[_depositor] = storedPendingReward[_depositor] + amount;
+    function _accrueRewards(AppStorage.Layout storage s, address _depositor) internal {
+        uint256 amount = _claimableReward(s, _depositor);
+        s.storedPendingReward[_depositor] += amount;
     }
 
     function claimReward(address recipient) external returns (uint256 amount) {
         AppStorage.Layout storage s = AppStorage.layout();
         require(isClaimStart(), "StabilityPool: Claim not started");
-        amount = _claimReward(msg.sender);
+        amount = _claimReward(s, msg.sender);
 
         if (amount > 0) {
             s.communityIssuance.transferAllocatedTokens(recipient, amount);
@@ -490,29 +472,29 @@ contract StabilityPool is IStabilityPoolFacet, SatoshiOwnable {
     }
 
     function _claimReward(AppStorage.Layout storage s, address account) internal returns (uint256 amount) {
-        uint256 initialDeposit = accountDeposits[account].amount;
+        uint256 initialDeposit = s.accountDeposits[account].amount;
 
         if (initialDeposit > 0) {
-            uint128 depositTimestamp = accountDeposits[account].timestamp;
+            uint128 depositTimestamp = s.accountDeposits[account].timestamp;
             s._triggerOSHIIssuance();
-            bool hasGains = _accrueDepositorCollateralGain(account);
+            bool hasGains = _accrueDepositorCollateralGain(s, account);
 
             uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(account);
             uint256 debtLoss = initialDeposit - compoundedDebtDeposit;
 
-            amount = _claimableReward(account);
+            amount = _claimableReward(s, account);
             // we update only if the snapshot has changed
             if (debtLoss > 0 || hasGains || amount > 0) {
                 // Update deposit
-                accountDeposits[account] =
+                s.accountDeposits[account] =
                     AccountDeposit({amount: uint128(compoundedDebtDeposit), timestamp: depositTimestamp});
-                _updateSnapshots(account, compoundedDebtDeposit);
+                _updateSnapshots(s, account, compoundedDebtDeposit);
             }
         }
-        uint256 pending = storedPendingReward[account];
+        uint256 pending = s.storedPendingReward[account];
         if (pending > 0) {
             amount += pending;
-            storedPendingReward[account] = 0;
+            s.storedPendingReward[account] = 0;
         }
         return amount;
     }

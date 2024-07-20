@@ -23,7 +23,7 @@ interface ISortedTroves {
     event NodeRemoved(address _id);
     event SetTroveManager(address _troveManager);
 
-    // function initialize(ISatoshiCore _satoshiCore) external;
+    function initialize(address owner) external;
 
     function insert(address _id, uint256 _NICR, address _prevId, address _nextId) external;
 

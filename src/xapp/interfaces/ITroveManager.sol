@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IDebtToken} from "./IDebtToken.sol";
 import {ISortedTroves} from "./ISortedTroves.sol";
+import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
 
 enum Status {
     nonExistent,
@@ -87,16 +88,7 @@ interface ITroveManager {
     event ClaimStartTimeSet(uint32 _startTime);
     event InterestCollected(address _troveManager, uint256 _amount);
 
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IGasPool _gasPool,
-    //     IDebtToken _debtToken,
-    //     IBorrowerOperations _borrowerOperations,
-    //     ILiquidationManager _liquidationManager,
-    //     IPriceFeedAggregator _priceFeedAggregator,
-    //     ICommunityIssuance _communityIssuance,
-    //     uint256 _gasCompensation
-    // ) external;
+    function initialize(address _owner, IDebtToken _debtToken, ICommunityIssuance _communityIssuance) external;
 
     function addCollateralSurplus(address borrower, uint256 collSurplus) external;
 
@@ -211,7 +203,7 @@ interface ITroveManager {
 
     function baseRate() external view returns (uint256);
 
-    function xapp() external view returns (address);
+    function satoshiXapp() external view returns (address);
 
     function borrowingFeeFloor() external view returns (uint256);
 

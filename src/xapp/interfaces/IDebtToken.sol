@@ -38,7 +38,6 @@ interface IDebtToken is IERC20 {
 
     function maxFlashLoan(address token) external view returns (uint256);
 
-
     function troveManager(ITroveManager) external view returns (bool);
 
     // function initialize(

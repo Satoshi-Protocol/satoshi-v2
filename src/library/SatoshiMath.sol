@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {Config} from "../xapp/Config.sol";
+
 /**
  * @title Satoshi Math Library Contract
  *        Mutated from:
@@ -176,12 +178,12 @@ library SatoshiMath {
     // --- Gas compensation functions ---
 
     // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
-    function _getCompositeDebt(uint256 _debt, uint256 gasCompensation) internal pure returns (uint256) {
-        return _debt + gasCompensation;
+    function _getCompositeDebt(uint256 _debt) internal pure returns (uint256) {
+        return _debt + Config.DEBT_GAS_COMPENSATION;
     }
 
-    function _getNetDebt(uint256 _debt, uint256 gasCompensation) internal pure returns (uint256) {
-        return _debt - gasCompensation;
+    function _getNetDebt(uint256 _debt) internal pure returns (uint256) {
+        return _debt - Config.DEBT_GAS_COMPENSATION;
     }
 
     // Return the amount of collateral to be drawn from a trove's collateral and sent as gas compensation.

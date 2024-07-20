@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 library Config {
     bytes32 internal constant OWNER_ROLE = keccak256("OWNER_ROLE");
+    bytes32 internal constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
 
     uint256 internal constant CCR = 1500000000000000000; // 150%
 
@@ -22,4 +23,10 @@ library Config {
 
     /* Liquidation */
     uint256 internal constant _100_PCT = 1000000000000000000; // 1e18 == 100%
+
+    uint256 internal constant DEBT_GAS_COMPENSATION = 2e18;
+
+    /* PriceFeedAggregator */
+    uint256 public constant PRICE_TARGET_DIGITS = 18;
+
 }

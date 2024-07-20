@@ -57,7 +57,6 @@ interface ILiquidationFacet {
 
     function batchLiquidateTroves(ITroveManager troveManager, address[] calldata _troveArray) external;
 
-    function enableTroveManager(ITroveManager _troveManager) external;
 
     function liquidate(ITroveManager troveManager, address borrower) external;
 

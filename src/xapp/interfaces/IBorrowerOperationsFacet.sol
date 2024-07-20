@@ -3,7 +3,6 @@ pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITroveManager} from "./ITroveManager.sol";
-import {IDelegatedOps} from "./IDelegatedOps.sol";
 
 enum BorrowerOperation {
     openTrove,
@@ -23,11 +22,12 @@ struct TroveManagerData {
     uint16 index;
 }
 
-interface IBorrowerOperationsFacet is IDelegatedOps {
+interface IBorrowerOperationsFacet {
     event BorrowingFeePaid(address indexed borrower, IERC20 indexed collateralToken, uint256 amount);
     event TroveCreated(address indexed _borrower, uint256 arrayIndex);
     event TroveManagerRemoved(ITroveManager indexed troveManager);
     event MinNetDebtUpdated(uint256 _minNetDebt);
+        event DelegateApprovalSet(address indexed caller, address indexed delegate, bool isApproved);
 
     // function initialize(
     //     ISatoshiCore _satoshiCore,
@@ -36,6 +36,10 @@ interface IBorrowerOperationsFacet is IDelegatedOps {
     //     uint256 _minNetDebt,
     //     uint256 _gasCompensation
     // ) external;
+
+    function isApprovedDelegate(address _account, address _delegate) external view returns (bool);
+
+    function setDelegateApproval(address _delegate, bool _isApproved) external;
 
     function addColl(
         ITroveManager _troveManager,
@@ -58,8 +62,6 @@ interface IBorrowerOperationsFacet is IDelegatedOps {
     ) external;
 
     function closeTrove(ITroveManager _troveManager, address _account) external;
-
-    function configureCollateral(ITroveManager _troveManager, IERC20 _collateralToken) external;
 
     function fetchBalances() external returns (Balances memory balances);
 
