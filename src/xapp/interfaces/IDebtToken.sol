@@ -2,15 +2,10 @@
 pragma solidity ^0.8.20;
 
 import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
-import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITroveManager} from "./ITroveManager.sol";
-import {IGasPool} from "./IGasPool.sol";
-import {IStabilityPool} from "./IStabilityPool.sol";
-import {IBorrowerOperations} from "./IBorrowerOperations.sol";
-import {IFactory} from "./IFactory.sol";
-import {ISatoshiCore} from "./ISatoshiCore.sol";
 
-interface IDebtToken is IERC20Upgradeable {
+interface IDebtToken is IERC20 {
     function burn(address _account, uint256 _amount) external;
 
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool);
@@ -37,30 +32,25 @@ interface IDebtToken is IERC20Upgradeable {
 
     function FLASH_LOAN_FEE() external view returns (uint256);
 
-    function borrowerOperations() external view returns (IBorrowerOperations);
-
-    function factory() external view returns (IFactory);
+    function satoshiXapp() external view returns (address);
 
     function flashFee(address token, uint256 amount) external view returns (uint256);
 
-    function gasPool() external view returns (IGasPool);
-
     function maxFlashLoan(address token) external view returns (uint256);
 
-    function stabilityPool() external view returns (IStabilityPool);
 
     function troveManager(ITroveManager) external view returns (bool);
 
-    function initialize(
-        ISatoshiCore _satoshiCore,
-        string memory _name,
-        string memory _symbol,
-        IStabilityPool _stabilityPool,
-        IBorrowerOperations _borrowerOperations,
-        IFactory _factory,
-        IGasPool _gasPool,
-        uint256 _gasCompensation
-    ) external;
+    // function initialize(
+    //     ISatoshiCore _satoshiCore,
+    //     string memory _name,
+    //     string memory _symbol,
+    //     IStabilityPool _stabilityPool,
+    //     IBorrowerOperations _borrowerOperations,
+    //     IFactory _factory,
+    //     IGasPool _gasPool,
+    //     uint256 _gasCompensation
+    // ) external;
 
     function wards(address) external view returns (bool);
 

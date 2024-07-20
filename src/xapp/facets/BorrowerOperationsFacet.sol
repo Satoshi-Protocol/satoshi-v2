@@ -212,7 +212,7 @@ contract BorrowerOperationsFacet is SatoshiOwnable, DelegatedOps, IBorrowerOpera
         address _upperHint,
         address _lowerHint
     ) external callerOrDelegated(account) {
-        require(!AppStorage.layout().paused(), "Trove adjustments are paused");
+        require(!AppStorage.layout().paused, "Trove adjustments are paused");
         _adjustTrove(troveManager, account, 0, _collateralAmount, 0, 0, false, _upperHint, _lowerHint);
 
         // collect interest payable to rewardManager

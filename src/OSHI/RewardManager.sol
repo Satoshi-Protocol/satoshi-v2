@@ -22,8 +22,6 @@ import {ICoreFacet} from "../xapp/interfaces/ICoreFacet.sol";
  *        The lock weight will not decay.
  */
 contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
-    using SafeERC20 for IDebtToken;
-    using SafeERC20 for IOSHIToken;
     using SafeERC20 for IERC20;
 
     uint256 public constant DECIMAL_PRECISION = 1e27;
@@ -76,7 +74,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     // --- External Functions ---
     function stake(uint256 _amount, LockDuration _duration) external {
         require(_amount > 0, "RewardManager: Amount must be greater than 0");
-        oshiToken.safeTransferFrom(msg.sender, address(this), _amount);
+        oshiToken.transferFrom(msg.sender, address(this), _amount);
 
         StakeData storage data = stakeData[msg.sender];
 
@@ -161,7 +159,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
             emit TotalOSHIStakedUpdated(totalOSHIWeightedStaked);
 
             // Transfer unstaked OSHI to user
-            oshiToken.safeTransfer(msg.sender, OSHIToWithdraw);
+            oshiToken.transfer(msg.sender, OSHIToWithdraw);
 
             emit StakeChanged(msg.sender, newWeight);
         }
@@ -197,7 +195,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         uint256 index = collTokenIndex[collateralToken];
         uint256 collFeePerOSHIStaked;
 
-        IERC20(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
+        collateralToken.safeTransferFrom(msg.sender, address(this), _amount);
 
         if (totalOSHIWeightedStaked > 0) {
             uint256 _amountToStaker = _amount * FEE_TO_STAKER_RATIO / FEE_RATIO_BASE;
@@ -216,7 +214,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     function increaseSATPerUintStaked(uint256 _amount) external {
         _isVaildCaller();
 
-        debtToken.safeTransferFrom(msg.sender, address(this), _amount);
+        debtToken.transferFrom(msg.sender, address(this), _amount);
 
         uint256 SATFeePerOSHIStaked;
 
@@ -318,7 +316,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     function claimFee() external onlyOwner {
         ICoreFacet coreFacet = ICoreFacet(satoshiXapp);
         if (satForFeeReceiver != 0) {
-            debtToken.safeTransfer(coreFacet.feeReceiver(), satForFeeReceiver);
+            debtToken.transfer(coreFacet.feeReceiver(), satForFeeReceiver);
             satForFeeReceiver = 0;
         }
         for (uint256 i; i < collToken.length; ++i) {
@@ -368,7 +366,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     function _sendDebtToken(uint256 debtAmount) private {
         if (debtAmount == 0) return;
 
-        debtToken.safeTransfer(msg.sender, debtAmount);
+        debtToken.transfer(msg.sender, debtAmount);
     }
 
     // --- Require ---
