@@ -15,7 +15,7 @@ import {
     LiquidationValues,
     LiquidationTotals
 } from "../interfaces/ILiquidationFacet.sol";
-import {AppStorage} from "../storages/AppStorage.sol";
+import {AppStorage} from "../AppStorage.sol";
 import {Config} from "../Config.sol";
 import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
 import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";

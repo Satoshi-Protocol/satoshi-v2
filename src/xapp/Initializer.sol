@@ -5,7 +5,7 @@ import {Initializable} from "@solidstate/contracts/security/initializable/Initia
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {AppStorage} from "./storages/AppStorage.sol";
+import {AppStorage} from "./AppStorage.sol";
 import {InitialConfig} from "./InitialConfig.sol";
 import {Config} from "./Config.sol";
 import {Utils} from "../library/Utils.sol";

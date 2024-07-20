@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {ICoreFacet} from "../interfaces/ICoreFacet.sol";
-import {AppStorage} from "../storages/AppStorage.sol";
+import {AppStorage} from "../AppStorage.sol";
 import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
 import {Config} from "../Config.sol";
 

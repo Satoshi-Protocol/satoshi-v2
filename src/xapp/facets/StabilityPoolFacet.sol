@@ -12,7 +12,7 @@ import {
     IStabilityPoolFacet, AccountDeposit, Snapshots, SunsetIndex, Queue
 } from "../interfaces/IStabilityPoolFacet.sol";
 import {Config} from "../Config.sol";
-import {AppStorage} from "../storages/AppStorage.sol";
+import {AppStorage} from "../AppStorage.sol";
 import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 
 contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInternal {

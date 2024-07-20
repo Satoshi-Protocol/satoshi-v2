@@ -6,7 +6,7 @@ import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInter
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {AppStorage} from "../storages/AppStorage.sol";
+import {AppStorage} from "../AppStorage.sol";
 import {SatoshiMath} from "../../library/SatoshiMath.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";

@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {AppStorage} from "../storages/AppStorage.sol";
+import {AppStorage} from "../AppStorage.sol";
 import {IPriceFeedAggregatorFacet, OracleRecord} from "../interfaces/IPriceFeedAggregatorFacet.sol";
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
 import {Config} from "../Config.sol";

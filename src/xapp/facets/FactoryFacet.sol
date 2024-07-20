@@ -5,7 +5,7 @@ import {AccessControlInternal} from "@solidstate/contracts/access/access_control
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {AppStorage} from "../storages/AppStorage.sol";
+import {AppStorage} from "../AppStorage.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";
 import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
