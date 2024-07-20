@@ -8,6 +8,7 @@ optimizer_runs = 200
 
 remappings = [
   "@solidstate/contracts=lib/solidstate-solidity/contracts",
+  "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
   "@openzeppelin/contracts-upgradeable=lib/openzeppelin-contracts-upgradeable/contracts",
   "@layerzerolabs/solidity-examples=lib/solidity-examples",
   "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
