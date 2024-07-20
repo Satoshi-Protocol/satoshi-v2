@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import {SolidStateDiamond} from "@solidstate/contracts/proxy/diamond/SolidStateDiamond.sol";
 import {AccessControl} from "@solidstate/contracts/access/access_control/AccessControl.sol";
@@ -12,5 +12,5 @@ import {AccessControl} from "@solidstate/contracts/access/access_control/AccessC
  */
 // solhint-disable-next-line no-empty-blocks
 contract SatoshiXAPP is SolidStateDiamond, AccessControl {
-    // inherit from SolidStateDiamond and AccessControl, no additional logic
+// inherit from SolidStateDiamond and AccessControl, no additional logic
 }

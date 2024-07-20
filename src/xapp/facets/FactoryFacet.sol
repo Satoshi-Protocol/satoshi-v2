@@ -1,0 +1,193 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {AppStorage} from "../storages/AppStorage.sol";
+import {SatoshiOwnable} from "../SatoshiOwnable.sol";
+import {ITroveManager} from "../interfaces/ITroveManager.sol";
+import {IDebtToken} from "../interfaces/IDebtToken.sol";
+import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
+import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
+import {DeploymentParams, IFactoryFacet} from "../interfaces/IFactoryFacet.sol";
+import {ICommunityIssuance} from "../interfaces/ICommunityIssuance.sol";
+import {TroveManagerData} from "../interfaces/IBorrowerOperationsFacet.sol";
+import {Queue, SunsetIndex} from "../interfaces/IStabilityPoolFacet.sol";
+import {Config} from "../Config.sol";
+
+contract FactoryFacet is IFactoryFacet, SatoshiOwnable {
+    IDebtToken public debtToken;
+    // IGasPool public gasPool;
+    // IPriceFeedAggregator public priceFeedAggregatorProxy;
+    // IBorrowerOperations public borrowerOperationsProxy;
+    // ILiquidationManager public liquidationManagerProxy;
+    // IStabilityPool public stabilityPoolProxy;
+    IBeacon public sortedTrovesBeacon;
+    IBeacon public troveManagerBeacon;
+    uint256 public gasCompensation;
+    // ICommunityIssuance public communityIssuance;
+    // ITroveManager[] public troveManagers;
+
+    // constructor() {
+    //     _disableInitializers();
+    // }
+
+    // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
+    // // solhint-disable-next-line no-empty-blocks
+    // function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+    //     // No additional authorization logic is needed for this contract
+    // }
+
+    // function initialize(
+    //     ISatoshiCore _satoshiCore,
+    //     IDebtToken _debtToken,
+    //     IGasPool _gasPool,
+    //     IPriceFeedAggregator _priceFeedAggregatorProxy,
+    //     IBorrowerOperations _borrowerOperationsProxy,
+    //     ILiquidationManager _liquidationManagerProxy,
+    //     IStabilityPool _stabilityPoolProxy,
+    //     IBeacon _sortedTrovesBeacon,
+    //     IBeacon _troveManagerBeacon,
+    //     ICommunityIssuance _communityIssuance,
+    //     uint256 _gasCompensation
+    // ) external initializer {
+    //     __UUPSUpgradeable_init_unchained();
+    //     __SatoshiOwnable_init(_satoshiCore);
+    //     debtToken = _debtToken;
+    //     gasPool = _gasPool;
+    //     priceFeedAggregatorProxy = _priceFeedAggregatorProxy;
+    //     borrowerOperationsProxy = _borrowerOperationsProxy;
+    //     liquidationManagerProxy = _liquidationManagerProxy;
+    //     stabilityPoolProxy = _stabilityPoolProxy;
+    //     sortedTrovesBeacon = _sortedTrovesBeacon;
+    //     troveManagerBeacon = _troveManagerBeacon;
+    //     gasCompensation = _gasCompensation;
+    //     communityIssuance = _communityIssuance;
+    // }
+
+    function troveManagerCount() external view returns (uint256) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.troveManagers.length;
+    }
+
+    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams calldata params)
+        external
+        onlyOwner
+    {
+        ISortedTroves sortedTrovesBeaconProxy = _deploySortedTrovesBeaconProxy();
+        ITroveManager troveManagerBeaconProxy = _deployTroveManagerBeaconProxy();
+
+        AppStorage.Layout storage s = AppStorage.layout();
+        s.troveManagers.push(troveManagerBeaconProxy);
+
+        sortedTrovesBeaconProxy.setConfig(troveManagerBeaconProxy);
+        troveManagerBeaconProxy.setConfig(sortedTrovesBeaconProxy, collateralToken);
+
+        // verify that the oracle is correctly working
+        troveManagerBeaconProxy.fetchPrice();
+
+        debtToken.enableTroveManager(troveManagerBeaconProxy);
+        _enableCollateral(s, collateralToken);
+        _configureCollateral(s, troveManagerBeaconProxy, collateralToken);
+        _enableTroveManager(s, troveManagerBeaconProxy);
+
+        troveManagerBeaconProxy.setParameters(
+            params.minuteDecayFactor,
+            params.redemptionFeeFloor,
+            params.maxRedemptionFee,
+            params.borrowingFeeFloor,
+            params.maxBorrowingFee,
+            params.interestRateInBps,
+            params.maxDebt,
+            params.MCR,
+            params.rewardRate,
+            params.claimStartTime
+        );
+
+        emit NewDeployment(collateralToken, priceFeed, troveManagerBeaconProxy, sortedTrovesBeaconProxy);
+    }
+
+    function _enableCollateral(AppStorage.Layout storage s, IERC20 _collateral) internal {
+        uint256 length = s.collateralTokens.length;
+        bool collateralEnabled;
+        for (uint256 i = 0; i < length; i++) {
+            if (s.collateralTokens[i] == _collateral) {
+                collateralEnabled = true;
+                break;
+            }
+        }
+        if (!collateralEnabled) {
+            Queue memory queueCached = s.queue;
+            if (queueCached.nextSunsetIndexKey > queueCached.firstSunsetIndexKey) {
+                SunsetIndex memory sIdx = s.sunsetIndexes[queueCached.firstSunsetIndexKey];
+                if (sIdx.expiry < block.timestamp) {
+                    delete s.sunsetIndexes[s.queue.firstSunsetIndexKey++];
+                    _overwriteCollateral(s, _collateral, sIdx.idx);
+                    return;
+                }
+            }
+            s.collateralTokens.push(_collateral);
+            s.indexByCollateral[_collateral] = s.collateralTokens.length;
+        } else {
+            // revert if the factory is trying to deploy a new TM with a sunset collateral
+            require(s.indexByCollateral[_collateral] > 0, "Collateral is sunsetting");
+        }
+    }
+
+    function _overwriteCollateral(AppStorage.Layout storage s, IERC20 _newCollateral, uint256 idx) internal {
+        require(s.indexByCollateral[_newCollateral] == 0, "Collateral must be sunset");
+        uint256 length = s.collateralTokens.length;
+        require(idx < length, "Index too large");
+        uint256 externalLoopEnd = s.currentEpoch;
+        uint256 internalLoopEnd = s.currentScale;
+        for (uint128 i; i <= externalLoopEnd;) {
+            for (uint128 j; j <= internalLoopEnd;) {
+                s.epochToScaleToSums[i][j][idx] = 0;
+                unchecked {
+                    ++j;
+                }
+            }
+            unchecked {
+                ++i;
+            }
+        }
+        s.indexByCollateral[_newCollateral] = idx + 1;
+        emit CollateralOverwritten(s.collateralTokens[idx], _newCollateral);
+        s.collateralTokens[idx] = _newCollateral;
+    }
+
+    function _configureCollateral(AppStorage.Layout storage s, ITroveManager troveManager, IERC20 collateralToken)
+        internal
+    {
+        s.troveManagersData[troveManager] = TroveManagerData(collateralToken, uint16(s.troveManagers.length));
+        s.troveManagers.push(troveManager);
+        emit CollateralConfigured(troveManager, collateralToken);
+    }
+
+    function _enableTroveManager(AppStorage.Layout storage s, ITroveManager _troveManager) internal {
+        s.enabledTroveManagers[_troveManager] = true;
+    }
+
+    function _deploySortedTrovesBeaconProxy() internal returns (ISortedTroves) {
+        bytes memory data = abi.encodeCall(ISortedTroves.initialize, _owner);
+        return ISortedTroves(address(new BeaconProxy(address(sortedTrovesBeacon), data)));
+    }
+
+    function _deployTroveManagerBeaconProxy() internal returns (ITroveManager) {
+        bytes memory data = abi.encodeCall(ITroveManager.initialize, (debtToken, gasCompensation));
+        return ITroveManager(address(new BeaconProxy(address(troveManagerBeacon), data)));
+    }
+
+    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external onlyOwner {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(_numerator.length == s.troveManagers.length, "Factory: invalid length");
+        uint128 totalRewardRate;
+        for (uint256 i; i < _numerator.length; ++i) {
+            uint128 troveRewardRate = _numerator[i] * Config.TM_MAX_REWARD_RATE / _denominator;
+            totalRewardRate += troveRewardRate;
+            s.troveManagers[i].setTMRewardRate(troveRewardRate);
+        }
+        require(totalRewardRate <= Config.TM_MAX_REWARD_RATE, "Factory: invalid total reward rate");
+    }
+}
