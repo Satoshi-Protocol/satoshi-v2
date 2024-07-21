@@ -95,5 +95,5 @@ contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, OwnableInternal 
         AppStorage.Layout storage s = AppStorage.layout();
         OracleRecord memory record = s.oracleRecords[_token];
         return (record.priceFeed, record.decimals);
-        }
+    }
 }

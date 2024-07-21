@@ -27,4 +27,28 @@ interface IFactoryFacet {
 
     event CollateralConfigured(ITroveManager troveManager, IERC20 indexed collateralToken);
     event CollateralOverwritten(IERC20 oldCollateralToken, IERC20 newCollateralToken);
+
+    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params) external;
+
+    function troveManagerCount() external view returns (uint256);
+
+    function troveManagers(uint256) external view returns (ITroveManager);
+
+    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external;
+
+    function maxTMRewardRate() external view returns (uint128);
+
+    // function initialize(
+    //     ISatoshiCore _satoshiCore,
+    //     IDebtToken _debtToken,
+    //     IGasPool _gasPool,
+    //     IPriceFeedAggregator _priceFeedAggregatorProxy,
+    //     IBorrowerOperations _borrowerOperationsProxy,
+    //     ILiquidationManager _liquidationManagerProxy,
+    //     IStabilityPool _stabilityPoolProxy,
+    //     IBeacon _sortedTrovesBeacon,
+    //     IBeacon _troveManagerBeacon,
+    //     ICommunityIssuance _communityIssuance,
+    //     uint256 _gasCompensation
+    // ) external;
 }

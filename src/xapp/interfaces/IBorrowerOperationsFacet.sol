@@ -27,7 +27,7 @@ interface IBorrowerOperationsFacet {
     event TroveCreated(address indexed _borrower, uint256 arrayIndex);
     event TroveManagerRemoved(ITroveManager indexed troveManager);
     event MinNetDebtUpdated(uint256 _minNetDebt);
-        event DelegateApprovalSet(address indexed caller, address indexed delegate, bool isApproved);
+    event DelegateApprovalSet(address indexed caller, address indexed delegate, bool isApproved);
 
     // function initialize(
     //     ISatoshiCore _satoshiCore,

@@ -27,7 +27,6 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
 
     // IFactory public factory;
 
-
     struct LocalVariables_adjustTrove {
         uint256 price;
         uint256 totalPricedCollateral;
@@ -222,7 +221,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _collateralAmount,
         address _upperHint,
         address _lowerHint
-    ) external  {
+    ) external {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Trove adjustments are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -365,7 +364,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         }
 
         // Calculate old and new ICRs and check if adjustment satisfies all conditions for the current system mode
-                uint8 decimals = IERC20Metadata(address(collateralToken)).decimals();
+        uint8 decimals = IERC20Metadata(address(collateralToken)).decimals();
         _requireValidAdjustmentInCurrentMode(
             vars.totalPricedCollateral, vars.totalDebt, isRecoveryMode, _collWithdrawal, _isDebtIncrease, vars, decimals
         );
@@ -394,7 +393,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
     function closeTrove(ITroveManager troveManager, address account) external {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s._isCallerOrDelegated(account), "Caller not approved");
-        
+
         IERC20 collateralToken;
         uint256 price;
         bool isRecoveryMode;
@@ -421,17 +420,14 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         }
     }
 
-    function troveManagersData(ITroveManager _troveManager)
-        external
-        view
-        returns (IERC20, uint16) {
-            TroveManagerData memory _troveManagersData = AppStorage.layout().troveManagersData[_troveManager];
-            return (_troveManagersData.collateralToken, _troveManagersData.index);
-        }
+    function troveManagersData(ITroveManager _troveManager) external view returns (IERC20, uint16) {
+        TroveManagerData memory _troveManagersData = AppStorage.layout().troveManagersData[_troveManager];
+        return (_troveManagersData.collateralToken, _troveManagersData.index);
+    }
 
-        function minNetDebt() external view returns (uint256) {
-            return AppStorage.layout().minNetDebt;
-        }
+    function minNetDebt() external view returns (uint256) {
+        return AppStorage.layout().minNetDebt;
+    }
 
     // --- Helper functions ---
 

@@ -28,5 +28,4 @@ library Config {
 
     /* PriceFeedAggregator */
     uint256 public constant PRICE_TARGET_DIGITS = 18;
-
 }

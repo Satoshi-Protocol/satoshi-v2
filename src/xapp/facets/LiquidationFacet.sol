@@ -20,7 +20,7 @@ import {Config} from "../Config.sol";
 import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
 import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 
-contract LiquidationFacet is  ILiquidationFacet, AccessControlInternal, OwnableInternal {
+contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableInternal {
     using StabilityPoolLib for AppStorage.Layout;
     using BorrowerOperationsLib for AppStorage.Layout;
     // function initialize(

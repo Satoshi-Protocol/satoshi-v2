@@ -13,7 +13,7 @@ import {IDebtToken} from "./interfaces/IDebtToken.sol";
 import {ICommunityIssuance} from "../OSHI/interfaces/ICommunityIssuance.sol";
 import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
 
-contract Initializer is Initializable, AccessControlInternal,  OwnableInternal {
+contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
     using Utils for *;
 
     /**
@@ -22,8 +22,13 @@ contract Initializer is Initializable, AccessControlInternal,  OwnableInternal {
      * @param data The encoded data for the initializer
      */
     function init(bytes calldata data) external initializer {
-        (address rewardManager, address debtToken, address communityIssuance, address sortedTrovesBeacon, address troveManagerBeacon) =
-            abi.decode(data, (address, address, address, address, address));
+        (
+            address rewardManager,
+            address debtToken,
+            address communityIssuance,
+            address sortedTrovesBeacon,
+            address troveManagerBeacon
+        ) = abi.decode(data, (address, address, address, address, address));
         rewardManager.ensureNonzeroAddress();
 
         // set roles

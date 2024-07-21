@@ -11,7 +11,7 @@ import {IRewardManager, LockDuration, NUMBER_OF_LOCK_DURATIONS} from "./interfac
 import {IDebtToken} from "../xapp/interfaces/IDebtToken.sol";
 import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
 import {ITroveManager} from "../xapp/interfaces/ITroveManager.sol";
-import {IWETH} from "../xapp/extensions/interfaces/IWETH.sol";
+import {IWETH} from "../xapp/helpers/interfaces/IWETH.sol";
 import {ICoreFacet} from "../xapp/interfaces/ICoreFacet.sol";
 import {Config} from "../xapp/Config.sol";
 
@@ -376,9 +376,9 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     function _isVaildCaller() internal view {
         bool isRegistered;
         if (
-            msg.sender == satoshiXapp || IAccessControl(satoshiXapp).hasRole(Config.OWNER_ROLE, msg.sender) || msg.sender == address(debtToken)
-                || msg.sender == ICoreFacet(satoshiXapp).feeReceiver() || isTroveManagerRegistered[msg.sender]
-                || whitelistCaller[msg.sender]
+            msg.sender == satoshiXapp || IAccessControl(satoshiXapp).hasRole(Config.OWNER_ROLE, msg.sender)
+                || msg.sender == address(debtToken) || msg.sender == ICoreFacet(satoshiXapp).feeReceiver()
+                || isTroveManagerRegistered[msg.sender] || whitelistCaller[msg.sender]
         ) isRegistered = true;
         require(isRegistered, "RewardManager: Caller is not Valid");
     }

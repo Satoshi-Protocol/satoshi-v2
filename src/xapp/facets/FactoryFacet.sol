@@ -71,6 +71,15 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
         return s.troveManagers.length;
     }
 
+    function troveManagers(uint256 index) external view returns (ITroveManager) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.troveManagers[index];
+    }
+
+    function maxTMRewardRate() external pure returns (uint128) {
+        return Config.TM_MAX_REWARD_RATE;
+    }
+
     function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams calldata params)
         external
         onlyOwner

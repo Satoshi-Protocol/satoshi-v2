@@ -132,7 +132,8 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
         emit StabilityPoolLib.StabilityPoolDebtBalanceUpdated(newTotalDebtTokenDeposits);
 
         uint256 newDeposit = compoundedDebtDeposit + _amount;
-        s.accountDeposits[msg.sender] = AccountDeposit({amount: uint128(newDeposit), timestamp: uint128(block.timestamp)});
+        s.accountDeposits[msg.sender] =
+            AccountDeposit({amount: uint128(newDeposit), timestamp: uint128(block.timestamp)});
 
         _updateSnapshots(s, msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);

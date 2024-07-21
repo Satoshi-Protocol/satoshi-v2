@@ -1,11 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {ICoreFacet} from "../interfaces/ICoreFacet.sol";
 import {AppStorage} from "../AppStorage.sol";
+import {IDebtToken} from "../interfaces/IDebtToken.sol";
 import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
+import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
 import {Config} from "../Config.sol";
 
 contract CoreFacet is ICoreFacet, AccessControlInternal, OwnableInternal {
@@ -52,7 +55,10 @@ contract CoreFacet is ICoreFacet, AccessControlInternal, OwnableInternal {
      */
     function setPaused(bool _paused) external {
         AppStorage.Layout storage s = AppStorage.layout();
-        require((_paused && _hasRole(Config.GUARDIAN_ROLE, msg.sender)) || _hasRole(Config.OWNER_ROLE, msg.sender), "Unauthorized");
+        require(
+            (_paused && _hasRole(Config.GUARDIAN_ROLE, msg.sender)) || _hasRole(Config.OWNER_ROLE, msg.sender),
+            "Unauthorized"
+        );
         s.paused = _paused;
         if (_paused) {
             emit Paused();
@@ -75,5 +81,25 @@ contract CoreFacet is ICoreFacet, AccessControlInternal, OwnableInternal {
 
     function startTime() external view returns (uint256) {
         return AppStorage.layout().startTime;
+    }
+
+    function debtToken() external view returns (IDebtToken) {
+        return AppStorage.layout().debtToken;
+    }
+
+    function sortedTrovesBeacon() external view returns (IBeacon) {
+        return AppStorage.layout().sortedTrovesBeacon;
+    }
+
+    function troveManagerBeacon() external view returns (IBeacon) {
+        return AppStorage.layout().troveManagerBeacon;
+    }
+
+    function communityIssuance() external view returns (ICommunityIssuance) {
+        return AppStorage.layout().communityIssuance;
+    }
+
+    function gasCompensation() external pure returns (uint256) {
+        return Config.DEBT_GAS_COMPENSATION;
     }
 }

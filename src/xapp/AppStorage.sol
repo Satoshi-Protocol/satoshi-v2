@@ -24,21 +24,16 @@ library AppStorage {
         uint256 startTime;
         IDebtToken debtToken;
         uint256 minNetDebt;
-
-            // owner => caller => isApproved
-    mapping(address => mapping(address => bool)) isApprovedDelegate;
-
+        // owner => caller => isApproved
+        mapping(address => mapping(address => bool)) isApprovedDelegate;
         /* Factory */
-            IBeacon sortedTrovesBeacon;
-    IBeacon  troveManagerBeacon;
-
+        IBeacon sortedTrovesBeacon;
+        IBeacon troveManagerBeacon;
         // troveManager => enabled
         mapping(ITroveManager => bool) enabledTroveManagers;
-
         /* Liquidation */
         mapping(ITroveManager => TroveManagerData) troveManagersData;
         ITroveManager[] troveManagers;
-        
         /* Stability Pool */
         // OSHI reward
         uint128 spRewardRate;
@@ -86,20 +81,15 @@ library AppStorage {
         *  In each case, the OSHI reward is issued (i.e. G is updated), before other state changes are made.
         */
         mapping(uint128 => mapping(uint128 => uint256)) epochToScaleToG;
-
         mapping(address => AccountDeposit) accountDeposits; // depositor address -> initial deposit
-    mapping(address => Snapshots) depositSnapshots; // depositor address -> snapshots struct
-
-    // index values are mapped against the values within `collateralTokens`
-    mapping(address => uint256[256]) depositSums; // depositor address -> sums
-
-    // depositor => gains
-    mapping(address => uint80[256])  collateralGainsByDepositor;
-
-    mapping(address => uint256)  storedPendingReward;
-
-    /* PriceFeedAggregatorFacet */
-    mapping(IERC20 => OracleRecord) oracleRecords;
+        mapping(address => Snapshots) depositSnapshots; // depositor address -> snapshots struct
+        // index values are mapped against the values within `collateralTokens`
+        mapping(address => uint256[256]) depositSums; // depositor address -> sums
+        // depositor => gains
+        mapping(address => uint80[256]) collateralGainsByDepositor;
+        mapping(address => uint256) storedPendingReward;
+        /* PriceFeedAggregatorFacet */
+        mapping(IERC20 => OracleRecord) oracleRecords;
     }
 
     function layout() internal pure returns (Layout storage s) {

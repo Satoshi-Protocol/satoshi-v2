@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-
-interface IPriceFeed  {
+interface IPriceFeed {
     // invalid price error for different types of price sources
     error InvalidPriceInt256(int256 price);
     error InvalidPriceUInt128(uint128 price);

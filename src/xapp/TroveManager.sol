@@ -194,7 +194,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
      */
     function setPaused(bool _paused) external {
         IAccessControl accessControlFacet = IAccessControl(satoshiXapp);
-        require((_paused && accessControlFacet.hasRole(Config.GUARDIAN_ROLE, msg.sender)) || accessControlFacet.hasRole(Config.OWNER_ROLE, msg.sender), "Unauthorized");
+        require(
+            (_paused && accessControlFacet.hasRole(Config.GUARDIAN_ROLE, msg.sender))
+                || accessControlFacet.hasRole(Config.OWNER_ROLE, msg.sender),
+            "Unauthorized"
+        );
         paused = _paused;
     }
 
@@ -664,7 +668,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         // Get the CollateralLot of equivalent value in USD
         singleRedemption.collateralLot = SatoshiMath._getOriginalCollateralAmount(
-            (singleRedemption.debtLot * SatoshiMath.DECIMAL_PRECISION) / _price, IERC20Metadata(address(collateralToken)).decimals()
+            (singleRedemption.debtLot * SatoshiMath.DECIMAL_PRECISION) / _price,
+            IERC20Metadata(address(collateralToken)).decimals()
         );
 
         // Decrease the debt and collateral of the current Trove according to the debt lot and corresponding collateral to send
@@ -691,7 +696,10 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
                 uint256 icrError = _partialRedemptionHintNICR > newNICR
                     ? _partialRedemptionHintNICR - newNICR
                     : newNICR - _partialRedemptionHintNICR;
-                if (icrError > 5e14 || SatoshiMath._getNetDebt(newDebt) < IBorrowerOperationsFacet(satoshiXapp).minNetDebt()) {
+                if (
+                    icrError > 5e14
+                        || SatoshiMath._getNetDebt(newDebt) < IBorrowerOperationsFacet(satoshiXapp).minNetDebt()
+                ) {
                     singleRedemption.cancelledPartial = true;
                     return singleRedemption;
                 }
