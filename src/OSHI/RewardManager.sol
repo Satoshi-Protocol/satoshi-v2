@@ -38,7 +38,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     IERC20[] public collToken;
     IWETH public weth;
 
-    address public satoshiXapp;
+    address public satoshiXApp;
     mapping(address => bool) public isTroveManagerRegistered;
     mapping(address => uint256) public collTokenIndex;
 
@@ -306,7 +306,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         external
         onlyOwner
     {
-        satoshiXapp = _satoshiXPP;
+        satoshiXApp = _satoshiXPP;
         weth = _weth;
         debtToken = _debtToken;
         oshiToken = _oshiToken;
@@ -316,7 +316,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function claimFee() external onlyOwner {
-        ICoreFacet coreFacet = ICoreFacet(satoshiXapp);
+        ICoreFacet coreFacet = ICoreFacet(satoshiXApp);
         if (satForFeeReceiver != 0) {
             debtToken.transfer(coreFacet.feeReceiver(), satForFeeReceiver);
             satForFeeReceiver = 0;
@@ -376,8 +376,8 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     function _isVaildCaller() internal view {
         bool isRegistered;
         if (
-            msg.sender == satoshiXapp || IAccessControl(satoshiXapp).hasRole(Config.OWNER_ROLE, msg.sender)
-                || msg.sender == address(debtToken) || msg.sender == ICoreFacet(satoshiXapp).feeReceiver()
+            msg.sender == satoshiXApp || IAccessControl(satoshiXApp).hasRole(Config.OWNER_ROLE, msg.sender)
+                || msg.sender == address(debtToken) || msg.sender == ICoreFacet(satoshiXApp).feeReceiver()
                 || isTroveManagerRegistered[msg.sender] || whitelistCaller[msg.sender]
         ) isRegistered = true;
         require(isRegistered, "RewardManager: Caller is not Valid");

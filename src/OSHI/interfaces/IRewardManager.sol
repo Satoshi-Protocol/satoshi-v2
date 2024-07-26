@@ -70,7 +70,7 @@ interface IRewardManager {
     function oshiToken() external view returns (IOSHIToken);
     function collToken(uint256) external view returns (IERC20);
     function weth() external view returns (IWETH);
-    function satoshiXapp() external view returns (address);
+    function satoshiXApp() external view returns (address);
     function collTokenIndex(address _collToken) external view returns (uint256);
     function totalOSHIWeightedStaked() external view returns (uint256);
     function getAvailableUnstakeAmount(address _user) external view returns (uint256);

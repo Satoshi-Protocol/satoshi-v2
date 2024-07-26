@@ -11,7 +11,7 @@ interface IMultiCollateralHintHelpers {
         uint8 decimals;
     }
 
-    function satoshiXapp() external view returns (address);
+    function satoshiXApp() external view returns (address);
 
     function getRedemptionHints(ITroveManager troveManager, uint256 _debtAmount, uint256 _price, uint256 _maxIterations)
         external

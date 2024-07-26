@@ -28,7 +28,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
     // IBorrowerOperations public borrowerOperations;
     // IFactory public factory;
     // IGasPool public gasPool;
-    address public satoshiXapp;
+    address public satoshiXApp;
 
     mapping(ITroveManager => bool) public troveManager;
 
@@ -69,7 +69,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         // IFactory _factory,
         // IGasPool _gasPool,
         // uint256 _gasCompensation
-        address _satoshiXapp
+        address _satoshiXApp
     ) external initializer {
         __UUPSUpgradeable_init_unchained();
         __ERC20_init(_name, _symbol);
@@ -82,35 +82,35 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         // gasPool = _gasPool;
 
         // DEBT_GAS_COMPENSATION = _gasCompensation;
-        satoshiXapp = _satoshiXapp;
+        satoshiXApp = _satoshiXApp;
     }
 
     function enableTroveManager(ITroveManager _troveManager) external {
-        require(msg.sender == satoshiXapp, "DebtToken: Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         troveManager[_troveManager] = true;
     }
 
     // --- Functions for intra-Satoshi calls ---
 
     function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
-        require(msg.sender == satoshiXapp, "DebtToken: Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _mint(_account, _amount);
-        _mint(satoshiXapp, Config.DEBT_GAS_COMPENSATION);
+        _mint(satoshiXApp, Config.DEBT_GAS_COMPENSATION);
 
         return true;
     }
 
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
-        require(msg.sender == satoshiXapp, "DebtToken: Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _burn(_account, _amount);
-        _burn(satoshiXapp, Config.DEBT_GAS_COMPENSATION);
+        _burn(satoshiXApp, Config.DEBT_GAS_COMPENSATION);
 
         return true;
     }
 
     function mint(address _account, uint256 _amount) external {
         require(
-            msg.sender == satoshiXapp || troveManager[ITroveManager(msg.sender)] || wards[msg.sender],
+            msg.sender == satoshiXApp || troveManager[ITroveManager(msg.sender)] || wards[msg.sender],
             "Debt: Caller not SatoshiXapp/TM/auth"
         );
         _mint(_account, _amount);
@@ -122,12 +122,12 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
     }
 
     function sendToSP(address _sender, uint256 _amount) external {
-        require(msg.sender == satoshiXapp, "Debt: Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "Debt: Caller not SatoshiXapp");
         _transfer(_sender, msg.sender, _amount);
     }
 
     function returnFromPool(address _poolAddress, address _receiver, uint256 _amount) external {
-        require(msg.sender == satoshiXapp || troveManager[ITroveManager(msg.sender)], "Debt: Caller not TM/SatoshiXapp");
+        require(msg.sender == satoshiXApp || troveManager[ITroveManager(msg.sender)], "Debt: Caller not TM/SatoshiXapp");
         _transfer(_poolAddress, _receiver, _amount);
     }
 
@@ -217,7 +217,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         _spendAllowance(address(receiver), address(this), amount + fee);
         _burn(address(receiver), amount);
 
-        address rewardManager = address(ICoreFacet(satoshiXapp).rewardManager());
+        address rewardManager = address(ICoreFacet(satoshiXApp).rewardManager());
         _transfer(address(receiver), address(this), fee);
         _approve(address(this), rewardManager, fee);
         IRewardManager(rewardManager).increaseSATPerUintStaked(fee);
@@ -232,7 +232,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
             "Debt: Cannot transfer tokens directly to the Debt token contract or the zero address"
         );
         require(
-            _recipient != satoshiXapp && !troveManager[ITroveManager(_recipient)],
+            _recipient != satoshiXApp && !troveManager[ITroveManager(_recipient)],
             "Debt: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
         );
     }

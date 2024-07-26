@@ -11,6 +11,6 @@ import {AccessControl} from "@solidstate/contracts/access/access_control/AccessC
  *         diamond proxy standard.
  */
 // solhint-disable-next-line no-empty-blocks
-contract SatoshiXAPP is SolidStateDiamond, AccessControl {
+contract SatoshiXApp is SolidStateDiamond, AccessControl {
 // inherit from SolidStateDiamond and AccessControl, no additional logic
 }

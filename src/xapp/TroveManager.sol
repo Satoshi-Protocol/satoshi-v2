@@ -39,7 +39,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     // IGasPool public gasPool;
     IDebtToken public debtToken;
     ICommunityIssuance public communityIssuance;
-    address public satoshiXapp;
+    address public satoshiXApp;
 
     // IPriceFeedAggregator public priceFeedAggregator;
     IERC20 public collateralToken;
@@ -161,7 +161,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         // priceFeedAggregator = _priceFeedAggregator;
         communityIssuance = _communityIssuance;
         lastUpdate = block.timestamp;
-        satoshiXapp = msg.sender;
+        satoshiXApp = msg.sender;
     }
 
     function setConfig(ISortedTroves _sortedTroves, IERC20 _collateralToken) external {
@@ -193,7 +193,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
      * @param _paused If true the protocol is paused
      */
     function setPaused(bool _paused) external {
-        IAccessControl accessControlFacet = IAccessControl(satoshiXapp);
+        IAccessControl accessControlFacet = IAccessControl(satoshiXApp);
         require(
             (_paused && accessControlFacet.hasRole(Config.GUARDIAN_ROLE, msg.sender))
                 || accessControlFacet.hasRole(Config.OWNER_ROLE, msg.sender),
@@ -278,7 +278,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     }
 
     function setTMRewardRate(uint128 _newRewardRate) external {
-        require(msg.sender == satoshiXapp, "TroveManager: Only factory");
+        require(msg.sender == satoshiXApp, "TroveManager: Only factory");
         _updateRewardIntegral(totalActiveDebt);
         rewardRate = _newRewardRate;
     }
@@ -286,7 +286,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     function collectInterests() public {
         uint256 interestPayableCached = interestPayable;
         require(interestPayableCached > 0, "Nothing to collect");
-        address rewardManager = address(ICoreFacet(satoshiXapp).rewardManager());
+        address rewardManager = address(ICoreFacet(satoshiXApp).rewardManager());
         debtToken.mint(address(this), interestPayableCached);
         debtToken.safeIncreaseAllowance(rewardManager, interestPayableCached);
         IRewardManager(rewardManager).increaseSATPerUintStaked(interestPayableCached);
@@ -298,7 +298,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     // --- Getters ---
 
     function fetchPrice() public returns (uint256) {
-        return IPriceFeedAggregatorFacet(satoshiXapp).fetchPrice(collateralToken);
+        return IPriceFeedAggregatorFacet(satoshiXApp).fetchPrice(collateralToken);
     }
 
     function getTroveOwnersCount() external view returns (uint256) {
@@ -571,7 +571,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         require(block.timestamp >= systemDeploymentTime + BOOTSTRAP_PERIOD, "BOOTSTRAP_PERIOD");
         totals.price = fetchPrice();
         uint256 _MCR = MCR;
-        require(IBorrowerOperationsFacet(satoshiXapp).getTCR() >= _MCR, "Cannot redeem when TCR < MCR");
+        require(IBorrowerOperationsFacet(satoshiXApp).getTCR() >= _MCR, "Cannot redeem when TCR < MCR");
         require(_debtAmount > 0, "Amount must be greater than zero");
         require(debtToken.balanceOf(msg.sender) >= _debtAmount, "Insufficient balance");
         _updateBalances();
@@ -629,7 +629,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         SatoshiMath._requireUserAcceptsFee(totals.collateralFee, totals.totalCollateralDrawn, _maxFeePercentage);
 
-        address rewardManager = address(ICoreFacet(satoshiXapp).rewardManager());
+        address rewardManager = address(ICoreFacet(satoshiXApp).rewardManager());
         if (totals.collateralFee > 0) {
             totalActiveCollateral = totalActiveCollateral - totals.collateralFee;
             collateralToken.safeIncreaseAllowance(rewardManager, totals.collateralFee);
@@ -698,7 +698,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
                     : newNICR - _partialRedemptionHintNICR;
                 if (
                     icrError > 5e14
-                        || SatoshiMath._getNetDebt(newDebt) < IBorrowerOperationsFacet(satoshiXapp).minNetDebt()
+                        || SatoshiMath._getNetDebt(newDebt) < IBorrowerOperationsFacet(satoshiXApp).minNetDebt()
                 ) {
                     singleRedemption.cancelledPartial = true;
                     return singleRedemption;
@@ -725,7 +725,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
      * Any surplus collateral left in the trove can be later claimed by the borrower.
      */
     function _redeemCloseTrove(address _borrower, uint256 _debt, uint256 _collateral) internal {
-        debtToken.burn(satoshiXapp, _debt);
+        debtToken.burn(satoshiXApp, _debt);
         totalActiveDebt = totalActiveDebt - _debt;
 
         surplusBalances[_borrower] += _collateral;
@@ -1075,11 +1075,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         emit SystemSnapshotsUpdated(totalStakesSnapshot, totalCollateralSnapshot);
 
         // send gas compensation
-        debtToken.returnFromPool(satoshiXapp, _liquidator, _debtGasComp);
+        debtToken.returnFromPool(satoshiXApp, _liquidator, _debtGasComp);
         uint256 collGasCompToLiquidator = _collGasComp / 2;
         uint256 collGasCompToFeeReceiver = _collGasComp - collGasCompToLiquidator;
         _sendCollateral(_liquidator, collGasCompToLiquidator);
-        address rewardManager = address(ICoreFacet(satoshiXapp).rewardManager());
+        address rewardManager = address(ICoreFacet(satoshiXApp).rewardManager());
         if (collGasCompToFeeReceiver > 0) {
             totalActiveCollateral = totalActiveCollateral - collGasCompToFeeReceiver;
             collateralToken.safeIncreaseAllowance(rewardManager, collGasCompToFeeReceiver);
@@ -1306,6 +1306,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     // --- Requires ---
 
     function _requireCallerIsSatoshiXapp() internal view {
-        require(msg.sender == satoshiXapp, "Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "Caller not SatoshiXapp");
     }
 }

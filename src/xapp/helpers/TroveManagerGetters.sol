@@ -11,10 +11,10 @@ struct Collateral {
 }
 
 contract TroveManagerGetters {
-    address public immutable satoshiXapp;
+    address public immutable satoshiXApp;
 
-    constructor(address _satoshiXapp) {
-        satoshiXapp = _satoshiXapp;
+    constructor(address _satoshiXApp) {
+        satoshiXApp = _satoshiXApp;
     }
 
     /**
@@ -22,12 +22,12 @@ contract TroveManagerGetters {
      *     `       array of tuples of [(collateral, [troveManager, ...]), ...]
      */
     function getAllCollateralsAndTroveManagers() external view returns (Collateral[] memory) {
-        uint256 length = IFactoryFacet(satoshiXapp).troveManagerCount();
+        uint256 length = IFactoryFacet(satoshiXApp).troveManagerCount();
         address[2][] memory troveManagersAndCollaterals = new address[2][](length);
         address[] memory uniqueCollaterals = new address[](length);
         uint256 collateralCount;
         for (uint256 i = 0; i < length; i++) {
-            ITroveManager troveManager = IFactoryFacet(satoshiXapp).troveManagers(i);
+            ITroveManager troveManager = IFactoryFacet(satoshiXApp).troveManagers(i);
             IERC20 collateral = troveManager.collateralToken();
             troveManagersAndCollaterals[i] = [address(troveManager), address(collateral)];
             for (uint256 x = 0; x < length; x++) {
@@ -67,11 +67,11 @@ contract TroveManagerGetters {
         view
         returns (ITroveManager[] memory, uint256)
     {
-        uint256 length = IFactoryFacet(satoshiXapp).troveManagerCount();
+        uint256 length = IFactoryFacet(satoshiXApp).troveManagerCount();
         ITroveManager[] memory troveManagers = new ITroveManager[](length);
         uint256 tmCount;
         for (uint256 i = 0; i < length; i++) {
-            ITroveManager troveManager = IFactoryFacet(satoshiXapp).troveManagers(i);
+            ITroveManager troveManager = IFactoryFacet(satoshiXApp).troveManagers(i);
             if (troveManager.getTroveStatus(account) > 0) {
                 troveManagers[tmCount] = troveManager;
                 tmCount++;

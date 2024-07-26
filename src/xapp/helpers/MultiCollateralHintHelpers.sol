@@ -16,10 +16,10 @@ import {Config} from "../Config.sol";
  *
  */
 contract MultiCollateralHintHelpers is IMultiCollateralHintHelpers {
-    address public immutable satoshiXapp;
+    address public immutable satoshiXApp;
 
-    constructor(address _satoshiXapp) {
-        satoshiXapp = _satoshiXapp;
+    constructor(address _satoshiXApp) {
+        satoshiXApp = _satoshiXApp;
     }
 
     // --- Functions ---
@@ -64,7 +64,7 @@ contract MultiCollateralHintHelpers is IMultiCollateralHintHelpers {
             _maxIterations = type(uint256).max;
         }
 
-        uint256 minNetDebt = IBorrowerOperationsFacet(satoshiXapp).minNetDebt();
+        uint256 minNetDebt = IBorrowerOperationsFacet(satoshiXApp).minNetDebt();
         while (currentTroveuser != address(0) && remainingDebt > 0 && _maxIterations-- > 0) {
             (uint256 debt, uint256 coll,,) = troveManager.getEntireDebtAndColl(currentTroveuser);
             uint256 netDebt = SatoshiMath._getNetDebt(debt);

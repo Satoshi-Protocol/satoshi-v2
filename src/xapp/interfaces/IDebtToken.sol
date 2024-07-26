@@ -32,7 +32,7 @@ interface IDebtToken is IERC20 {
 
     function FLASH_LOAN_FEE() external view returns (uint256);
 
-    function satoshiXapp() external view returns (address);
+    function satoshiXApp() external view returns (address);
 
     function flashFee(address token, uint256 amount) external view returns (uint256);
 

@@ -8,7 +8,7 @@ import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
 import {ICommunityIssuance} from "./interfaces/ICommunityIssuance.sol";
 
 contract CommunityIssuance is ICommunityIssuance, UUPSUpgradeable, OwnableUpgradeable {
-    address public satoshiXapp;
+    address public satoshiXApp;
     IOSHIToken public OSHIToken;
 
     mapping(address => uint256) public allocated; // allocate to troveManagers and SP
@@ -24,14 +24,14 @@ contract CommunityIssuance is ICommunityIssuance, UUPSUpgradeable, OwnableUpgrad
         // No additional authorization logic is needed for this contract
     }
 
-    function initialize(address owner, IOSHIToken _oshiToken, address _satoshiXapp) external initializer {
+    function initialize(address owner, IOSHIToken _oshiToken, address _satoshiXApp) external initializer {
         __UUPSUpgradeable_init_unchained();
         __Ownable_init_unchained(owner);
         OSHIToken = _oshiToken;
-        satoshiXapp = _satoshiXapp;
+        satoshiXApp = _satoshiXApp;
 
         emit OSHITokenSet(_oshiToken);
-        emit SatoshiXappSet(_satoshiXapp);
+        emit SatoshiXappSet(_satoshiXApp);
     }
 
     function setAllocated(address[] calldata _recipients, uint256[] calldata _amounts) external onlyOwner {

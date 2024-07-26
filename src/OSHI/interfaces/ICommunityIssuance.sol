@@ -13,7 +13,7 @@ interface ICommunityIssuance {
     function collectAllocatedTokens(uint256 amount) external;
     function allocated(address) external view returns (uint256);
     function collected(address) external view returns (uint256);
-    function satoshiXapp() external view returns (address);
+    function satoshiXApp() external view returns (address);
     function OSHIToken() external view returns (IOSHIToken);
     function initialize(address owner, IOSHIToken _oshiToken, address _satoshiXPP) external;
 }

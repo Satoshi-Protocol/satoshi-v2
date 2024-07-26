@@ -203,7 +203,7 @@ interface ITroveManager {
 
     function baseRate() external view returns (uint256);
 
-    function satoshiXapp() external view returns (address);
+    function satoshiXApp() external view returns (address);
 
     function borrowingFeeFloor() external view returns (uint256);
 
