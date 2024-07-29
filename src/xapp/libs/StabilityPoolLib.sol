@@ -5,6 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {SatoshiMath} from "../../library/SatoshiMath.sol";
+import {Snapshots} from "../interfaces/IStabilityPoolFacet.sol";
 import {Config} from "../Config.sol";
 
 library StabilityPoolLib {
@@ -14,10 +15,6 @@ library StabilityPoolLib {
     event EpochUpdated(uint128 _currentEpoch);
     event P_Updated(uint256 _P);
     event StabilityPoolDebtBalanceUpdated(uint256 _newBalance);
-
-    function _getTotalDebtTokenDeposits(AppStorage.Layout storage s) internal view returns (uint256) {
-        return s.totalDebtTokenDeposits;
-    }
 
     /*
      * Cancels out the specified debt against the Debt contained in the Stability Pool (as far as possible)
@@ -54,17 +51,6 @@ library StabilityPoolLib {
         s.communityIssuance.collectAllocatedTokens(OSHIIssuance);
         _updateG(s, OSHIIssuance);
         s.lastUpdate = uint32(block.timestamp);
-    }
-
-    function _OSHIIssuance(AppStorage.Layout storage s) internal view returns (uint256) {
-        uint256 duration = block.timestamp - s.lastUpdate;
-        uint256 releasedToken = duration * s.spRewardRate;
-        uint256 allocatedToken = s.communityIssuance.allocated(address(this));
-        // check the allocated token in community issuance
-        if (releasedToken > allocatedToken) {
-            releasedToken = allocatedToken;
-        }
-        return releasedToken;
     }
 
     function _updateG(AppStorage.Layout storage s, uint256 OSHIIssuance) internal {
@@ -213,5 +199,110 @@ library StabilityPoolLib {
         s.lastOSHIError = OSHINumerator - (OSHIPerUnitStaked * _totalDebtTokenDeposits);
 
         return OSHIPerUnitStaked;
+    }
+
+    function _OSHIIssuance(AppStorage.Layout storage s) internal view returns (uint256) {
+        uint256 duration = block.timestamp - s.lastUpdate;
+        uint256 releasedToken = duration * s.spRewardRate;
+        uint256 allocatedToken = s.communityIssuance.allocated(address(this));
+        // check the allocated token in community issuance
+        if (releasedToken > allocatedToken) {
+            releasedToken = allocatedToken;
+        }
+        return releasedToken;
+    }
+
+    function _getCompoundedDebtDeposit(AppStorage.Layout storage s, address _depositor)
+        internal
+        view
+        returns (uint256)
+    {
+        uint256 initialDeposit = s.accountDeposits[_depositor].amount;
+        if (initialDeposit == 0) {
+            return 0;
+        }
+
+        Snapshots memory snapshots = s.depositSnapshots[_depositor];
+
+        uint256 compoundedDeposit = _getCompoundedStakeFromSnapshots(s, initialDeposit, snapshots);
+        return compoundedDeposit;
+    }
+
+    // Internal function, used to calculcate compounded deposits and compounded front end stakes.
+    function _getCompoundedStakeFromSnapshots(
+        AppStorage.Layout storage s,
+        uint256 initialStake,
+        Snapshots memory snapshots
+    ) internal view returns (uint256) {
+        uint256 snapshot_P = snapshots.P;
+        uint128 scaleSnapshot = snapshots.scale;
+        uint128 epochSnapshot = snapshots.epoch;
+
+        // If stake was made before a pool-emptying event, then it has been fully cancelled with debt -- so, return 0
+        if (epochSnapshot < s.currentEpoch) {
+            return 0;
+        }
+
+        uint256 compoundedStake;
+        uint128 scaleDiff = s.currentScale - scaleSnapshot;
+
+        /* Compute the compounded stake. If a scale change in P was made during the stake's lifetime,
+         * account for it. If more than one scale change was made, then the stake has decreased by a factor of
+         * at least 1e-9 -- so return 0.
+         */
+        if (scaleDiff == 0) {
+            compoundedStake = (initialStake * s.P) / snapshot_P;
+        } else if (scaleDiff == 1) {
+            compoundedStake = (initialStake * s.P) / snapshot_P / Config.SCALE_FACTOR;
+        } else {
+            // if scaleDiff >= 2
+            compoundedStake = 0;
+        }
+
+        /*
+         * If compounded deposit is less than a billionth of the initial deposit, return 0.
+         *
+         * NOTE: originally, this line was in place to stop rounding errors making the deposit too large. However, the error
+         * corrections should ensure the error in P "favors the Pool", i.e. any given compounded deposit should slightly less
+         * than it's theoretical value.
+         *
+         * Thus it's unclear whether this line is still really needed.
+         */
+        if (compoundedStake < initialStake / 1e9) {
+            return 0;
+        }
+
+        return compoundedStake;
+    }
+
+    function _getOSHIGainFromSnapshots(AppStorage.Layout storage s, uint256 initialStake, Snapshots memory snapshots)
+        internal
+        view
+        returns (uint256)
+    {
+        /*
+         * Grab the sum 'G' from the epoch at which the stake was made. The OSHI gain may span up to one scale change.
+         * If it does, the second portion of the OSHI gain is scaled by 1e9.
+         * If the gain spans no scale change, the second portion will be 0.
+         */
+        uint128 epochSnapshot = snapshots.epoch;
+        uint128 scaleSnapshot = snapshots.scale;
+        uint256 G_Snapshot = snapshots.G;
+        uint256 P_Snapshot = snapshots.P;
+
+        uint256 firstPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot] - G_Snapshot;
+        uint256 secondPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot + 1] / Config.SCALE_FACTOR;
+
+        uint256 OSHIGain = (initialStake * (firstPortion + secondPortion)) / P_Snapshot / SatoshiMath.DECIMAL_PRECISION;
+
+        return OSHIGain;
+    }
+
+    function _getTotalDebtTokenDeposits(AppStorage.Layout storage s) internal view returns (uint256) {
+        return s.totalDebtTokenDeposits;
+    }
+
+    function _isClaimStart(AppStorage.Layout storage s) internal view returns (bool) {
+        return s.claimStartTime <= uint32(block.timestamp);
     }
 }

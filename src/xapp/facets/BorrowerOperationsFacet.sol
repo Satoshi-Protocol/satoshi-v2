@@ -91,7 +91,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         emit DelegateApprovalSet(msg.sender, _delegate, _isApproved);
     }
 
-    function setMinNetDebt(uint256 _minNetDebt) public onlyOwner {
+    function setMinNetDebt(uint256 _minNetDebt) external onlyOwner {
         _setMinNetDebt(_minNetDebt);
     }
 
@@ -138,7 +138,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         return BorrowerOperationsLib._fetchBalances(AppStorage.layout());
     }
 
-    function checkRecoveryMode(uint256 TCR) public pure returns (bool) {
+    function checkRecoveryMode(uint256 TCR) external pure returns (bool) {
         return BorrowerOperationsLib._checkRecoveryMode(TCR);
     }
 
@@ -165,14 +165,14 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         bool isRecoveryMode;
 
         (collateralToken, vars.price, vars.totalPricedCollateral, vars.totalDebt, isRecoveryMode) =
-            _getCollateralAndTCRData(troveManager);
+            s._getCollateralAndTCRData(troveManager);
 
-        _requireValidMaxFeePercentage(_maxFeePercentage);
+        BorrowerOperationsLib._requireValidMaxFeePercentage(_maxFeePercentage);
 
         vars.netDebt = _debtAmount
             + _triggerBorrowingFee(s, troveManager, collateralToken, account, _maxFeePercentage, _debtAmount);
 
-        _requireAtLeastMinNetDebt(s, vars.netDebt);
+        BorrowerOperationsLib._requireAtLeastMinNetDebt(s, vars.netDebt);
 
         uint8 decimals = IERC20Metadata(address(collateralToken)).decimals();
         uint256 scaledCollateralAmount = SatoshiMath._getScaledCollateralAmount(_collateralAmount, decimals);
@@ -183,10 +183,10 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         vars.NICR = SatoshiMath._computeNominalCR(_collateralAmount, vars.compositeDebt);
 
         if (isRecoveryMode) {
-            _requireICRisAboveCCR(vars.ICR);
+            BorrowerOperationsLib._requireICRisAboveCCR(vars.ICR);
         } else {
-            _requireICRisAboveMCR(vars.ICR, troveManager.MCR());
-            uint256 newTCR = _getNewTCRFromTroveChange(
+            BorrowerOperationsLib._requireICRisAboveMCR(vars.ICR, troveManager.MCR());
+            uint256 newTCR = BorrowerOperationsLib._getNewTCRFromTroveChange(
                 vars.totalPricedCollateral,
                 vars.totalDebt,
                 _collateralAmount * vars.price,
@@ -195,7 +195,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
                 true,
                 decimals
             ); // bools: coll increase, debt increase
-            _requireNewTCRisAboveCCR(newTCR);
+            BorrowerOperationsLib._requireNewTCRisAboveCCR(newTCR);
         }
 
         // Create the trove
@@ -344,12 +344,12 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         LocalVariables_adjustTrove memory vars;
         bool isRecoveryMode;
         (collateralToken, vars.price, vars.totalPricedCollateral, vars.totalDebt, isRecoveryMode) =
-            _getCollateralAndTCRData(troveManager);
+            s._getCollateralAndTCRData(troveManager);
 
         (vars.coll, vars.debt) = troveManager.applyPendingRewards(account);
 
         // Get the collChange based on whether or not collateral was sent in the transaction
-        (vars.collChange, vars.isCollIncrease) = _getCollChange(_collDeposit, _collWithdrawal);
+        (vars.collChange, vars.isCollIncrease) = BorrowerOperationsLib._getCollChange(_collDeposit, _collWithdrawal);
         vars.netDebtChange = _debtChange;
         vars.debtChange = _debtChange;
         vars.account = account;
@@ -357,7 +357,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
 
         if (_isDebtIncrease) {
             require(_debtChange != 0, "BorrowerOps: Debt increase requires non-zero debtChange");
-            _requireValidMaxFeePercentage(_maxFeePercentage);
+            BorrowerOperationsLib._requireValidMaxFeePercentage(_maxFeePercentage);
 
             vars.netDebtChange +=
                 _triggerBorrowingFee(s, troveManager, collateralToken, msg.sender, _maxFeePercentage, _debtChange);
@@ -371,7 +371,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
 
         // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough Debt
         if (!_isDebtIncrease && _debtChange != 0) {
-            _requireAtLeastMinNetDebt(s, SatoshiMath._getNetDebt(vars.debt) - vars.netDebtChange);
+            BorrowerOperationsLib._requireAtLeastMinNetDebt(s, SatoshiMath._getNetDebt(vars.debt) - vars.netDebtChange);
         }
 
         // If we are incrasing collateral, send tokens to the trove manager prior to adjusting the trove
@@ -400,14 +400,16 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 totalPricedCollateral;
         uint256 totalDebt;
         (collateralToken, price, totalPricedCollateral, totalDebt, isRecoveryMode) =
-            _getCollateralAndTCRData(troveManager);
+            s._getCollateralAndTCRData(troveManager);
         require(!isRecoveryMode, "BorrowerOps: Operation not permitted during Recovery Mode");
         uint8 decimals = IERC20Metadata(address(collateralToken)).decimals();
         (uint256 coll, uint256 debt) = troveManager.applyPendingRewards(account);
 
-        uint256 newTCR =
-            _getNewTCRFromTroveChange(totalPricedCollateral, totalDebt, coll * price, false, debt, false, decimals);
-        _requireNewTCRisAboveCCR(newTCR);
+        uint256 newTCR = BorrowerOperationsLib._getNewTCRFromTroveChange(
+            totalPricedCollateral, totalDebt, coll * price, false, debt, false, decimals
+        );
+
+        BorrowerOperationsLib._requireNewTCRisAboveCCR(newTCR);
 
         troveManager.closeTrove(account, msg.sender, coll, debt);
 
@@ -453,19 +455,6 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         return debtFee;
     }
 
-    function _getCollChange(uint256 _collReceived, uint256 _requestedCollWithdrawal)
-        internal
-        pure
-        returns (uint256 collChange, bool isCollIncrease)
-    {
-        if (_collReceived != 0) {
-            collChange = _collReceived;
-            isCollIncrease = true;
-        } else {
-            collChange = _requestedCollWithdrawal;
-        }
-    }
-
     function _requireValidAdjustmentInCurrentMode(
         uint256 totalPricedCollateral,
         uint256 totalDebt,
@@ -494,7 +483,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 oldICR = SatoshiMath._computeCR(scaledCollAmount, _vars.debt, _vars.price);
 
         // Get the trove's new ICR after the adjustment
-        uint256 newICR = _getNewICRFromTroveChange(
+        uint256 newICR = BorrowerOperationsLib._getNewICRFromTroveChange(
             _vars.coll,
             _vars.debt,
             _vars.collChange,
@@ -508,13 +497,13 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         if (_isRecoveryMode) {
             require(_collWithdrawal == 0, "BorrowerOps: Collateral withdrawal not permitted Recovery Mode");
             if (_isDebtIncrease) {
-                _requireICRisAboveCCR(newICR);
-                _requireNewICRisAboveOldICR(newICR, oldICR);
+                BorrowerOperationsLib._requireICRisAboveCCR(newICR);
+                BorrowerOperationsLib._requireNewICRisAboveOldICR(newICR, oldICR);
             }
         } else {
             // if Normal Mode
-            _requireICRisAboveMCR(newICR, _vars.MCR);
-            uint256 newTCR = _getNewTCRFromTroveChange(
+            BorrowerOperationsLib._requireICRisAboveMCR(newICR, _vars.MCR);
+            uint256 newTCR = BorrowerOperationsLib._getNewTCRFromTroveChange(
                 totalPricedCollateral,
                 totalDebt,
                 _vars.collChange * _vars.price,
@@ -523,112 +512,8 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
                 _isDebtIncrease,
                 decimals
             );
-            _requireNewTCRisAboveCCR(newTCR);
+            BorrowerOperationsLib._requireNewTCRisAboveCCR(newTCR);
         }
-    }
-
-    function _requireICRisAboveMCR(uint256 _newICR, uint256 MCR) internal pure {
-        require(_newICR >= MCR, "BorrowerOps: An operation that would result in ICR < MCR is not permitted");
-    }
-
-    function _requireICRisAboveCCR(uint256 _newICR) internal pure {
-        require(_newICR >= Config.CCR, "BorrowerOps: Operation must leave trove with ICR >= CCR");
-    }
-
-    function _requireNewICRisAboveOldICR(uint256 _newICR, uint256 _oldICR) internal pure {
-        require(_newICR >= _oldICR, "BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode");
-    }
-
-    function _requireNewTCRisAboveCCR(uint256 _newTCR) internal pure {
-        require(_newTCR >= Config.CCR, "BorrowerOps: An operation that would result in TCR < CCR is not permitted");
-    }
-
-    function _requireAtLeastMinNetDebt(AppStorage.Layout storage s, uint256 _netDebt) internal view {
-        require(_netDebt >= s.minNetDebt, "BorrowerOps: Trove's net debt must be greater than minimum");
-    }
-
-    function _requireValidMaxFeePercentage(uint256 _maxFeePercentage) internal pure {
-        require(
-            _maxFeePercentage <= SatoshiMath.DECIMAL_PRECISION, "Max fee percentage must less than or equal to 100%"
-        );
-    }
-
-    // Compute the new collateral ratio, considering the change in coll and debt. Assumes 0 pending rewards.
-    function _getNewICRFromTroveChange(
-        uint256 _coll,
-        uint256 _debt,
-        uint256 _collChange,
-        bool _isCollIncrease,
-        uint256 _debtChange,
-        bool _isDebtIncrease,
-        uint256 _price,
-        uint8 decimals
-    ) internal pure returns (uint256) {
-        (uint256 newColl, uint256 newDebt) =
-            _getNewTroveAmounts(_coll, _debt, _collChange, _isCollIncrease, _debtChange, _isDebtIncrease);
-
-        uint256 scaledCollAmount = SatoshiMath._getScaledCollateralAmount(newColl, decimals);
-        uint256 newICR = SatoshiMath._computeCR(scaledCollAmount, newDebt, _price);
-        return newICR;
-    }
-
-    function _getNewTroveAmounts(
-        uint256 _coll,
-        uint256 _debt,
-        uint256 _collChange,
-        bool _isCollIncrease,
-        uint256 _debtChange,
-        bool _isDebtIncrease
-    ) internal pure returns (uint256, uint256) {
-        uint256 newColl = _coll;
-        uint256 newDebt = _debt;
-
-        newColl = _isCollIncrease ? _coll + _collChange : _coll - _collChange;
-        newDebt = _isDebtIncrease ? _debt + _debtChange : _debt - _debtChange;
-
-        return (newColl, newDebt);
-    }
-
-    function _getNewTCRFromTroveChange(
-        uint256 totalColl,
-        uint256 totalDebt,
-        uint256 _collChange,
-        bool _isCollIncrease,
-        uint256 _debtChange,
-        bool _isDebtIncrease,
-        uint8 decimals
-    ) internal pure returns (uint256) {
-        totalDebt = _isDebtIncrease ? totalDebt + _debtChange : totalDebt - _debtChange;
-        totalColl = _isCollIncrease ? totalColl + _collChange : totalColl - _collChange;
-
-        uint256 scaledCollAmount = SatoshiMath._getScaledCollateralAmount(totalColl, decimals);
-        uint256 newTCR = SatoshiMath._computeCR(scaledCollAmount, totalDebt);
-        return newTCR;
-    }
-
-    function _getCollateralAndTCRData(ITroveManager troveManager)
-        internal
-        returns (
-            IERC20 collateralToken,
-            uint256 price,
-            uint256 totalPricedCollateral,
-            uint256 totalDebt,
-            bool isRecoveryMode
-        )
-    {
-        AppStorage.Layout storage s = AppStorage.layout();
-        TroveManagerData storage t = s.troveManagersData[troveManager];
-        uint256 index;
-        (collateralToken, index) = (t.collateralToken, t.index);
-
-        require(address(collateralToken) != address(0), "Collateral not enabled");
-
-        uint256 amount;
-        Balances memory balances = s._fetchBalances();
-        (amount, totalPricedCollateral, totalDebt) = BorrowerOperationsLib._getTCRData(balances);
-        isRecoveryMode = checkRecoveryMode(amount);
-
-        return (collateralToken, balances.prices[index], totalPricedCollateral, totalDebt, isRecoveryMode);
     }
 
     function getGlobalSystemBalances() external returns (uint256 totalPricedCollateral, uint256 totalDebt) {

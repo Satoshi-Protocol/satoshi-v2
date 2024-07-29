@@ -122,7 +122,7 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
 
         _accrueDepositorCollateralGain(s, msg.sender);
 
-        uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(msg.sender);
+        uint256 compoundedDebtDeposit = s._getCompoundedDebtDeposit(msg.sender);
 
         _accrueRewards(s, msg.sender);
 
@@ -160,7 +160,7 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
 
         _accrueDepositorCollateralGain(s, msg.sender);
 
-        uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(msg.sender);
+        uint256 compoundedDebtDeposit = s._getCompoundedDebtDeposit(msg.sender);
         uint256 debtToWithdraw = SatoshiMath._min(_amount, compoundedDebtDeposit);
 
         _accrueRewards(s, msg.sender);
@@ -297,30 +297,7 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
 
         Snapshots memory snapshots = s.depositSnapshots[_depositor];
 
-        return _getOSHIGainFromSnapshots(s, initialDeposit, snapshots);
-    }
-
-    function _getOSHIGainFromSnapshots(AppStorage.Layout storage s, uint256 initialStake, Snapshots memory snapshots)
-        internal
-        view
-        returns (uint256)
-    {
-        /*
-         * Grab the sum 'G' from the epoch at which the stake was made. The OSHI gain may span up to one scale change.
-         * If it does, the second portion of the OSHI gain is scaled by 1e9.
-         * If the gain spans no scale change, the second portion will be 0.
-         */
-        uint128 epochSnapshot = snapshots.epoch;
-        uint128 scaleSnapshot = snapshots.scale;
-        uint256 G_Snapshot = snapshots.G;
-        uint256 P_Snapshot = snapshots.P;
-
-        uint256 firstPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot] - G_Snapshot;
-        uint256 secondPortion = s.epochToScaleToG[epochSnapshot][scaleSnapshot + 1] / Config.SCALE_FACTOR;
-
-        uint256 OSHIGain = (initialStake * (firstPortion + secondPortion)) / P_Snapshot / SatoshiMath.DECIMAL_PRECISION;
-
-        return OSHIGain;
+        return s._getOSHIGainFromSnapshots(initialDeposit, snapshots);
     }
 
     // --- Compounded deposit ---
@@ -329,70 +306,15 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
      * Return the user's compounded deposit. Given by the formula:  d = d0 * P/P(0)
      * where P(0) is the depositor's snapshot of the product P, taken when they last updated their deposit.
      */
-    function getCompoundedDebtDeposit(address _depositor) public view returns (uint256) {
+    function getCompoundedDebtDeposit(address _depositor) external view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
-        uint256 initialDeposit = s.accountDeposits[_depositor].amount;
-        if (initialDeposit == 0) {
-            return 0;
-        }
-
-        Snapshots memory snapshots = s.depositSnapshots[_depositor];
-
-        uint256 compoundedDeposit = _getCompoundedStakeFromSnapshots(s, initialDeposit, snapshots);
-        return compoundedDeposit;
-    }
-
-    // Internal function, used to calculcate compounded deposits and compounded front end stakes.
-    function _getCompoundedStakeFromSnapshots(
-        AppStorage.Layout storage s,
-        uint256 initialStake,
-        Snapshots memory snapshots
-    ) internal view returns (uint256) {
-        uint256 snapshot_P = snapshots.P;
-        uint128 scaleSnapshot = snapshots.scale;
-        uint128 epochSnapshot = snapshots.epoch;
-
-        // If stake was made before a pool-emptying event, then it has been fully cancelled with debt -- so, return 0
-        if (epochSnapshot < s.currentEpoch) {
-            return 0;
-        }
-
-        uint256 compoundedStake;
-        uint128 scaleDiff = s.currentScale - scaleSnapshot;
-
-        /* Compute the compounded stake. If a scale change in P was made during the stake's lifetime,
-         * account for it. If more than one scale change was made, then the stake has decreased by a factor of
-         * at least 1e-9 -- so return 0.
-         */
-        if (scaleDiff == 0) {
-            compoundedStake = (initialStake * s.P) / snapshot_P;
-        } else if (scaleDiff == 1) {
-            compoundedStake = (initialStake * s.P) / snapshot_P / Config.SCALE_FACTOR;
-        } else {
-            // if scaleDiff >= 2
-            compoundedStake = 0;
-        }
-
-        /*
-         * If compounded deposit is less than a billionth of the initial deposit, return 0.
-         *
-         * NOTE: originally, this line was in place to stop rounding errors making the deposit too large. However, the error
-         * corrections should ensure the error in P "favors the Pool", i.e. any given compounded deposit should slightly less
-         * than it's theoretical value.
-         *
-         * Thus it's unclear whether this line is still really needed.
-         */
-        if (compoundedStake < initialStake / 1e9) {
-            return 0;
-        }
-
-        return compoundedStake;
+        return s._getCompoundedDebtDeposit(_depositor);
     }
 
     // --- Sender functions for Debt deposit, collateral gains and Satoshi gains ---
-    function claimCollateralGains(address recipient, uint256[] calldata collateralIndexes) public virtual {
-        uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(msg.sender);
+    function claimCollateralGains(address recipient, uint256[] calldata collateralIndexes) external virtual {
         AppStorage.Layout storage s = AppStorage.layout();
+        uint256 compoundedDebtDeposit = s._getCompoundedDebtDeposit(msg.sender);
         uint128 depositTimestamp = s.accountDeposits[msg.sender].timestamp;
         _accrueDepositorCollateralGain(s, msg.sender);
 
@@ -462,7 +384,7 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
 
     function claimReward(address recipient) external returns (uint256 amount) {
         AppStorage.Layout storage s = AppStorage.layout();
-        require(isClaimStart(), "StabilityPool: Claim not started");
+        require(s._isClaimStart(), "StabilityPool: Claim not started");
         amount = _claimReward(s, msg.sender);
 
         if (amount > 0) {
@@ -480,7 +402,7 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
             s._triggerOSHIIssuance();
             bool hasGains = _accrueDepositorCollateralGain(s, account);
 
-            uint256 compoundedDebtDeposit = getCompoundedDebtDeposit(account);
+            uint256 compoundedDebtDeposit = s._getCompoundedDebtDeposit(account);
             uint256 debtLoss = initialDeposit - compoundedDebtDeposit;
 
             amount = _claimableReward(s, account);
@@ -508,8 +430,8 @@ contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInt
     }
 
     // check the start time
-    function isClaimStart() public view returns (bool) {
+    function isClaimStart() external view returns (bool) {
         AppStorage.Layout storage s = AppStorage.layout();
-        return s.claimStartTime <= uint32(block.timestamp);
+        return s._isClaimStart();
     }
 }
