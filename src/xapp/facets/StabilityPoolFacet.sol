@@ -15,7 +15,7 @@ import {Config} from "../Config.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 
-contract StabilityPool is IStabilityPoolFacet, AccessControlInternal, OwnableInternal {
+contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal, OwnableInternal {
     using SafeERC20 for IERC20;
     using StabilityPoolLib for AppStorage.Layout;
 

@@ -27,6 +27,7 @@ import {Config} from "./Config.sol";
 import {IPriceFeedAggregatorFacet} from "./interfaces/IPriceFeedAggregatorFacet.sol";
 import {IBorrowerOperationsFacet} from "./interfaces/IBorrowerOperationsFacet.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
+import {Utils} from "../library/Utils.sol";
 
 contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
@@ -143,6 +144,10 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         address _owner,
         // ISatoshiCore _satoshiCore,
@@ -151,8 +156,13 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         // IBorrowerOperations _borrowerOperations,
         // ILiquidationManager _liquidationManager,
         // IPriceFeedAggregator _priceFeedAggregator,
-        ICommunityIssuance _communityIssuance
+        ICommunityIssuance _communityIssuance,
+        address _satoshiXApp
     ) external initializer {
+        Utils.ensureNonzeroAddress(_owner);
+        Utils.ensureNonzeroAddress(address(_debtToken));
+        Utils.ensureNonzeroAddress(address(_communityIssuance));
+
         __Ownable_init_unchained(_owner);
         // gasPool = _gasPool;
         debtToken = _debtToken;
@@ -161,7 +171,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         // priceFeedAggregator = _priceFeedAggregator;
         communityIssuance = _communityIssuance;
         lastUpdate = block.timestamp;
-        satoshiXApp = msg.sender;
+        satoshiXApp = _satoshiXApp;
     }
 
     function setConfig(ISortedTroves _sortedTroves, IERC20 _collateralToken) external {

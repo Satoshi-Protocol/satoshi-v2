@@ -184,7 +184,8 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
     }
 
     function _deployTroveManagerBeaconProxy(AppStorage.Layout storage s) internal returns (ITroveManager) {
-        bytes memory data = abi.encodeCall(ITroveManager.initialize, (_owner(), s.debtToken, s.communityIssuance));
+        bytes memory data =
+            abi.encodeCall(ITroveManager.initialize, (_owner(), s.debtToken, s.communityIssuance, address(this)));
         return ITroveManager(address(new BeaconProxy(address(s.troveManagerBeacon), data)));
     }
 

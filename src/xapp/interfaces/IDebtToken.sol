@@ -40,16 +40,18 @@ interface IDebtToken is IERC20 {
 
     function troveManager(ITroveManager) external view returns (bool);
 
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     string memory _name,
-    //     string memory _symbol,
-    //     IStabilityPool _stabilityPool,
-    //     IBorrowerOperations _borrowerOperations,
-    //     IFactory _factory,
-    //     IGasPool _gasPool,
-    //     uint256 _gasCompensation
-    // ) external;
+    function initialize(
+        // ISatoshiCore _satoshiCore,
+        string memory _name,
+        string memory _symbol,
+        // IStabilityPool _stabilityPool,
+        // IBorrowerOperations _borrowerOperations,
+        // IFactory _factory,
+        // IGasPool _gasPool,
+        // uint256 _gasCompensation
+        address _satoshiXApp,
+        address _owner
+    ) external;
 
     function wards(address) external view returns (bool);
 

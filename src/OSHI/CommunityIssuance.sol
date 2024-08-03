@@ -6,6 +6,7 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
 import {ICommunityIssuance} from "./interfaces/ICommunityIssuance.sol";
+import {Utils} from "../library/Utils.sol";
 
 contract CommunityIssuance is ICommunityIssuance, UUPSUpgradeable, OwnableUpgradeable {
     address public satoshiXApp;
@@ -25,6 +26,10 @@ contract CommunityIssuance is ICommunityIssuance, UUPSUpgradeable, OwnableUpgrad
     }
 
     function initialize(address owner, IOSHIToken _oshiToken, address _satoshiXApp) external initializer {
+        Utils.ensureNonzeroAddress(owner);
+        Utils.ensureNonzeroAddress(address(_oshiToken));
+        Utils.ensureNonzeroAddress(_satoshiXApp);
+
         __UUPSUpgradeable_init_unchained();
         __Ownable_init_unchained(owner);
         OSHIToken = _oshiToken;

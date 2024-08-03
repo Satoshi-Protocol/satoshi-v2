@@ -88,7 +88,12 @@ interface ITroveManager {
     event ClaimStartTimeSet(uint32 _startTime);
     event InterestCollected(address _troveManager, uint256 _amount);
 
-    function initialize(address _owner, IDebtToken _debtToken, ICommunityIssuance _communityIssuance) external;
+    function initialize(
+        address _owner,
+        IDebtToken _debtToken,
+        ICommunityIssuance _communityIssuance,
+        address _satoshiXApp
+    ) external;
 
     function addCollateralSurplus(address borrower, uint256 collSurplus) external;
 

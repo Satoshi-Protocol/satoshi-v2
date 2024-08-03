@@ -14,6 +14,7 @@ import {IDebtToken} from "./interfaces/IDebtToken.sol";
 import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
 import {Config} from "./Config.sol";
+import {Utils} from "../library/Utils.sol";
 
 contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, OwnableUpgradeable {
     string public constant version = "1";
@@ -69,12 +70,16 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         // IFactory _factory,
         // IGasPool _gasPool,
         // uint256 _gasCompensation
-        address _satoshiXApp
+        address _satoshiXApp,
+        address _owner
     ) external initializer {
+        Utils.ensureNonzeroAddress(_satoshiXApp);
+        Utils.ensureNonzeroAddress(_owner);
+
         __UUPSUpgradeable_init_unchained();
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
-
+        __Ownable_init(_owner);
         // stabilityPool = _stabilityPool;
         // satoshiCore = _satoshiCore;
         // borrowerOperations = _borrowerOperations;

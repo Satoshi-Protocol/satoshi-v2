@@ -14,6 +14,7 @@ import {ITroveManager} from "../xapp/interfaces/ITroveManager.sol";
 import {IWETH} from "../xapp/helpers/interfaces/IWETH.sol";
 import {ICoreFacet} from "../xapp/interfaces/ICoreFacet.sol";
 import {Config} from "../xapp/Config.sol";
+import {Utils} from "../library/Utils.sol";
 
 /**
  * @title Reward Manager Contract
@@ -69,6 +70,8 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function initialize(address owner) external initializer {
+        Utils.ensureNonzeroAddress(owner);
+
         __UUPSUpgradeable_init_unchained();
         __Ownable_init_unchained(owner);
     }

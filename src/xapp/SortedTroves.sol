@@ -5,6 +5,7 @@ import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Ini
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {ITroveManager} from "./interfaces/ITroveManager.sol";
 import {ISortedTroves, Node, Data} from "./interfaces/ISortedTroves.sol";
+import {Utils} from "../library/Utils.sol";
 
 contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
     ITroveManager public troveManager;
@@ -16,6 +17,8 @@ contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
     }
 
     function initialize(address owner) external initializer {
+        Utils.ensureNonzeroAddress(owner);
+
         __Ownable_init_unchained(owner);
     }
 
