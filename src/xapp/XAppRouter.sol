@@ -49,7 +49,7 @@ contract XAppRouter is Initializable, OwnableUpgradeable, XApp {
 
         (bool success,) = xData.to.call(xData.data);
 
-        if(!success) {
+        if (!success) {
             _xCallback(xData.callbackData);
         }
     }

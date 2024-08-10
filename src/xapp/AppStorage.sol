@@ -10,6 +10,7 @@ import {Queue, SunsetIndex, AccountDeposit, Snapshots} from "./interfaces/IStabi
 import {OracleRecord} from "./interfaces/IPriceFeedAggregatorFacet.sol";
 import {ICommunityIssuance} from "./../OSHI/interfaces/ICommunityIssuance.sol";
 import {IRewardManager} from "./../OSHI/interfaces/IRewardManager.sol";
+import {AssetConfig, ChainConfig} from "./interfaces/INexusYieldManager.sol";
 
 library AppStorage {
     bytes32 internal constant STORAGE_SLOT = bytes32(uint256(keccak256("satoshi.app.storage")) - 1);
@@ -90,6 +91,20 @@ library AppStorage {
         mapping(address => uint256) storedPendingReward;
         /* PriceFeedAggregatorFacet */
         mapping(IERC20 => OracleRecord) oracleRecords;
+        /* Nexus Yield Manager */
+        address rewardManagerAddr;
+        bool isPaused;
+        uint256 day;
+        mapping(address => bool) isPrivileged;
+        mapping(uint64 => mapping(address => mapping(address => uint32))) withdrawalTime;
+        mapping(uint64 => mapping(address => mapping(address => uint256))) scheduledWithdrawalAmount;
+        mapping(uint64 => mapping(address => AssetConfig)) assetConfigs;
+        mapping(uint64 => mapping(address => bool)) isAssetSupported;
+        mapping(uint64 => mapping(address => uint256)) dailyMintCount;
+        mapping(uint64 => ChainConfig) chainConfigs;
+        mapping(uint64 => address) contractOn;
+        mapping(uint64 => bool) supportedChainIds;
+        mapping(uint64 => mapping(address => uint256)) assetPrice;
     }
 
     function layout() internal pure returns (Layout storage s) {

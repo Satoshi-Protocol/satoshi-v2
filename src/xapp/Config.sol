@@ -28,4 +28,13 @@ library Config {
 
     /* PriceFeedAggregator */
     uint256 public constant PRICE_TARGET_DIGITS = 18;
+
+    /* Nexus Yield Manager */
+    uint256 public constant TARGET_DIGITS = 18;
+
+    uint256 public constant BASIS_POINTS_DIVISOR = 10000;
+
+    uint256 public constant MANTISSA_ONE = 1e18;
+
+    uint256 public constant ONE_DOLLAR = 1e18;
 }
