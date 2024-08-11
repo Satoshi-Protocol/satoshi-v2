@@ -10,12 +10,16 @@ import {Queue, SunsetIndex, AccountDeposit, Snapshots} from "./interfaces/IStabi
 import {OracleRecord} from "./interfaces/IPriceFeedAggregatorFacet.sol";
 import {ICommunityIssuance} from "./../OSHI/interfaces/ICommunityIssuance.sol";
 import {IRewardManager} from "./../OSHI/interfaces/IRewardManager.sol";
-import {AssetConfig, ChainConfig} from "./interfaces/INexusYieldManager.sol";
+import {IXAppRouter} from "./interfaces/IXAppRouter.sol";
+import {AssetConfig, ChainConfig} from "./interfaces/INexusYieldManagerFacet.sol";
+import {XTypes} from "lib/omni/contracts/core/src/libraries/XTypes.sol";
 
 library AppStorage {
     bytes32 internal constant STORAGE_SLOT = bytes32(uint256(keccak256("satoshi.app.storage")) - 1);
 
     struct Layout {
+        IXAppRouter xAppRouter;
+        XTypes.MsgShort xmsg;
         address feeReceiver;
         IRewardManager rewardManager;
         ICommunityIssuance communityIssuance;

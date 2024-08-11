@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.19;
 
+import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {INexusYieldManager, AssetConfig, ChainConfig} from "../interfaces/INexusYieldManager.sol";
+import {INexusYieldManagerFacet, AssetConfig, ChainConfig} from "../interfaces/INexusYieldManagerFacet.sol";
 import {IPriceFeedAggregatorFacet} from "../interfaces/IPriceFeedAggregatorFacet.sol";
 import {IRollupMinter} from "../interfaces/IRollupMinter.sol";
 import {IRollupNYM} from "../interfaces/IRollupNYM.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {Config} from "../Config.sol";
+import {XTypes} from "lib/omni/contracts/core/src/libraries/XTypes.sol";
 
 /**
  * @title Nexus Yield Manager Contract.
@@ -17,8 +20,21 @@ import {Config} from "../Config.sol";
  * https://github.com/VenusProtocol/venus-protocol/blob/develop/contracts/PegStability/PegStability.sol
  * @notice Contract for swapping stable token for debtToken token and vice versa to maintain the peg stability between them.
  */
-contract NexusYieldManager is INexusYieldManager {
+contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInternal, OwnableInternal {
     using SafeERC20 for IERC20;
+
+    modifier onlyRouter() {
+        AppStorage.Layout storage s = AppStorage.layout();
+        require(msg.sender == address(s.xAppRouter), "NexusYieldManager: caller is not the router");
+        _;
+    }
+
+    modifier xrecv(XTypes.MsgShort calldata xmsg) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        s.xmsg = xmsg;
+        _;
+        delete s.xmsg;
+    }
 
     /**
      * @dev Prevents functions to execute when contract is paused.
@@ -57,64 +73,25 @@ contract NexusYieldManager is INexusYieldManager {
         chainConfig.burnGas = burnGas_;
     }
 
-    /**
-     * @notice Sets the configuration for an asset.
-     * @param asset The address of the asset.
-     * @param feeIn_ The fee for swapIn.
-     * @param feeOut_ The fee for swapOut.
-     * @param debtTokenMintCap_ The maximum amount of debtToken that can be minted for the asset.
-     * @param dailyDebtTokenMintCap_ The maximum amount of debtToken that can be minted daily for the asset.
-     * @param oracle_ The address of the price feed oracle for the asset.
-     * @param isUsingOracle_ A flag indicating whether the asset is using an oracle for price feed.
-     * @param swapWaitingPeriod_ The waiting period in seconds before withdrawing the asset after a swap out.
-     * @param maxPrice_ The maximum price in USD with decimals 18 for the asset.
-     * @param minPrice_ The minimum price in USD with decimals 18 for the asset.
-     */
-    function setAssetConfig(
-        uint64 chain,
-        address asset,
-        uint256 decimals_,
-        uint256 feeIn_,
-        uint256 feeOut_,
-        uint256 debtTokenMintCap_,
-        uint256 dailyDebtTokenMintCap_,
-        address oracle_,
-        bool isUsingOracle_,
-        uint256 swapWaitingPeriod_,
-        uint256 maxPrice_,
-        uint256 minPrice_
-    ) external {
+    function setAssetConfig(uint64 chain, address asset, AssetConfig calldata assetConfig_) external {
         AppStorage.Layout storage s = AppStorage.layout();
-        if (feeIn_ >= Config.BASIS_POINTS_DIVISOR || feeOut_ >= Config.BASIS_POINTS_DIVISOR) {
-            revert InvalidFee(feeIn_, feeOut_);
+        if (assetConfig_.feeIn >= Config.BASIS_POINTS_DIVISOR || assetConfig_.feeOut >= Config.BASIS_POINTS_DIVISOR) {
+            revert InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
         }
         AssetConfig storage assetConfig = s.assetConfigs[chain][asset];
-        assetConfig.decimals = decimals_;
-        assetConfig.feeIn = feeIn_;
-        assetConfig.feeOut = feeOut_;
-        assetConfig.debtTokenMintCap = debtTokenMintCap_;
-        assetConfig.dailyDebtTokenMintCap = dailyDebtTokenMintCap_;
-        assetConfig.oracle = IPriceFeedAggregatorFacet(oracle_);
-        assetConfig.isUsingOracle = isUsingOracle_;
-        assetConfig.swapWaitingPeriod = swapWaitingPeriod_;
-        assetConfig.maxPrice = maxPrice_;
-        assetConfig.minPrice = minPrice_;
+        assetConfig.decimals = assetConfig_.decimals;
+        assetConfig.feeIn = assetConfig_.feeIn;
+        assetConfig.feeOut = assetConfig_.feeOut;
+        assetConfig.debtTokenMintCap = assetConfig_.debtTokenMintCap;
+        assetConfig.dailyDebtTokenMintCap = assetConfig_.dailyDebtTokenMintCap;
+        assetConfig.oracle = assetConfig_.oracle;
+        assetConfig.isUsingOracle = assetConfig_.isUsingOracle;
+        assetConfig.swapWaitingPeriod = assetConfig_.swapWaitingPeriod;
+        assetConfig.maxPrice = assetConfig_.maxPrice;
+        assetConfig.minPrice = assetConfig_.minPrice;
         s.isAssetSupported[chain][asset] = true;
 
-        emit AssetConfigSetting(
-            chain,
-            asset,
-            decimals_,
-            feeIn_,
-            feeOut_,
-            debtTokenMintCap_,
-            dailyDebtTokenMintCap_,
-            oracle_,
-            isUsingOracle_,
-            swapWaitingPeriod_,
-            maxPrice_,
-            minPrice_
-        );
+        emit AssetConfigSetting(chain, asset, assetConfig_);
     }
 
     /**
@@ -139,60 +116,27 @@ contract NexusYieldManager is INexusYieldManager {
      * @param actualTransferAmt The amount of asset to be swapped.
      */
     // @custom:event Emits AssetForDebtTokenSwapped event.
-    function swapIn(address asset, address receiver, uint256 actualTransferAmt, uint64 destChainId, uint256 price)
-        external
-        isActive
-    {
+    function swapIn(
+        address asset,
+        address receiver,
+        uint256 actualTransferAmt,
+        uint64 destChainId,
+        uint256 price,
+        XTypes.MsgShort calldata xmsg
+    ) external isActive onlyRouter xrecv(xmsg) {
         AppStorage.Layout storage s = AppStorage.layout();
         _ensureNonzeroAddress(receiver);
         _ensureNonzeroAmount(actualTransferAmt);
         _ensureAssetSupported(destChainId, asset);
         _ensureSourceChainSenderVaild();
 
-        s.assetPrice[xmsg.sourceChainId][asset] = price;
+        _updateAssetPrice(xmsg.sourceChainId, asset, price);
 
-        // convert to decimal 18
         uint256 actualTransferAmtInUSD = _previewTokenUSDAmount(asset, actualTransferAmt, FeeDirection.IN);
 
-        // calculate feeIn
-        uint256 fee = _calculateFee(asset, actualTransferAmtInUSD, FeeDirection.IN);
-        uint256 debtTokenToMint = actualTransferAmtInUSD - fee;
-
-        AssetConfig storage assetConfig = s.assetConfigs[xmsg.sourceChainId][asset];
-        if (assetConfig.debtTokenMinted + actualTransferAmtInUSD > assetConfig.debtTokenMintCap) {
-            revert DebtTokenMintCapReached(
-                assetConfig.debtTokenMinted, actualTransferAmtInUSD, assetConfig.debtTokenMintCap
-            );
-        }
-
-        uint256 today = block.timestamp / 1 days;
-
-        if (today > s.day) {
-            s.day = today;
-            s.dailyMintCount[xmsg.sourceChainId][asset] = 0;
-        }
-
-        uint256 dailyMinted = s.dailyMintCount[xmsg.sourceChainId][asset];
-        if (dailyMinted + actualTransferAmtInUSD > assetConfig.dailyDebtTokenMintCap) {
-            revert DebtTokenDailyMintCapReached(dailyMinted, actualTransferAmtInUSD, assetConfig.dailyDebtTokenMintCap);
-        }
-
-        unchecked {
-            assetConfig.debtTokenMinted += actualTransferAmtInUSD;
-            s.dailyMintCount[xmsg.sourceChainId][asset] += actualTransferAmtInUSD;
-        }
-
-        ChainConfig storage chain = s.chainConfigs[destChainId];
-        bytes memory data = abi.encodeWithSelector(IRollupMinter.mint.selector, receiver, debtTokenToMint);
-        xcall(destChainId, chain.rollupMinter, data, chain.mintGas);
-
-        // mint fee
-        if (fee != 0) {
-            data = abi.encodeWithSelector(IRollupMinter.mint.selector, chain.feeReceiver, fee);
-            xcall(destChainId, chain.rollupMinter, data, chain.mintGas);
-        }
-
-        emit AssetForDebtTokenSwapped(msg.sender, receiver, asset, actualTransferAmt, debtTokenToMint, fee);
+        _checkDebtTokenMintCap(s, xmsg.sourceChainId, asset, actualTransferAmtInUSD);
+        _updateDailyMintCount(s, xmsg.sourceChainId, asset, actualTransferAmtInUSD);
+        _swapInMintDebtToken(s, destChainId, asset, receiver, actualTransferAmtInUSD);
     }
 
     /**
@@ -200,21 +144,31 @@ contract NexusYieldManager is INexusYieldManager {
      * @param asset The address of the asset.
      * @param amount The amount of debt tokens.
      */
-    function scheduleSwapOut(address account, address asset, uint256 amount, uint256 price) external isActive {
+    function scheduleSwapOut(
+        address account,
+        address asset,
+        uint256 amount,
+        uint256 price,
+        XTypes.MsgShort calldata xmsg
+    ) external isActive onlyRouter xrecv(xmsg) {
         AppStorage.Layout storage s = AppStorage.layout();
         uint64 sourceChainId = xmsg.sourceChainId;
 
         _ensureNonzeroAmount(amount);
         _ensureAssetSupported(sourceChainId, asset);
         _ensureSourceChainSenderVaild();
+        _checkWithdrawalTimeNonZero(sourceChainId, asset, account);
+        _updateAssetPrice(sourceChainId, asset, price);
+        _scheduleSwapOut(s, sourceChainId, asset, account, amount);
+    }
 
-        s.assetPrice[sourceChainId][asset] = price;
-
-        uint32 withdrawalTimeCatched = s.withdrawalTime[sourceChainId][asset][account];
-        if (withdrawalTimeCatched != 0) {
-            revert WithdrawalAlreadyScheduled(withdrawalTimeCatched);
-        }
-
+    function _scheduleSwapOut(
+        AppStorage.Layout storage s,
+        uint64 sourceChainId,
+        address asset,
+        address account,
+        uint256 amount
+    ) private {
         AssetConfig storage assetConfig = s.assetConfigs[sourceChainId][asset];
 
         s.withdrawalTime[sourceChainId][asset][account] = uint32(block.timestamp + assetConfig.swapWaitingPeriod);
@@ -231,25 +185,25 @@ contract NexusYieldManager is INexusYieldManager {
             assetConfig.debtTokenMinted -= swapAmount;
         }
 
-        // xcall
         _burnOnSourceChain(account, amount, fee);
 
         s.scheduledWithdrawalAmount[sourceChainId][asset][account] = assetAmount;
-        // emit WithdrawalScheduled(asset, account, assetAmount, fee, withdrawalTime[sourceChainId][asset][account]);
+        emit WithdrawalScheduled(asset, account, assetAmount, fee, s.withdrawalTime[sourceChainId][asset][account]);
     }
 
     /**
      * @dev Withdraw a specific asset after scheduling a swapOut.
      * @param asset The address of the asset to be withdrawn.
      */
-    function withdraw(address account, address asset, uint256 amount) external {
+    function withdraw(address account, address asset, uint256 amount, XTypes.MsgShort calldata xmsg)
+        external
+        onlyRouter
+        xrecv(xmsg)
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         _ensureSourceChainSenderVaild();
 
-        uint32 withdrawalTimeCatched = s.withdrawalTime[xmsg.sourceChainId][asset][account];
-        if (withdrawalTimeCatched == 0 || block.timestamp < withdrawalTimeCatched) {
-            revert WithdrawalNotAvailable(withdrawalTimeCatched);
-        }
+        _checkWithdrawalTimeValid(xmsg.sourceChainId, asset, account);
 
         s.withdrawalTime[xmsg.sourceChainId][asset][account] = 0;
         uint256 _amount = s.scheduledWithdrawalAmount[xmsg.sourceChainId][asset][account];
@@ -258,7 +212,7 @@ contract NexusYieldManager is INexusYieldManager {
 
         ChainConfig storage chain = s.chainConfigs[xmsg.sourceChainId];
         bytes memory data = abi.encodeWithSelector(IRollupNYM.transferAsset.selector, asset, account, _amount);
-        xcall(xmsg.sourceChainId, chain.nexusYieldManager, data, 2000000);
+        s.xAppRouter.callToPortal(xmsg.sourceChainId, chain.nexusYieldManager, data, 2000000);
 
         emit Withdraw(asset, account, _amount);
     }
@@ -332,7 +286,7 @@ contract NexusYieldManager is INexusYieldManager {
      * @param amount The amount of debt tokens used for swap.
      * @return The amount of asset that would be taken from the user.
      */
-    function previewSwapOut(address asset, uint256 amount) external returns (uint256, uint256) {
+    function previewSwapOut(address asset, uint256 amount) external view returns (uint256, uint256) {
         _ensureNonzeroAmount(amount);
         // _ensureAssetSupported(asset);
 
@@ -348,7 +302,7 @@ contract NexusYieldManager is INexusYieldManager {
      * @param assetAmount The amount of stable tokens provided for the swap.
      * @return The amount of debtToken that would be sent to the receiver.
      */
-    function previewSwapIn(address asset, uint256 assetAmount) external returns (uint256, uint256) {
+    function previewSwapIn(address asset, uint256 assetAmount) external view returns (uint256, uint256) {
         _ensureNonzeroAmount(assetAmount);
         // _ensureAssetSupported(asset);
 
@@ -368,7 +322,7 @@ contract NexusYieldManager is INexusYieldManager {
     function convertDebtTokenToAssetAmount(address asset, uint256 amount) public view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         uint256 scaledAmt;
-        uint256 decimals = s.assetConfigs[xmsg.sourceChainId][asset].decimals;
+        uint256 decimals = s.assetConfigs[s.xmsg.sourceChainId][asset].decimals;
         if (decimals == Config.TARGET_DIGITS) {
             scaledAmt = amount;
         } else if (decimals < Config.TARGET_DIGITS) {
@@ -389,7 +343,7 @@ contract NexusYieldManager is INexusYieldManager {
     function convertAssetToDebtTokenAmount(address asset, uint256 amount) public view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         uint256 scaledAmt;
-        uint256 decimals = s.assetConfigs[xmsg.sourceChainId][asset].decimals;
+        uint256 decimals = s.assetConfigs[s.xmsg.sourceChainId][asset].decimals;
         if (decimals == Config.TARGET_DIGITS) {
             scaledAmt = amount;
         } else if (decimals < Config.TARGET_DIGITS) {
@@ -406,7 +360,11 @@ contract NexusYieldManager is INexusYieldManager {
      * @param amount The amount of stable tokens.
      * @return The USD value of the given amount of stable tokens scaled by 1e18 taking into account the direction of the swap
      */
-    function _previewTokenUSDAmount(address asset, uint256 amount, FeeDirection direction) internal returns (uint256) {
+    function _previewTokenUSDAmount(address asset, uint256 amount, FeeDirection direction)
+        internal
+        view
+        returns (uint256)
+    {
         return (convertAssetToDebtTokenAmount(asset, amount) * _getPriceInUSD(asset, direction)) / Config.MANTISSA_ONE;
     }
 
@@ -417,6 +375,7 @@ contract NexusYieldManager is INexusYieldManager {
      */
     function _previewAssetAmountFromDebtToken(address asset, uint256 amount, FeeDirection direction)
         internal
+        view
         returns (uint256)
     {
         return (convertDebtTokenToAssetAmount(asset, amount) * Config.MANTISSA_ONE) / _getPriceInUSD(asset, direction);
@@ -427,15 +386,15 @@ contract NexusYieldManager is INexusYieldManager {
      * @dev This function gets the price of the asset in USD.
      * @return The price in USD, adjusted based on the selected direction.
      */
-    function _getPriceInUSD(address asset, FeeDirection direction) internal returns (uint256) {
+    function _getPriceInUSD(address asset, FeeDirection direction) internal view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
-        AssetConfig storage assetConfig = s.assetConfigs[xmsg.sourceChainId][asset];
+        AssetConfig storage assetConfig = s.assetConfigs[s.xmsg.sourceChainId][asset];
         if (!assetConfig.isUsingOracle) {
             return Config.ONE_DOLLAR;
         }
 
         // get price with decimals 18
-        uint256 price = s.assetPrice[xmsg.sourceChainId][asset];
+        uint256 price = s.assetPrice[s.xmsg.sourceChainId][asset];
 
         if (price > assetConfig.maxPrice || price < assetConfig.minPrice) {
             revert InvalidPrice(price);
@@ -459,7 +418,7 @@ contract NexusYieldManager is INexusYieldManager {
      */
     function _calculateFee(address asset, uint256 amount, FeeDirection direction) internal view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
-        AssetConfig storage assetConfig = s.assetConfigs[xmsg.sourceChainId][asset];
+        AssetConfig storage assetConfig = s.assetConfigs[s.xmsg.sourceChainId][asset];
         uint256 feePercent;
         if (direction == FeeDirection.IN) {
             feePercent = assetConfig.feeIn;
@@ -507,8 +466,8 @@ contract NexusYieldManager is INexusYieldManager {
 
     function _ensureSourceChainSenderVaild() private view {
         AppStorage.Layout storage s = AppStorage.layout();
-        if (xmsg.sender != s.contractOn[xmsg.sourceChainId]) {
-            revert InvalidSourceChainSender(xmsg.sender, s.contractOn[xmsg.sourceChainId]);
+        if (s.xmsg.sender != s.contractOn[s.xmsg.sourceChainId]) {
+            revert InvalidSourceChainSender(s.xmsg.sender, s.contractOn[s.xmsg.sourceChainId]);
         }
     }
 
@@ -604,25 +563,105 @@ contract NexusYieldManager is INexusYieldManager {
         AppStorage.Layout storage s = AppStorage.layout();
         ChainConfig storage chain = s.chainConfigs[destChainId];
         bytes memory data = abi.encodeWithSelector(IRollupMinter.mint.selector, account, amount);
-        xcall(destChainId, chain.rollupMinter, data, chain.mintGas);
+        s.xAppRouter.callToPortal(destChainId, chain.rollupMinter, data, chain.mintGas);
 
         if (fee != 0) {
             data = abi.encodeWithSelector(IRollupMinter.mint.selector, chain.feeReceiver, fee);
-            xcall(xmsg.sourceChainId, chain.rollupMinter, data, chain.mintGas);
+            s.xAppRouter.callToPortal(s.xmsg.sourceChainId, chain.rollupMinter, data, chain.mintGas);
+        }
+    }
+
+    function _swapInMintDebtToken(
+        AppStorage.Layout storage s,
+        uint64 destChainId,
+        address asset,
+        address receiver,
+        uint256 actualTransferAmtInUSD
+    ) private {
+        uint256 fee = _calculateFee(asset, actualTransferAmtInUSD, FeeDirection.IN);
+        uint256 debtTokenToMint = actualTransferAmtInUSD - fee;
+
+        ChainConfig storage chain = s.chainConfigs[destChainId];
+        bytes memory data = abi.encodeWithSelector(IRollupMinter.mint.selector, receiver, debtTokenToMint);
+        s.xAppRouter.callToPortal(destChainId, chain.rollupMinter, data, chain.mintGas);
+
+        if (fee != 0) {
+            data = abi.encodeWithSelector(IRollupMinter.mint.selector, chain.feeReceiver, fee);
+            s.xAppRouter.callToPortal(destChainId, chain.rollupMinter, data, chain.mintGas);
         }
     }
 
     function _burnOnSourceChain(address account, uint256 amount, uint256 fee) internal {
         AppStorage.Layout storage s = AppStorage.layout();
-        uint64 sourceChainId = xmsg.sourceChainId;
+        uint64 sourceChainId = s.xmsg.sourceChainId;
         ChainConfig storage chain = s.chainConfigs[sourceChainId];
 
         bytes memory data = abi.encodeWithSelector(IRollupMinter.burn.selector, account, amount);
-        xcall(sourceChainId, chain.rollupMinter, data, chain.burnGas);
+        s.xAppRouter.callToPortal(sourceChainId, chain.rollupMinter, data, chain.burnGas);
 
         if (fee != 0) {
             data = abi.encodeWithSelector(IRollupMinter.mint.selector, chain.feeReceiver, fee);
-            xcall(sourceChainId, chain.rollupMinter, data, chain.mintGas);
+            s.xAppRouter.callToPortal(sourceChainId, chain.rollupMinter, data, chain.mintGas);
+        }
+    }
+
+    function _checkWithdrawalTimeNonZero(uint64 sourceChainId, address asset, address account) internal view {
+        AppStorage.Layout storage s = AppStorage.layout();
+        uint32 withdrawalTimeCatched = s.withdrawalTime[sourceChainId][asset][account];
+        if (withdrawalTimeCatched != 0) {
+            revert WithdrawalAlreadyScheduled(withdrawalTimeCatched);
+        }
+    }
+
+    function _checkWithdrawalTimeValid(uint64 sourceChainId, address asset, address account) internal view {
+        AppStorage.Layout storage s = AppStorage.layout();
+        uint32 withdrawalTimeCatched = s.withdrawalTime[sourceChainId][asset][account];
+        if (withdrawalTimeCatched == 0 || block.timestamp < withdrawalTimeCatched) {
+            revert WithdrawalNotAvailable(withdrawalTimeCatched);
+        }
+    }
+
+    function _updateAssetPrice(uint64 sourceChainId, address asset, uint256 price) private {
+        AppStorage.Layout storage s = AppStorage.layout();
+        s.assetPrice[sourceChainId][asset] = price;
+    }
+
+    function _checkDebtTokenMintCap(
+        AppStorage.Layout storage s,
+        uint64 sourceChainId,
+        address asset,
+        uint256 actualTransferAmtInUSD
+    ) private view {
+        AssetConfig storage assetConfig = s.assetConfigs[sourceChainId][asset];
+        if (assetConfig.debtTokenMinted + actualTransferAmtInUSD > assetConfig.debtTokenMintCap) {
+            revert DebtTokenMintCapReached(
+                assetConfig.debtTokenMinted, actualTransferAmtInUSD, assetConfig.debtTokenMintCap
+            );
+        }
+    }
+
+    function _updateDailyMintCount(
+        AppStorage.Layout storage s,
+        uint64 sourceChainId,
+        address asset,
+        uint256 actualTransferAmtInUSD
+    ) private {
+        uint256 today = block.timestamp / 1 days;
+
+        if (today > s.day) {
+            s.day = today;
+            s.dailyMintCount[sourceChainId][asset] = 0;
+        }
+
+        uint256 dailyMinted = s.dailyMintCount[sourceChainId][asset];
+        AssetConfig storage assetConfig = s.assetConfigs[sourceChainId][asset];
+        if (dailyMinted + actualTransferAmtInUSD > assetConfig.dailyDebtTokenMintCap) {
+            revert DebtTokenDailyMintCapReached(dailyMinted, actualTransferAmtInUSD, assetConfig.dailyDebtTokenMintCap);
+        }
+
+        unchecked {
+            assetConfig.debtTokenMinted += actualTransferAmtInUSD;
+            s.dailyMintCount[sourceChainId][asset] += actualTransferAmtInUSD;
         }
     }
 

@@ -2,6 +2,7 @@ pragma solidity ^0.8.19;
 
 import {IDebtToken} from "./IDebtToken.sol";
 import {IPriceFeedAggregatorFacet} from "./IPriceFeedAggregatorFacet.sol";
+import {XTypes} from "lib/omni/contracts/core/src/libraries/XTypes.sol";
 // import {ISatoshiOwnable} from "../dependencies/ISatoshiOwnable.sol";
 
 struct AssetConfig {
@@ -38,7 +39,7 @@ struct ChainConfig {
     uint64 burnGas;
 }
 
-interface INexusYieldManager {
+interface INexusYieldManagerFacet {
     // Helper enum for calculation of the fee.
     enum FeeDirection {
         IN,
@@ -77,20 +78,7 @@ interface INexusYieldManager {
     event TokenTransferred(address indexed token, address indexed to, uint256 amount);
 
     /// @notice Event emitted when the asset configuration is set.
-    event AssetConfigSetting(
-        uint64 chain,
-        address asset,
-        uint256 decimals,
-        uint256 feeIn,
-        uint256 feeOut,
-        uint256 debtTokenMintCap,
-        uint256 dailyMintCap,
-        address oracle,
-        bool isUsingOracle,
-        uint256 swapWaitingPeriod,
-        uint256 maxPrice,
-        uint256 minPrice
-    );
+    event AssetConfigSetting(uint64 chain, address asset, AssetConfig config);
 
     /// @notice Event emitted when an asset is sunset.
     event AssetSunset(address asset);
@@ -150,34 +138,7 @@ interface INexusYieldManager {
 
     error InvalidChainId();
 
-    function TARGET_DIGITS() external view returns (uint256);
-
-    function BASIS_POINTS_DIVISOR() external view returns (uint256);
-
-    function MANTISSA_ONE() external view returns (uint256);
-
-    function ONE_DOLLAR() external view returns (uint256);
-
-    function debtToken() external view returns (IDebtToken);
-
-    function rewardManagerAddr() external view returns (address);
-
-    function isPaused() external view returns (bool);
-
-    function setAssetConfig(
-        uint64 chain,
-        address asset,
-        uint256 decimals,
-        uint256 feeIn_,
-        uint256 feeOut_,
-        uint256 debtTokenMintCap_,
-        uint256 dailyMintCap_,
-        address oracle_,
-        bool isUsingOracle_,
-        uint256 swapWaitingPeriod_,
-        uint256 maxPrice,
-        uint256 minPrice
-    ) external;
+    function setAssetConfig(uint64 chain, address asset, AssetConfig calldata config) external;
 
     function setChainConfig(
         uint64 chain,
@@ -193,8 +154,14 @@ interface INexusYieldManager {
 
     function sunsetAsset(uint64 chainId, address asset) external;
 
-    function swapIn(address asset, address receiver, uint256 actualTransferAmt, uint64 destChainId, uint256 price)
-        external;
+    function swapIn(
+        address asset,
+        address receiver,
+        uint256 actualTransferAmt,
+        uint64 destChainId,
+        uint256 price,
+        XTypes.MsgShort calldata xmsg
+    ) external;
 
     function pause() external;
 
@@ -214,9 +181,15 @@ interface INexusYieldManager {
 
     // function swapInPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
 
-    function scheduleSwapOut(address account, address asset, uint256 stableTknAmount, uint256 price) external;
+    function scheduleSwapOut(
+        address account,
+        address asset,
+        uint256 stableTknAmount,
+        uint256 price,
+        XTypes.MsgShort calldata xmsg
+    ) external;
 
-    function withdraw(address account, address asset, uint256 amount) external;
+    function withdraw(address account, address asset, uint256 amount, XTypes.MsgShort calldata xmsg) external;
 
     function convertDebtTokenToAssetAmount(address asset, uint256 amount) external view returns (uint256);
 
@@ -240,14 +213,10 @@ interface INexusYieldManager {
 
     function debtTokenDailyMintCapRemain(uint64 chainID, address asset) external view returns (uint256);
 
-    function dailyMintCount(uint64 chainID, address asset) external view returns (uint256);
-
     function pendingWithdrawal(uint64 chain, address asset, address account) external view returns (uint256, uint32);
 
     function pendingWithdrawals(uint64[] memory chainId, address[] memory assets, address account)
         external
         view
         returns (uint256[] memory, uint32[] memory);
-
-    function isAssetSupported(uint64 chainId, address asset) external view returns (bool);
 }

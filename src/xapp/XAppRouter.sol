@@ -24,7 +24,12 @@ contract XAppRouter is Initializable, OwnableUpgradeable, XApp {
     address public satoshiXApp;
 
     modifier onlyXCall() {
-        require(omni.isXCall(), "not xcall");
+        require(isXCall(), "not xcall");
+        _;
+    }
+
+    modifier onlyXApp() {
+        require(msg.sender == satoshiXApp, "not xapp");
         _;
     }
 
@@ -47,7 +52,7 @@ contract XAppRouter is Initializable, OwnableUpgradeable, XApp {
 
         require(xData.to == satoshiXApp, "XAppRouter: Invalid to address");
 
-        (bool success,) = xData.to.call(xData.data);
+        (bool success,) = xData.to.call(abi.encode(xData.data, xmsg));
 
         if (!success) {
             _xCallback(xData.callbackData);
@@ -56,5 +61,9 @@ contract XAppRouter is Initializable, OwnableUpgradeable, XApp {
 
     function _xCallback(CallbackData memory callbackData) internal {
         xcall(callbackData.chainId, callbackData.to, callbackData.data, callbackData.gasLimit);
+    }
+
+    function callToPortal(uint64 destChainId, address to, bytes memory data, uint64 gasLimit) public onlyXApp {
+        xcall(destChainId, to, data, gasLimit);
     }
 }
