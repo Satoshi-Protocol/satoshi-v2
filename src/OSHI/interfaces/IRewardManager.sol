@@ -2,10 +2,10 @@
 pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IWETH} from "../../xapp/helpers/interfaces/IWETH.sol";
-import {IDebtToken} from "../../xapp/interfaces/IDebtToken.sol";
+import {IWETH} from "../../core/helpers/interfaces/IWETH.sol";
+import {IDebtToken} from "../../core/interfaces/IDebtToken.sol";
 import {IOSHIToken} from "./IOSHIToken.sol";
-import {ITroveManager} from "../../xapp/interfaces/ITroveManager.sol";
+import {ITroveManager} from "../../core/interfaces/ITroveManager.sol";
 
 enum LockDuration {
     THREE, // 3 months

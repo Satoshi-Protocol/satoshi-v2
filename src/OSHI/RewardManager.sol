@@ -8,12 +8,12 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {SatoshiMath} from "../library/SatoshiMath.sol";
 import {IRewardManager, LockDuration, NUMBER_OF_LOCK_DURATIONS} from "./interfaces/IRewardManager.sol";
-import {IDebtToken} from "../xapp/interfaces/IDebtToken.sol";
+import {IDebtToken} from "../core/interfaces/IDebtToken.sol";
 import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
-import {ITroveManager} from "../xapp/interfaces/ITroveManager.sol";
-import {IWETH} from "../xapp/helpers/interfaces/IWETH.sol";
-import {ICoreFacet} from "../xapp/interfaces/ICoreFacet.sol";
-import {Config} from "../xapp/Config.sol";
+import {ITroveManager} from "../core/interfaces/ITroveManager.sol";
+import {IWETH} from "../core/helpers/interfaces/IWETH.sol";
+import {ICoreFacet} from "../core/interfaces/ICoreFacet.sol";
+import {Config} from "../core/Config.sol";
 import {Utils} from "../library/Utils.sol";
 
 /**

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Config} from "../xapp/Config.sol";
+import {Config} from "../core/Config.sol";
 
 /**
  * @title Satoshi Math Library Contract

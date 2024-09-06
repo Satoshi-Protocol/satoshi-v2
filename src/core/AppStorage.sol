@@ -12,14 +12,12 @@ import {ICommunityIssuance} from "./../OSHI/interfaces/ICommunityIssuance.sol";
 import {IRewardManager} from "./../OSHI/interfaces/IRewardManager.sol";
 import {IXAppRouter} from "./interfaces/IXAppRouter.sol";
 import {AssetConfig, ChainConfig} from "./interfaces/INexusYieldManagerFacet.sol";
-import {XTypes} from "lib/omni/contracts/core/src/libraries/XTypes.sol";
 
 library AppStorage {
     bytes32 internal constant STORAGE_SLOT = bytes32(uint256(keccak256("satoshi.app.storage")) - 1);
 
     struct Layout {
         IXAppRouter xAppRouter;
-        XTypes.MsgShort xmsg;
         address feeReceiver;
         IRewardManager rewardManager;
         ICommunityIssuance communityIssuance;
@@ -100,15 +98,12 @@ library AppStorage {
         bool isPaused;
         uint256 day;
         mapping(address => bool) isPrivileged;
-        mapping(uint64 => mapping(address => mapping(address => uint32))) withdrawalTime;
-        mapping(uint64 => mapping(address => mapping(address => uint256))) scheduledWithdrawalAmount;
-        mapping(uint64 => mapping(address => AssetConfig)) assetConfigs;
-        mapping(uint64 => mapping(address => bool)) isAssetSupported;
-        mapping(uint64 => mapping(address => uint256)) dailyMintCount;
-        mapping(uint64 => ChainConfig) chainConfigs;
-        mapping(uint64 => address) contractOn;
-        mapping(uint64 => bool) supportedChainIds;
-        mapping(uint64 => mapping(address => uint256)) assetPrice;
+        mapping(address => mapping(address => uint32)) withdrawalTime;
+        mapping(address => mapping(address => uint256)) scheduledWithdrawalAmount;
+        mapping(address => AssetConfig) assetConfigs;
+        mapping(address => bool) isAssetSupported;
+        mapping(address => uint256) dailyMintCount;
+        mapping(address => uint256) assetPrice;
     }
 
     function layout() internal pure returns (Layout storage s) {

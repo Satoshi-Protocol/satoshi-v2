@@ -2,7 +2,6 @@ pragma solidity ^0.8.19;
 
 import {IDebtToken} from "./IDebtToken.sol";
 import {IPriceFeedAggregatorFacet} from "./IPriceFeedAggregatorFacet.sol";
-import {XTypes} from "lib/omni/contracts/core/src/libraries/XTypes.sol";
 // import {ISatoshiOwnable} from "../dependencies/ISatoshiOwnable.sol";
 
 struct AssetConfig {
@@ -78,7 +77,7 @@ interface INexusYieldManagerFacet {
     event TokenTransferred(address indexed token, address indexed to, uint256 amount);
 
     /// @notice Event emitted when the asset configuration is set.
-    event AssetConfigSetting(uint64 chain, address asset, AssetConfig config);
+    event AssetConfigSetting(address asset, AssetConfig config);
 
     /// @notice Event emitted when an asset is sunset.
     event AssetSunset(address asset);
@@ -129,7 +128,7 @@ interface INexusYieldManagerFacet {
     error NotPrivileged(address addr);
 
     /// @notice thrown when the asset is not supported
-    error AssetNotSupported(uint64 chainId, address asset);
+    error AssetNotSupported(address asset);
 
     /// @notice thrown when the price of the asset is greater than the max price or less than the min price
     error InvalidPrice(uint256 price);
@@ -138,30 +137,14 @@ interface INexusYieldManagerFacet {
 
     error InvalidChainId();
 
-    function setAssetConfig(uint64 chain, address asset, AssetConfig calldata config) external;
+    error AssetNotEnough(uint256 assetAmount, uint256 transferAmount);
 
-    function setChainConfig(
-        uint64 chain,
-        address debtToken,
-        address rollupMinter,
-        address nexusYieldManager,
-        address feeReceiver,
-        uint64 mintGas,
-        uint64 burnGas
-    ) external;
+    function setAssetConfig(address asset, AssetConfig calldata config) external;
 
-    function addChainContract(uint64 chainId, address contractAddress) external;
+    function sunsetAsset(address asset) external;
 
-    function sunsetAsset(uint64 chainId, address asset) external;
-
-    function swapIn(
-        address asset,
-        address receiver,
-        uint256 actualTransferAmt,
-        uint64 destChainId,
-        uint256 price,
-        XTypes.MsgShort calldata xmsg
-    ) external;
+    function swapIn(address asset, address receiver, uint256 assetAmount)
+        external returns (uint256);
 
     function pause() external;
 
@@ -181,41 +164,35 @@ interface INexusYieldManagerFacet {
 
     // function swapInPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
 
-    function scheduleSwapOut(
-        address account,
-        address asset,
-        uint256 stableTknAmount,
-        uint256 price,
-        XTypes.MsgShort calldata xmsg
-    ) external;
+    function scheduleSwapOut(address asset, uint256 amount) external returns (uint256);
 
-    function withdraw(address account, address asset, uint256 amount, XTypes.MsgShort calldata xmsg) external;
+    function withdraw(address asset) external;
 
     function convertDebtTokenToAssetAmount(address asset, uint256 amount) external view returns (uint256);
 
     function convertAssetToDebtTokenAmount(address asset, uint256 amount) external view returns (uint256);
 
-    function oracle(uint64 chainID, address asset) external view returns (IPriceFeedAggregatorFacet);
+    function oracle(address asset) external view returns (IPriceFeedAggregatorFacet);
 
-    function feeIn(uint64 chainID, address asset) external view returns (uint256);
+    function feeIn(address asset) external view returns (uint256);
 
-    function feeOut(uint64 chainID, address asset) external view returns (uint256);
+    function feeOut(address asset) external view returns (uint256);
 
-    function debtTokenMintCap(uint64 chainID, address asset) external view returns (uint256);
+    function debtTokenMintCap(address asset) external view returns (uint256);
 
-    function dailyDebtTokenMintCap(uint64 chainID, address asset) external view returns (uint256);
+    function dailyDebtTokenMintCap(address asset) external view returns (uint256);
 
-    function debtTokenMinted(uint64 chainID, address asset) external view returns (uint256);
+    function debtTokenMinted(address asset) external view returns (uint256);
 
-    function isUsingOracle(uint64 chainID, address asset) external view returns (bool);
+    function isUsingOracle(address asset) external view returns (bool);
 
-    function swapWaitingPeriod(uint64 chainID, address asset) external view returns (uint256);
+    function swapWaitingPeriod(address asset) external view returns (uint256);
 
-    function debtTokenDailyMintCapRemain(uint64 chainID, address asset) external view returns (uint256);
+    function debtTokenDailyMintCapRemain(address asset) external view returns (uint256);
 
-    function pendingWithdrawal(uint64 chain, address asset, address account) external view returns (uint256, uint32);
+    function pendingWithdrawal(address asset, address account) external view returns (uint256, uint32);
 
-    function pendingWithdrawals(uint64[] memory chainId, address[] memory assets, address account)
+    function pendingWithdrawals(address[] memory assets, address account)
         external
         view
         returns (uint256[] memory, uint32[] memory);

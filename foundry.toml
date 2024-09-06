@@ -14,6 +14,8 @@ remappings = [
   "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
   "@api3/contracts=lib/contracts/contracts",
   "solmate=lib/solmate/src",
+  "@layerzerolabs/oapp-evm/=lib/devtools/packages/oapp-evm/",
+  "@layerzerolabs/lz-evm-protocol-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/protocol",
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
