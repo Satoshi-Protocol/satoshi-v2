@@ -1,1 +1,1 @@
-## Satoshi Protocol - Omni Network
+## Satoshi Protocol V2
