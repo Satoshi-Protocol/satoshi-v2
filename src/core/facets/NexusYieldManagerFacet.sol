@@ -172,7 +172,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         _ensureNonzeroAmount(amount);
         _ensureAssetSupported(asset);
 
-         AppStorage.Layout storage s = AppStorage.layout();
+        AppStorage.Layout storage s = AppStorage.layout();
         uint32 withdrawalTimeCatched = s.withdrawalTime[asset][msg.sender];
         if (withdrawalTimeCatched != 0) {
             revert WithdrawalAlreadyScheduled(withdrawalTimeCatched);
@@ -236,7 +236,6 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         IERC20(asset).safeTransfer(msg.sender, _amount);
         emit Withdraw(asset, msg.sender, _amount);
     }
-
 
     /**
      * Admin Functions **
@@ -535,11 +534,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     }
 
     // @notice Get the pending withdrawal amount and time for the given asset and account.
-    function pendingWithdrawal(address asset, address account)
-        external
-        view
-        returns (uint256, uint32)
-    {
+    function pendingWithdrawal(address asset, address account) external view returns (uint256, uint32) {
         AppStorage.Layout storage s = AppStorage.layout();
         return (s.scheduledWithdrawalAmount[asset][account], s.withdrawalTime[asset][account]);
     }

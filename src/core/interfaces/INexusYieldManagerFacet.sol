@@ -143,8 +143,7 @@ interface INexusYieldManagerFacet {
 
     function sunsetAsset(address asset) external;
 
-    function swapIn(address asset, address receiver, uint256 assetAmount)
-        external returns (uint256);
+    function swapIn(address asset, address receiver, uint256 assetAmount) external returns (uint256);
 
     function pause() external;
 
