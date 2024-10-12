@@ -2,21 +2,31 @@
 pragma solidity ^0.8.20;
 
 import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {ERC20PermitUpgradeable} from
-    "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
+import {
+    IOFT,
+    SendParam,
+    OFTLimit,
+    OFTReceipt,
+    OFTFeeDetail,
+    MessagingReceipt,
+    MessagingFee
+} from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+
 import {ITroveManager} from "./interfaces/ITroveManager.sol";
 import {IDebtToken} from "./interfaces/IDebtToken.sol";
 import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
 import {Config} from "./Config.sol";
 import {Utils} from "../library/Utils.sol";
+import {OFTPermitUpgradeable} from "./libs/OFTPermitUpgradeable.sol";
 
-contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, OwnableUpgradeable {
+contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     string public constant version = "1";
 
     // --- ERC 3156 Data ---
@@ -52,7 +62,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         _;
     }
 
-    constructor() {
+    constructor(address _lzEndpoint) OFTPermitUpgradeable(_lzEndpoint) {
         _disableInitializers();
     }
 
@@ -77,8 +87,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         Utils.ensureNonzeroAddress(_owner);
 
         __UUPSUpgradeable_init_unchained();
-        __ERC20_init(_name, _symbol);
-        __ERC20Permit_init(_name);
+        __OFT_init(_name, _symbol, _owner);
         __Ownable_init(_owner);
         // stabilityPool = _stabilityPool;
         // satoshiCore = _satoshiCore;
@@ -103,6 +112,28 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         _mint(satoshiXApp, Config.DEBT_GAS_COMPENSATION);
 
         return true;
+    }
+
+    function mintWithGasCompensationToOtherChain(
+        SendParam calldata _sendParam,
+        MessagingFee calldata _fee,
+        address _refundAddress
+    ) external returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
+        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
+        (uint256 amountSentLD, uint256 amountReceivedLD) =
+            _debitView(_sendParam.amountLD, _sendParam.minAmountLD, _sendParam.dstEid);
+
+        // @dev Builds the options and OFT message to quote in the endpoint.
+        (bytes memory message, bytes memory options) = _buildMsgAndOptions(_sendParam, amountReceivedLD);
+
+        // @dev Sends the message to the LayerZero endpoint and returns the LayerZero msg receipt.
+        msgReceipt = _lzSend(_sendParam.dstEid, message, options, _fee, _refundAddress);
+        // @dev Formulate the OFT receipt.
+        oftReceipt = OFTReceipt(amountSentLD, amountReceivedLD);
+
+        emit OFTSent(msgReceipt.guid, _sendParam.dstEid, msg.sender, amountSentLD, amountReceivedLD);
+
+        _mint(satoshiXApp, Config.DEBT_GAS_COMPENSATION);
     }
 
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {

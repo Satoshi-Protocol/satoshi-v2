@@ -17,6 +17,10 @@ remappings = [
   "@layerzerolabs/oapp-evm/=lib/devtools/packages/oapp-evm/",
   "@layerzerolabs/lz-evm-protocol-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/protocol",
   "@layerzerolabs/oft-evm/=lib/devtools/packages/oft-evm/",
+  "@layerzerolabs/oapp-upgradeable/contracts=lib/LayerZero-v2.git/oapp/contracts",
+  "@layerzerolabs/lz-evm-messagelib-v2/contracts=lib/LayerZero-v2.git/oapp/contracts",
+  "@layerzerolabs/test-devtools-evm-foundry/=lib/devtools/packages/test-devtools-evm-foundry/",
+
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

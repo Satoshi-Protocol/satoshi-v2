@@ -9,7 +9,8 @@ import {AppStorage} from "./AppStorage.sol";
 import {InitialConfig} from "./InitialConfig.sol";
 import {Config} from "./Config.sol";
 import {Utils} from "../library/Utils.sol";
-import {IDebtToken} from "./interfaces/IDebtToken.sol";
+// import {IDebtToken} from "./interfaces/IDebtToken.sol";
+import {DebtToken} from "./DebtToken.sol";
 import {ICommunityIssuance} from "../OSHI/interfaces/ICommunityIssuance.sol";
 import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
 
@@ -41,7 +42,7 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         AppStorage.Layout storage s = AppStorage.layout();
         s.feeReceiver = InitialConfig.FEE_RECEIVER;
         s.rewardManager = IRewardManager(rewardManager);
-        s.debtToken = IDebtToken(debtToken);
+        s.debtToken = DebtToken(debtToken);
         s.communityIssuance = ICommunityIssuance(communityIssuance);
         s.startTime = block.timestamp;
 

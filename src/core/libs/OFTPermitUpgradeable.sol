@@ -2,14 +2,15 @@
 
 pragma solidity ^0.8.20;
 
-import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import { IOFT, OFTCoreUpgradeable } from "./OFTCoreUpgradeable.sol";
+import {ERC20PermitUpgradeable} from
+    "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import {IOFT, OFTCoreUpgradeable} from "@layerzerolabs/oapp-upgradeable/contracts/oft/OFTCoreUpgradeable.sol";
 
 /**
  * @title OFT Contract
  * @dev OFT is an ERC-20 token that extends the functionality of the OFTCore contract.
  */
-abstract contract OFTUpgradeable is OFTCoreUpgradeable, ERC20Upgradeable {
+abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgradeable {
     /**
      * @dev Constructor for the OFT contract.
      * @param _lzEndpoint The LayerZero endpoint address.
@@ -28,6 +29,7 @@ abstract contract OFTUpgradeable is OFTCoreUpgradeable, ERC20Upgradeable {
      */
     function __OFT_init(string memory _name, string memory _symbol, address _delegate) internal onlyInitializing {
         __ERC20_init(_name, _symbol);
+        __ERC20Permit_init(_name);
         __OFTCore_init(_delegate);
     }
 
@@ -75,11 +77,12 @@ abstract contract OFTUpgradeable is OFTCoreUpgradeable, ERC20Upgradeable {
      * @return amountSentLD The amount sent in local decimals.
      * @return amountReceivedLD The amount received in local decimals on the remote.
      */
-    function _debit(
-        uint256 _amountLD,
-        uint256 _minAmountLD,
-        uint32 _dstEid
-    ) internal virtual override returns (uint256 amountSentLD, uint256 amountReceivedLD) {
+    function _debit(uint256 _amountLD, uint256 _minAmountLD, uint32 _dstEid)
+        internal
+        virtual
+        override
+        returns (uint256 amountSentLD, uint256 amountReceivedLD)
+    {
         (amountSentLD, amountReceivedLD) = _debitView(_amountLD, _minAmountLD, _dstEid);
 
         // @dev In NON-default OFT, amountSentLD could be 100, with a 10% fee, the amountReceivedLD amount is 90,
@@ -96,11 +99,12 @@ abstract contract OFTUpgradeable is OFTCoreUpgradeable, ERC20Upgradeable {
      * @dev _srcEid The source chain ID.
      * @return amountReceivedLD The amount of tokens ACTUALLY received in local decimals.
      */
-    function _credit(
-        address _to,
-        uint256 _amountLD,
-        uint32 /*_srcEid*/
-    ) internal virtual override returns (uint256 amountReceivedLD) {
+    function _credit(address _to, uint256 _amountLD, uint32 /*_srcEid*/ )
+        internal
+        virtual
+        override
+        returns (uint256 amountReceivedLD)
+    {
         // @dev Default OFT mints on dst.
         _mint(_to, _amountLD);
         // @dev In the case of NON-default OFT, the _amountLD MIGHT not be == amountReceivedLD.

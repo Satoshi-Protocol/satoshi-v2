@@ -6,10 +6,21 @@ import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInter
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import {
+    IOFT,
+    SendParam,
+    OFTLimit,
+    OFTReceipt,
+    OFTFeeDetail,
+    MessagingReceipt,
+    MessagingFee
+} from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+
 import {AppStorage} from "../AppStorage.sol";
 import {SatoshiMath} from "../../library/SatoshiMath.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
+// import {IDebtToken} from "../interfaces/IDebtToken.sol";
+import {DebtToken} from "../DebtToken.sol";
 import {
     IBorrowerOperationsFacet,
     BorrowerOperation,
@@ -22,7 +33,7 @@ import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
 
 contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal, OwnableInternal {
     using SafeERC20 for IERC20;
-    using SafeERC20 for IDebtToken;
+    using SafeERC20 for DebtToken;
     using BorrowerOperationsLib for *;
 
     // IFactory public factory;
@@ -156,7 +167,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    ) public {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Deposits are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -214,6 +225,59 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         }
     }
 
+    function openTroveToOtherChain(
+        ITroveManager troveManager,
+        address account,
+        uint256 _maxFeePercentage,
+        uint256 _collateralAmount,
+        uint256 _debtAmount,
+        address _upperHint,
+        address _lowerHint,
+        uint32 dstEid, // Destination endpoint ID.
+        bytes calldata extraOptions, // Additional options supplied by the caller to be used in the LayerZero message.
+        MessagingFee calldata _fee
+    ) external payable {
+        openTrove(troveManager, account, _maxFeePercentage, _collateralAmount, _debtAmount, _upperHint, _lowerHint);
+
+        _sendDebtTokenToOtherChain(account, _debtAmount, dstEid, extraOptions, _fee);
+    }
+
+    function _sendDebtTokenToOtherChain(
+        address account,
+        uint256 debtAmount,
+        uint32 dstEid, // Destination endpoint ID.
+        bytes calldata extraOptions, // Additional options supplied by the caller to be used in the LayerZero message.
+        MessagingFee calldata _fee
+    ) internal {
+        AppStorage.Layout storage s = AppStorage.layout();
+
+        // Step 1: Transfer Debt tokens to the BorrowerOps contract
+        s.debtToken.safeTransferFrom(msg.sender, address(this), debtAmount);
+
+        // Step 2: Prepare the SendParam
+        SendParam memory _sendParam = SendParam(
+            // TODO: what is effieceint way to convert address to bytes32
+            dstEid,
+            bytes32(uint256(uint160(account))),
+            debtAmount,
+            debtAmount,
+            extraOptions,
+            "",
+            ""
+        );
+
+        // Step 3: Quote the fee
+        // TODO: payInLzToken
+        require(_fee.lzTokenFee == 0, "BorrowerOps: lzTokenFee not supported");
+        require(msg.value == _fee.nativeFee, "BorrowerOps: nativeFee not sent");
+        MessagingFee memory expectFee = s.debtToken.quoteSend(_sendParam, _fee.lzTokenFee > 0);
+        require(expectFee.nativeFee == _fee.nativeFee, "BorrowerOps: nativeFee incorrect");
+        require(expectFee.lzTokenFee == _fee.lzTokenFee, "BorrowerOps: lzTokenFee incorrect");
+
+        // Step 4: Send the Debt tokens to the other chain
+        s.debtToken.send(_sendParam, _fee, account);
+    }
+
     // Send collateral to a trove
     function addColl(
         ITroveManager troveManager,
@@ -259,7 +323,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    ) public {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Withdrawals are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -269,6 +333,21 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         if (troveManager.interestPayable() != 0) {
             troveManager.collectInterests();
         }
+    }
+
+    function withdrawDebtToOtherChain(
+        ITroveManager troveManager,
+        address account,
+        uint256 _maxFeePercentage,
+        uint256 _debtAmount,
+        address _upperHint,
+        address _lowerHint,
+        uint32 dstEid, // Destination endpoint ID.
+        bytes calldata extraOptions, // Additional options supplied by the caller to be used in the LayerZero message.
+        MessagingFee calldata _fee
+    ) external {
+        withdrawDebt(troveManager, account, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint);
+        _sendDebtTokenToOtherChain(account, _debtAmount, dstEid, extraOptions, _fee);
     }
 
     // Repay Debt tokens to a Trove: Burn the repaid Debt tokens, and reduce the trove's debt accordingly

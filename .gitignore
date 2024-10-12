@@ -27,3 +27,19 @@ lib/solidity-examples
 *.info
 
 node_modules/
+
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Hardhat files
+artifacts
+
+# LayerZero specific files
+.layerzero
+# pnpm
+pnpm-error.log
+# Editor and OS files
+.DS_Store
+.idea

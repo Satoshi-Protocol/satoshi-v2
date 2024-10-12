@@ -18,6 +18,7 @@
     "solmate=lib/solmate/src",
     "@layerzerolabs/oapp-evm/=lib/devtools/packages/oapp-evm/",
     "@layerzerolabs/lz-evm-protocol-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/protocol",
-    "@layerzerolabs/oft-evm/=lib/devtools/packages/oft-evm/"
+    "@layerzerolabs/oft-evm/=lib/devtools/packages/oft-evm/",
+    "@layerzerolabs/oapp-upgradeable/contracts=lib/LayerZero-v2.git/oapp/contracts"
   ]
 }
