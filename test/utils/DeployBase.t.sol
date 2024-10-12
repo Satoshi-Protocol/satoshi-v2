@@ -268,7 +268,10 @@ abstract contract DeployBase is Test {
     function _deployDebtToken(address deployer) internal {
         vm.startPrank(deployer);
         assert(address(debtToken) == address(0)); // check if contract is not deployed
-        address debtTokenImpl = address(new DebtToken());
+        address debtTokenImpl = address(new DebtToken(
+            // TODO: pass parameter
+            // 0x6EDCE65403992e310A62460808c4b910D972f10f // arbitrum testnet
+        ));
         bytes memory data =
             abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), OWNER));
         debtToken = IDebtToken(address(new ERC1967Proxy(address(debtTokenImpl), data)));
