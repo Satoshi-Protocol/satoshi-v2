@@ -19,7 +19,7 @@ interface ISatoshiPeriphery {
 
     function debtToken() external view returns (DebtToken);
 
-    function borrowerOperationsProxy() external view returns (IBorrowerOperationsFacet);
+    function borrowerOperationsFacet() external view returns (IBorrowerOperationsFacet);
 
     function weth() external view returns (IWETH);
 
