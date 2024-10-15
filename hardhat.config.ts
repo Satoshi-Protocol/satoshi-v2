@@ -9,9 +9,11 @@ import 'hardhat-deploy'
 import 'hardhat-contract-sizer'
 import '@nomiclabs/hardhat-ethers'
 import '@layerzerolabs/toolbox-hardhat'
+import "@openzeppelin/hardhat-upgrades";
 import { HardhatUserConfig, HttpNetworkAccountsUserConfig } from 'hardhat/types'
 
 import { EndpointId } from '@layerzerolabs/lz-definitions'
+import "@nomicfoundation/hardhat-foundry";
 
 // Set your preferred authentication method
 //
@@ -37,11 +39,12 @@ if (accounts == null) {
 const config: HardhatUserConfig = {
     paths: {
         cache: 'cache/hardhat',
+        sources: "src",
     },
     solidity: {
         compilers: [
             {
-                version: '0.8.20',
+                version: '0.8.22',
                 settings: {
                     optimizer: {
                         enabled: true,
