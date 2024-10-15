@@ -20,7 +20,7 @@ remappings = [
   "@layerzerolabs/oapp-upgradeable/contracts=lib/LayerZero-v2.git/oapp/contracts",
   "@layerzerolabs/lz-evm-messagelib-v2/contracts=lib/LayerZero-v2.git/oapp/contracts",
   "@layerzerolabs/test-devtools-evm-foundry/=lib/devtools/packages/test-devtools-evm-foundry/",
-
+  "solidity-bytes-utils=lib/solidity-bytes-utils"
 ]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
