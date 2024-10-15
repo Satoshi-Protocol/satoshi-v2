@@ -34,20 +34,20 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
     using SafeERC20 for DebtToken;
 
     DebtToken public debtToken;
-    IBorrowerOperationsFacet public immutable borrowerOperationsProxy;
+    IBorrowerOperationsFacet public immutable borrowerOperationsFacet;
     IWETH public immutable weth;
 
-    constructor(DebtToken _debtToken, IBorrowerOperationsFacet _borrowerOperationsProxy, IWETH _weth) {
+    constructor(DebtToken _debtToken, IBorrowerOperationsFacet _borrowerOperationsFacet, IWETH _weth) {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
-        if (address(_borrowerOperationsProxy) == address(0)) revert InvalidZeroAddress();
+        if (address(_borrowerOperationsFacet) == address(0)) revert InvalidZeroAddress();
         if (address(_weth) == address(0)) revert InvalidZeroAddress();
 
         debtToken = _debtToken;
-        borrowerOperationsProxy = _borrowerOperationsProxy;
+        borrowerOperationsFacet = _borrowerOperationsFacet;
         weth = _weth;
     }
 
-    // account should call borrowerOperationsProxy.setDelegateApproval first
+    // account should call borrowerOperationsFacet.setDelegateApproval first
     // to approve this contract to call openTrove
     function openTrove(
         ITroveManager troveManager,
@@ -63,7 +63,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
 
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
-        borrowerOperationsProxy.openTrove(
+        borrowerOperationsFacet.openTrove(
             troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
         );
 
@@ -90,7 +90,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
 
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
-        borrowerOperationsProxy.openTrove(
+        borrowerOperationsFacet.openTrove(
             troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
         );
 
@@ -108,7 +108,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
 
         _beforeAddColl(collateralToken, _collAmount);
 
-        borrowerOperationsProxy.addColl(troveManager, msg.sender, _collAmount, _upperHint, _lowerHint);
+        borrowerOperationsFacet.addColl(troveManager, msg.sender, _collAmount, _upperHint, _lowerHint);
     }
 
     function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
@@ -117,7 +117,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         IERC20 collateralToken = troveManager.collateralToken();
         uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
 
-        borrowerOperationsProxy.withdrawColl(troveManager, msg.sender, _collWithdrawal, _upperHint, _lowerHint);
+        borrowerOperationsFacet.withdrawColl(troveManager, msg.sender, _collWithdrawal, _upperHint, _lowerHint);
 
         uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
         uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
@@ -133,7 +133,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         address _lowerHint
     ) external {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-        borrowerOperationsProxy.withdrawDebt(
+        borrowerOperationsFacet.withdrawDebt(
             troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
         );
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
@@ -154,7 +154,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         MessagingFee calldata _fee
     ) external {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-        borrowerOperationsProxy.withdrawDebt(
+        borrowerOperationsFacet.withdrawDebt(
             troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
         );
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
@@ -168,7 +168,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
     {
         _beforeRepayDebt(_debtAmount);
 
-        borrowerOperationsProxy.repayDebt(troveManager, msg.sender, _debtAmount, _upperHint, _lowerHint);
+        borrowerOperationsFacet.repayDebt(troveManager, msg.sender, _debtAmount, _upperHint, _lowerHint);
     }
 
     function adjustTrove(
@@ -195,7 +195,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
             _beforeRepayDebt(_debtChange);
         }
 
-        borrowerOperationsProxy.adjustTrove(
+        borrowerOperationsFacet.adjustTrove(
             troveManager,
             msg.sender,
             _maxFeePercentage,
@@ -221,16 +221,16 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         }
     }
 
-    // TODO: get DEBT_GAS_COMPENSATION
+    // TODO: closeTrove: get DEBT_GAS_COMPENSATION
     // function closeTrove(ITroveManager troveManager) external {
     //     (uint256 collAmount, uint256 debtAmount) = troveManager.getTroveCollAndDebt(msg.sender);
-    //     uint256 netDebtAmount = debtAmount - borrowerOperationsProxy.DEBT_GAS_COMPENSATION();
+    //     uint256 netDebtAmount = debtAmount - borrowerOperationsFacet.DEBT_GAS_COMPENSATION();
     //     _beforeRepayDebt(netDebtAmount);
 
     //     IERC20 collateralToken = troveManager.collateralToken();
     //     uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
 
-    //     borrowerOperationsProxy.closeTrove(troveManager, msg.sender);
+    //     borrowerOperationsFacet.closeTrove(troveManager, msg.sender);
 
     //     uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
     //     uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
@@ -281,7 +281,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
             collateralToken.safeTransferFrom(msg.sender, address(this), collAmount);
         }
 
-        collateralToken.approve(address(borrowerOperationsProxy), collAmount);
+        collateralToken.approve(address(borrowerOperationsFacet), collAmount);
     }
 
     function _afterWithdrawColl(IERC20 collateralToken, uint256 collAmount) private {
@@ -342,13 +342,5 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         // to receive native token
     }
 
-    // mapping(uint256 => uint256) public chainIdToEid;
-
-    // function whiteListEid(uint256 _eid) external {
-    //     chainIdToEid[CHAIN_ID] = _eid;
-    // }
-
-    // function validEid(uint256 chainId) external {
-    //     require(chainIdToEid[chainId] != 0, "SatoshiPeriphery: Invalid chain id");
-    // }
+    // TODO: Liquidate
 }
