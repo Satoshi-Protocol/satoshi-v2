@@ -41,7 +41,7 @@ const config: HardhatUserConfig = {
     solidity: {
         compilers: [
             {
-                version: '0.8.22',
+                version: '0.8.20',
                 settings: {
                     optimizer: {
                         enabled: true,
@@ -55,6 +55,16 @@ const config: HardhatUserConfig = {
         'sepolia-testnet': {
             eid: EndpointId.SEPOLIA_V2_TESTNET,
             url: process.env.RPC_URL_SEPOLIA || 'https://rpc.sepolia.org/',
+            accounts,
+        },
+        'arbitrum-sepolia': {
+            eid: EndpointId.ARBITRUM_V2_TESTNET, // from @layerzerolabs/lz-definitions
+            url: process.env.RPC_URL_ARBITRUM_SEPOLIA || 'https://arbitrum-sepolia.gateway.tenderly.co',
+            accounts,
+        },
+        'base-sepolia': {
+            eid: EndpointId.BASE_V2_TESTNET, // from @layerzerolabs/lz-definitions
+            url: process.env.RPC_URL_BASE_SEPOLIA || 'https://base-sepolia.gateway.tenderly.co',
             accounts,
         },
         'avalanche-testnet': {

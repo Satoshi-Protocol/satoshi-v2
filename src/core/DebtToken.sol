@@ -114,6 +114,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         return true;
     }
 
+    // TODO: 實驗
     function mintWithGasCompensationToOtherChain(
         SendParam calldata _sendParam,
         MessagingFee calldata _fee,

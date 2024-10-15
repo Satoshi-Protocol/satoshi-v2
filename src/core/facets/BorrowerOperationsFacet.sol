@@ -239,6 +239,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
     ) external payable {
         openTrove(troveManager, account, _maxFeePercentage, _collateralAmount, _debtAmount, _upperHint, _lowerHint);
 
+        // TODO: move to periphery
         _sendDebtTokenToOtherChain(account, _debtAmount, dstEid, extraOptions, _fee);
     }
 
