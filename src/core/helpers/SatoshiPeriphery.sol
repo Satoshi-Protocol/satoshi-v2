@@ -20,7 +20,7 @@ import {IWETH} from "./interfaces/IWETH.sol";
 import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {DebtToken} from "../DebtToken.sol";
-import {ISatoshiPeriphery} from "./interfaces/ISatoshiPeriphery.sol";
+import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
 
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
 // import {ILiquidationManager} from "../interfaces/ILiquidationManager.sol";
@@ -34,6 +34,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
     using SafeERC20 for DebtToken;
 
     DebtToken public debtToken;
+    // TODO: rename to XApp and type convert to address
+    address public immutable xApp;
     IBorrowerOperationsFacet public immutable borrowerOperationsFacet;
     IWETH public immutable weth;
 
@@ -55,34 +57,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         uint256 _collAmount,
         uint256 _debtAmount,
         address _upperHint,
-        address _lowerHint
-    ) external payable {
-        IERC20 collateralToken = troveManager.collateralToken();
-
-        _beforeAddColl(collateralToken, _collAmount);
-
-        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-
-        borrowerOperationsFacet.openTrove(
-            troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
-        );
-
-        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
-        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
-        require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
-        _afterWithdrawDebt(userDebtAmount);
-    }
-
-    function openTroveToOtherChain(
-        ITroveManager troveManager,
-        uint256 _maxFeePercentage,
-        uint256 _collAmount,
-        uint256 _debtAmount,
-        address _upperHint,
         address _lowerHint,
-        uint32 _dstEid, // Destination endpoint ID.
-        bytes calldata _extraOptions, // Additional options supplied by the caller to be used in the LayerZero message.
-        MessagingFee calldata _fee
+        LzSendParam calldata _lzSendParam
     ) external payable {
         IERC20 collateralToken = troveManager.collateralToken();
 
@@ -97,7 +73,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
         require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
-        _afterWithdrawDebtForLz(userDebtAmount, _dstEid, _extraOptions, _fee);
+        _afterWithdrawDebt(userDebtAmount, _lzSendParam);
     }
 
     function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
@@ -130,28 +106,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         uint256 _maxFeePercentage,
         uint256 _debtAmount,
         address _upperHint,
-        address _lowerHint
-    ) external {
-        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-        borrowerOperationsFacet.withdrawDebt(
-            troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
-        );
-        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
-        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
-        require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
-
-        _afterWithdrawDebt(userDebtAmount);
-    }
-
-    function withdrawDebtToOtherChain(
-        ITroveManager troveManager,
-        uint256 _maxFeePercentage,
-        uint256 _debtAmount,
-        address _upperHint,
         address _lowerHint,
-        uint32 _dstEid, // Destination endpoint ID.
-        bytes calldata _extraOptions, // Additional options supplied by the caller to be used in the LayerZero message.
-        MessagingFee calldata _fee
+        LzSendParam calldata _lzSendParam
     ) external {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
         borrowerOperationsFacet.withdrawDebt(
@@ -160,7 +116,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
         require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
-        _afterWithdrawDebtForLz(userDebtAmount, _dstEid, _extraOptions, _fee);
+
+        _afterWithdrawDebt(userDebtAmount, _lzSendParam);
     }
 
     function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
@@ -179,7 +136,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         uint256 _debtChange,
         bool _isDebtIncrease,
         address _upperHint,
-        address _lowerHint
+        address _lowerHint,
+        LzSendParam calldata _lzSendParam
     ) external payable {
         if (_collDeposit != 0 && _collWithdrawal != 0) revert CannotWithdrawAndAddColl();
 
@@ -217,7 +175,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
                 debtTokenBalanceAfter - debtTokenBalanceBefore == _debtChange, "SatoshiPeriphery: Debt amount mismatch"
             );
 
-            _afterWithdrawDebt(_debtChange);
+            _afterWithdrawDebt(_debtChange, _lzSendParam);
         }
     }
 
@@ -273,6 +231,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
     function _beforeAddColl(IERC20 collateralToken, uint256 collAmount) private {
         if (collAmount == 0) return;
 
+        // TODO: Do not support native token
         if (address(collateralToken) == address(weth)) {
             if (msg.value < collAmount) revert MsgValueMismatch(msg.value, collAmount);
 
@@ -302,33 +261,35 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         debtToken.safeTransferFrom(msg.sender, address(this), debtAmount);
     }
 
-    function _afterWithdrawDebt(uint256 debtAmount) private {
-        if (debtAmount == 0) return;
-        debtToken.safeTransfer(msg.sender, debtAmount);
-    }
-
-    function _afterWithdrawDebtForLz(
-        uint256 debtAmount,
-        uint32 dstEid, // Destination endpoint ID.
-        bytes calldata extraOptions, // Additional options supplied by the caller to be used in the LayerZero message.
-        MessagingFee calldata _fee
-    ) private {
+    function _afterWithdrawDebt(uint256 debtAmount, LzSendParam calldata lzSendParam) private {
         if (debtAmount == 0) return;
         address account = msg.sender;
-        // Step 2: Prepare the SendParam
-        SendParam memory _sendParam =
-            SendParam(dstEid, bytes32(uint256(uint160(account))), debtAmount, debtAmount, extraOptions, "", "");
+        if (lzSendParam.dstEid == 0) {
+            debtToken.safeTransfer(account, debtAmount);
+        } else {
+            // Step 1: Prepare the SendParam
+            SendParam memory _sendParam = SendParam(
+                lzSendParam.dstEid,
+                bytes32(uint256(uint160(account))),
+                debtAmount,
+                debtAmount,
+                lzSendParam.extraOptions,
+                "",
+                ""
+            );
 
-        // Step 3: Quote the fee
-        // TODO: payInLzToken
-        require(_fee.lzTokenFee == 0, "BorrowerOps: lzTokenFee not supported");
-        require(msg.value == _fee.nativeFee, "BorrowerOps: nativeFee not sent");
-        MessagingFee memory expectFee = debtToken.quoteSend(_sendParam, _fee.lzTokenFee > 0);
-        require(expectFee.nativeFee == _fee.nativeFee, "BorrowerOps: nativeFee incorrect");
-        require(expectFee.lzTokenFee == _fee.lzTokenFee, "BorrowerOps: lzTokenFee incorrect");
+            // Step 2: Quote the fee
+            // TODO: payInLzToken
+            require(lzSendParam.fee.lzTokenFee == 0, "BorrowerOps: lzTokenFee not supported");
+            // TODO: check collateral token is native token?
+            require(msg.value == lzSendParam.fee.nativeFee, "BorrowerOps: nativeFee not sent");
+            MessagingFee memory expectFee = debtToken.quoteSend(_sendParam, lzSendParam.fee.lzTokenFee > 0);
+            require(expectFee.nativeFee == lzSendParam.fee.nativeFee, "BorrowerOps: nativeFee incorrect");
+            require(expectFee.lzTokenFee == lzSendParam.fee.lzTokenFee, "BorrowerOps: lzTokenFee incorrect");
 
-        // Step 4: Send the Debt tokens to the other chain
-        debtToken.send(_sendParam, _fee, account);
+            // Step 3: Send the Debt tokens to the other chain
+            debtToken.send(_sendParam, lzSendParam.fee, account);
+        }
     }
 
     function _refundGas() internal {

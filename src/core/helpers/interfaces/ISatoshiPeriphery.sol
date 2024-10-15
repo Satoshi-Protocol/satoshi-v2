@@ -1,12 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {MessagingFee} from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+
 import {DebtToken} from "../../DebtToken.sol";
 
 import {IBorrowerOperationsFacet} from "../../interfaces/IBorrowerOperationsFacet.sol";
 import {ITroveManager} from "../../interfaces/ITroveManager.sol";
 import {IWETH} from "./IWETH.sol";
 // import {ILiquidationManager} from "../../interfaces/core/ILiquidationManager.sol";
+
+struct LzSendParam {
+    uint32 dstEid;
+    bytes extraOptions;
+    MessagingFee fee;
+}
 
 interface ISatoshiPeriphery {
     error MsgValueMismatch(uint256 msgValue, uint256 collAmount);
@@ -29,7 +37,8 @@ interface ISatoshiPeriphery {
         uint256 _collAmount,
         uint256 _debtAmount,
         address _upperHint,
-        address _lowerHint
+        address _lowerHint,
+        LzSendParam calldata _lzSendParam
     ) external payable;
 
     function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
@@ -44,7 +53,8 @@ interface ISatoshiPeriphery {
         uint256 _maxFeePercentage,
         uint256 _debtAmount,
         address _upperHint,
-        address _lowerHint
+        address _lowerHint,
+        LzSendParam calldata _lzSendParam
     ) external;
 
     function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
@@ -58,7 +68,8 @@ interface ISatoshiPeriphery {
         uint256 _debtChange,
         bool _isDebtIncrease,
         address _upperHint,
-        address _lowerHint
+        address _lowerHint,
+        LzSendParam calldata _lzSendParam
     ) external payable;
 
     // function closeTrove(ITroveManager troveManager) external;
