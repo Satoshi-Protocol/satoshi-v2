@@ -54,14 +54,14 @@ abstract contract DeployBase is Test {
     IBeacon internal troveManagerBeacon;
 
     function setUp() public virtual {
-        _deployOSHIToken(DEPLOYER);
-        _deployDebtToken(DEPLOYER);
         _deployRewardManager(DEPLOYER);
-        _deployCommunityIssuance(DEPLOYER);
         _deploySortedTrovesBeacon(DEPLOYER);
         _deployTroveManagerBeacon(DEPLOYER);
         _deploySatoshiXApp(DEPLOYER);
         _deployAndCutFacets(DEPLOYER);
+        _deployOSHIToken(DEPLOYER);
+        _deployDebtToken(DEPLOYER);
+        _deployCommunityIssuance(DEPLOYER);
         _deployInitializer(DEPLOYER);
     }
 
@@ -86,8 +86,8 @@ abstract contract DeployBase is Test {
         _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
         (facetAddr, selectors) = _deployPriceFeedAggregatorFacet(deployer);
         _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
-        (facetAddr, selectors) = _deployStabilityPoolFacet(deployer);
-        _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
+        // (facetAddr, selectors) = _deployStabilityPoolFacet(deployer);
+        // _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
     }
 
     function _deployBorrowerOperationsFacet(address deployer) internal returns (address, bytes4[] memory) {
@@ -121,8 +121,19 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(coreFacet) == address(0)); // check if contract is not deployed
         coreFacet = ICoreFacet(address(new CoreFacet()));
-        bytes4[] memory selectors = new bytes4[](10);
-        //TODO add selectors
+        bytes4[] memory selectors = new bytes4[](12);
+        selectors[0] = ICoreFacet.setFeeReceiver.selector;
+        selectors[1] = ICoreFacet.setRewardManager.selector;
+        selectors[2] = ICoreFacet.setPaused.selector;
+        selectors[3] = ICoreFacet.feeReceiver.selector;
+        selectors[4] = ICoreFacet.rewardManager.selector;
+        selectors[5] = ICoreFacet.paused.selector;
+        selectors[6] = ICoreFacet.startTime.selector;
+        selectors[7] = ICoreFacet.debtToken.selector;
+        selectors[8] = ICoreFacet.gasCompensation.selector;
+        selectors[9] = ICoreFacet.sortedTrovesBeacon.selector;
+        selectors[10] = ICoreFacet.troveManagerBeacon.selector;
+        selectors[11] = ICoreFacet.communityIssuance.selector;
         vm.stopPrank();
         return (address(coreFacet), selectors);
     }
@@ -131,8 +142,12 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(factoryFacet) == address(0)); // check if contract is not deployed
         factoryFacet = IFactoryFacet(address(new FactoryFacet()));
-        bytes4[] memory selectors = new bytes4[](10);
-        //TODO add selectors
+        bytes4[] memory selectors = new bytes4[](5);
+        selectors[0] = IFactoryFacet.deployNewInstance.selector;
+        selectors[1] = IFactoryFacet.troveManagerCount.selector;
+        selectors[2] = IFactoryFacet.troveManagers.selector;
+        selectors[3] = IFactoryFacet.setTMRewardRate.selector;
+        selectors[4] = IFactoryFacet.maxTMRewardRate.selector;
         vm.stopPrank();
         return (address(factoryFacet), selectors);
     }
@@ -141,8 +156,10 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(liquidationFacet) == address(0)); // check if contract is not deployed
         liquidationFacet = ILiquidationFacet(address(new LiquidationFacet()));
-        bytes4[] memory selectors = new bytes4[](10);
-        //TODO add selectors
+        bytes4[] memory selectors = new bytes4[](3);
+        selectors[0] = ILiquidationFacet.batchLiquidateTroves.selector;
+        selectors[1] = ILiquidationFacet.liquidate.selector;
+        selectors[2] = ILiquidationFacet.liquidateTroves.selector;
         vm.stopPrank();
         return (address(liquidationFacet), selectors);
     }
@@ -151,8 +168,11 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(priceFeedAggregatorFacet) == address(0)); // check if contract is not deployed
         priceFeedAggregatorFacet = IPriceFeedAggregatorFacet(address(new PriceFeedAggregatorFacet()));
-        bytes4[] memory selectors = new bytes4[](10);
-        //TODO add selectors
+        bytes4[] memory selectors = new bytes4[](4);
+        selectors[0] = IPriceFeedAggregatorFacet.fetchPrice.selector;
+        selectors[1] = IPriceFeedAggregatorFacet.fetchPriceUnsafe.selector;
+        selectors[2] = IPriceFeedAggregatorFacet.setPriceFeed.selector;
+        selectors[3] = IPriceFeedAggregatorFacet.oracleRecords.selector;
         vm.stopPrank();
         return (address(priceFeedAggregatorFacet), selectors);
     }
@@ -161,7 +181,7 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(stabilityPoolFacet) == address(0)); // check if contract is not deployed
         stabilityPoolFacet = IStabilityPoolFacet(address(new StabilityPoolFacet()));
-        bytes4[] memory selectors = new bytes4[](10);
+        bytes4[] memory selectors = new bytes4[](0);
         //TODO add selectors
         vm.stopPrank();
         return (address(stabilityPoolFacet), selectors);
