@@ -24,19 +24,6 @@ import {Config} from "../Config.sol";
 contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInternal, OwnableInternal, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
-    modifier onlyRouter() {
-        AppStorage.Layout storage s = AppStorage.layout();
-        require(msg.sender == address(s.xAppRouter), "NexusYieldManager: caller is not the router");
-        _;
-    }
-
-    // modifier xrecv(XTypes.MsgShort calldata xmsg) {
-    //     AppStorage.Layout storage s = AppStorage.layout();
-    //     s.xmsg = xmsg;
-    //     _;
-    //     delete s.xmsg;
-    // }
-
     /**
      * @dev Prevents functions to execute when contract is paused.
      */
@@ -55,7 +42,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         _;
     }
 
-    function setAssetConfig(address asset, AssetConfig calldata assetConfig_) external {
+    function setAssetConfig(address asset, AssetConfig calldata assetConfig_) external onlyOwner {
         AppStorage.Layout storage s = AppStorage.layout();
         if (assetConfig_.feeIn >= Config.BASIS_POINTS_DIVISOR || assetConfig_.feeOut >= Config.BASIS_POINTS_DIVISOR) {
             revert InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
@@ -85,6 +72,21 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         s.isAssetSupported[asset] = false;
 
         emit AssetSunset(asset);
+    }
+
+    /**
+     * @notice Transfer the token to the privileged vault.
+     * @param token The address of the token to transfer.
+     * @param vault The address of the privileged vault.
+     * @param amount The amount of token to transfer.
+     */
+    function transerTokenToPrivilegedVault(address token, address vault, uint256 amount) external onlyOwner {
+        AppStorage.Layout storage s = AppStorage.layout();
+        if (!s.isPrivileged[vault]) {
+            revert NotPrivileged(vault);
+        }
+        IERC20(token).transfer(vault, amount);
+        emit TokenTransferred(token, vault, amount);
     }
 
     /**
@@ -148,8 +150,8 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         // mint debtToken fee to rewardManager
         if (fee != 0) {
             s.debtToken.mint(address(this), fee);
-            s.debtToken.approve(s.rewardManagerAddr, fee);
-            IRewardManager(s.rewardManagerAddr).increaseSATPerUintStaked(fee);
+            s.debtToken.approve(address(s.rewardManager), fee);
+            s.rewardManager.increaseSATPerUintStaked(fee);
         }
 
         emit AssetForDebtTokenSwapped(msg.sender, receiver, asset, actualTransferAmt, debtTokenToMint, fee);
@@ -201,8 +203,8 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
 
         if (fee != 0) {
             s.debtToken.transferFrom(msg.sender, address(this), fee);
-            s.debtToken.approve(s.rewardManagerAddr, fee);
-            IRewardManager(s.rewardManagerAddr).increaseSATPerUintStaked(fee);
+            s.debtToken.approve(address(s.rewardManager), fee);
+            s.rewardManager.increaseSATPerUintStaked(fee);
         }
 
         s.debtToken.burn(msg.sender, swapAmount);
@@ -238,6 +240,99 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     }
 
     /**
+     * @notice Swaps debtToken for a asset.
+     * @param receiver The address where the stablecoin will be sent.
+     * @param amount The amount of stable tokens to receive.
+     * @return The amount of asset received.
+     */
+    // @custom:event Emits DebtTokenForAssetSwapped event.
+    function swapOutPrivileged(address asset, address receiver, uint256 amount)
+        external
+        isActive
+        onlyPrivileged
+        nonReentrant
+        returns (uint256)
+    {
+        _ensureNonzeroAddress(receiver);
+        _ensureNonzeroAmount(amount);
+        _ensureAssetSupported(asset);
+
+        AppStorage.Layout storage s = AppStorage.layout();
+
+        // get asset amount
+        uint256 assetAmount = _previewAssetAmountFromDebtToken(asset, amount, FeeDirection.OUT);
+
+        uint256 debtBalance = s.debtToken.balanceOf(msg.sender);
+        if (debtBalance < amount) {
+            revert NotEnoughDebtToken(debtBalance, amount);
+        }
+
+        AssetConfig storage assetConfig = s.assetConfigs[asset];
+
+        if (assetConfig.debtTokenMinted < amount) {
+            revert DebtTokenMintedUnderflow(assetConfig.debtTokenMinted, amount);
+        }
+
+        unchecked {
+            assetConfig.debtTokenMinted -= amount;
+        }
+
+        s.debtToken.burn(msg.sender, amount);
+        IERC20(asset).safeTransfer(receiver, assetAmount);
+        emit DebtTokenForAssetSwapped(msg.sender, receiver, asset, amount, assetAmount, 0);
+        return assetAmount;
+    }
+
+    /**
+     * @notice Swaps stable tokens for debtToken.
+     * @dev This function adds support to fee-on-transfer tokens. The actualTransferAmt is calculated, by recording token balance state before and after the transfer.
+     * @param receiver The address that will receive the debtToken tokens.
+     * @param assetAmount The amount of stable tokens to be swapped.
+     * @return Amount of debtToken minted to the sender.
+     */
+    // @custom:event Emits AssetForDebtTokenSwapped event.
+    function swapInPrivileged(address asset, address receiver, uint256 assetAmount)
+        external
+        isActive
+        onlyPrivileged
+        nonReentrant
+        returns (uint256)
+    {
+        _ensureNonzeroAddress(receiver);
+        _ensureNonzeroAmount(assetAmount);
+        _ensureAssetSupported(asset);
+
+        AppStorage.Layout storage s = AppStorage.layout();
+
+        // transfer IN, supporting fee-on-transfer tokens
+        uint256 balanceBefore = IERC20(asset).balanceOf(address(this));
+        IERC20(asset).safeTransferFrom(msg.sender, address(this), assetAmount);
+        uint256 balanceAfter = IERC20(asset).balanceOf(address(this));
+
+        // calculate actual transfered amount (in case of fee-on-transfer tokens)
+        uint256 actualTransferAmt = balanceAfter - balanceBefore;
+
+        // convert to decimal 18
+        uint256 actualTransferAmtInUSD = _previewTokenUSDAmount(asset, actualTransferAmt, FeeDirection.IN);
+
+        AssetConfig storage assetConfig = s.assetConfigs[asset];
+        if (assetConfig.debtTokenMinted + actualTransferAmtInUSD > assetConfig.debtTokenMintCap) {
+            revert DebtTokenMintCapReached(
+                assetConfig.debtTokenMinted, actualTransferAmtInUSD, assetConfig.debtTokenMintCap
+            );
+        }
+        unchecked {
+            assetConfig.debtTokenMinted += actualTransferAmtInUSD;
+        }
+
+        // mint debtToken to receiver
+        s.debtToken.mint(receiver, actualTransferAmtInUSD);
+
+        emit AssetForDebtTokenSwapped(msg.sender, receiver, asset, actualTransferAmt, actualTransferAmtInUSD, 0);
+        return actualTransferAmtInUSD;
+    }
+
+    /**
      * Admin Functions **
      */
 
@@ -270,17 +365,6 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     }
 
     /**
-     * @notice Set the address of the Reward Manager.
-     * @param rewardManager_ The address of the Reward Manager.
-     */
-    function setRewardManager(address rewardManager_) external {
-        AppStorage.Layout storage s = AppStorage.layout();
-        address oldTreasuryAddress = s.rewardManagerAddr;
-        s.rewardManagerAddr = rewardManager_;
-        emit RewardManagerChanged(oldTreasuryAddress, rewardManager_);
-    }
-
-    /**
      * @notice Set the privileged status of an address.
      * @param account The address to set the privileged status.
      * @param isPrivileged_ The privileged status to set.
@@ -303,7 +387,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      */
     function previewSwapOut(address asset, uint256 amount) external view returns (uint256, uint256) {
         _ensureNonzeroAmount(amount);
-        // _ensureAssetSupported(asset);
+        _ensureAssetSupported(asset);
 
         uint256 fee = _calculateFee(asset, amount, FeeDirection.OUT);
         uint256 assetAmount = _previewAssetAmountFromDebtToken(asset, amount - fee, FeeDirection.OUT);
@@ -319,7 +403,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      */
     function previewSwapIn(address asset, uint256 assetAmount) external view returns (uint256, uint256) {
         _ensureNonzeroAmount(assetAmount);
-        // _ensureAssetSupported(asset);
+        _ensureAssetSupported(asset);
 
         uint256 assetAmountUSD = _previewTokenUSDAmount(asset, assetAmount, FeeDirection.IN);
 

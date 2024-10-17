@@ -20,6 +20,8 @@ import {PriceFeedAggregatorFacet} from "../../src/core/facets/PriceFeedAggregato
 import {IPriceFeedAggregatorFacet} from "../../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
 import {StabilityPoolFacet} from "../../src/core/facets/StabilityPoolFacet.sol";
 import {IStabilityPoolFacet} from "../../src/core/interfaces/IStabilityPoolFacet.sol";
+import {INexusYieldManagerFacet} from "../../src/core/interfaces/INexusYieldManagerFacet.sol";
+import {NexusYieldManagerFacet} from "../../src/core/facets/NexusYieldManagerFacet.sol";
 import {Initializer} from "../../src/core/Initializer.sol";
 
 import {IRewardManager} from "../../src/OSHI/interfaces/IRewardManager.sol";
@@ -43,6 +45,7 @@ abstract contract DeployBase is Test {
     ILiquidationFacet internal liquidationFacet;
     IPriceFeedAggregatorFacet internal priceFeedAggregatorFacet;
     IStabilityPoolFacet internal stabilityPoolFacet;
+    INexusYieldManagerFacet internal nexusYieldManagerFacet;
     Initializer internal initializer;
 
     IDebtToken internal debtToken;
@@ -86,8 +89,10 @@ abstract contract DeployBase is Test {
         _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
         (facetAddr, selectors) = _deployPriceFeedAggregatorFacet(deployer);
         _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
-        // (facetAddr, selectors) = _deployStabilityPoolFacet(deployer);
-        // _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
+        (facetAddr, selectors) = _deployStabilityPoolFacet(deployer);
+        _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
+        (facetAddr, selectors) = _deployNexusYieldManagerFacet(deployer);
+        _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
     }
 
     function _deployBorrowerOperationsFacet(address deployer) internal returns (address, bytes4[] memory) {
@@ -181,8 +186,65 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(stabilityPoolFacet) == address(0)); // check if contract is not deployed
         stabilityPoolFacet = IStabilityPoolFacet(address(new StabilityPoolFacet()));
-        bytes4[] memory selectors = new bytes4[](0);
-        //TODO add selectors
+        bytes4[] memory selectors = new bytes4[](23);
+        selectors[0] = IStabilityPoolFacet.claimCollateralGains.selector;
+        selectors[1] = IStabilityPoolFacet.provideToSP.selector;
+        selectors[2] = IStabilityPoolFacet.startCollateralSunset.selector;
+        selectors[3] = IStabilityPoolFacet.withdrawFromSP.selector;
+        selectors[4] = IStabilityPoolFacet.accountDeposits.selector;
+        selectors[5] = IStabilityPoolFacet.collateralGainsByDepositor.selector;
+        selectors[6] = IStabilityPoolFacet.collateralTokens.selector;
+        selectors[7] = IStabilityPoolFacet.currentEpoch.selector;
+        selectors[8] = IStabilityPoolFacet.currentScale.selector;
+        selectors[9] = IStabilityPoolFacet.depositSnapshots.selector;
+        selectors[10] = IStabilityPoolFacet.depositSums.selector;
+        selectors[11] = IStabilityPoolFacet.epochToScaleToG.selector;
+        selectors[12] = IStabilityPoolFacet.epochToScaleToSums.selector;
+        selectors[13] = IStabilityPoolFacet.getCompoundedDebtDeposit.selector;
+        selectors[14] = IStabilityPoolFacet.getDepositorCollateralGain.selector;
+        selectors[15] = IStabilityPoolFacet.getTotalDebtTokenDeposits.selector;
+        selectors[16] = IStabilityPoolFacet.indexByCollateral.selector;
+        selectors[17] = IStabilityPoolFacet.claimableReward.selector;
+        selectors[18] = IStabilityPoolFacet.claimReward.selector;
+        selectors[19] = IStabilityPoolFacet.setClaimStartTime.selector;
+        selectors[20] = IStabilityPoolFacet.isClaimStart.selector;
+        selectors[21] = IStabilityPoolFacet.rewardRate.selector;
+        selectors[22] = IStabilityPoolFacet.setSPRewardRate.selector;
+        vm.stopPrank();
+        return (address(stabilityPoolFacet), selectors);
+    }
+
+    function _deployNexusYieldManagerFacet(address deployer) internal returns (address, bytes4[] memory) {
+        vm.startPrank(deployer);
+        assert(address(nexusYieldManagerFacet) == address(0)); // check if contract is not deployed
+        nexusYieldManagerFacet = INexusYieldManagerFacet(address(new NexusYieldManagerFacet()));
+        bytes4[] memory selectors = new bytes4[](26);
+        selectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
+        selectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
+        selectors[2] = INexusYieldManagerFacet.swapIn.selector;
+        selectors[3] = INexusYieldManagerFacet.pause.selector;
+        selectors[4] = INexusYieldManagerFacet.resume.selector;
+        selectors[5] = INexusYieldManagerFacet.setPrivileged.selector;
+        selectors[6] = INexusYieldManagerFacet.transerTokenToPrivilegedVault.selector;
+        selectors[7] = INexusYieldManagerFacet.previewSwapOut.selector;
+        selectors[8] = INexusYieldManagerFacet.previewSwapIn.selector;
+        selectors[9] = INexusYieldManagerFacet.swapOutPrivileged.selector;
+        selectors[10] = INexusYieldManagerFacet.swapInPrivileged.selector;
+        selectors[11] = INexusYieldManagerFacet.scheduleSwapOut.selector;
+        selectors[12] = INexusYieldManagerFacet.withdraw.selector;
+        selectors[13] = INexusYieldManagerFacet.convertDebtTokenToAssetAmount.selector;
+        selectors[14] = INexusYieldManagerFacet.convertAssetToDebtTokenAmount.selector;
+        selectors[15] = INexusYieldManagerFacet.oracle.selector;
+        selectors[16] = INexusYieldManagerFacet.feeIn.selector;
+        selectors[17] = INexusYieldManagerFacet.feeOut.selector;
+        selectors[18] = INexusYieldManagerFacet.debtTokenMintCap.selector;
+        selectors[19] = INexusYieldManagerFacet.dailyDebtTokenMintCap.selector;
+        selectors[20] = INexusYieldManagerFacet.debtTokenMinted.selector;
+        selectors[21] = INexusYieldManagerFacet.isUsingOracle.selector;
+        selectors[22] = INexusYieldManagerFacet.swapWaitingPeriod.selector;
+        selectors[23] = INexusYieldManagerFacet.debtTokenDailyMintCapRemain.selector;
+        selectors[24] = INexusYieldManagerFacet.pendingWithdrawal.selector;
+        selectors[25] = INexusYieldManagerFacet.pendingWithdrawals.selector;
         vm.stopPrank();
         return (address(stabilityPoolFacet), selectors);
     }

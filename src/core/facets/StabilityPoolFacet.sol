@@ -19,61 +19,6 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal, Ownab
     using SafeERC20 for IERC20;
     using StabilityPoolLib for AppStorage.Layout;
 
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
-    // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
-    // // solhint-disable-next-line no-empty-blocks
-    // function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
-    //     // No additional authorization logic is needed for this contract
-    // }
-
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IDebtToken _debtToken,
-    //     IFactory _factory,
-    //     ILiquidationManager _liquidationManager,
-    //     ICommunityIssuance _communityIssuance
-    // ) external initializer {
-    //     __UUPSUpgradeable_init_unchained();
-    //     __SatoshiOwnable_init(_satoshiCore);
-    //     debtToken = _debtToken;
-    //     factory = _factory;
-    //     liquidationManager = _liquidationManager;
-    //     P = DECIMAL_PRECISION;
-    //     communityIssuance = _communityIssuance;
-    //     lastUpdate = uint32(block.timestamp);
-    // }
-
-    // function enableCollateral(IERC20 _collateral) external {
-    //     require(msg.sender == address(factory), "Not factory");
-    //     uint256 length = collateralTokens.length;
-    //     bool collateralEnabled;
-    //     for (uint256 i = 0; i < length; i++) {
-    //         if (collateralTokens[i] == _collateral) {
-    //             collateralEnabled = true;
-    //             break;
-    //         }
-    //     }
-    //     if (!collateralEnabled) {
-    //         Queue memory queueCached = queue;
-    //         if (queueCached.nextSunsetIndexKey > queueCached.firstSunsetIndexKey) {
-    //             SunsetIndex memory sIdx = _sunsetIndexes[queueCached.firstSunsetIndexKey];
-    //             if (sIdx.expiry < block.timestamp) {
-    //                 delete _sunsetIndexes[queue.firstSunsetIndexKey++];
-    //                 _overwriteCollateral(_collateral, sIdx.idx);
-    //                 return;
-    //             }
-    //         }
-    //         collateralTokens.push(_collateral);
-    //         indexByCollateral[_collateral] = collateralTokens.length;
-    //     } else {
-    //         // revert if the factory is trying to deploy a new TM with a sunset collateral
-    //         require(indexByCollateral[_collateral] > 0, "Collateral is sunsetting");
-    //     }
-    // }
-
     function setSPRewardRate(uint128 _newRewardRate) external onlyOwner {
         require(_newRewardRate <= Config.SP_MAX_REWARD_RATE, "StabilityPool: Reward rate too high");
         AppStorage.Layout storage s = AppStorage.layout();
@@ -433,5 +378,69 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal, Ownab
     function isClaimStart() external view returns (bool) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s._isClaimStart();
+    }
+
+    function accountDeposits(address _depositor) external view returns (uint128 amount, uint128 timestamp) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        amount = s.accountDeposits[_depositor].amount;
+        timestamp = s.accountDeposits[_depositor].timestamp;
+    }
+
+    function collateralGainsByDepositor(address depositor, uint256 index) external view returns (uint80 gains) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        gains = s.collateralGainsByDepositor[depositor][index];
+    }
+
+    function collateralTokens(uint256 index) external view returns (IERC20) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.collateralTokens[index];
+    }
+
+    function currentEpoch() external view returns (uint128) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.currentEpoch;
+    }
+
+    function currentScale() external view returns (uint128) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.currentScale;
+    }
+
+    function depositSnapshots(address depositor)
+        external
+        view
+        returns (uint256 P, uint256 G, uint128 scale, uint128 epoch)
+    {
+        AppStorage.Layout storage s = AppStorage.layout();
+        Snapshots memory snapshots = s.depositSnapshots[depositor];
+        P = snapshots.P;
+        G = snapshots.G;
+        scale = snapshots.scale;
+        epoch = snapshots.epoch;
+    }
+
+    function depositSums(address depositor, uint256 index) external view returns (uint256) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.depositSums[depositor][index];
+    }
+
+    function epochToScaleToG(uint128 epoch, uint128 scale) external view returns (uint256) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.epochToScaleToG[epoch][scale];
+    }
+
+    function epochToScaleToSums(uint128 epoch, uint128 scale, uint256 index) external view returns (uint256) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.epochToScaleToSums[epoch][scale][index];
+    }
+
+    function indexByCollateral(IERC20 collateral) external view returns (uint256 index) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.indexByCollateral[collateral];
+    }
+
+    function rewardRate() external view returns (uint128) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.spRewardRate;
     }
 }

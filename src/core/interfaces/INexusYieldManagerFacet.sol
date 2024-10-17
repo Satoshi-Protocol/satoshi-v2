@@ -2,7 +2,6 @@ pragma solidity ^0.8.19;
 
 import {IDebtToken} from "./IDebtToken.sol";
 import {IPriceFeedAggregatorFacet} from "./IPriceFeedAggregatorFacet.sol";
-// import {ISatoshiOwnable} from "../dependencies/ISatoshiOwnable.sol";
 
 struct AssetConfig {
     /// The address of ResilientOracle contract wrapped in its interface.
@@ -149,19 +148,17 @@ interface INexusYieldManagerFacet {
 
     function resume() external;
 
-    function setRewardManager(address rewardManager_) external;
-
     function setPrivileged(address account, bool isPrivileged_) external;
 
-    // function transerTokenToPrivilegedVault(address token, address vault, uint256 amount) external;
+    function transerTokenToPrivilegedVault(address token, address vault, uint256 amount) external;
 
     function previewSwapOut(address asset, uint256 stableTknAmount) external returns (uint256, uint256);
 
     function previewSwapIn(address asset, uint256 stableTknAmount) external returns (uint256, uint256);
 
-    // function swapOutPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
+    function swapOutPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
 
-    // function swapInPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
+    function swapInPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
 
     function scheduleSwapOut(address asset, uint256 amount) external returns (uint256);
 

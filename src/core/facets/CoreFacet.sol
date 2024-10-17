@@ -12,18 +12,6 @@ import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
 import {Config} from "../Config.sol";
 
 contract CoreFacet is ICoreFacet, AccessControlInternal, OwnableInternal {
-    // constructor(address _owner, address _guardian, address _feeReceiver, address _rewardManager, uint256 _ownershipTransferDelay) {
-    //     owner = _owner;
-    //     startTime = block.timestamp;
-    //     guardian = _guardian;
-    //     feeReceiver = _feeReceiver;
-    //     rewardManager = _rewardManager;
-    //     ownershipTransferDelay = ownershipTransferDelay;
-    //     emit GuardianSet(_guardian);
-    //     emit FeeReceiverSet(_feeReceiver);
-    //     emit RewardManagerSet(_rewardManager);
-    // }
-
     /**
      * @notice Set the receiver of one time borrow fee in the protocol
      * @param _feeReceiver Address of the fee's recipient

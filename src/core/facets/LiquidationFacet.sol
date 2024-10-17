@@ -23,20 +23,6 @@ import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableInternal {
     using StabilityPoolLib for AppStorage.Layout;
     using BorrowerOperationsLib for AppStorage.Layout;
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IStabilityPool _stabilityPool,
-    //     IBorrowerOperations _borrowerOperations,
-    //     IFactory _factory,
-    //     uint256 _gasCompensation
-    // ) external initializer {
-    //     __UUPSUpgradeable_init_unchained();
-    //     __SatoshiOwnable_init(_satoshiCore);
-    //     __SatoshiBase_init(_gasCompensation);
-    //     stabilityPool = _stabilityPool;
-    //     borrowerOperations = _borrowerOperations;
-    //     factory = _factory;
-    // }
 
     // --- Trove Liquidation functions ---
 

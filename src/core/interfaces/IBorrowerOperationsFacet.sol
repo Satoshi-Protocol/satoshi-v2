@@ -29,14 +29,6 @@ interface IBorrowerOperationsFacet {
     event MinNetDebtUpdated(uint256 _minNetDebt);
     event DelegateApprovalSet(address indexed caller, address indexed delegate, bool isApproved);
 
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IDebtToken _debtToken,
-    //     IFactory _factory,
-    //     uint256 _minNetDebt,
-    //     uint256 _gasCompensation
-    // ) external;
-
     function isApprovedDelegate(address _account, address _delegate) external view returns (bool);
 
     function setDelegateApproval(address _delegate, bool _isApproved) external;
@@ -109,10 +101,6 @@ interface IBorrowerOperationsFacet {
     ) external;
 
     function checkRecoveryMode(uint256 TCR) external pure returns (bool);
-
-    // function debtToken() external view returns (IDebtToken);
-
-    // function factory() external view returns (IFactory);
 
     function getCompositeDebt(uint256 _debt) external view returns (uint256);
 

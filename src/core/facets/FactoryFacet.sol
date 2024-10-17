@@ -17,55 +17,6 @@ import {Queue, SunsetIndex} from "../interfaces/IStabilityPoolFacet.sol";
 import {Config} from "../Config.sol";
 
 contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
-    // IDebtToken public debtToken;
-    // IGasPool public gasPool;
-    // IPriceFeedAggregator public priceFeedAggregatorProxy;
-    // IBorrowerOperations public borrowerOperationsProxy;
-    // ILiquidationManager public liquidationManagerProxy;
-    // IStabilityPool public stabilityPoolProxy;
-    // IBeacon public sortedTrovesBeacon;
-    // IBeacon public troveManagerBeacon;
-    // uint256 public gasCompensation;
-    // ICommunityIssuance public communityIssuance;
-    // ITroveManager[] public troveManagers;
-
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
-    // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
-    // // solhint-disable-next-line no-empty-blocks
-    // function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
-    //     // No additional authorization logic is needed for this contract
-    // }
-
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IDebtToken _debtToken,
-    //     IGasPool _gasPool,
-    //     IPriceFeedAggregator _priceFeedAggregatorProxy,
-    //     IBorrowerOperations _borrowerOperationsProxy,
-    //     ILiquidationManager _liquidationManagerProxy,
-    //     IStabilityPool _stabilityPoolProxy,
-    //     IBeacon _sortedTrovesBeacon,
-    //     IBeacon _troveManagerBeacon,
-    //     ICommunityIssuance _communityIssuance,
-    //     uint256 _gasCompensation
-    // ) external initializer {
-    //     __UUPSUpgradeable_init_unchained();
-    //     __SatoshiOwnable_init(_satoshiCore);
-    //     debtToken = _debtToken;
-    //     gasPool = _gasPool;
-    //     priceFeedAggregatorProxy = _priceFeedAggregatorProxy;
-    //     borrowerOperationsProxy = _borrowerOperationsProxy;
-    //     liquidationManagerProxy = _liquidationManagerProxy;
-    //     stabilityPoolProxy = _stabilityPoolProxy;
-    //     sortedTrovesBeacon = _sortedTrovesBeacon;
-    //     troveManagerBeacon = _troveManagerBeacon;
-    //     gasCompensation = _gasCompensation;
-    //     communityIssuance = _communityIssuance;
-    // }
-
     function troveManagerCount() external view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s.troveManagers.length;
