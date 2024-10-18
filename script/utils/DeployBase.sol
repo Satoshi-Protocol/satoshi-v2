@@ -139,8 +139,8 @@ abstract contract DeployBase is Script {
 
     function _deployRewardManager() private {
         assert(address(rewardManager) == address(0));
-        address rewardManagerImpl = address(new RewardManager());
 
+        address rewardManagerImpl = address(new RewardManager());
         bytes memory data = abi.encodeCall(RewardManager.initialize, (InitialConfig.OWNER));
         rewardManager = IRewardManager(address(new ERC1967Proxy(rewardManagerImpl, data)));
     }

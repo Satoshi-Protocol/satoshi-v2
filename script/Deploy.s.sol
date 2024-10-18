@@ -11,6 +11,8 @@ import {DeployBase} from "./utils/DeployBase.sol";
 import {Script, console} from "forge-std/Script.sol";
 import {IERC2535DiamondCutInternal} from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
 
+import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
+
 contract DeployScript is DeployBase, IERC2535DiamondCutInternal {
     uint256 public constant TOTAL_FACETS = 7;
 
@@ -21,8 +23,8 @@ contract DeployScript is DeployBase, IERC2535DiamondCutInternal {
 
         _deployContracts();
 
-        _initSatoshiXApp();
         _updateFacetCuts();
+        _initSatoshiXApp();
 
         vm.stopBroadcast();
     }
@@ -80,14 +82,15 @@ contract DeployScript is DeployBase, IERC2535DiamondCutInternal {
         FacetCut[] memory facetCuts = new FacetCut[](1);
         facetCuts[0] = Builder.buildInitializer(coreFacet);
 
-        bytes memory data = abi.encodeWithSelector(
-            Initializer.init.selector,
+        bytes memory _data = abi.encode(
             address(rewardManager),
             address(debtToken),
             address(communityIssuance),
             address(sortedTrovesBeacon),
             address(troveManagerBeacon)
         );
+
+        bytes memory data = abi.encodeWithSelector(Initializer.init.selector, _data);
 
         ISatoshiXApp(satoshiXApp).diamondCut(facetCuts, initializer, data);
     }
