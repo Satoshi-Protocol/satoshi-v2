@@ -61,6 +61,11 @@ struct RewardSnapshot {
     uint256 debt;
 }
 
+struct FarmingParams {
+    uint256 retainPercentage;
+    uint256 refillPercentage;
+}
+
 interface ITroveManager {
     event BaseRateUpdated(uint256 _baseRate);
     event CollateralSent(address _to, uint256 _amount);
@@ -87,6 +92,12 @@ interface ITroveManager {
     event RewardClaimed(address indexed account, address indexed recipient, uint256 claimed);
     event ClaimStartTimeSet(uint32 _startTime);
     event InterestCollected(address _troveManager, uint256 _amount);
+    event CollateralTransferred(address indexed _recipient, uint256 _amount);
+    event CollateralReceived(address indexed _sender, uint256 _amount);
+    event FarmingParamsSet(uint256 _retainPercentage, uint256 _refillPercentage);
+    event VaultManagerSet(address _vaultManager);
+
+    error NotPrivileged(address);
 
     function initialize(
         address _owner,
@@ -318,4 +329,18 @@ interface ITroveManager {
     function lastUpdate() external view returns (uint256);
 
     function claimStartTime() external view returns (uint32);
+
+    function transferCollToPrivilegedVault(address vault, uint256 amount) external;
+
+    function receiveCollFromPrivilegedVault(uint256 amount) external;
+
+    function setFarmingParams(uint256 retainPercentage, uint256 refillPercentage) external;
+
+    function setVaultManager(address vaultManager_) external;
+
+    function retainPercentage() external view returns (uint256);
+
+    function refillPercentage() external view returns (uint256);
+
+    function FARMING_PRECISION() external view returns (uint256);
 }

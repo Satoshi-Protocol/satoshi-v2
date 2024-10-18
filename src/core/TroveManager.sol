@@ -18,7 +18,8 @@ import {
     VolumeData,
     RedemptionTotals,
     SingleRedemptionValues,
-    RewardSnapshot
+    RewardSnapshot,
+    FarmingParams
 } from "./interfaces/ITroveManager.sol";
 import {ICommunityIssuance} from "../OSHI/interfaces/ICommunityIssuance.sol";
 import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
@@ -27,6 +28,7 @@ import {Config} from "./Config.sol";
 import {IPriceFeedAggregatorFacet} from "./interfaces/IPriceFeedAggregatorFacet.sol";
 import {IBorrowerOperationsFacet} from "./interfaces/IBorrowerOperationsFacet.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
+import {IVaultManager} from "./interfaces/IVaultManager.sol";
 import {Utils} from "../library/Utils.sol";
 
 contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
@@ -138,6 +140,12 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
     // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
     address[] TroveOwners;
+
+    // CDP Farming
+    uint256 public constant FARMING_PRECISION = 1e4;
+    uint256 public collateralOutput;
+    FarmingParams public farmingParams;
+    IVaultManager public vaultManager;
 
     modifier whenNotPaused() {
         require(!paused, "Collateral Paused");
@@ -1139,6 +1147,21 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     // --- Trove property setters ---
 
     function _sendCollateral(address _account, uint256 _amount) private {
+        uint256 boundary = totalActiveCollateral * farmingParams.retainPercentage / FARMING_PRECISION;
+        uint256 remainColl = totalActiveCollateral - collateralOutput;
+        uint256 target = (totalActiveCollateral - _amount) * farmingParams.refillPercentage / FARMING_PRECISION;
+
+        // remain collateral is not enough, must refill
+        if (_amount > remainColl) {
+            vaultManager.exitStrategyByTroveManager(_amount - remainColl);
+            // refill to target
+            uint256 refillAmount = SatoshiMath._min(target, collateralOutput);
+            if (refillAmount != 0) vaultManager.exitStrategyByTroveManager(refillAmount);
+        } else if (remainColl - _amount < boundary) {
+            uint256 refillAmount = _amount + target - remainColl;
+            vaultManager.exitStrategyByTroveManager(refillAmount);
+        }
+
         if (_amount > 0) {
             totalActiveCollateral = totalActiveCollateral - _amount;
             emit CollateralSent(_account, _amount);
@@ -1317,5 +1340,51 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
     function _requireCallerIsSatoshiXapp() internal view {
         require(msg.sender == satoshiXApp, "Caller not SatoshiXapp");
+    }
+
+    // --- CDP Farming ---
+
+    function setVaultManager(address vaultManager_) external onlyOwner {
+        vaultManager = IVaultManager(vaultManager_);
+        emit VaultManagerSet(vaultManager_);
+    }
+
+    function setFarmingParams(uint256 retainPercentage_, uint256 refillPercentage_) external onlyOwner {
+        farmingParams.retainPercentage = retainPercentage_;
+        farmingParams.refillPercentage = refillPercentage_;
+        emit FarmingParamsSet(retainPercentage_, refillPercentage_);
+    }
+
+    function transferCollToPrivilegedVault(address vault, uint256 amount) external onlyOwner {
+        // check the output amount does not exceed the limit
+        require(
+            collateralOutput + amount
+                <= getEntireSystemColl() * (FARMING_PRECISION - farmingParams.retainPercentage) / FARMING_PRECISION,
+            "TroveManager: Exceed the collateral transfer limit"
+        );
+
+        // record the collateral output
+        collateralOutput += amount;
+        collateralToken.transfer(address(vaultManager), amount);
+        emit CollateralTransferred(vault, amount);
+    }
+
+    function receiveCollFromPrivilegedVault(uint256 amount) external {
+        if (msg.sender != address(vaultManager)) {
+            revert NotPrivileged(msg.sender);
+        }
+
+        // record the collateral input
+        collateralToken.safeTransferFrom(msg.sender, address(this), amount);
+        collateralOutput -= amount;
+        emit CollateralReceived(msg.sender, amount);
+    }
+
+    function retainPercentage() external view returns (uint256) {
+        return farmingParams.retainPercentage;
+    }
+
+    function refillPercentage() external view returns (uint256) {
+        return farmingParams.refillPercentage;
     }
 }
