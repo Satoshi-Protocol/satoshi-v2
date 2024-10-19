@@ -1,3 +1,4 @@
+
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -5,8 +6,7 @@ import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITroveManager} from "./interfaces/ITroveManager.sol";
 import {TroveManagerData} from "./interfaces/IBorrowerOperationsFacet.sol";
-// import {IDebtToken} from "./interfaces/IDebtToken.sol";
-import {DebtToken} from "./DebtToken.sol";
+import {IDebtToken} from "./interfaces/IDebtToken.sol";
 import {Queue, SunsetIndex, AccountDeposit, Snapshots} from "./interfaces/IStabilityPoolFacet.sol";
 import {OracleRecord} from "./interfaces/IPriceFeedAggregatorFacet.sol";
 import {ICommunityIssuance} from "./../OSHI/interfaces/ICommunityIssuance.sol";
@@ -26,7 +26,7 @@ library AppStorage {
         uint256 ownershipTransferDeadline;
         bool paused;
         uint256 startTime;
-        DebtToken debtToken;
+        IDebtToken debtToken;
         uint256 minNetDebt;
         // owner => caller => isApproved
         mapping(address => mapping(address => bool)) isApprovedDelegate;
