@@ -17,7 +17,7 @@ import {TroveManager} from "../../src/core/TroveManager.sol";
 import {RewardManager} from "../../src/OSHI/RewardManager.sol";
 import {CommunityIssuance} from "../../src/OSHI/CommunityIssuance.sol";
 import {OSHIToken} from "../../src/OSHI/OSHIToken.sol";
-import {MultiCollateralHintHelpers} from "../../src/core/helpers/MultiCollateralHintHelpers.sol";   
+import {MultiCollateralHintHelpers} from "../../src/core/helpers/MultiCollateralHintHelpers.sol";
 import {TroveHelper} from "../../src/core/helpers/TroveHelper.sol";
 import {MultiTroveGetter} from "../../src/core/helpers/MultiTroveGetter.sol";
 import {TroveManagerGetters} from "../../src/core/helpers/TroveManagerGetters.sol";
@@ -28,8 +28,8 @@ import {IOSHIToken} from "../../src/OSHI/interfaces/IOSHIToken.sol";
 import {IDebtToken} from "../../src/core/interfaces/IDebtToken.sol";
 import {ISortedTroves} from "../../src/core/interfaces/ISortedTroves.sol";
 import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
-import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";  
-import {IMultiTroveGetter} from "../../src/core/helpers/interfaces/IMultiTroveGetter.sol";  
+import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import {IMultiTroveGetter} from "../../src/core/helpers/interfaces/IMultiTroveGetter.sol";
 import {ITroveHelper} from "../../src/core/helpers/interfaces/ITroveHelper.sol";
 
 import {Script, console} from "forge-std/Script.sol";
@@ -143,11 +143,11 @@ abstract contract DeployBase is Script {
     }
 
     function _deployHelpers() internal {
-        multiCollateralHintHelpers = IMultiCollateralHintHelpers(address(new MultiCollateralHintHelpers(satoshiXApp)));    
+        multiCollateralHintHelpers = IMultiCollateralHintHelpers(address(new MultiCollateralHintHelpers(satoshiXApp)));
         multiTroveGetter = IMultiTroveGetter(address(new MultiTroveGetter()));
         troveHelper = ITroveHelper(address(new TroveHelper()));
         troveManagerGetters = new TroveManagerGetters(satoshiXApp);
-    }   
+    }
 
     function _deployCommunityIssuance() private {
         assert(address(communityIssuance) == address(0)); // check if contract is not deployed
@@ -165,6 +165,4 @@ abstract contract DeployBase is Script {
         bytes memory data = abi.encodeCall(RewardManager.initialize, (InitialConfig.OWNER));
         rewardManager = IRewardManager(address(new ERC1967Proxy(rewardManagerImpl, data)));
     }
-
-    
 }
