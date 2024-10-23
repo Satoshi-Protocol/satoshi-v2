@@ -37,60 +37,39 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
-abstract contract DeployBase is Script {
+library Deployer {
     //! COPY FROM TEST
     address constant DEPLOYER = 0x1234567890123456789012345678901234567890;
     address constant OWNER = 0x1111111111111111111111111111111111111111;
+    address constant LZ_ENDPOINT = 0x1234567890123456789012345678901234567890;
     address constant GUARDIAN = 0x2222222222222222222222222222222222222222;
     string constant DEBT_TOKEN_NAME = "SATOSHI_STABLECOIN";
     string constant DEBT_TOKEN_SYMBOL = "SAT";
 
-    // XApp
-    address payable satoshiXApp;
-
-    // Facets
-    address coreFacet;
-    address borrowerOperationsFacet;
-    address factoryFacet;
-    address liquidationFacet;
-    address nexusYieldManagerFacet;
-    address priceFeedAggregatorFacet;
-    address stabilityPoolFacet;
-
-    // Initializer
-    address initializer;
-
-    // Core contracts
-    IDebtToken debtToken;
-    IBeacon sortedTrovesBeacon;
-    IBeacon troveManagerBeacon;
-
-    // OSHI contracts
-    IRewardManager rewardManager;
-    IOSHIToken oshiToken;
-    ICommunityIssuance communityIssuance;
-
-    // Helpers
-    IMultiCollateralHintHelpers multiCollateralHintHelpers;
-    IMultiTroveGetter multiTroveGetter;
-    ITroveHelper troveHelper;
-    TroveManagerGetters troveManagerGetters;
-
-    function _deploySatoshiXApp() internal {
-        require(address(satoshiXApp) == address(0), "SatoshiXApp already deployed");
-
-        satoshiXApp = payable(address(new SatoshiXApp()));
+    function isDeployed(address _addr) public view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(_addr)
+        }
+        require(size > 0, "Contract not deployed");
     }
 
-    function _deployFacets() internal {
-        require(address(coreFacet) == address(0), "coreFacet already deployed");
-        require(address(borrowerOperationsFacet) == address(0), "borrowerOperationsFacet already deployed");
-        require(address(factoryFacet) == address(0), "factoryFacet already deployed");
-        require(address(liquidationFacet) == address(0), "liquidationFacet already deployed");
-        require(address(nexusYieldManagerFacet) == address(0), "nexusYieldManagerFacet already deployed");
-        require(address(priceFeedAggregatorFacet) == address(0), "priceFeedAggregatorFacet already deployed");
-        require(address(stabilityPoolFacet) == address(0), "stabilityPoolFacet already deployed");
+    function _deploySatoshiXApp() internal returns (address payable) {
+        return payable(address(new SatoshiXApp()));
+    }
 
+    function _deployFacets()
+        internal
+        returns (
+            address coreFacet,
+            address borrowerOperationsFacet,
+            address factoryFacet,
+            address liquidationFacet,
+            address nexusYieldManagerFacet,
+            address priceFeedAggregatorFacet,
+            address stabilityPoolFacet
+        )
+    {
         coreFacet = address(new CoreFacet());
         borrowerOperationsFacet = address(new BorrowerOperationsFacet());
         factoryFacet = address(new FactoryFacet());
@@ -100,69 +79,67 @@ abstract contract DeployBase is Script {
         stabilityPoolFacet = address(new PriceFeedAggregatorFacet());
     }
 
-    function _deployInitializer() internal {
-        require(address(initializer) == address(0), "Initializer already deployed");
-
-        initializer = address(new Initializer());
+    function _deployInitializer() internal returns (address) {
+        return address(new Initializer());
     }
 
-    function _deployDebtToken() internal {
-        assert(address(debtToken) == address(0)); // check if contract is not deployed
-        assert(address(satoshiXApp) != address(0)); // check if contract is not deployed
+    // function _deployDebtToken(address satoshiXApp) internal returns (IDebtToken) {
+    //     assert(address(debtToken) == address(0)); // check if contract is not deployed
+    //     assert(address(satoshiXApp) != address(0)); // check if contract is not deployed
 
-        address debtTokenImpl = address(new DebtToken());
-        bytes memory data =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), OWNER));
+    //     address debtTokenImpl = address(new DebtToken(LZ_ENDPOINT));
+    //     bytes memory data =
+    //         abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), OWNER));
 
-        debtToken = IDebtToken(address(new ERC1967Proxy(debtTokenImpl, data)));
-    }
+    //     debtToken = IDebtToken(address(new ERC1967Proxy(debtTokenImpl, data)));
+    // }
 
-    function _deploySortedTrovesBeacon() internal {
-        assert(address(sortedTrovesBeacon) == address(0)); // check if contract is not deployed
-
+    function _deployTrovesBeacons() internal returns (IBeacon sortedTrovesBeacon, IBeacon troveManagerBeacon) {
         address sortedTrovesImpl = address(new SortedTroves());
         sortedTrovesBeacon = new UpgradeableBeacon(sortedTrovesImpl, OWNER);
-    }
-
-    function _deployTroveManagerBeacon() internal {
-        assert(address(troveManagerBeacon) == address(0)); // check if contract is not deployed
 
         address troveManagerImpl = address(new TroveManager());
         troveManagerBeacon = new UpgradeableBeacon(troveManagerImpl, OWNER);
     }
 
-    function _deployOSHIToken() internal {
-        assert(address(oshiToken) == address(0)); // check if contract is not deployed
-
+    function _deployOSHIToken(address _satoshiXApp)
+        internal
+        returns (IOSHIToken oshiToken, ICommunityIssuance communityIssuance, IRewardManager rewardManager)
+    {
         address oshiTokenImpl = address(new OSHIToken());
         bytes memory data = abi.encodeCall(IOSHIToken.initialize, OWNER);
         oshiToken = IOSHIToken(address(new ERC1967Proxy(address(oshiTokenImpl), data)));
 
-        _deployCommunityIssuance();
-        _deployRewardManager();
+        communityIssuance = _deployCommunityIssuance(oshiToken, _satoshiXApp);
+        rewardManager = _deployRewardManager();
     }
 
-    function _deployHelpers() internal {
-        multiCollateralHintHelpers = IMultiCollateralHintHelpers(address(new MultiCollateralHintHelpers(satoshiXApp)));
-        multiTroveGetter = IMultiTroveGetter(address(new MultiTroveGetter()));
-        troveHelper = ITroveHelper(address(new TroveHelper()));
-        troveManagerGetters = new TroveManagerGetters(satoshiXApp);
+    function _deployHelpers(address satoshiXApp)
+        internal
+        returns (
+            address multiCollateralHintHelpers,
+            address troveHelper,
+            address multiTroveGetter,
+            address troveManagerGetters
+        )
+    {
+        multiCollateralHintHelpers = address(new MultiCollateralHintHelpers(satoshiXApp));
+        multiTroveGetter = address(new MultiTroveGetter());
+        troveHelper = address(new TroveHelper());
+        troveManagerGetters = address(new TroveManagerGetters(satoshiXApp));
     }
 
-    function _deployCommunityIssuance() private {
-        assert(address(communityIssuance) == address(0)); // check if contract is not deployed
+    function _deployCommunityIssuance(IOSHIToken oshiToken, address satoshiXApp) private returns (ICommunityIssuance) {
         assert(address(oshiToken) != address(0)); // check if OSHI token is deployed
 
         address communityIssuanceImpl = address(new CommunityIssuance());
         bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (OWNER, oshiToken, address(satoshiXApp)));
-        communityIssuance = ICommunityIssuance(address(new ERC1967Proxy(address(communityIssuanceImpl), data)));
+        return ICommunityIssuance(address(new ERC1967Proxy(address(communityIssuanceImpl), data)));
     }
 
-    function _deployRewardManager() private {
-        assert(address(rewardManager) == address(0));
-
+    function _deployRewardManager() private returns (IRewardManager) {
         address rewardManagerImpl = address(new RewardManager());
         bytes memory data = abi.encodeCall(RewardManager.initialize, (InitialConfig.OWNER));
-        rewardManager = IRewardManager(address(new ERC1967Proxy(rewardManagerImpl, data)));
+        return IRewardManager(address(new ERC1967Proxy(rewardManagerImpl, data)));
     }
 }
