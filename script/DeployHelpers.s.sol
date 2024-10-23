@@ -15,8 +15,6 @@ contract DeployHelpersScript is Script {
     address troveManagerGetters;
 
     function run() public {
-        satoshiXApp.isDeployed();
-
         (multiCollateralHintHelpers, troveHelper, multiTroveGetter, troveManagerGetters) =
             Deployer._deployHelpers(satoshiXApp);
 

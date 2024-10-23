@@ -40,7 +40,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     IBeacon sortedTrovesBeacon;
     IBeacon troveManagerBeacon;
 
-    // // OSHI contracts
+    // OSHI contracts
     IRewardManager rewardManager;
     IOSHIToken oshiToken;
     ICommunityIssuance communityIssuance;
