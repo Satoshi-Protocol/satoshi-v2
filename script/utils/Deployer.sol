@@ -33,11 +33,17 @@ import {IMultiTroveGetter} from "../../src/core/helpers/interfaces/IMultiTroveGe
 import {ITroveHelper} from "../../src/core/helpers/interfaces/ITroveHelper.sol";
 
 import {Vm} from "forge-std/Vm.sol";
+import {console} from "forge-std/console.sol";
+import {stdJson} from "forge-std/StdJson.sol";
+import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
 library Deployer {
+    using stdJson for string;
+    using Strings for string;
+
     //! COPY FROM TEST
     address constant DEPLOYER = 0x1234567890123456789012345678901234567890;
     address constant OWNER = 0x1111111111111111111111111111111111111111;
@@ -46,6 +52,25 @@ library Deployer {
     string constant DEBT_TOKEN_SYMBOL = "SAT";
 
     Vm internal constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+
+    function getSatoshiXApp() internal returns (address) {
+        string memory latestRunPath =
+            string.concat("broadcast/Deploy.s.sol/", vm.toString(block.chainid), "/run-latest.json");
+
+        if (vm.exists(latestRunPath)) {
+            string memory latestRun = vm.readFile(latestRunPath);
+            string memory contractName = latestRun.readString("$.transactions[0].contractName");
+
+            // dev: If deployment is first time, SatoshiXApp is deployed in the second transaction
+            if (contractName.equal("Builder")) {
+                return latestRun.readAddress("$.transactions[1].contractAddress");
+            } else {
+                return latestRun.readAddress("$.transactions[0].contractAddress");
+            }
+        } else {
+            revert("SatoshiXApp not found");
+        }
+    }
 
     function _verifyDeployed(address _addr, string memory contractName) internal view {
         uint256 size;
