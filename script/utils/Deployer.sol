@@ -21,6 +21,7 @@ import {MultiCollateralHintHelpers} from "../../src/core/helpers/MultiCollateral
 import {TroveHelper} from "../../src/core/helpers/TroveHelper.sol";
 import {MultiTroveGetter} from "../../src/core/helpers/MultiTroveGetter.sol";
 import {TroveManagerGetters} from "../../src/core/helpers/TroveManagerGetters.sol";
+import {Config} from "./Config.sol";
 
 import {IRewardManager} from "../../src/OSHI/interfaces/IRewardManager.sol";
 import {ICommunityIssuance} from "../../src/OSHI/interfaces/ICommunityIssuance.sol";
@@ -44,16 +45,10 @@ library Deployer {
     using stdJson for string;
     using Strings for string;
 
-    //! COPY FROM TEST
-    address constant DEPLOYER = 0x1234567890123456789012345678901234567890;
-    address constant OWNER = 0x1111111111111111111111111111111111111111;
-    address constant GUARDIAN = 0x2222222222222222222222222222222222222222;
-    string constant DEBT_TOKEN_NAME = "SATOSHI_STABLECOIN";
-    string constant DEBT_TOKEN_SYMBOL = "SAT";
-
     Vm internal constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
 
-    function getSatoshiXApp() internal returns (address) {
+    // Get SatoshiXApp address from the latest run (broadcast/Deploy.s.sol/{chainId}/run-latest.json)
+    function getSatoshiXApp() external returns (address) {
         string memory latestRunPath =
             string.concat("broadcast/Deploy.s.sol/", vm.toString(block.chainid), "/run-latest.json");
 
@@ -72,6 +67,7 @@ library Deployer {
         }
     }
 
+    // Check if the contract is deployed and the deployed code matches the expected code
     function _verifyDeployed(address _addr, string memory contractName) internal view {
         uint256 size;
         assembly {
@@ -114,35 +110,42 @@ library Deployer {
         return address(new Initializer());
     }
 
-    function _deployDebtToken(address satoshiXApp, address lzEndpoing) internal returns (IDebtToken debtToken) {
+    function _deployDebtToken(address satoshiXApp, address lzEndpoing, address owner)
+        internal
+        returns (IDebtToken debtToken)
+    {
         _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         address debtTokenImpl = address(new DebtToken(lzEndpoing));
-        bytes memory data =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, satoshiXApp, OWNER));
+        bytes memory data = abi.encodeCall(
+            IDebtToken.initialize, (Config.DEBT_TOKEN_NAME, Config.DEBT_TOKEN_SYMBOL, satoshiXApp, owner)
+        );
 
         debtToken = IDebtToken(address(new ERC1967Proxy(debtTokenImpl, data)));
     }
 
-    function _deployTrovesBeacons() internal returns (IBeacon sortedTrovesBeacon, IBeacon troveManagerBeacon) {
+    function _deployTrovesBeacons(address owner)
+        internal
+        returns (IBeacon sortedTrovesBeacon, IBeacon troveManagerBeacon)
+    {
         address sortedTrovesImpl = address(new SortedTroves());
-        sortedTrovesBeacon = new UpgradeableBeacon(sortedTrovesImpl, OWNER);
+        sortedTrovesBeacon = new UpgradeableBeacon(sortedTrovesImpl, owner);
 
         address troveManagerImpl = address(new TroveManager());
-        troveManagerBeacon = new UpgradeableBeacon(troveManagerImpl, OWNER);
+        troveManagerBeacon = new UpgradeableBeacon(troveManagerImpl, owner);
     }
 
-    function _deployOSHIToken(address _satoshiXApp)
+    function _deployOSHIToken(address _satoshiXApp, address owner)
         internal
         returns (IOSHIToken oshiToken, ICommunityIssuance communityIssuance, IRewardManager rewardManager)
     {
         _verifyDeployed(_satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         address oshiTokenImpl = address(new OSHIToken());
-        bytes memory data = abi.encodeCall(IOSHIToken.initialize, OWNER);
+        bytes memory data = abi.encodeCall(IOSHIToken.initialize, owner);
         oshiToken = IOSHIToken(address(new ERC1967Proxy(address(oshiTokenImpl), data)));
 
-        communityIssuance = _deployCommunityIssuance(oshiToken, _satoshiXApp);
+        communityIssuance = _deployCommunityIssuance(oshiToken, _satoshiXApp, owner);
         rewardManager = _deployRewardManager();
     }
 
@@ -163,12 +166,15 @@ library Deployer {
         troveManagerGetters = address(new TroveManagerGetters(satoshiXApp));
     }
 
-    function _deployCommunityIssuance(IOSHIToken oshiToken, address satoshiXApp) private returns (ICommunityIssuance) {
+    function _deployCommunityIssuance(IOSHIToken oshiToken, address satoshiXApp, address owner)
+        private
+        returns (ICommunityIssuance)
+    {
         _verifyDeployed(address(oshiToken), "ERC1967Proxy.sol:ERC1967Proxy");
         _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         address communityIssuanceImpl = address(new CommunityIssuance());
-        bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (OWNER, oshiToken, address(satoshiXApp)));
+        bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (owner, oshiToken, address(satoshiXApp)));
         return ICommunityIssuance(address(new ERC1967Proxy(address(communityIssuanceImpl), data)));
     }
 

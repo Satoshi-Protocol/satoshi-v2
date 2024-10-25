@@ -18,7 +18,11 @@ import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol"
 import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
 
 contract DeployScript is Script, IERC2535DiamondCutInternal {
-    uint256 public constant MOCK_PK = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+    uint256 internal DEPLOYMENT_PRIVATE_KEY;
+    uint256 internal OWNER_PRIVATE_KEY;
+    address public deployer;
+    address public satoshiCoreOwner;
+
     uint256 public constant TOTAL_FACETS = 7;
 
     // XApp
@@ -45,6 +49,16 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     IOSHIToken oshiToken;
     ICommunityIssuance communityIssuance;
 
+    function setUp() external {
+        DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
+        assert(DEPLOYMENT_PRIVATE_KEY != 0);
+        deployer = vm.addr(DEPLOYMENT_PRIVATE_KEY);
+
+        OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
+        assert(OWNER_PRIVATE_KEY != 0);
+        satoshiCoreOwner = vm.addr(OWNER_PRIVATE_KEY);
+    }
+
     function run() public {
         _deployContracts();
 
@@ -53,7 +67,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployContracts() internal {
-        vm.startBroadcast(MOCK_PK);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         satoshiXApp = Deployer._deploySatoshiXApp();
 
@@ -68,8 +82,8 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
         ) = Deployer._deployFacets();
 
         initializer = Deployer._deployInitializer();
-        (sortedTrovesBeacon, troveManagerBeacon) = Deployer._deployTrovesBeacons();
-        (oshiToken, communityIssuance, rewardManager) = Deployer._deployOSHIToken(satoshiXApp);
+        (sortedTrovesBeacon, troveManagerBeacon) = Deployer._deployTrovesBeacons(satoshiCoreOwner);
+        (oshiToken, communityIssuance, rewardManager) = Deployer._deployOSHIToken(satoshiXApp, satoshiCoreOwner);
 
         console.log("======= SATOSHI X APP =======");
         console.log("SatoshiXApp: ", satoshiXApp);
@@ -98,7 +112,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     }
 
     function _updateFacetCuts() internal {
-        vm.startBroadcast(MOCK_PK);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         FacetCut[] memory facetCuts = new FacetCut[](TOTAL_FACETS);
 
@@ -117,7 +131,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     }
 
     function _initSatoshiXApp() internal {
-        vm.startBroadcast(MOCK_PK);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         FacetCut[] memory facetCuts = new FacetCut[](1);
         facetCuts[0] = Builder.buildInitializer(initializer);

@@ -9,7 +9,8 @@ contract DeployHelpersScript is Script {
     using Deployer for address;
     using stdJson for *;
 
-    uint256 public constant MOCK_PK = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+    uint256 internal DEPLOYMENT_PRIVATE_KEY;
+    address public deployer;
 
     address satoshiXApp;
 
@@ -19,12 +20,16 @@ contract DeployHelpersScript is Script {
     address troveManagerGetters;
 
     function setUp() public {
+        DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
+        assert(DEPLOYMENT_PRIVATE_KEY != 0);
+        deployer = vm.addr(DEPLOYMENT_PRIVATE_KEY);
+
         satoshiXApp = Deployer.getSatoshiXApp();
         console.log("SatoshiXApp: ", satoshiXApp);
     }
 
     function run() public {
-        vm.startBroadcast(MOCK_PK);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         (multiCollateralHintHelpers, troveHelper, multiTroveGetter, troveManagerGetters) =
             Deployer._deployHelpers(satoshiXApp);
