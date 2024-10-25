@@ -16,6 +16,7 @@ import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
 import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
 import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
 import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
+import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
 
 contract DeployScript is Script, IERC2535DiamondCutInternal {
     uint256 internal DEPLOYMENT_PRIVATE_KEY;
@@ -24,6 +25,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     address public satoshiCoreOwner;
 
     uint256 public constant TOTAL_FACETS = 7;
+    address public constant LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
 
     // XApp
     address payable satoshiXApp;
@@ -43,6 +45,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     // Core contracts
     IBeacon sortedTrovesBeacon;
     IBeacon troveManagerBeacon;
+    IDebtToken debtToken;
 
     // OSHI contracts
     IRewardManager rewardManager;
@@ -84,6 +87,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
         initializer = Deployer._deployInitializer();
         (sortedTrovesBeacon, troveManagerBeacon) = Deployer._deployTrovesBeacons(satoshiCoreOwner);
         (oshiToken, communityIssuance, rewardManager) = Deployer._deployOSHIToken(satoshiXApp, satoshiCoreOwner);
+        debtToken = Deployer._deployDebtToken(satoshiXApp, LZ_ENDPOINT, satoshiCoreOwner);
 
         console.log("======= SATOSHI X APP =======");
         console.log("SatoshiXApp: ", satoshiXApp);
@@ -101,6 +105,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
         console.log("======= CORE CONTRACTS =======");
         console.log("SortedTrovesBeacon: ", address(sortedTrovesBeacon));
         console.log("TroveManagerBeacon: ", address(troveManagerBeacon));
+        console.log("DebtToken: ", address(debtToken));
 
         console.log("======= OSHI TOKEN =======");
         console.log("RewardManager: ", address(rewardManager));
@@ -136,7 +141,13 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
         FacetCut[] memory facetCuts = new FacetCut[](1);
         facetCuts[0] = Builder.buildInitializer(initializer);
 
-        bytes memory _data = abi.encode(address(123), address(3452), address(563), address(346), address(23));
+        bytes memory _data = abi.encode(
+            address(rewardManager),
+            address(debtToken),
+            address(communityIssuance),
+            address(sortedTrovesBeacon),
+            address(troveManagerBeacon)
+        );
         bytes memory data = abi.encodeWithSelector(Initializer.init.selector, _data);
 
         ISatoshiXApp(satoshiXApp).diamondCut(facetCuts, initializer, data);

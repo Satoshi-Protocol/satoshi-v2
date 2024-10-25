@@ -28,8 +28,17 @@ contract DeployHelpersScript is Script {
     function run() public {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
-        (multiCollateralHintHelpers, troveHelper, multiTroveGetter, troveManagerGetters) = Deployer._deployHelpers();
-        satoshiPeriphery = Deployer._deployPeriphery(_weth);
+        address satoshiXApp = Deployer.getContractAddress("Deploy", "SatoshiXApp");
+        address debtImpl = Deployer.getContractAddress("Deploy", "DebtToken");
+        address debtToken = Deployer.getERC1967ProxyAddress("Deploy", debtImpl);
+        address borrowerOperationsFacet = Deployer.getContractAddress("Deploy", "BorrowerOperationsFacet");
+
+        console.log(debtImpl);
+        console.log(debtToken);
+
+        (multiCollateralHintHelpers, troveHelper, multiTroveGetter, troveManagerGetters) =
+            Deployer._deployHelpers(satoshiXApp);
+        satoshiPeriphery = Deployer._deployPeriphery(debtToken, borrowerOperationsFacet, _weth, satoshiXApp);
 
         console.log("======= HELPERS =======");
         console.log("MultiCollateralHintHelpers: ", multiCollateralHintHelpers);

@@ -51,8 +51,8 @@ library Deployer {
 
     Vm internal constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
 
-    // Get contract address from the latest run data in broadcast
-    function getContractAddress(string memory deployFile, string memory contractName) public returns (address) {
+    // @notice Get contract address from the latest-run data in broadcast
+    function getContractAddress(string memory deployFile, string memory contractName) public view returns (address) {
         string memory latestRunPath =
             string.concat("broadcast/", deployFile, ".s.sol/", vm.toString(block.chainid), "/run-latest.json");
 
@@ -69,7 +69,38 @@ library Deployer {
             }
         }
 
-        revert("DebtToken not found");
+        revert("Contract not found");
+    }
+
+    // @notice Get the address of the ERC1967Proxy contract by implementation address
+    // @dev Get address by first impl address in CREATE arguments
+    function getERC1967ProxyAddress(string memory deployFile, address impl) public view returns (address) {
+        string memory latestRunPath =
+            string.concat("broadcast/", deployFile, ".s.sol/", vm.toString(block.chainid), "/run-latest.json");
+
+        string memory latestRun = vm.readFile(latestRunPath);
+        string[] memory txs = latestRun.readStringArray(".transactions");
+
+        for (uint32 i = 0; i < txs.length; i++) {
+            string memory contractNamePath = string.concat("$.transactions[", vm.toString(i), "].contractName");
+            string memory _contractName = latestRun.readString(contractNamePath);
+
+            string memory txTypePath = string.concat("$.transactions[", vm.toString(i), "].transactionType");
+            string memory _txType = latestRun.readString(txTypePath);
+
+            if (_contractName.equal("ERC1967Proxy") && (_txType.equal("CREATE"))) {
+                string memory firstArgPath = string.concat(".transactions[", vm.toString(i), "].arguments[0]");
+                address _impl = latestRun.readAddress(firstArgPath);
+
+                if (_impl == impl) {
+                    string memory contractAddress =
+                        string.concat("$.transactions[", vm.toString(i), "].contractAddress");
+                    return latestRun.readAddress(contractAddress);
+                }
+            }
+        }
+
+        revert("Contract not found");
     }
 
     // Check if the contract is deployed and the deployed code matches the expected code
@@ -154,11 +185,10 @@ library Deployer {
         rewardManager = _deployRewardManager();
     }
 
-    function _deployPeriphery(address _weth) internal returns (address periphery) {
-        address satoshiXApp = getContractAddress("Deploy", "SatoshiXApp");
-        address debtToken = getContractAddress("DeployDebtToken", "ERC1967Proxy");
-        address borrowerOperationsFacet = getContractAddress("Deploy", "BorrowerOperationsFacet");
-
+    function _deployPeriphery(address debtToken, address borrowerOperationsFacet, address _weth, address satoshiXApp)
+        internal
+        returns (address periphery)
+    {
         _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         periphery = address(
@@ -168,7 +198,7 @@ library Deployer {
         );
     }
 
-    function _deployHelpers()
+    function _deployHelpers(address satoshiXApp)
         internal
         returns (
             address multiCollateralHintHelpers,
@@ -177,7 +207,6 @@ library Deployer {
             address troveManagerGetters
         )
     {
-        address satoshiXApp = getContractAddress("Deploy", "SatoshiXApp");
         _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         multiCollateralHintHelpers = address(new MultiCollateralHintHelpers(satoshiXApp));
