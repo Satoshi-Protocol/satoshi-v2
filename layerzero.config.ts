@@ -7,52 +7,45 @@ const sepoliaContract: OmniPointHardhat = {
     contractName: 'DebtToken',
 }
 
-const arbitrumSepoliaContract: OmniPointHardhat = {
-    eid: EndpointId.ARBITRUM_V2_TESTNET,
-    contractName: 'DebtToken',
-}
+// const arbitrumSepoliaContract: OmniPointHardhat = {
+//     eid: EndpointId.ARBITRUM_V2_TESTNET,
+//     contractName: 'DebtToken',
+// }
 
-const baseSepoliaContract: OmniPointHardhat = {
-    eid: EndpointId.BASE_V2_TESTNET,
+// const baseSepoliaContract: OmniPointHardhat = {
+//     eid: EndpointId.BASE_V2_TESTNET,
+//     contractName: 'DebtToken',
+// }
+
+const holeskyContract: OmniPointHardhat = {
+    eid: EndpointId.HOLESKY_V2_TESTNET,
     contractName: 'DebtToken',
 }
 
 const config: OAppOmniGraphHardhat = {
     contracts: [
-        {
-            contract: arbitrumSepoliaContract,
-        },
+        // {
+        //     contract: arbitrumSepoliaContract,
+        // },
         {
             contract: sepoliaContract,
         },
+        // {
+        //     contract: baseSepoliaContract,
+        // },
         {
-            contract: baseSepoliaContract,
+            contract: holeskyContract,
         },
     ],
     connections: [
         {
-            from: arbitrumSepoliaContract,
+            from: holeskyContract,
             to: sepoliaContract,
         },
-        {
-            from: arbitrumSepoliaContract,
-            to: baseSepoliaContract,
-        },
+
         {
             from: sepoliaContract,
-            to: arbitrumSepoliaContract,
-        },
-        {
-            from: sepoliaContract,
-            to: baseSepoliaContract,
-        },
-        {
-            from: baseSepoliaContract,
-            to: sepoliaContract,
-        },
-        {
-            from: baseSepoliaContract,
-            to: arbitrumSepoliaContract,
+            to: holeskyContract,
         },
     ],
 }

@@ -43,8 +43,27 @@ const config: HardhatUserConfig = {
         cache: 'cache/hardhat',
         sources: 'src',
     },
+    solidity: {
+        compilers: [
+            {
+                version: '0.8.20',
+                settings: {
+                    optimizer: {
+                        enabled: true,
+                        runs: 200,
+                    },
+                },
+            },
+        ],
+    },
 
     networks: {
+        holesky: {
+            eid: EndpointId.HOLESKY_V2_TESTNET,
+            url: process.env.RPC_URL_HOLESKY || 'https://ethereum-holesky-rpc.publicnode.com',
+            chainId: 17000,
+            accounts,
+        },
         'sepolia-testnet': {
             eid: EndpointId.SEPOLIA_V2_TESTNET,
             url: process.env.RPC_URL_SEPOLIA || 'https://rpc.sepolia.org/',
