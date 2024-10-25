@@ -1,29 +1,44 @@
-//! LEGACY CODE
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-// // SPDX-License-Identifier: MIT
-// pragma solidity ^0.8.20;
+import {Script, console} from "forge-std/Script.sol";
+import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
+import {Deployer} from "./utils/Deployer.sol";
 
-// import {Script, console} from "forge-std/Script.sol";
-// import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-// import {Deployer} from "./utils/Deployer.sol";
+contract DeployDebtToken is Script {
+    uint256 internal DEPLOYMENT_PRIVATE_KEY;
+    uint256 internal OWNER_PRIVATE_KEY;
+    address public deployer;
+    address public satoshiCoreOwner;
 
-// contract DeployDebtToken is Script {
-//     uint256 public constant MOCK_PK = 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80;
+    address public constant LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
+    address public satoshiXApp;
 
-//     address public constant LZ_ENDPOINT = 0x1234567890123456789012345678901234567890;
-//     address public satoshiXApp = 0x1234567890123456789012345678901234567890;
+    IDebtToken debtToken;
 
-//     IDebtToken debtToken;
+    function setUp() external {
+        DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
+        assert(DEPLOYMENT_PRIVATE_KEY != 0);
+        deployer = vm.addr(DEPLOYMENT_PRIVATE_KEY);
 
-//     function run() public {
-//         _deployDebtToken();
-//     }
+        OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
+        assert(OWNER_PRIVATE_KEY != 0);
+        satoshiCoreOwner = vm.addr(OWNER_PRIVATE_KEY);
 
-//     function _deployDebtToken() internal view returns (address) {
-//         vm.startBroadcast(MOCK_PK);
+        satoshiXApp = Deployer.getSatoshiXApp();
+        console.log("XApp: ", satoshiXApp);
+    }
 
-//         debtToken = Deployer._deployDebtToken(satoshiXApp, LZ_ENDPOINT);
+    function run() public {
+        _deployDebtToken();
+    }
 
-//         vm.stopBroadcast();
-//     }
-// }
+    function _deployDebtToken() internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+
+        debtToken = Deployer._deployDebtToken(satoshiXApp, LZ_ENDPOINT, satoshiCoreOwner);
+        console.log("DebtToken: ", address(debtToken));
+
+        vm.stopBroadcast();
+    }
+}

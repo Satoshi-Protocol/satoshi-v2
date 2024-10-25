@@ -57,6 +57,8 @@ const config: HardhatUserConfig = {
         ],
     },
 
+    // @dev: Must add chainId on each network
+    // @dev: chainId read by DebtToken deployment script
     networks: {
         holesky: {
             eid: EndpointId.HOLESKY_V2_TESTNET,

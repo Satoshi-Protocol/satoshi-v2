@@ -57,10 +57,10 @@ library Deployer {
             string memory contractName = latestRun.readString("$.transactions[0].contractName");
 
             // dev: If deployment is first time, SatoshiXApp is deployed in the second transaction
-            if (contractName.equal("Builder")) {
-                return latestRun.readAddress("$.transactions[1].contractAddress");
-            } else {
+            if (contractName.equal("SatoshiXApp")) {
                 return latestRun.readAddress("$.transactions[0].contractAddress");
+            } else {
+                return latestRun.readAddress("$.transactions[1].contractAddress");
             }
         } else {
             revert("SatoshiXApp not found");
