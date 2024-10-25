@@ -22,6 +22,7 @@ import {TroveHelper} from "../../src/core/helpers/TroveHelper.sol";
 import {MultiTroveGetter} from "../../src/core/helpers/MultiTroveGetter.sol";
 import {TroveManagerGetters} from "../../src/core/helpers/TroveManagerGetters.sol";
 import {Config} from "./Config.sol";
+import {SatoshiPeriphery} from "../../src/core/helpers/SatoshiPeriphery.sol";
 
 import {IRewardManager} from "../../src/OSHI/interfaces/IRewardManager.sol";
 import {ICommunityIssuance} from "../../src/OSHI/interfaces/ICommunityIssuance.sol";
@@ -32,6 +33,9 @@ import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
 import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
 import {IMultiTroveGetter} from "../../src/core/helpers/interfaces/IMultiTroveGetter.sol";
 import {ITroveHelper} from "../../src/core/helpers/interfaces/ITroveHelper.sol";
+import {IBorrowerOperationsFacet} from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import {IWETH} from "../../src/core/helpers/interfaces/IWETH.sol";
+import {ISatoshiPeriphery} from "../../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
 
 import {Vm} from "forge-std/Vm.sol";
 import {console} from "forge-std/console.sol";
@@ -47,24 +51,25 @@ library Deployer {
 
     Vm internal constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
 
-    // Get SatoshiXApp address from the latest run (broadcast/Deploy.s.sol/{chainId}/run-latest.json)
-    function getSatoshiXApp() external returns (address) {
+    // Get contract address from the latest run data in broadcast
+    function getContractAddress(string memory deployFile, string memory contractName) public returns (address) {
         string memory latestRunPath =
-            string.concat("broadcast/Deploy.s.sol/", vm.toString(block.chainid), "/run-latest.json");
+            string.concat("broadcast/", deployFile, ".s.sol/", vm.toString(block.chainid), "/run-latest.json");
 
-        if (vm.exists(latestRunPath)) {
-            string memory latestRun = vm.readFile(latestRunPath);
-            string memory contractName = latestRun.readString("$.transactions[0].contractName");
+        string memory latestRun = vm.readFile(latestRunPath);
+        string[] memory txs = latestRun.readStringArray(".transactions");
 
-            // dev: If deployment is first time, SatoshiXApp is deployed in the second transaction
-            if (contractName.equal("SatoshiXApp")) {
-                return latestRun.readAddress("$.transactions[0].contractAddress");
-            } else {
-                return latestRun.readAddress("$.transactions[1].contractAddress");
+        for (uint32 i = 0; i < txs.length; i++) {
+            string memory contractNamePath = string.concat("$.transactions[", vm.toString(i), "].contractName");
+            string memory _contractName = latestRun.readString(contractNamePath);
+
+            if (_contractName.equal(contractName)) {
+                string memory contractAddress = string.concat("$.transactions[", vm.toString(i), "].contractAddress");
+                return latestRun.readAddress(contractAddress);
             }
-        } else {
-            revert("SatoshiXApp not found");
         }
+
+        revert("DebtToken not found");
     }
 
     // Check if the contract is deployed and the deployed code matches the expected code
@@ -149,7 +154,21 @@ library Deployer {
         rewardManager = _deployRewardManager();
     }
 
-    function _deployHelpers(address satoshiXApp)
+    function _deployPeriphery(address _weth) internal returns (address periphery) {
+        address satoshiXApp = getContractAddress("Deploy", "SatoshiXApp");
+        address debtToken = getContractAddress("DeployDebtToken", "ERC1967Proxy");
+        address borrowerOperationsFacet = getContractAddress("Deploy", "BorrowerOperationsFacet");
+
+        _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+
+        periphery = address(
+            new SatoshiPeriphery(
+                DebtToken(debtToken), IBorrowerOperationsFacet(borrowerOperationsFacet), IWETH(_weth), satoshiXApp
+            )
+        );
+    }
+
+    function _deployHelpers()
         internal
         returns (
             address multiCollateralHintHelpers,
@@ -158,6 +177,7 @@ library Deployer {
             address troveManagerGetters
         )
     {
+        address satoshiXApp = getContractAddress("Deploy", "SatoshiXApp");
         _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         multiCollateralHintHelpers = address(new MultiCollateralHintHelpers(satoshiXApp));
