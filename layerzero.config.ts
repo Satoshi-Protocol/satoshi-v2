@@ -39,14 +39,33 @@ const config: OAppOmniGraphHardhat = {
     ],
     connections: [
         {
+            from: sepoliaContract,
+            to: holeskyContract,
+            config: {
+                sendLibrary: '0xcc1ae8Cf5D3904Cef3360A9532B477529b177cCE',
+            },
+        },
+        // {
+        //     from: sepoliaContract,
+        //     to: arbitrumSepoliaContract,
+        // },
+        {
             from: holeskyContract,
             to: sepoliaContract,
         },
+        // {
+        //     from: holeskyContract,
+        //     to: arbitrumSepoliaContract,
+        // },
+        // {
+        //     from: arbitrumSepoliaContract,
+        //     to: sepoliaContract,
+        // },
 
-        {
-            from: sepoliaContract,
-            to: holeskyContract,
-        },
+        // {
+        //     from: arbitrumSepoliaContract,
+        //     to: holeskyContract,
+        // },
     ],
 }
 

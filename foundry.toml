@@ -25,4 +25,9 @@ remappings = [
   "solidity-bytes-utils=lib/solidity-bytes-utils"
 ]
 
+[profile.default.rpc_endpoints]
+holesky = "${RPC_URL_HOLESKY}"
+sepolia = "${RPC_URL_SEPOLIA}"
+arbitrum-sepolia = "${RPC_URL_ARBITRUM_SEPOLIA}"
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

@@ -7,6 +7,7 @@ interface Transaction {
     contractName: string
     transactionType: string
     contractAddress: string
+    arguments: string[]
 }
 
 const contractName = 'DebtToken'
@@ -14,17 +15,31 @@ const contractName = 'DebtToken'
 // get the contract address from broadcast(forge) recordings
 const getContractAddress = (deployFile: string, contract: string, chainId: number, timestamp?: number) => {
     const time = timestamp ? `${timestamp}` : 'latest'
-
-    const coreDevelopment = JSON.parse(
+    const development = JSON.parse(
         fs.readFileSync(path.resolve(__dirname, `../broadcast/${deployFile}.s.sol/${chainId}/run-${time}.json`), 'utf8')
     )
 
-    const txs = coreDevelopment.transactions
+    const txs = development.transactions
     const targetTx: Transaction[] = txs.filter(
         (tx: Transaction) => tx.contractName === contract && tx.transactionType == 'CREATE'
     )
 
     return targetTx[0].contractAddress
+}
+
+const getProxyAddress = (deployFile: string, contract: string, impl: string, chainId: number, timestamp?: number) => {
+    const time = timestamp ? `${timestamp}` : 'latest'
+    const development = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, `../broadcast/${deployFile}.s.sol/${chainId}/run-${time}.json`), 'utf8')
+    )
+
+    const txs = development.transactions
+    const targetTx: Transaction[] = txs.filter(
+        (tx: Transaction) => tx.contractName === contract && tx.transactionType === 'CREATE'
+    )
+    const res = targetTx.filter((tx) => tx.arguments[0].toLocaleLowerCase() === impl)
+
+    return res[0].contractAddress
 }
 
 const deploy: DeployFunction = async (hre) => {
@@ -37,7 +52,9 @@ const deploy: DeployFunction = async (hre) => {
     console.log(`Deployer: ${deployer}`)
 
     const artifact = await deployments.getExtendedArtifact('DebtToken')
-    const debtTokenAddr = getContractAddress('DeployDebtToken', 'ERC1967Proxy', hre.network.config.chainId!)
+    const debtImpl = getContractAddress('Deploy', 'DebtToken', hre.network.config.chainId!)
+    console.log(`DebtToken implementation address: ${debtImpl}`)
+    const debtTokenAddr = getProxyAddress('Deploy', 'ERC1967Proxy', debtImpl, hre.network.config.chainId!)
 
     const proxyDeployments = {
         address: debtTokenAddr,

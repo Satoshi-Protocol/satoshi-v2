@@ -25,6 +25,8 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
     address public satoshiCoreOwner;
 
     uint256 public constant TOTAL_FACETS = 7;
+
+    // TODO
     address public constant LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
 
     // XApp
