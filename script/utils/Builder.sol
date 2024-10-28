@@ -10,8 +10,11 @@ import {INexusYieldManagerFacet} from "../../src/core/interfaces/INexusYieldMana
 import {IPriceFeedAggregatorFacet} from "../../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
 import {IStabilityPoolFacet} from "../../src/core/interfaces/IStabilityPoolFacet.sol";
 import {Initializer} from "../../src/core/Initializer.sol";
+import {Vm} from "forge-std/Vm.sol";
 
 library Builder {
+    Vm internal constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
+
     function buildCoreFacet(address coreFacet)
         public
         pure
@@ -268,5 +271,14 @@ library Builder {
             action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
             selectors: selectors
         });
+    }
+
+    /// @notice Build path for fetching a field from a transaction in broadcast json file
+    /// @dev Only build path from transactions array
+    /// @param index Index of the transaction in the transactions array
+    /// @param field Field to fetch from the transaction
+    /// @return path Path to fetch the field from the transaction
+    function buildTxsFilePath(uint32 index, string memory field) external pure returns (string memory path) {
+        path = string.concat("$.transactions[", vm.toString(index), "].", field);
     }
 }

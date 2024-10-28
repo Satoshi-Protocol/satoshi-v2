@@ -22,6 +22,7 @@ import {TroveHelper} from "../../src/core/helpers/TroveHelper.sol";
 import {MultiTroveGetter} from "../../src/core/helpers/MultiTroveGetter.sol";
 import {TroveManagerGetters} from "../../src/core/helpers/TroveManagerGetters.sol";
 import {Config} from "./Config.sol";
+import {Builder} from "./Builder.sol";
 import {SatoshiPeriphery} from "../../src/core/helpers/SatoshiPeriphery.sol";
 
 import {IRewardManager} from "../../src/OSHI/interfaces/IRewardManager.sol";
@@ -48,10 +49,15 @@ import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 library Deployer {
     using stdJson for string;
     using Strings for string;
+    using Builder for uint32;
 
     Vm internal constant vm = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
 
-    // @notice Get contract address from the latest-run data in broadcast
+    /// @notice Get contract address from the latest-run data in broadcast
+    /// @dev Detect chain ID to get correct the broadcast folder path
+    /// @param deployFile The deploy file name in broadcast path
+    /// @param contractName The contract name for searching
+    /// @return The contract address
     function getContractAddress(string memory deployFile, string memory contractName) public view returns (address) {
         string memory latestRunPath =
             string.concat("broadcast/", deployFile, ".s.sol/", vm.toString(block.chainid), "/run-latest.json");
@@ -60,20 +66,21 @@ library Deployer {
         string[] memory txs = latestRun.readStringArray(".transactions");
 
         for (uint32 i = 0; i < txs.length; i++) {
-            string memory contractNamePath = string.concat("$.transactions[", vm.toString(i), "].contractName");
-            string memory _contractName = latestRun.readString(contractNamePath);
+            string memory _contractName = latestRun.readString(i.buildTxsFilePath("contractName"));
 
             if (_contractName.equal(contractName)) {
-                string memory contractAddress = string.concat("$.transactions[", vm.toString(i), "].contractAddress");
-                return latestRun.readAddress(contractAddress);
+                return latestRun.readAddress(i.buildTxsFilePath("contractAddress"));
             }
         }
 
         revert("Contract not found");
     }
 
-    // @notice Get the address of the ERC1967Proxy contract by implementation address
-    // @dev Get address by first impl address in CREATE arguments
+    /// @notice Get the address of the ERC1967Proxy contract by implementation address
+    /// @dev Get address by first impl address in CREATE arguments
+    /// @param deployFile The deploy file name in broadcast path
+    /// @param impl The implementation address in Proxy contract
+    /// @return The ERC1967Proxy contract address
     function getERC1967ProxyAddress(string memory deployFile, address impl) public view returns (address) {
         string memory latestRunPath =
             string.concat("broadcast/", deployFile, ".s.sol/", vm.toString(block.chainid), "/run-latest.json");
@@ -82,20 +89,14 @@ library Deployer {
         string[] memory txs = latestRun.readStringArray(".transactions");
 
         for (uint32 i = 0; i < txs.length; i++) {
-            string memory contractNamePath = string.concat("$.transactions[", vm.toString(i), "].contractName");
-            string memory _contractName = latestRun.readString(contractNamePath);
-
-            string memory txTypePath = string.concat("$.transactions[", vm.toString(i), "].transactionType");
-            string memory _txType = latestRun.readString(txTypePath);
+            string memory _contractName = latestRun.readString(i.buildTxsFilePath("contractName"));
+            string memory _txType = latestRun.readString(i.buildTxsFilePath("transactionType"));
 
             if (_contractName.equal("ERC1967Proxy") && (_txType.equal("CREATE"))) {
-                string memory firstArgPath = string.concat(".transactions[", vm.toString(i), "].arguments[0]");
-                address _impl = latestRun.readAddress(firstArgPath);
+                address _impl = latestRun.readAddress(i.buildTxsFilePath("arguments[0]"));
 
                 if (_impl == impl) {
-                    string memory contractAddress =
-                        string.concat("$.transactions[", vm.toString(i), "].contractAddress");
-                    return latestRun.readAddress(contractAddress);
+                    return latestRun.readAddress(i.buildTxsFilePath("contractAddress"));
                 }
             }
         }
@@ -103,8 +104,10 @@ library Deployer {
         revert("Contract not found");
     }
 
-    // Check if the contract is deployed and the deployed code matches the expected code
-    function _verifyDeployed(address _addr, string memory contractName) internal view {
+    /// @notice Check if the contract is deployed and the deployed code matches the expected code
+    /// @param _addr The contract address
+    /// @param contractName The contract name for searching deployed code. e.g. SatoshiXApp.sol:SatoshiXApp
+    function _verifyContractDeployed(address _addr, string memory contractName) internal view {
         uint256 size;
         assembly {
             size := extcodesize(_addr)
@@ -150,7 +153,7 @@ library Deployer {
         internal
         returns (IDebtToken debtToken)
     {
-        _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         address debtTokenImpl = address(new DebtToken(lzEndpoing));
         bytes memory data = abi.encodeCall(
@@ -175,21 +178,21 @@ library Deployer {
         internal
         returns (IOSHIToken oshiToken, ICommunityIssuance communityIssuance, IRewardManager rewardManager)
     {
-        _verifyDeployed(_satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(_satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         address oshiTokenImpl = address(new OSHIToken());
         bytes memory data = abi.encodeCall(IOSHIToken.initialize, owner);
         oshiToken = IOSHIToken(address(new ERC1967Proxy(address(oshiTokenImpl), data)));
 
         communityIssuance = _deployCommunityIssuance(oshiToken, _satoshiXApp, owner);
-        rewardManager = _deployRewardManager();
+        rewardManager = _deployRewardManager(owner);
     }
 
     function _deployPeriphery(address debtToken, address borrowerOperationsFacet, address _weth, address satoshiXApp)
         internal
         returns (address periphery)
     {
-        _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         periphery = address(
             new SatoshiPeriphery(
@@ -207,7 +210,7 @@ library Deployer {
             address troveManagerGetters
         )
     {
-        _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         multiCollateralHintHelpers = address(new MultiCollateralHintHelpers(satoshiXApp));
         multiTroveGetter = address(new MultiTroveGetter());
@@ -219,17 +222,19 @@ library Deployer {
         private
         returns (ICommunityIssuance)
     {
-        _verifyDeployed(address(oshiToken), "ERC1967Proxy.sol:ERC1967Proxy");
-        _verifyDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(address(oshiToken), "ERC1967Proxy.sol:ERC1967Proxy");
+        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
         address communityIssuanceImpl = address(new CommunityIssuance());
         bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (owner, oshiToken, address(satoshiXApp)));
+
         return ICommunityIssuance(address(new ERC1967Proxy(address(communityIssuanceImpl), data)));
     }
 
-    function _deployRewardManager() private returns (IRewardManager) {
+    function _deployRewardManager(address owner) private returns (IRewardManager) {
         address rewardManagerImpl = address(new RewardManager());
-        bytes memory data = abi.encodeCall(RewardManager.initialize, (InitialConfig.OWNER));
+        bytes memory data = abi.encodeCall(RewardManager.initialize, (owner));
+
         return IRewardManager(address(new ERC1967Proxy(rewardManagerImpl, data)));
     }
 }
