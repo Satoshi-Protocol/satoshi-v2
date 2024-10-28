@@ -11,6 +11,8 @@ contract DeployHelpersScript is Script {
 
     uint256 internal DEPLOYMENT_PRIVATE_KEY;
     address public deployer;
+
+    // TODO: need to check testnet config
     address _weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     address multiCollateralHintHelpers;
