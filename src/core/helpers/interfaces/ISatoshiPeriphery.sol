@@ -27,7 +27,7 @@ interface ISatoshiPeriphery {
 
     function debtToken() external view returns (DebtToken);
 
-    function borrowerOperationsFacet() external view returns (IBorrowerOperationsFacet);
+    function xApp() external view returns (address);
 
     function weth() external view returns (IWETH);
 
@@ -72,7 +72,7 @@ interface ISatoshiPeriphery {
         LzSendParam calldata _lzSendParam
     ) external payable;
 
-    // function closeTrove(ITroveManager troveManager) external;
+    function closeTrove(ITroveManager troveManager) external;
 
     function redeemCollateral(
         ITroveManager troveManager,
@@ -85,10 +85,10 @@ interface ISatoshiPeriphery {
         uint256 _maxFeePercentage
     ) external;
 
-    // function liquidateTroves(
-    //     ILiquidationManager liquidationManager,
-    //     ITroveManager troveManager,
-    //     uint256 maxTrovesToLiquidate,
-    //     uint256 maxICR
-    // ) external;
+    function liquidateTroves(
+        ITroveManager troveManager,
+        uint256 maxTrovesToLiquidate,
+        uint256 maxICR,
+        LzSendParam calldata _lzSendParam
+    ) external;
 }

@@ -194,11 +194,7 @@ library Deployer {
     {
         _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
 
-        periphery = address(
-            new SatoshiPeriphery(
-                DebtToken(debtToken), IBorrowerOperationsFacet(borrowerOperationsFacet), IWETH(_weth), satoshiXApp
-            )
-        );
+        periphery = address(new SatoshiPeriphery(DebtToken(debtToken), IWETH(_weth), satoshiXApp));
     }
 
     function _deployHelpers(address satoshiXApp)

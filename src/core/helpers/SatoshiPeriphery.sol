@@ -18,12 +18,14 @@ import {
 
 import {IWETH} from "./interfaces/IWETH.sol";
 import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
+import {ILiquidationFacet} from "../interfaces/ILiquidationFacet.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {DebtToken} from "../DebtToken.sol";
 import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
 
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
-// import {ILiquidationManager} from "../interfaces/ILiquidationManager.sol";
+
+import {Config} from "../Config.sol";
 
 /**
  * @title Satoshi Borrower Operations Router
@@ -34,24 +36,28 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
     using SafeERC20 for DebtToken;
 
     DebtToken public debtToken;
-    // TODO: rename to XApp and type convert to address
+
     address public immutable xApp;
-    IBorrowerOperationsFacet public immutable borrowerOperationsFacet;
     IWETH public immutable weth;
 
-    constructor(DebtToken _debtToken, IBorrowerOperationsFacet _borrowerOperationsFacet, IWETH _weth, address _xApp) {
+    constructor(DebtToken _debtToken, IWETH _weth, address _xApp) {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
-        if (address(_borrowerOperationsFacet) == address(0)) revert InvalidZeroAddress();
+        if (_xApp == address(0)) revert InvalidZeroAddress();
         if (address(_weth) == address(0)) revert InvalidZeroAddress();
 
         debtToken = _debtToken;
-        borrowerOperationsFacet = _borrowerOperationsFacet;
         weth = _weth;
         xApp = _xApp;
     }
 
-    // account should call borrowerOperationsFacet.setDelegateApproval first
-    // to approve this contract to call openTrove
+    /// @notice Open a trove
+    /// @dev Account should call `setDelegateApproval()` first to approve this contract to call openTrove
+    /// @param troveManager The TroveManager contract
+    /// @param _maxFeePercentage User willing to accept in case of a fee slippage
+    /// @param _collAmount The amount of collateral to deposit
+    /// @param _debtAmount The expected debt amount of borrowed
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
     function openTrove(
         ITroveManager troveManager,
         uint256 _maxFeePercentage,
@@ -67,16 +73,22 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
 
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
-        borrowerOperationsFacet.openTrove(
+        IBorrowerOperationsFacet(xApp).openTrove(
             troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
         );
 
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
         require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
+
         _afterWithdrawDebt(userDebtAmount, _lzSendParam);
     }
 
+    /// @notice Add collateral to a active trove
+    /// @param troveManager The TroveManager contract
+    /// @param _collAmount The amount of additional collateral
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
     function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
         external
         payable
@@ -85,16 +97,23 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
 
         _beforeAddColl(collateralToken, _collAmount);
 
-        borrowerOperationsFacet.addColl(troveManager, msg.sender, _collAmount, _upperHint, _lowerHint);
+        IBorrowerOperationsFacet(xApp).addColl(troveManager, msg.sender, _collAmount, _upperHint, _lowerHint);
     }
 
+    /// @notice Withdraws _collWithdrawal of collateral from the caller’s Trove
+    /// @dev Executes only if the user has an active Trove,
+    /// @dev Withdrawal would not pull the user’s Trove below the MCR, and the resulting total collateralization ratio of the system is above 150%(TCR)
+    /// @param troveManager The TroveManager contract
+    /// @param _collWithdrawal The amount of collateral to withdraw
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
     function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
         external
     {
         IERC20 collateralToken = troveManager.collateralToken();
         uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
 
-        borrowerOperationsFacet.withdrawColl(troveManager, msg.sender, _collWithdrawal, _upperHint, _lowerHint);
+        IBorrowerOperationsFacet(xApp).withdrawColl(troveManager, msg.sender, _collWithdrawal, _upperHint, _lowerHint);
 
         uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
         uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
@@ -102,6 +121,13 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         _afterWithdrawColl(collateralToken, userCollAmount);
     }
 
+    /// @notice Issues _debtAmount of Debt token from the caller’s Trove to the caller.
+    /// @dev Executes only if the Trove's collateralization ratio would remain above the minimum
+    /// @param troveManager The TroveManager contract
+    /// @param _maxFeePercentage User willing to accept in case of a fee slippage
+    /// @param _debtAmount The amount of debt to withdraw
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
     function withdrawDebt(
         ITroveManager troveManager,
         uint256 _maxFeePercentage,
@@ -111,7 +137,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         LzSendParam calldata _lzSendParam
     ) external {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-        borrowerOperationsFacet.withdrawDebt(
+        IBorrowerOperationsFacet(xApp).withdrawDebt(
             troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
         );
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
@@ -121,14 +147,20 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         _afterWithdrawDebt(userDebtAmount, _lzSendParam);
     }
 
+    /// @notice Repays _debtAmount of Debt token to the caller’s Trove
+    /// @param troveManager The TroveManager contract
+    /// @param _debtAmount The amount of debt to repay
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
     function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
         external
     {
         _beforeRepayDebt(_debtAmount);
 
-        borrowerOperationsFacet.repayDebt(troveManager, msg.sender, _debtAmount, _upperHint, _lowerHint);
+        IBorrowerOperationsFacet(xApp).repayDebt(troveManager, msg.sender, _debtAmount, _upperHint, _lowerHint);
     }
 
+    /// @notice Enables a borrower to simultaneously change (decrease/increase) both their collateral and debt,
     function adjustTrove(
         ITroveManager troveManager,
         uint256 _maxFeePercentage,
@@ -143,8 +175,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         if (_collDeposit != 0 && _collWithdrawal != 0) revert CannotWithdrawAndAddColl();
 
         IERC20 collateralToken = troveManager.collateralToken();
-
-        // add collateral
         _beforeAddColl(collateralToken, _collDeposit);
 
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
@@ -154,7 +184,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
             _beforeRepayDebt(_debtChange);
         }
 
-        borrowerOperationsFacet.adjustTrove(
+        IBorrowerOperationsFacet(xApp).adjustTrove(
             troveManager,
             msg.sender,
             _maxFeePercentage,
@@ -180,22 +210,23 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         }
     }
 
-    // TODO: closeTrove: get DEBT_GAS_COMPENSATION
-    // function closeTrove(ITroveManager troveManager) external {
-    //     (uint256 collAmount, uint256 debtAmount) = troveManager.getTroveCollAndDebt(msg.sender);
-    //     uint256 netDebtAmount = debtAmount - borrowerOperationsFacet.DEBT_GAS_COMPENSATION();
-    //     _beforeRepayDebt(netDebtAmount);
+    /// @notice Close the trove from the caller
+    /// @param troveManager The TroveManager contract
+    function closeTrove(ITroveManager troveManager) external {
+        (uint256 collAmount, uint256 debtAmount) = troveManager.getTroveCollAndDebt(msg.sender);
+        uint256 netDebtAmount = debtAmount - Config.DEBT_GAS_COMPENSATION;
+        _beforeRepayDebt(netDebtAmount);
 
-    //     IERC20 collateralToken = troveManager.collateralToken();
-    //     uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
+        IERC20 collateralToken = troveManager.collateralToken();
+        uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
 
-    //     borrowerOperationsFacet.closeTrove(troveManager, msg.sender);
+        IBorrowerOperationsFacet(xApp).closeTrove(troveManager, msg.sender);
 
-    //     uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
-    //     uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
-    //     require(userCollAmount == collAmount, "SatoshiPeriphery: Collateral amount mismatch");
-    //     _afterWithdrawColl(collateralToken, userCollAmount);
-    // }
+        uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
+        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
+        require(userCollAmount == collAmount, "SatoshiPeriphery: Collateral amount mismatch");
+        _afterWithdrawColl(collateralToken, userCollAmount);
+    }
 
     function redeemCollateral(
         ITroveManager troveManager,
@@ -229,6 +260,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         _afterWithdrawColl(collateralToken, userCollAmount);
     }
 
+    /// @dev Only support ERC20 & WETH, if receive native tokens, function will be converted to WETH then transfer
     function _beforeAddColl(IERC20 collateralToken, uint256 collAmount) private {
         if (collAmount == 0) return;
 
@@ -241,7 +273,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
             collateralToken.safeTransferFrom(msg.sender, address(this), collAmount);
         }
 
-        collateralToken.approve(address(borrowerOperationsFacet), collAmount);
+        collateralToken.approve(xApp, collAmount);
     }
 
     function _afterWithdrawColl(IERC20 collateralToken, uint256 collAmount) private {
@@ -249,6 +281,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
 
         if (address(collateralToken) == address(weth)) {
             weth.withdraw(collAmount);
+
             (bool success,) = payable(msg.sender).call{value: collAmount}("");
             if (!success) revert NativeTokenTransferFailed();
         } else {
@@ -262,9 +295,14 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         debtToken.safeTransferFrom(msg.sender, address(this), debtAmount);
     }
 
+    /// @notice Withdraw the debt token to the msg sender
+    /// @dev Transfer the debt token in current chain if dstEid is 0
+    /// @dev Only debt token need to provide lzSendParam, and support native token as lz fee
     function _afterWithdrawDebt(uint256 debtAmount, LzSendParam calldata lzSendParam) private {
         if (debtAmount == 0) return;
         address account = msg.sender;
+
+        // In current chain
         if (lzSendParam.dstEid == 0) {
             debtToken.safeTransfer(account, debtAmount);
         } else {
@@ -284,6 +322,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
             require(lzSendParam.fee.lzTokenFee == 0, "BorrowerOps: lzTokenFee not supported");
             // TODO: check collateral token is native token?
             require(msg.value == lzSendParam.fee.nativeFee, "BorrowerOps: nativeFee not sent");
+
             MessagingFee memory expectFee = debtToken.quoteSend(_sendParam, lzSendParam.fee.lzTokenFee > 0);
             require(expectFee.nativeFee == lzSendParam.fee.nativeFee, "BorrowerOps: nativeFee incorrect");
             require(expectFee.lzTokenFee == lzSendParam.fee.lzTokenFee, "BorrowerOps: lzTokenFee incorrect");
@@ -293,6 +332,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         }
     }
 
+    //? not used
     function _refundGas() internal {
         if (address(this).balance != 0) {
             (bool success,) = payable(msg.sender).call{value: address(this).balance}("");
@@ -304,5 +344,24 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         // to receive native token
     }
 
-    // TODO: Liquidate
+    function liquidateTroves(
+        ITroveManager troveManager,
+        uint256 maxTrovesToLiquidate,
+        uint256 maxICR,
+        LzSendParam calldata _lzSendParam
+    ) external {
+        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
+        uint256 collTokenBalanceBefore = troveManager.collateralToken().balanceOf(address(this));
+
+        ILiquidationFacet(xApp).liquidateTroves(troveManager, maxTrovesToLiquidate, maxICR);
+
+        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
+        uint256 collTokenBalanceAfter = troveManager.collateralToken().balanceOf(address(this));
+
+        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
+        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
+
+        _afterWithdrawDebt(userDebtAmount, _lzSendParam);
+        _afterWithdrawColl(troveManager.collateralToken(), userCollAmount);
+    }
 }
