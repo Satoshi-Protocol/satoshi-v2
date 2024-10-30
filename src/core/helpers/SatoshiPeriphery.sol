@@ -15,32 +15,30 @@ import {
     MessagingReceipt,
     MessagingFee
 } from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
-
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
 import {ILiquidationFacet} from "../interfaces/ILiquidationFacet.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {DebtToken} from "../DebtToken.sol";
 import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
-
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
-
 import {Config} from "../Config.sol";
 
 /**
  * @title Satoshi Borrower Operations Router
  *        Handle the native token and ERC20 for the borrower operations
  */
-contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
+contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuard {
     using SafeERC20 for IERC20;
     using SafeERC20 for DebtToken;
 
     DebtToken public debtToken;
+    address public xApp;
+    IWETH public weth;
 
-    address public immutable xApp;
-    IWETH public immutable weth;
-
-    constructor(DebtToken _debtToken, IWETH _weth, address _xApp) {
+    function initialize(DebtToken _debtToken, IWETH _weth, address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
         if (_xApp == address(0)) revert InvalidZeroAddress();
         if (address(_weth) == address(0)) revert InvalidZeroAddress();
@@ -48,6 +46,13 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         debtToken = _debtToken;
         weth = _weth;
         xApp = _xApp;
+
+        __Ownable_init(_owner);
+        __UUPSUpgradeable_init_unchained();
+    }
+
+    receive() external payable {
+        // to receive native token
     }
 
     /// @notice Open a trove
@@ -332,18 +337,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
         }
     }
 
-    //? not used
-    function _refundGas() internal {
-        if (address(this).balance != 0) {
-            (bool success,) = payable(msg.sender).call{value: address(this).balance}("");
-            if (!success) revert RefundFailed();
-        }
-    }
-
-    receive() external payable {
-        // to receive native token
-    }
-
     function liquidateTroves(
         ITroveManager troveManager,
         uint256 maxTrovesToLiquidate,
@@ -363,5 +356,21 @@ contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
 
         _afterWithdrawDebt(userDebtAmount, _lzSendParam);
         _afterWithdrawColl(troveManager.collateralToken(), userCollAmount);
+    }
+
+    /// INTERNAL FUNCTIONS
+
+    /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
+    // solhint-disable-next-line no-empty-blocks
+    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+        // No additional authorization logic is needed for this contract
+    }
+
+    //? not used
+    function _refundGas() internal {
+        if (address(this).balance != 0) {
+            (bool success,) = payable(msg.sender).call{value: address(this).balance}("");
+            if (!success) revert RefundFailed();
+        }
     }
 }

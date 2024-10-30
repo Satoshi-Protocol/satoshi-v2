@@ -31,6 +31,8 @@ interface ISatoshiPeriphery {
 
     function weth() external view returns (IWETH);
 
+    function initialize(DebtToken _debtToken, IWETH _weth, address _xApp, address _owner) external;
+
     function openTrove(
         ITroveManager troveManager,
         uint256 _maxFeePercentage,

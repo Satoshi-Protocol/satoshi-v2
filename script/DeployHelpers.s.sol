@@ -10,7 +10,9 @@ contract DeployHelpersScript is Script {
     using stdJson for *;
 
     uint256 internal DEPLOYMENT_PRIVATE_KEY;
+    uint256 internal OWNER_PRIVATE_KEY;
     address public deployer;
+    address public satoshiCoreOwner;
 
     // TODO: need to check testnet config
     address _weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -25,6 +27,10 @@ contract DeployHelpersScript is Script {
         DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
         assert(DEPLOYMENT_PRIVATE_KEY != 0);
         deployer = vm.addr(DEPLOYMENT_PRIVATE_KEY);
+
+        OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
+        assert(OWNER_PRIVATE_KEY != 0);
+        satoshiCoreOwner = vm.addr(OWNER_PRIVATE_KEY);
     }
 
     function run() public {
@@ -33,14 +39,13 @@ contract DeployHelpersScript is Script {
         address satoshiXApp = Deployer.getContractAddress("Deploy", "SatoshiXApp");
         address debtImpl = Deployer.getContractAddress("Deploy", "DebtToken");
         address debtToken = Deployer.getERC1967ProxyAddress("Deploy", debtImpl);
-        address borrowerOperationsFacet = Deployer.getContractAddress("Deploy", "BorrowerOperationsFacet");
 
         console.log(debtImpl);
         console.log(debtToken);
 
         (multiCollateralHintHelpers, troveHelper, multiTroveGetter, troveManagerGetters) =
             Deployer._deployHelpers(satoshiXApp);
-        satoshiPeriphery = Deployer._deployPeriphery(debtToken, borrowerOperationsFacet, _weth, satoshiXApp);
+        satoshiPeriphery = Deployer._deployPeriphery(debtToken, _weth, satoshiXApp, satoshiCoreOwner);
 
         console.log("======= HELPERS =======");
         console.log("MultiCollateralHintHelpers: ", multiCollateralHintHelpers);

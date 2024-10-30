@@ -182,19 +182,24 @@ library Deployer {
 
         address oshiTokenImpl = address(new OSHIToken());
         bytes memory data = abi.encodeCall(IOSHIToken.initialize, owner);
-        oshiToken = IOSHIToken(address(new ERC1967Proxy(address(oshiTokenImpl), data)));
+        oshiToken = IOSHIToken(address(new ERC1967Proxy(oshiTokenImpl, data)));
 
         communityIssuance = _deployCommunityIssuance(oshiToken, _satoshiXApp, owner);
         rewardManager = _deployRewardManager(owner);
     }
 
-    function _deployPeriphery(address debtToken, address borrowerOperationsFacet, address _weth, address satoshiXApp)
+    function _deployPeriphery(address debtToken, address _weth, address satoshiXApp, address _owner)
         internal
         returns (address periphery)
     {
         _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        //DebtToken(debtToken), IWETH(_weth), satoshiXApp)
 
-        periphery = address(new SatoshiPeriphery(DebtToken(debtToken), IWETH(_weth), satoshiXApp));
+        bytes memory data =
+            abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(debtToken), IWETH(_weth), satoshiXApp, _owner));
+        address peripheryImpl = address(new SatoshiPeriphery());
+
+        periphery = address(new ERC1967Proxy(peripheryImpl, data));
     }
 
     function _deployHelpers(address satoshiXApp)
