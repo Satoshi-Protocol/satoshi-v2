@@ -22,6 +22,9 @@ const holeskyContract: OmniPointHardhat = {
     contractName: 'DebtToken',
 }
 
+// send & received library related to the DVN on lz
+// link: https://docs.layerzero.network/v2/developers/evm/protocol-gas-settings/default-config#setting-send-and-receive-libraries
+
 const config: OAppOmniGraphHardhat = {
     contracts: [
         // {

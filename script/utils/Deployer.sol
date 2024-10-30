@@ -106,7 +106,7 @@ library Deployer {
 
     /// @notice Check if the contract is deployed and the deployed code matches the expected code
     /// @param _addr The contract address
-    /// @param contractName The contract name for searching deployed code. e.g. SatoshiXApp.sol:SatoshiXApp
+    /// @param contractName The contract name in project for searching deployed code. e.g. SatoshiXApp.sol:SatoshiXApp
     function _verifyContractDeployed(address _addr, string memory contractName) internal view {
         uint256 size;
         assembly {
@@ -154,6 +154,7 @@ library Deployer {
         returns (IDebtToken debtToken)
     {
         _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        require(lzEndpoing != address(0), "LZ endpoint address is zero address");
 
         address debtTokenImpl = address(new DebtToken(lzEndpoing));
         bytes memory data = abi.encodeCall(
@@ -193,7 +194,9 @@ library Deployer {
         returns (address periphery)
     {
         _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
-        //DebtToken(debtToken), IWETH(_weth), satoshiXApp)
+        require(_weth != address(0), "WETH address is zero address");
+        require(debtToken != address(0), "DebtToken address is zero address");
+        require(_owner != address(0), "Owner address is zero address");
 
         bytes memory data =
             abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(debtToken), IWETH(_weth), satoshiXApp, _owner));

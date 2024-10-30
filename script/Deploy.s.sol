@@ -7,6 +7,7 @@ import {Initializer} from "../src/core/Initializer.sol";
 
 import {Builder} from "./utils/Builder.sol";
 import {Deployer} from "./utils/Deployer.sol";
+import {Config} from "./utils/Config.sol";
 
 import {Script, console} from "forge-std/Script.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
@@ -19,15 +20,13 @@ import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
 import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
 
 contract DeployScript is Script, IERC2535DiamondCutInternal {
+    address public LZ_ENDPOINT;
+    uint256 public constant TOTAL_FACETS = 7;
+
     uint256 internal DEPLOYMENT_PRIVATE_KEY;
     uint256 internal OWNER_PRIVATE_KEY;
     address public deployer;
     address public satoshiCoreOwner;
-
-    uint256 public constant TOTAL_FACETS = 7;
-
-    // TODO
-    address public constant LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
 
     // XApp
     address payable satoshiXApp;
@@ -62,6 +61,9 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
         OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
         assert(OWNER_PRIVATE_KEY != 0);
         satoshiCoreOwner = vm.addr(OWNER_PRIVATE_KEY);
+
+        Config.ConfigData memory config = abi.decode(Config.getConfig(), (Config.ConfigData));
+        LZ_ENDPOINT = config.lzEndpoint;
     }
 
     function run() public {

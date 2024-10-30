@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {Script, console} from "forge-std/Script.sol";
 import {stdJson} from "forge-std/StdJson.sol";
 import {Deployer} from "./utils/Deployer.sol";
+import {Config} from "./utils/Config.sol";
 
 contract DeployHelpersScript is Script {
     using Deployer for address;
@@ -13,9 +14,7 @@ contract DeployHelpersScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;
     address public deployer;
     address public satoshiCoreOwner;
-
-    // TODO: need to check testnet config
-    address _weth = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+    address public WETH;
 
     address multiCollateralHintHelpers;
     address troveHelper;
@@ -31,6 +30,9 @@ contract DeployHelpersScript is Script {
         OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
         assert(OWNER_PRIVATE_KEY != 0);
         satoshiCoreOwner = vm.addr(OWNER_PRIVATE_KEY);
+
+        Config.ConfigData memory config = abi.decode(Config.getConfig(), (Config.ConfigData));
+        WETH = config.weth;
     }
 
     function run() public {
@@ -45,7 +47,7 @@ contract DeployHelpersScript is Script {
 
         (multiCollateralHintHelpers, troveHelper, multiTroveGetter, troveManagerGetters) =
             Deployer._deployHelpers(satoshiXApp);
-        satoshiPeriphery = Deployer._deployPeriphery(debtToken, _weth, satoshiXApp, satoshiCoreOwner);
+        satoshiPeriphery = Deployer._deployPeriphery(debtToken, WETH, satoshiXApp, satoshiCoreOwner);
 
         console.log("======= HELPERS =======");
         console.log("MultiCollateralHintHelpers: ", multiCollateralHintHelpers);
