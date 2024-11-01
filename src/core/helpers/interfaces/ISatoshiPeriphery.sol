@@ -44,8 +44,7 @@ interface ISatoshiPeriphery {
     ) external payable;
 
     function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
-        external
-        payable;
+        external;
 
     function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
         external;
@@ -57,7 +56,7 @@ interface ISatoshiPeriphery {
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external;
+    ) external payable;
 
     function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
         external;
@@ -92,5 +91,5 @@ interface ISatoshiPeriphery {
         uint256 maxTrovesToLiquidate,
         uint256 maxICR,
         LzSendParam calldata _lzSendParam
-    ) external;
+    ) external payable;
 }
