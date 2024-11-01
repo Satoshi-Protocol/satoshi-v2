@@ -106,18 +106,12 @@ library Deployer {
 
     /// @notice Check if the contract is deployed and the deployed code matches the expected code
     /// @param _addr The contract address
-    /// @param contractName The contract name in project for searching deployed code. e.g. SatoshiXApp.sol:SatoshiXApp
-    function _verifyContractDeployed(address _addr, string memory contractName) internal view {
+    function _verifyContractDeployed(address _addr) internal view {
         uint256 size;
         assembly {
             size := extcodesize(_addr)
         }
         require(size > 0, "Contract not deployed");
-
-        bytes memory code = _addr.code;
-        bytes memory deployedCode = vm.getDeployedCode(contractName);
-
-        require(keccak256(code) == keccak256(deployedCode), "Contract not matched");
     }
 
     function _deploySatoshiXApp() internal returns (address payable) {
@@ -153,7 +147,7 @@ library Deployer {
         internal
         returns (IDebtToken debtToken)
     {
-        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(satoshiXApp);
         require(lzEndpoing != address(0), "LZ endpoint address is zero address");
 
         address debtTokenImpl = address(new DebtToken(lzEndpoing));
@@ -179,7 +173,7 @@ library Deployer {
         internal
         returns (IOSHIToken oshiToken, ICommunityIssuance communityIssuance, IRewardManager rewardManager)
     {
-        _verifyContractDeployed(_satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(_satoshiXApp);
 
         address oshiTokenImpl = address(new OSHIToken());
         bytes memory data = abi.encodeCall(IOSHIToken.initialize, owner);
@@ -189,17 +183,15 @@ library Deployer {
         rewardManager = _deployRewardManager(owner);
     }
 
-    function _deployPeriphery(address debtToken, address _weth, address satoshiXApp, address _owner)
+    function _deployPeriphery(address debtToken, address satoshiXApp, address _owner)
         internal
         returns (address periphery)
     {
-        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
-        require(_weth != address(0), "WETH address is zero address");
+        _verifyContractDeployed(satoshiXApp);
         require(debtToken != address(0), "DebtToken address is zero address");
         require(_owner != address(0), "Owner address is zero address");
 
-        bytes memory data =
-            abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(debtToken), IWETH(_weth), satoshiXApp, _owner));
+        bytes memory data = abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(debtToken), satoshiXApp, _owner));
         address peripheryImpl = address(new SatoshiPeriphery());
 
         periphery = address(new ERC1967Proxy(peripheryImpl, data));
@@ -214,7 +206,7 @@ library Deployer {
             address troveManagerGetters
         )
     {
-        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(satoshiXApp);
 
         multiCollateralHintHelpers = address(new MultiCollateralHintHelpers(satoshiXApp));
         multiTroveGetter = address(new MultiTroveGetter());
@@ -226,8 +218,8 @@ library Deployer {
         private
         returns (ICommunityIssuance)
     {
-        _verifyContractDeployed(address(oshiToken), "ERC1967Proxy.sol:ERC1967Proxy");
-        _verifyContractDeployed(satoshiXApp, "SatoshiXApp.sol:SatoshiXApp");
+        _verifyContractDeployed(address(oshiToken));
+        _verifyContractDeployed(satoshiXApp);
 
         address communityIssuanceImpl = address(new CommunityIssuance());
         bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (owner, oshiToken, address(satoshiXApp)));

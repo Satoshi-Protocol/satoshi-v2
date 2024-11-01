@@ -14,7 +14,6 @@ contract DeployHelpersScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;
     address public deployer;
     address public satoshiCoreOwner;
-    address public WETH;
 
     address multiCollateralHintHelpers;
     address troveHelper;
@@ -30,9 +29,6 @@ contract DeployHelpersScript is Script {
         OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
         assert(OWNER_PRIVATE_KEY != 0);
         satoshiCoreOwner = vm.addr(OWNER_PRIVATE_KEY);
-
-        Config.ConfigData memory config = abi.decode(Config.getConfig(), (Config.ConfigData));
-        WETH = config.weth;
     }
 
     function run() public {
@@ -47,7 +43,7 @@ contract DeployHelpersScript is Script {
 
         (multiCollateralHintHelpers, troveHelper, multiTroveGetter, troveManagerGetters) =
             Deployer._deployHelpers(satoshiXApp);
-        satoshiPeriphery = Deployer._deployPeriphery(debtToken, WETH, satoshiXApp, satoshiCoreOwner);
+        satoshiPeriphery = Deployer._deployPeriphery(debtToken, satoshiXApp, satoshiCoreOwner);
 
         console.log("======= HELPERS =======");
         console.log("MultiCollateralHintHelpers: ", multiCollateralHintHelpers);

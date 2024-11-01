@@ -14,7 +14,6 @@ import {
     MessagingFee
 } from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
@@ -29,26 +28,23 @@ import {Config} from "../Config.sol";
  * @title Satoshi Borrower Operations Router
  *        Handle the native token and ERC20 for the borrower operations
  */
-contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
+contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
     using SafeERC20 for DebtToken;
 
     DebtToken public debtToken;
     address public xApp;
-    IWETH public weth;
 
-    function initialize(DebtToken _debtToken, IWETH _weth, address _xApp, address _owner) external initializer {
+    function initialize(DebtToken _debtToken,  address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
         if (_xApp == address(0)) revert InvalidZeroAddress();
-        if (address(_weth) == address(0)) revert InvalidZeroAddress();
 
         debtToken = _debtToken;
-        weth = _weth;
         xApp = _xApp;
 
         __Ownable_init(_owner);
         __UUPSUpgradeable_init_unchained();
-        __ReentrancyGuard_init();
+
     }
 
     receive() external payable {
@@ -301,14 +297,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     function _afterWithdrawColl(IERC20 collateralToken, uint256 collAmount) private {
         if (collAmount == 0) return;
 
-        if (address(collateralToken) == address(weth)) {
-            weth.withdraw(collAmount);
-
-            (bool success,) = payable(msg.sender).call{value: collAmount}("");
-            if (!success) revert NativeTokenTransferFailed();
-        } else {
-            collateralToken.safeTransfer(msg.sender, collAmount);
-        }
+        collateralToken.safeTransfer(msg.sender, collAmount);
     }
 
     /// @notice Withdraw the debt token to the msg sender

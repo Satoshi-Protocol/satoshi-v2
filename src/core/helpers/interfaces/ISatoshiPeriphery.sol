@@ -7,7 +7,6 @@ import {DebtToken} from "../../DebtToken.sol";
 
 import {IBorrowerOperationsFacet} from "../../interfaces/IBorrowerOperationsFacet.sol";
 import {ITroveManager} from "../../interfaces/ITroveManager.sol";
-import {IWETH} from "./IWETH.sol";
 // import {ILiquidationManager} from "../../interfaces/core/ILiquidationManager.sol";
 
 struct LzSendParam {
@@ -29,9 +28,7 @@ interface ISatoshiPeriphery {
 
     function xApp() external view returns (address);
 
-    function weth() external view returns (IWETH);
-
-    function initialize(DebtToken _debtToken, IWETH _weth, address _xApp, address _owner) external;
+    function initialize(DebtToken _debtToken, address _xApp, address _owner) external;
 
     function openTrove(
         ITroveManager troveManager,
