@@ -35,7 +35,6 @@ import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMu
 import {IMultiTroveGetter} from "../../src/core/helpers/interfaces/IMultiTroveGetter.sol";
 import {ITroveHelper} from "../../src/core/helpers/interfaces/ITroveHelper.sol";
 import {IBorrowerOperationsFacet} from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {IWETH} from "../../src/core/helpers/interfaces/IWETH.sol";
 import {ISatoshiPeriphery} from "../../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
 
 import {Vm} from "forge-std/Vm.sol";
@@ -148,7 +147,8 @@ library Deployer {
         returns (IDebtToken debtToken)
     {
         _verifyContractDeployed(satoshiXApp);
-        require(lzEndpoing != address(0), "LZ endpoint address is zero address");
+        _verifyContractDeployed(lzEndpoing);
+        require(owner != address(0), "Owner address is zero address");
 
         address debtTokenImpl = address(new DebtToken(lzEndpoing));
         bytes memory data = abi.encodeCall(
@@ -162,6 +162,8 @@ library Deployer {
         internal
         returns (IBeacon sortedTrovesBeacon, IBeacon troveManagerBeacon)
     {
+        require(owner != address(0), "Owner address is zero address");
+
         address sortedTrovesImpl = address(new SortedTroves());
         sortedTrovesBeacon = new UpgradeableBeacon(sortedTrovesImpl, owner);
 
@@ -174,6 +176,7 @@ library Deployer {
         returns (IOSHIToken oshiToken, ICommunityIssuance communityIssuance, IRewardManager rewardManager)
     {
         _verifyContractDeployed(_satoshiXApp);
+        require(owner != address(0), "Owner address is zero address");
 
         address oshiTokenImpl = address(new OSHIToken());
         bytes memory data = abi.encodeCall(IOSHIToken.initialize, owner);
@@ -188,7 +191,7 @@ library Deployer {
         returns (address periphery)
     {
         _verifyContractDeployed(satoshiXApp);
-        require(debtToken != address(0), "DebtToken address is zero address");
+        _verifyContractDeployed(debtToken);
         require(_owner != address(0), "Owner address is zero address");
 
         bytes memory data = abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(debtToken), satoshiXApp, _owner));
