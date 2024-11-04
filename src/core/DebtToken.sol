@@ -114,29 +114,6 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         return true;
     }
 
-    // TODO: 實驗
-    function mintWithGasCompensationToOtherChain(
-        SendParam calldata _sendParam,
-        MessagingFee calldata _fee,
-        address _refundAddress
-    ) external returns (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) {
-        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
-        (uint256 amountSentLD, uint256 amountReceivedLD) =
-            _debitView(_sendParam.amountLD, _sendParam.minAmountLD, _sendParam.dstEid);
-
-        // @dev Builds the options and OFT message to quote in the endpoint.
-        (bytes memory message, bytes memory options) = _buildMsgAndOptions(_sendParam, amountReceivedLD);
-
-        // @dev Sends the message to the LayerZero endpoint and returns the LayerZero msg receipt.
-        msgReceipt = _lzSend(_sendParam.dstEid, message, options, _fee, _refundAddress);
-        // @dev Formulate the OFT receipt.
-        oftReceipt = OFTReceipt(amountSentLD, amountReceivedLD);
-
-        emit OFTSent(msgReceipt.guid, _sendParam.dstEid, msg.sender, amountSentLD, amountReceivedLD);
-
-        _mint(satoshiXApp, Config.DEBT_GAS_COMPENSATION);
-    }
-
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
         require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _burn(_account, _amount);

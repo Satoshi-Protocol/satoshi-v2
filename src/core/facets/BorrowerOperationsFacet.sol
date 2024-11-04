@@ -26,6 +26,7 @@ import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
  *        https://github.com/liquity/dev/blob/main/packages/contracts/contracts/BorrowerOperations.sol
  *
  */
+
 contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal, OwnableInternal {
     using SafeERC20 for IERC20;
     using SafeERC20 for IDebtToken;
@@ -166,6 +167,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Deposits are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
+
         IERC20 collateralToken;
         LocalVariables_openTrove memory vars;
         bool isRecoveryMode;
@@ -231,6 +233,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Trove adjustments are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
+
         _adjustTrove(s, troveManager, account, 0, _collateralAmount, 0, 0, false, _upperHint, _lowerHint);
 
         // collect interest payable to rewardManager

@@ -7,7 +7,6 @@ import {DebtToken} from "../../DebtToken.sol";
 
 import {IBorrowerOperationsFacet} from "../../interfaces/IBorrowerOperationsFacet.sol";
 import {ITroveManager} from "../../interfaces/ITroveManager.sol";
-import {IWETH} from "./IWETH.sol";
 // import {ILiquidationManager} from "../../interfaces/core/ILiquidationManager.sol";
 
 struct LzSendParam {
@@ -27,9 +26,9 @@ interface ISatoshiPeriphery {
 
     function debtToken() external view returns (DebtToken);
 
-    function borrowerOperationsFacet() external view returns (IBorrowerOperationsFacet);
+    function xApp() external view returns (address);
 
-    function weth() external view returns (IWETH);
+    function initialize(DebtToken _debtToken, address _xApp, address _owner) external;
 
     function openTrove(
         ITroveManager troveManager,
@@ -42,8 +41,7 @@ interface ISatoshiPeriphery {
     ) external payable;
 
     function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
-        external
-        payable;
+        external;
 
     function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
         external;
@@ -55,7 +53,7 @@ interface ISatoshiPeriphery {
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external;
+    ) external payable;
 
     function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
         external;
@@ -72,7 +70,7 @@ interface ISatoshiPeriphery {
         LzSendParam calldata _lzSendParam
     ) external payable;
 
-    // function closeTrove(ITroveManager troveManager) external;
+    function closeTrove(ITroveManager troveManager) external;
 
     function redeemCollateral(
         ITroveManager troveManager,
@@ -85,10 +83,10 @@ interface ISatoshiPeriphery {
         uint256 _maxFeePercentage
     ) external;
 
-    // function liquidateTroves(
-    //     ILiquidationManager liquidationManager,
-    //     ITroveManager troveManager,
-    //     uint256 maxTrovesToLiquidate,
-    //     uint256 maxICR
-    // ) external;
+    function liquidateTroves(
+        ITroveManager troveManager,
+        uint256 maxTrovesToLiquidate,
+        uint256 maxICR,
+        LzSendParam calldata _lzSendParam
+    ) external payable;
 }

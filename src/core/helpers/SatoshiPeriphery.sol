@@ -1,307 +1,352 @@
-// // SPDX-License-Identifier: MIT
-// pragma solidity ^0.8.20;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-// import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-// import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {
+    IOFT,
+    SendParam,
+    OFTLimit,
+    OFTReceipt,
+    OFTFeeDetail,
+    MessagingReceipt,
+    MessagingFee
+} from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {IWETH} from "./interfaces/IWETH.sol";
+import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
+import {ILiquidationFacet} from "../interfaces/ILiquidationFacet.sol";
+import {ITroveManager} from "../interfaces/ITroveManager.sol";
+import {DebtToken} from "../DebtToken.sol";
+import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
+import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
+import {Config} from "../Config.sol";
 
-// import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-// import {
-//     IOFT,
-//     SendParam,
-//     OFTLimit,
-//     OFTReceipt,
-//     OFTFeeDetail,
-//     MessagingReceipt,
-//     MessagingFee
-// } from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+/**
+ * @title Satoshi Borrower Operations Router
+ *        Handle the native token and ERC20 for the borrower operations
+ */
+contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable {
+    using SafeERC20 for IERC20;
+    using SafeERC20 for DebtToken;
 
-// import {IWETH} from "./interfaces/IWETH.sol";
-// import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
-// import {ITroveManager} from "../interfaces/ITroveManager.sol";
-// import {DebtToken} from "../DebtToken.sol";
-// import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
+    DebtToken public debtToken;
+    address public xApp;
 
-// import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
-// // import {ILiquidationManager} from "../interfaces/ILiquidationManager.sol";
+    function initialize(DebtToken _debtToken,  address _xApp, address _owner) external initializer {
+        if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
+        if (_xApp == address(0)) revert InvalidZeroAddress();
 
-// /**
-//  * @title Satoshi Borrower Operations Router
-//  *        Handle the native token and ERC20 for the borrower operations
-//  */
-// contract SatoshiPeriphery is ISatoshiPeriphery, ReentrancyGuard {
-//     using SafeERC20 for IERC20;
-//     using SafeERC20 for DebtToken;
+        debtToken = _debtToken;
+        xApp = _xApp;
 
-//     DebtToken public debtToken;
-//     // TODO: rename to XApp and type convert to address
-//     address public immutable xApp;
-//     IBorrowerOperationsFacet public immutable borrowerOperationsFacet;
-//     IWETH public immutable weth;
+        __Ownable_init(_owner);
+        __UUPSUpgradeable_init_unchained();
 
-//     constructor(DebtToken _debtToken, IBorrowerOperationsFacet _borrowerOperationsFacet, IWETH _weth) {
-//         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
-//         if (address(_borrowerOperationsFacet) == address(0)) revert InvalidZeroAddress();
-//         if (address(_weth) == address(0)) revert InvalidZeroAddress();
+    }
 
-//         debtToken = _debtToken;
-//         borrowerOperationsFacet = _borrowerOperationsFacet;
-//         weth = _weth;
-//     }
+    receive() external payable {
+        // to receive native token
+    }
 
-//     // account should call borrowerOperationsFacet.setDelegateApproval first
-//     // to approve this contract to call openTrove
-//     function openTrove(
-//         ITroveManager troveManager,
-//         uint256 _maxFeePercentage,
-//         uint256 _collAmount,
-//         uint256 _debtAmount,
-//         address _upperHint,
-//         address _lowerHint,
-//         LzSendParam calldata _lzSendParam
-//     ) external payable {
-//         IERC20 collateralToken = troveManager.collateralToken();
+    // EXTERNAL FUNCTIONS //
 
-//         _beforeAddColl(collateralToken, _collAmount);
+    /// @notice Open a trove
+    /// @dev Account should call `setDelegateApproval()` first to approve this contract to call openTrove
+    /// @param troveManager The TroveManager contract
+    /// @param _maxFeePercentage User willing to accept in case of a fee slippage
+    /// @param _collAmount The amount of collateral to deposit
+    /// @param _debtAmount The expected debt amount of borrowed
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
+    /// @param _lzSendParam The send param for cross-chain (lz)
+    function openTrove(
+        ITroveManager troveManager,
+        uint256 _maxFeePercentage,
+        uint256 _collAmount,
+        uint256 _debtAmount,
+        address _upperHint,
+        address _lowerHint,
+        LzSendParam calldata _lzSendParam
+    ) external payable {
+        IERC20 collateralToken = troveManager.collateralToken();
 
-//         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
+        _beforeAddColl(collateralToken, _collAmount);
 
-//         borrowerOperationsFacet.openTrove(
-//             troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
-//         );
+        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
-//         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
-//         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
-//         require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
-//         _afterWithdrawDebt(userDebtAmount, _lzSendParam);
-//     }
+        IBorrowerOperationsFacet(xApp).openTrove(
+            troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
+        );
 
-//     function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
-//         external
-//         payable
-//     {
-//         IERC20 collateralToken = troveManager.collateralToken();
+        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
+        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
+        require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
 
-//         _beforeAddColl(collateralToken, _collAmount);
+        _afterWithdrawDebt(userDebtAmount, _lzSendParam);
+    }
 
-//         borrowerOperationsFacet.addColl(troveManager, msg.sender, _collAmount, _upperHint, _lowerHint);
-//     }
+    /// @notice Add collateral to a active trove
+    /// @param troveManager The TroveManager contract
+    /// @param _collAmount The amount of additional collateral
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
+    function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
+        external
+    {
+        IERC20 collateralToken = troveManager.collateralToken();
 
-//     function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
-//         external
-//     {
-//         IERC20 collateralToken = troveManager.collateralToken();
-//         uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
+        _beforeAddColl(collateralToken, _collAmount);
 
-//         borrowerOperationsFacet.withdrawColl(troveManager, msg.sender, _collWithdrawal, _upperHint, _lowerHint);
+        IBorrowerOperationsFacet(xApp).addColl(troveManager, msg.sender, _collAmount, _upperHint, _lowerHint);
+    }
 
-//         uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
-//         uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
-//         require(userCollAmount == _collWithdrawal, "SatoshiPeriphery: Collateral amount mismatch");
-//         _afterWithdrawColl(collateralToken, userCollAmount);
-//     }
+    /// @notice Withdraws _collWithdrawal of collateral from the caller’s Trove
+    /// @dev Executes only if the user has an active Trove,
+    /// @dev Withdrawal would not pull the user’s Trove below the MCR, and the resulting total collateralization ratio of the system is above 150%(TCR)
+    /// @param troveManager The TroveManager contract
+    /// @param _collWithdrawal The amount of collateral to withdraw
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
+    function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
+        external
+    {
+        IERC20 collateralToken = troveManager.collateralToken();
+        uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
 
-//     function withdrawDebt(
-//         ITroveManager troveManager,
-//         uint256 _maxFeePercentage,
-//         uint256 _debtAmount,
-//         address _upperHint,
-//         address _lowerHint,
-//         LzSendParam calldata _lzSendParam
-//     ) external {
-//         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-//         borrowerOperationsFacet.withdrawDebt(
-//             troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
-//         );
-//         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
-//         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
-//         require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
+        IBorrowerOperationsFacet(xApp).withdrawColl(troveManager, msg.sender, _collWithdrawal, _upperHint, _lowerHint);
 
-//         _afterWithdrawDebt(userDebtAmount, _lzSendParam);
-//     }
+        uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
+        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
+        require(userCollAmount == _collWithdrawal, "SatoshiPeriphery: Collateral amount mismatch");
+        _afterWithdrawColl(collateralToken, userCollAmount);
+    }
 
-//     function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
-//         external
-//     {
-//         _beforeRepayDebt(_debtAmount);
+    /// @notice Issues _debtAmount of Debt token from the caller’s Trove to the caller.
+    /// @dev Executes only if the Trove's collateralization ratio would remain above the minimum
+    /// @param troveManager The TroveManager contract
+    /// @param _maxFeePercentage User willing to accept in case of a fee slippage
+    /// @param _debtAmount The amount of debt to withdraw
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
+    function withdrawDebt(
+        ITroveManager troveManager,
+        uint256 _maxFeePercentage,
+        uint256 _debtAmount,
+        address _upperHint,
+        address _lowerHint,
+        LzSendParam calldata _lzSendParam
+    ) external payable {
+        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
+        IBorrowerOperationsFacet(xApp).withdrawDebt(
+            troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
+        );
+        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
+        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
+        require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
 
-//         borrowerOperationsFacet.repayDebt(troveManager, msg.sender, _debtAmount, _upperHint, _lowerHint);
-//     }
+        _afterWithdrawDebt(userDebtAmount, _lzSendParam);
+    }
 
-//     function adjustTrove(
-//         ITroveManager troveManager,
-//         uint256 _maxFeePercentage,
-//         uint256 _collDeposit,
-//         uint256 _collWithdrawal,
-//         uint256 _debtChange,
-//         bool _isDebtIncrease,
-//         address _upperHint,
-//         address _lowerHint,
-//         LzSendParam calldata _lzSendParam
-//     ) external payable {
-//         if (_collDeposit != 0 && _collWithdrawal != 0) revert CannotWithdrawAndAddColl();
+    /// @notice Repays _debtAmount of Debt token to the caller’s Trove
+    /// @param troveManager The TroveManager contract
+    /// @param _debtAmount The amount of debt to repay
+    /// @param _upperHint The upper hint (for querying the position of the sorted trove)
+    /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
+    function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
+        external
+    {
+        _beforeRepayDebt(_debtAmount);
 
-//         IERC20 collateralToken = troveManager.collateralToken();
+        IBorrowerOperationsFacet(xApp).repayDebt(troveManager, msg.sender, _debtAmount, _upperHint, _lowerHint);
+    }
 
-//         // add collateral
-//         _beforeAddColl(collateralToken, _collDeposit);
+    /// @notice Enables a borrower to simultaneously change (decrease/increase) both their collateral and debt,
+    function adjustTrove(
+        ITroveManager troveManager,
+        uint256 _maxFeePercentage,
+        uint256 _collDeposit,
+        uint256 _collWithdrawal,
+        uint256 _debtChange,
+        bool _isDebtIncrease,
+        address _upperHint,
+        address _lowerHint,
+        LzSendParam calldata _lzSendParam
+    ) external payable {
+        if (_collDeposit != 0 && _collWithdrawal != 0) revert CannotWithdrawAndAddColl();
 
-//         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
+        IERC20 collateralToken = troveManager.collateralToken();
+        _beforeAddColl(collateralToken, _collDeposit);
 
-//         // repay debt
-//         if (!_isDebtIncrease) {
-//             _beforeRepayDebt(_debtChange);
-//         }
+        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
-//         borrowerOperationsFacet.adjustTrove(
-//             troveManager,
-//             msg.sender,
-//             _maxFeePercentage,
-//             _collDeposit,
-//             _collWithdrawal,
-//             _debtChange,
-//             _isDebtIncrease,
-//             _upperHint,
-//             _lowerHint
-//         );
+        // repay debt
+        if (!_isDebtIncrease) {
+            _beforeRepayDebt(_debtChange);
+        }
 
-//         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
-//         // withdraw collateral
-//         _afterWithdrawColl(collateralToken, _collWithdrawal);
+        IBorrowerOperationsFacet(xApp).adjustTrove(
+            troveManager,
+            msg.sender,
+            _maxFeePercentage,
+            _collDeposit,
+            _collWithdrawal,
+            _debtChange,
+            _isDebtIncrease,
+            _upperHint,
+            _lowerHint
+        );
 
-//         // withdraw debt
-//         if (_isDebtIncrease) {
-//             require(
-//                 debtTokenBalanceAfter - debtTokenBalanceBefore == _debtChange, "SatoshiPeriphery: Debt amount mismatch"
-//             );
+        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
+        // withdraw collateral
+        _afterWithdrawColl(collateralToken, _collWithdrawal);
 
-//             _afterWithdrawDebt(_debtChange, _lzSendParam);
-//         }
-//     }
+        // withdraw debt
+        if (_isDebtIncrease) {
+            require(
+                debtTokenBalanceAfter - debtTokenBalanceBefore == _debtChange, "SatoshiPeriphery: Debt amount mismatch"
+            );
 
-//     // TODO: closeTrove: get DEBT_GAS_COMPENSATION
-//     // function closeTrove(ITroveManager troveManager) external {
-//     //     (uint256 collAmount, uint256 debtAmount) = troveManager.getTroveCollAndDebt(msg.sender);
-//     //     uint256 netDebtAmount = debtAmount - borrowerOperationsFacet.DEBT_GAS_COMPENSATION();
-//     //     _beforeRepayDebt(netDebtAmount);
+            _afterWithdrawDebt(_debtChange, _lzSendParam);
+        }
+    }
 
-//     //     IERC20 collateralToken = troveManager.collateralToken();
-//     //     uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
+    /// @notice Close the trove from the caller
+    /// @param troveManager The TroveManager contract
+    function closeTrove(ITroveManager troveManager) external {
+        (uint256 collAmount, uint256 debtAmount) = troveManager.getTroveCollAndDebt(msg.sender);
+        uint256 netDebtAmount = debtAmount - Config.DEBT_GAS_COMPENSATION;
+        _beforeRepayDebt(netDebtAmount);
 
-//     //     borrowerOperationsFacet.closeTrove(troveManager, msg.sender);
+        IERC20 collateralToken = troveManager.collateralToken();
+        uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
 
-//     //     uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
-//     //     uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
-//     //     require(userCollAmount == collAmount, "SatoshiPeriphery: Collateral amount mismatch");
-//     //     _afterWithdrawColl(collateralToken, userCollAmount);
-//     // }
+        IBorrowerOperationsFacet(xApp).closeTrove(troveManager, msg.sender);
 
-//     function redeemCollateral(
-//         ITroveManager troveManager,
-//         uint256 _debtAmount,
-//         address _firstRedemptionHint,
-//         address _upperPartialRedemptionHint,
-//         address _lowerPartialRedemptionHint,
-//         uint256 _partialRedemptionHintNICR,
-//         uint256 _maxIterations,
-//         uint256 _maxFeePercentage
-//     ) external {
-//         IERC20 collateralToken = troveManager.collateralToken();
+        uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
+        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
+        require(userCollAmount == collAmount, "SatoshiPeriphery: Collateral amount mismatch");
+        _afterWithdrawColl(collateralToken, userCollAmount);
+    }
 
-//         _beforeRepayDebt(_debtAmount);
+    function redeemCollateral(
+        ITroveManager troveManager,
+        uint256 _debtAmount,
+        address _firstRedemptionHint,
+        address _upperPartialRedemptionHint,
+        address _lowerPartialRedemptionHint,
+        uint256 _partialRedemptionHintNICR,
+        uint256 _maxIterations,
+        uint256 _maxFeePercentage
+    ) external {
+        IERC20 collateralToken = troveManager.collateralToken();
 
-//         uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
+        _beforeRepayDebt(_debtAmount);
 
-//         troveManager.redeemCollateral(
-//             _debtAmount,
-//             _firstRedemptionHint,
-//             _upperPartialRedemptionHint,
-//             _lowerPartialRedemptionHint,
-//             _partialRedemptionHintNICR,
-//             _maxIterations,
-//             _maxFeePercentage
-//         );
+        uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
 
-//         uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
-//         uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
+        troveManager.redeemCollateral(
+            _debtAmount,
+            _firstRedemptionHint,
+            _upperPartialRedemptionHint,
+            _lowerPartialRedemptionHint,
+            _partialRedemptionHintNICR,
+            _maxIterations,
+            _maxFeePercentage
+        );
 
-//         _afterWithdrawColl(collateralToken, userCollAmount);
-//     }
+        uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
+        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
 
-//     function _beforeAddColl(IERC20 collateralToken, uint256 collAmount) private {
-//         if (collAmount == 0) return;
+        _afterWithdrawColl(collateralToken, userCollAmount);
+    }
 
-//         // TODO: Do not support native token
-//         if (address(collateralToken) == address(weth)) {
-//             if (msg.value < collAmount) revert MsgValueMismatch(msg.value, collAmount);
+    function liquidateTroves(
+        ITroveManager troveManager,
+        uint256 maxTrovesToLiquidate,
+        uint256 maxICR,
+        LzSendParam calldata _lzSendParam
+    ) external payable {
+        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
+        uint256 collTokenBalanceBefore = troveManager.collateralToken().balanceOf(address(this));
 
-//             weth.deposit{value: collAmount}();
-//         } else {
-//             collateralToken.safeTransferFrom(msg.sender, address(this), collAmount);
-//         }
+        ILiquidationFacet(xApp).liquidateTroves(troveManager, maxTrovesToLiquidate, maxICR);
 
-//         collateralToken.approve(address(borrowerOperationsFacet), collAmount);
-//     }
+        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
+        uint256 collTokenBalanceAfter = troveManager.collateralToken().balanceOf(address(this));
 
-//     function _afterWithdrawColl(IERC20 collateralToken, uint256 collAmount) private {
-//         if (collAmount == 0) return;
+        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
+        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
 
-//         if (address(collateralToken) == address(weth)) {
-//             weth.withdraw(collAmount);
-//             (bool success,) = payable(msg.sender).call{value: collAmount}("");
-//             if (!success) revert NativeTokenTransferFailed();
-//         } else {
-//             collateralToken.safeTransfer(msg.sender, collAmount);
-//         }
-//     }
+        _afterWithdrawDebt(userDebtAmount, _lzSendParam);
+        _afterWithdrawColl(troveManager.collateralToken(), userCollAmount);
+    }
 
-//     function _beforeRepayDebt(uint256 debtAmount) private {
-//         if (debtAmount == 0) return;
+    // INTERNAL FUNCTIONS //
 
-//         debtToken.safeTransferFrom(msg.sender, address(this), debtAmount);
-//     }
+    /// @dev Only support ERC20 token, not support native token
+    function _beforeAddColl(IERC20 collateralToken, uint256 collAmount) private {
+        if (collAmount == 0) return;
 
-//     function _afterWithdrawDebt(uint256 debtAmount, LzSendParam calldata lzSendParam) private {
-//         if (debtAmount == 0) return;
-//         address account = msg.sender;
-//         if (lzSendParam.dstEid == 0) {
-//             debtToken.safeTransfer(account, debtAmount);
-//         } else {
-//             // Step 1: Prepare the SendParam
-//             SendParam memory _sendParam = SendParam(
-//                 lzSendParam.dstEid,
-//                 bytes32(uint256(uint160(account))),
-//                 debtAmount,
-//                 debtAmount,
-//                 lzSendParam.extraOptions,
-//                 "",
-//                 ""
-//             );
+        collateralToken.safeTransferFrom(msg.sender, address(this), collAmount);
+        collateralToken.approve(xApp, collAmount);
+    }
 
-//             // Step 2: Quote the fee
-//             // TODO: payInLzToken
-//             require(lzSendParam.fee.lzTokenFee == 0, "BorrowerOps: lzTokenFee not supported");
-//             // TODO: check collateral token is native token?
-//             require(msg.value == lzSendParam.fee.nativeFee, "BorrowerOps: nativeFee not sent");
-//             MessagingFee memory expectFee = debtToken.quoteSend(_sendParam, lzSendParam.fee.lzTokenFee > 0);
-//             require(expectFee.nativeFee == lzSendParam.fee.nativeFee, "BorrowerOps: nativeFee incorrect");
-//             require(expectFee.lzTokenFee == lzSendParam.fee.lzTokenFee, "BorrowerOps: lzTokenFee incorrect");
+    function _afterWithdrawColl(IERC20 collateralToken, uint256 collAmount) private {
+        if (collAmount == 0) return;
 
-//             // Step 3: Send the Debt tokens to the other chain
-//             debtToken.send(_sendParam, lzSendParam.fee, account);
-//         }
-//     }
+        collateralToken.safeTransfer(msg.sender, collAmount);
+    }
 
-//     function _refundGas() internal {
-//         if (address(this).balance != 0) {
-//             (bool success,) = payable(msg.sender).call{value: address(this).balance}("");
-//             if (!success) revert RefundFailed();
-//         }
-//     }
+    /// @notice Withdraw the debt token to the msg sender
+    /// @dev Need used in the payable functions
+    /// @dev Transfer the debt token in current chain if dstEid is 0
+    /// @dev Only debt token need to provide lzSendParam, and support native token as lz fee
+    function _afterWithdrawDebt(uint256 debtAmount, LzSendParam calldata lzSendParam) private {
+        if (debtAmount == 0) return;
+        address account = msg.sender;
 
-//     receive() external payable {
-//         // to receive native token
-//     }
+        // In current chain
+        if (lzSendParam.dstEid == 0) {
+            debtToken.safeTransfer(account, debtAmount);
+        } else {
+            // Step 1: Prepare the SendParam
+            SendParam memory _sendParam = SendParam(
+                lzSendParam.dstEid,
+                bytes32(uint256(uint160(account))),
+                debtAmount,
+                debtAmount,
+                lzSendParam.extraOptions,
+                "",
+                ""
+            );
 
-//     // TODO: Liquidate
-// }
+            // Step 2: Quote the fee
+            // TODO: payInLzToken
+            require(lzSendParam.fee.lzTokenFee == 0, "SatoshiPeriphery: lzTokenFee not supported");
+            // TODO: check collateral token is native token?
+            require(msg.value == lzSendParam.fee.nativeFee, "SatoshiPeriphery: nativeFee not sent");
+
+            MessagingFee memory expectFee = debtToken.quoteSend(_sendParam, lzSendParam.fee.lzTokenFee > 0);
+            require(expectFee.nativeFee == lzSendParam.fee.nativeFee, "SatoshiPeriphery: nativeFee incorrect");
+            require(expectFee.lzTokenFee == lzSendParam.fee.lzTokenFee, "SatoshiPeriphery: lzTokenFee incorrect");
+
+            // Step 3: Send the Debt tokens to the other chain
+            debtToken.send(_sendParam, lzSendParam.fee, account);
+        }
+    }
+
+    function _beforeRepayDebt(uint256 debtAmount) private {
+        if (debtAmount == 0) return;
+
+        debtToken.safeTransferFrom(msg.sender, address(this), debtAmount);
+    }
+
+    /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
+    // solhint-disable-next-line no-empty-blocks
+    function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+        // No additional authorization logic is needed for this contract
+    }
+}
