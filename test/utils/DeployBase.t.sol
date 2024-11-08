@@ -23,6 +23,7 @@ import {IStabilityPoolFacet} from "../../src/core/interfaces/IStabilityPoolFacet
 import {INexusYieldManagerFacet} from "../../src/core/interfaces/INexusYieldManagerFacet.sol";
 import {NexusYieldManagerFacet} from "../../src/core/facets/NexusYieldManagerFacet.sol";
 import {Initializer} from "../../src/core/Initializer.sol";
+import {EndpointV2Mock} from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
 
 import {IRewardManager} from "../../src/OSHI/interfaces/IRewardManager.sol";
 import {RewardManager} from "../../src/OSHI/RewardManager.sol";
@@ -266,14 +267,13 @@ abstract contract DeployBase is Test {
     }
 
     function _deployDebtToken(address deployer) internal {
+        EndpointV2Mock endpointMock;
+        uint32 eid = 1;
+        endpointMock = new EndpointV2Mock(eid, address(this));
+
         vm.startPrank(deployer);
         assert(address(debtToken) == address(0)); // check if contract is not deployed
-        address debtTokenImpl = address(
-            new DebtToken(
-                // TODO: pass parameter
-                0x6EDCE65403992e310A62460808c4b910D972f10f // arbitrum testnet
-            )
-        );
+        address debtTokenImpl = address(new DebtToken(address(endpointMock)));
         bytes memory data =
             abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), OWNER));
         debtToken = IDebtToken(address(new ERC1967Proxy(address(debtTokenImpl), data)));
@@ -344,14 +344,16 @@ abstract contract DeployBase is Test {
             action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
             selectors: selectors
         });
-        bytes memory data = abi.encodeWithSelector(
-            Initializer.init.selector,
+
+        bytes memory _data = abi.encode(
             address(rewardManager),
             address(debtToken),
             address(communityIssuance),
             address(sortedTrovesBeacon),
             address(troveManagerBeacon)
         );
+
+        bytes memory data = abi.encodeWithSelector(Initializer.init.selector, _data);
         satoshiXApp.diamondCut(facetCuts, address(initializer), data);
         vm.stopPrank();
     }
