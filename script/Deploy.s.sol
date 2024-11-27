@@ -64,6 +64,7 @@ contract DeployScript is Script, IERC2535DiamondCutInternal {
 
         Config.ConfigData memory config = abi.decode(Config.getConfig(), (Config.ConfigData));
         LZ_ENDPOINT = config.lzEndpoint;
+        assert(LZ_ENDPOINT != address(0));
     }
 
     function run() public {
