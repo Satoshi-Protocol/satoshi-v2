@@ -37,8 +37,13 @@ import {DEPLOYER, OWNER, DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL} from "../TestConfig
 
 import {IOSHIToken} from "../../src/OSHI/interfaces/IOSHIToken.sol";
 import {OSHIToken} from "../../src/OSHI/OSHIToken.sol";
+import {ISatoshiPeriphery} from "../../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import {SatoshiPeriphery} from "../../src/core/helpers/SatoshiPeriphery.sol";
+import {IWETH} from "../../src/core/helpers/interfaces/IWETH.sol";
+import {WETH9} from "../mocks/WETH9.sol";
 
 abstract contract DeployBase is Test {
+    IWETH weth;
     ISatoshiXApp internal satoshiXApp;
     IBorrowerOperationsFacet internal borrowerOperationsFacet;
     ICoreFacet internal coreFacet;
@@ -57,22 +62,44 @@ abstract contract DeployBase is Test {
     IBeacon internal sortedTrovesBeacon;
     IBeacon internal troveManagerBeacon;
 
+    ISatoshiPeriphery internal satoshiPeriphery;
+
     function setUp() public virtual {
-        _deployRewardManager(DEPLOYER);
+        _deployWETH(DEPLOYER);
         _deploySortedTrovesBeacon(DEPLOYER);
-        _deployTroveManagerBeacon(DEPLOYER);
         _deploySatoshiXApp(DEPLOYER);
+        _deployTroveManagerBeacon(DEPLOYER);
         _deployAndCutFacets(DEPLOYER);
         _deployOSHIToken(DEPLOYER);
         _deployDebtToken(DEPLOYER);
         _deployCommunityIssuance(DEPLOYER);
         _deployInitializer(DEPLOYER);
+        _deployRewardManager(DEPLOYER);
+        _deployPeriphery(DEPLOYER);
+        _setContracts(DEPLOYER);
+    }
+
+    function _setContracts(address deployer) internal {
+        vm.startPrank(deployer);
+        ICoreFacet core = ICoreFacet(address(satoshiXApp));
+        core.setRewardManager(address(rewardManager));
+        core.setFeeReceiver(OWNER);
+        vm.stopPrank();
+    }
+
+    function _deployPeriphery(address deployer) internal {
+        vm.startPrank(deployer);
+        bytes memory data = abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), deployer));
+        address peripheryImpl = address(new SatoshiPeriphery());
+        satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
+        vm.stopPrank();
     }
 
     function _deploySatoshiXApp(address deployer) internal {
         vm.startPrank(deployer);
         assert(address(satoshiXApp) == address(0)); // check if contract is not deployed
         satoshiXApp = ISatoshiXApp(payable(address(new SatoshiXApp())));
+
         vm.stopPrank();
     }
 
@@ -264,6 +291,14 @@ abstract contract DeployBase is Test {
         bytes memory data = abi.encodeCall(IRewardManager.initialize, (OWNER));
         rewardManager = IRewardManager(address(new ERC1967Proxy(address(rewardManagerImpl), data)));
         vm.stopPrank();
+        vm.startPrank(OWNER);
+        rewardManager.setAddresses(
+            address(satoshiXApp),
+            weth,
+            debtToken,
+            oshiToken
+        );
+        vm.stopPrank();
     }
 
     function _deployDebtToken(address deployer) internal {
@@ -356,5 +391,22 @@ abstract contract DeployBase is Test {
         bytes memory data = abi.encodeWithSelector(Initializer.init.selector, _data);
         satoshiXApp.diamondCut(facetCuts, address(initializer), data);
         vm.stopPrank();
+    }
+
+    function _deployWETH(address deployer) internal {
+        vm.startPrank(deployer);
+        weth = IWETH(address(new WETH9()));
+        vm.stopPrank();
+    }
+
+    function assertContractAddressHasCode(address contractAddress) public {
+        // Check if the contract address has code
+        uint256 codeSize;
+        assembly {
+            codeSize := extcodesize(contractAddress)
+        }
+
+        // Assert that the code size is greater than 0
+        assertTrue(codeSize > 0, "The address does not contain a contract.");
     }
 }

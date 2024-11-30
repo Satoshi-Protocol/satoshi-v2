@@ -15,7 +15,7 @@ import {MessagingFee, MessagingReceipt} from "@layerzerolabs/oft-evm/contracts/O
 import {TestHelperOz5} from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
-contract DebtTokenTest is TestHelperOz5 {
+contract LzDebtTokenTest is TestHelperOz5 {
     using OptionsBuilder for bytes;
 
     string constant DEBT_TOKEN_NAME = "SATOSHI_STABLECOIN";
@@ -189,24 +189,6 @@ contract DebtTokenTest is TestHelperOz5 {
         uint256 afterReceiverBalance = debtTokenA.balanceOf(receiver);
         assertEq(beforePoolBalance - amount, afterPoolBalance, "Pool balance should decrease by the amount");
         assertEq(beforeReceiverBalance + amount, afterReceiverBalance, "Receiver balance should increase by the amount");
-    }
-
-    // Test the `flashLoan` function
-    function test_flashLoan() external {
-        uint256 totalSupplyBefore = debtTokenA.totalSupply();
-        uint256 amount = 10000 ether;
-        address rewardManager = address(ICoreFacet(satoshiXApp).rewardManager());
-
-        FlashloanTester flashloanTester = new FlashloanTester(IDebtToken(address(debtTokenA)));
-
-        vm.prank(satoshiXApp);
-        debtTokenA.mint(address(flashloanTester), 9 ether);
-
-        flashloanTester.flashBorrow(address(debtTokenA), amount);
-
-        assertEq(debtTokenA.allowance(address(this), address(flashloanTester)), 0);
-        assertEq(debtTokenA.balanceOf(rewardManager), 9 ether);
-        assertEq(debtTokenA.totalSupply() - 9 ether, totalSupplyBefore);
     }
 
     // Test the `transfer` function

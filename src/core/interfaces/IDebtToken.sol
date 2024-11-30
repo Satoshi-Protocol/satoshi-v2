@@ -3,9 +3,12 @@ pragma solidity ^0.8.20;
 
 import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+// import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
+
 import {ITroveManager} from "./ITroveManager.sol";
 
-interface IDebtToken is IERC20 {
+interface IDebtToken is IERC20, IERC20Metadata {
     function burn(address _account, uint256 _amount) external;
 
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool);
