@@ -28,7 +28,7 @@ interface IFactoryFacet {
     event CollateralConfigured(ITroveManager troveManager, IERC20 indexed collateralToken);
     event CollateralOverwritten(IERC20 oldCollateralToken, IERC20 newCollateralToken);
 
-    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params) external;
+    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params) external returns (ITroveManager, ISortedTroves);
 
     function troveManagerCount() external view returns (uint256);
 

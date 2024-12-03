@@ -15,7 +15,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {FlashloanTester} from "../src/test/FlashloanTester.sol";
 
 contract DebtTokenTest is DeployBase {
-        using Math for uint256;
+    using Math for uint256;
 
     address user1;
     address user2;
@@ -23,7 +23,6 @@ contract DebtTokenTest is DeployBase {
     address user4;
     uint256 maxFeePercentage = 0.05e18; // 5%
     bytes32 private immutable _PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
-
 
     function setUp() public override {
         super.setUp();

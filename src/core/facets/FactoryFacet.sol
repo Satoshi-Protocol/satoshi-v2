@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {console} from "forge-std/Test.sol";
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
@@ -34,10 +35,11 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
     function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams calldata params)
         external
         onlyOwner
+        returns (ITroveManager troveManagerBeaconProxy, ISortedTroves sortedTrovesBeaconProxy)
     {
         AppStorage.Layout storage s = AppStorage.layout();
-        ISortedTroves sortedTrovesBeaconProxy = _deploySortedTrovesBeaconProxy(s);
-        ITroveManager troveManagerBeaconProxy = _deployTroveManagerBeaconProxy(s);
+        sortedTrovesBeaconProxy = _deploySortedTrovesBeaconProxy(s);
+        troveManagerBeaconProxy = _deployTroveManagerBeaconProxy(s);
 
         s.troveManagers.push(troveManagerBeaconProxy);
 
@@ -66,6 +68,8 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
         );
 
         emit NewDeployment(collateralToken, priceFeed, troveManagerBeaconProxy, sortedTrovesBeaconProxy);
+
+        // return (troveManagerBeaconProxy, sortedTrovesBeaconProxy);
     }
 
     function _enableCollateral(AppStorage.Layout storage s, IERC20 _collateral) internal {
@@ -142,6 +146,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
 
     function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external onlyOwner {
         AppStorage.Layout storage s = AppStorage.layout();
+        // console.log("setTMRewardRate", _numerator.length, s.troveManagers.length);
         require(_numerator.length == s.troveManagers.length, "Factory: invalid length");
         uint128 totalRewardRate;
         for (uint256 i; i < _numerator.length; ++i) {

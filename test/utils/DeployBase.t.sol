@@ -2,18 +2,24 @@
 pragma solidity ^0.8.20;
 
 import {Test, console} from "forge-std/Test.sol";
+import {ERC20Mock} from "../mocks/ERC20Mock.sol";
 import {IERC2535DiamondCutInternal} from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {RoundData, OracleMock} from "../mocks/OracleMock.sol";
+
 import {SatoshiXApp} from "../../src/core/SatoshiXApp.sol";
 import {ISatoshiXApp} from "../../src/core/interfaces/ISatoshiXApp.sol";
 import {BorrowerOperationsFacet} from "../../src/core/facets/BorrowerOperationsFacet.sol";
 import {IBorrowerOperationsFacet} from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
 import {CoreFacet} from "../../src/core/facets/CoreFacet.sol";
 import {ICoreFacet} from "../../src/core/interfaces/ICoreFacet.sol";
+import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
+
 import {FactoryFacet} from "../../src/core/facets/FactoryFacet.sol";
-import {IFactoryFacet} from "../../src/core/interfaces/IFactoryFacet.sol";
+import {IFactoryFacet, DeploymentParams} from "../../src/core/interfaces/IFactoryFacet.sol";
 import {LiquidationFacet} from "../../src/core/facets/LiquidationFacet.sol";
 import {ILiquidationFacet} from "../../src/core/interfaces/ILiquidationFacet.sol";
 import {PriceFeedAggregatorFacet} from "../../src/core/facets/PriceFeedAggregatorFacet.sol";
@@ -33,7 +39,12 @@ import {ICommunityIssuance} from "../../src/OSHI/interfaces/ICommunityIssuance.s
 import {CommunityIssuance} from "../../src/OSHI/CommunityIssuance.sol";
 import {SortedTroves} from "../../src/core/SortedTroves.sol";
 import {TroveManager} from "../../src/core/TroveManager.sol";
-import {DEPLOYER, OWNER, DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL} from "../TestConfig.sol";
+import "../TestConfig.sol";
+import {ISortedTroves} from "../../src/core/interfaces/ISortedTroves.sol";
+import {IPriceFeed} from "../../src/priceFeed/IPriceFeed.sol";
+import {AggregatorV3Interface} from "../../src/priceFeed/AggregatorV3Interface.sol";
+import {MultiCollateralHintHelpers} from "../../src/core/helpers/MultiCollateralHintHelpers.sol";
+import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
 
 import {IOSHIToken} from "../../src/OSHI/interfaces/IOSHIToken.sol";
 import {OSHIToken} from "../../src/OSHI/OSHIToken.sol";
@@ -64,19 +75,25 @@ abstract contract DeployBase is Test {
 
     ISatoshiPeriphery internal satoshiPeriphery;
 
+    IERC20 collateralMock;
+    RoundData internal initRoundData;
+
+    address internal oracleMockAddr;
+
     function setUp() public virtual {
         _deployWETH(DEPLOYER);
         _deploySortedTrovesBeacon(DEPLOYER);
-        _deploySatoshiXApp(DEPLOYER);
         _deployTroveManagerBeacon(DEPLOYER);
+        _deployInitializer(DEPLOYER);
+        _deploySatoshiXApp(DEPLOYER);
         _deployAndCutFacets(DEPLOYER);
         _deployOSHIToken(DEPLOYER);
         _deployDebtToken(DEPLOYER);
         _deployCommunityIssuance(DEPLOYER);
-        _deployInitializer(DEPLOYER);
         _deployRewardManager(DEPLOYER);
         _deployPeriphery(DEPLOYER);
         _setContracts(DEPLOYER);
+        _satoshiXAppInit(DEPLOYER);
     }
 
     function _setContracts(address deployer) internal {
@@ -399,6 +416,189 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
+    function _deployMockTroveManager(address deployer) internal returns (ISortedTroves, ITroveManager) {
+        collateralMock = new ERC20Mock("Collateral", "COLL");
+        initRoundData = RoundData({
+            answer: 4000000000000,
+            startedAt: block.timestamp,
+            updatedAt: block.timestamp,
+            answeredInRound: 1
+        });
+        DeploymentParams memory deploymentParams = DeploymentParams({
+            minuteDecayFactor: MINUTE_DECAY_FACTOR,
+            redemptionFeeFloor: REDEMPTION_FEE_FLOOR,
+            maxRedemptionFee: MAX_REDEMPTION_FEE,
+            borrowingFeeFloor: BORROWING_FEE_FLOOR,
+            maxBorrowingFee: MAX_BORROWING_FEE,
+            interestRateInBps: INTEREST_RATE_IN_BPS,
+            maxDebt: MAX_DEBT,
+            MCR: MCR,
+            rewardRate: REWARD_RATE,
+            OSHIAllocation: TM_ALLOCATION,
+            claimStartTime: TM_CLAIM_START_TIME
+        });
+
+        address priceFeedAddr =
+            _deployPriceFeed(deployer, ORACLE_MOCK_DECIMALS, ORACLE_MOCK_VERSION, initRoundData);
+        _setPriceFeedToPriceFeedAggregatorProxy(OWNER, collateralMock, IPriceFeed(priceFeedAddr));
+
+        (ISortedTroves sortedTrovesBeaconProxy, ITroveManager troveManagerBeaconProxy) =
+            _deployNewInstance(OWNER, collateralMock, IPriceFeed(priceFeedAddr), deploymentParams);
+
+        _setConfigByOwner(OWNER, troveManagerBeaconProxy);
+
+        return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
+        // vm.startPrank(deployer);
+        // vm.stopPrank();
+    }
+
+    function _deployNewInstance(
+        address owner,
+        IERC20 collateral,
+        IPriceFeed priceFeed,
+        DeploymentParams memory deploymentParams
+    ) internal returns (ISortedTroves, ITroveManager) {
+        vm.startPrank(owner);
+
+        // uint64 nonce = vm.getNonce(address(satoshiXApp));
+        // address cpSortedTrovesBeaconProxyAddr = vm.computeCreateAddress(address(satoshiXApp), nonce);
+        // address cpTroveManagerBeaconProxyAddr = vm.computeCreateAddress(address(satoshiXApp), ++nonce);
+
+        // check NewDeployment event
+        // vm.expectEmit(true, true, true, true, address(satoshiXApp));
+        // emit NewDeployment(
+        //     collateral,
+        //     priceFeed,
+        //     ITroveManager(cpTroveManagerBeaconProxyAddr),
+        //     ISortedTroves(cpSortedTrovesBeaconProxyAddr)
+        // );
+
+        (
+            ITroveManager troveManagerBeaconProxy,
+            ISortedTroves sortedTrovesBeaconProxy
+        ) = IFactoryFacet(address(satoshiXApp)).deployNewInstance(collateral, priceFeed, deploymentParams);
+
+
+        vm.stopPrank();
+        return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
+    }
+
+    function _deployPriceFeed(address deployer, uint8 decimals, uint256 version, RoundData memory roundData)
+        internal
+        returns (address)
+    {
+        // deploy oracle mock contract to mock price feed source
+        oracleMockAddr = _deployOracleMock(deployer, decimals, version);
+        // update data to the oracle mock
+        vm.startPrank(deployer);
+        OracleMock(oracleMockAddr).updateRoundData(roundData);
+        vm.stopPrank();
+        return oracleMockAddr;
+    }
+
+
+    function _deployOracleMock(address deployer, uint8 decimals, uint256 version) internal returns (address) {
+        vm.startPrank(deployer);
+        address oracleAddr = address(new OracleMock(decimals, version));
+        vm.stopPrank();
+        return oracleAddr;
+    }
+
+    function _setPriceFeedToPriceFeedAggregatorProxy(address owner, IERC20 collateral, IPriceFeed priceFeed) internal {
+        vm.startPrank(owner);
+        IPriceFeedAggregatorFacet(address(satoshiXApp)).setPriceFeed(collateral, priceFeed);
+        vm.stopPrank();
+    }
+
+
+    function _registerTroveManager(address owner, ITroveManager _troveManager) internal {
+        vm.startPrank(owner);
+        rewardManager.registerTroveManager(_troveManager);
+        vm.stopPrank();
+    }
+
+    function _setConfigByOwner(address owner, ITroveManager troveManagerBeaconProxy) internal {
+        // set allocation for the stability pool
+        address[] memory _recipients = new address[](1);
+        _recipients[0] = address(satoshiXApp);
+        uint256[] memory _amount = new uint256[](1);
+        _amount[0] = SP_ALLOCATION;
+        // _setRewardManager(owner, address(rewardManagerProxy));
+        _setTMCommunityIssuanceAllocation(owner, troveManagerBeaconProxy);
+        _setSPCommunityIssuanceAllocation(owner);
+        // _setAddress(owner, address(satoshiXApp), weth, address(debtToken), address(oshiToken));
+        _registerTroveManager(owner, troveManagerBeaconProxy);
+        _setClaimStartTime(owner, SP_CLAIM_START_TIME);
+        _setSPRewardRate(owner);
+        _setTMRewardRate(owner, troveManagerBeaconProxy);
+    }
+
+    // function _setAddress(
+    //     address owner,
+    //     IBorrowerOperations _borrowerOperations,
+    //     IWETH _weth,
+    //     IDebtToken _debtToken,
+    //     IOSHIToken _oshiToken
+    // ) internal {
+    //     vm.startPrank(owner);
+    //     rewardManager.setAddresses(_borrowerOperations, _weth, _debtToken, _oshiToken);
+    //     vm.stopPrank();
+    // }
+
+    function _setTMCommunityIssuanceAllocation(address owner, ITroveManager troveManagerBeaconProxy) internal {
+        address[] memory _recipients = new address[](1);
+        _recipients[0] = address(troveManagerBeaconProxy);
+        uint256[] memory _amounts = new uint256[](1);
+        _amounts[0] = TM_ALLOCATION;
+        vm.startPrank(owner);
+        communityIssuance.setAllocated(_recipients, _amounts);
+        vm.stopPrank();
+    }
+
+    function _setSPCommunityIssuanceAllocation(address owner) internal {
+        address[] memory _recipients = new address[](1);
+        _recipients[0] = address(satoshiXApp);
+        uint256[] memory _amounts = new uint256[](1);
+        _amounts[0] = SP_ALLOCATION;
+        vm.startPrank(owner);
+        communityIssuance.setAllocated(_recipients, _amounts);
+        vm.stopPrank();
+    }
+
+    function _setTMRewardRate(address owner, ITroveManager troveManagerBeaconProxy) internal {
+        vm.startPrank(owner);
+        uint128[] memory numerator = new uint128[](2);
+        numerator[0] = 0;
+        numerator[1] = 0;
+        IFactoryFacet factoryProxy = IFactoryFacet(address(satoshiXApp));
+        factoryProxy.setTMRewardRate(numerator, 1);
+        // assertEq(troveManagerBeaconProxy.rewardRate(), factoryProxy.maxRewardRate());
+        vm.stopPrank();
+    }
+
+    function _setSPRewardRate(address owner) internal {
+        vm.startPrank(owner);
+        IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
+        stabilityPoolProxy.setSPRewardRate(SP_MAX_REWARD_RATE);
+        vm.stopPrank();
+    }
+
+    function _setClaimStartTime(address owner, uint32 _claimStartTime) internal {
+        vm.startPrank(owner);
+        IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
+        stabilityPoolProxy.setClaimStartTime(_claimStartTime);
+        vm.stopPrank();
+    }
+
+    function _deployHintHelpers(address deployer) internal returns (address) {
+        vm.startPrank(deployer);
+
+        address hintHelpersAddr = address(new MultiCollateralHintHelpers(address(satoshiXApp)));
+        vm.stopPrank();
+
+        return hintHelpersAddr;
+    }
+
     function assertContractAddressHasCode(address contractAddress) public {
         // Check if the contract address has code
         uint256 codeSize;
@@ -408,5 +608,10 @@ abstract contract DeployBase is Test {
 
         // Assert that the code size is greater than 0
         assertTrue(codeSize > 0, "The address does not contain a contract.");
+    }
+
+    /** */
+    function borrowerOperationsProxy() public view returns (IBorrowerOperationsFacet) {
+        return IBorrowerOperationsFacet(address(satoshiXApp));
     }
 }
