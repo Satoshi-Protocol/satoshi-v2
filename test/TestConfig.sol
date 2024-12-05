@@ -32,3 +32,4 @@ uint256 constant ORACLE_MOCK_VERSION = 1;
 
 uint128 constant SP_MAX_REWARD_RATE = 63419583967529168;
 uint256 constant DEBT_GAS_COMPENSATION = 2e18;
+uint256 constant LIQUIDATION_FEE = 200; //  (0.5%)

@@ -2,8 +2,9 @@
 
 pragma solidity ^0.8.20;
 
-import {DeployBase} from "./utils/DeployBase.t.sol";
+import {console} from "forge-std/console.sol";
 import {Test} from "forge-std/Test.sol";
+import {DeployBase} from "./utils/DeployBase.t.sol";
 import {EndpointV2Mock} from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
 
 import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
@@ -16,7 +17,7 @@ contract CoreFacetTest is DeployBase {
 
     function setUp() public virtual override {
         super.setUp();
-        _satoshiXAppInit(DEPLOYER);
+        // _satoshiXAppInit(DEPLOYER);
     }
 
     function test_feeReceiver() public {
@@ -50,10 +51,10 @@ contract CoreFacetTest is DeployBase {
         assertFalse(ICoreFacet(address(satoshiXApp)).paused());
     }
 
-    // function test_startTime() public {
-    //     uint256 startTime = ICoreFacet(address(satoshiXApp)).startTime();
-    //     assertEq(startTime, 0);
-    // }
+    function test_startTime() public {
+        uint256 startTime = ICoreFacet(address(satoshiXApp)).startTime();
+        assertEq(startTime, 1);
+    }
 
     function test_debtToken() public {
         address _debtToken = address(ICoreFacet(address(satoshiXApp)).debtToken());

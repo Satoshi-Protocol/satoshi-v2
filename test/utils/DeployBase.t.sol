@@ -52,6 +52,52 @@ import {ISatoshiPeriphery} from "../../src/core/helpers/interfaces/ISatoshiPerip
 import {SatoshiPeriphery} from "../../src/core/helpers/SatoshiPeriphery.sol";
 import {IWETH} from "../../src/core/helpers/interfaces/IWETH.sol";
 import {WETH9} from "../mocks/WETH9.sol";
+import {GasPool} from "../../src/core/GasPool.sol";
+import {IGasPool} from "../../src/core/interfaces/IGasPool.sol";
+
+struct LocalVars {
+    // base vars
+    uint256 collAmt;
+    uint256 debtAmt;
+    uint256 maxFeePercentage;
+    uint256 borrowingFee;
+    uint256 compositeDebt;
+    uint256 totalCollAmt;
+    uint256 totalNetDebtAmt;
+    uint256 totalDebt;
+    uint256 stake;
+    uint256 NICR;
+    address upperHint;
+    address lowerHint;
+    // change trove state vars
+    uint256 addCollAmt;
+    uint256 withdrawCollAmt;
+    uint256 repayDebtAmt;
+    uint256 withdrawDebtAmt;
+    //before state vars
+    uint256 rewardManagerDebtAmtBefore;
+    uint256 gasPoolDebtAmtBefore;
+    uint256 userBalanceBefore;
+    uint256 userCollAmtBefore;
+    uint256 userDebtAmtBefore;
+    uint256 troveManagerCollateralAmtBefore;
+    uint256 debtTokenTotalSupplyBefore;
+    // after state vars
+    uint256 rewardManagerDebtAmtAfter;
+    uint256 gasPoolDebtAmtAfter;
+    uint256 userBalanceAfter;
+    uint256 userCollAmtAfter;
+    uint256 userDebtAmtAfter;
+    uint256 troveManagerCollateralAmtAfter;
+    uint256 debtTokenTotalSupplyAfter;
+    // hints
+    uint256 truncatedDebtAmount;
+    address firstRedemptionHint;
+    address upperPartialRedemptionHint;
+    address lowerPartialRedemptionHint;
+    uint256 partialRedemptionHintNICR;
+    uint256 price;
+}
 
 abstract contract DeployBase is Test {
     IWETH weth;
@@ -63,6 +109,7 @@ abstract contract DeployBase is Test {
     IPriceFeedAggregatorFacet internal priceFeedAggregatorFacet;
     IStabilityPoolFacet internal stabilityPoolFacet;
     INexusYieldManagerFacet internal nexusYieldManagerFacet;
+
     Initializer internal initializer;
 
     IDebtToken internal debtToken;
@@ -79,6 +126,7 @@ abstract contract DeployBase is Test {
     RoundData internal initRoundData;
 
     address internal oracleMockAddr;
+    IGasPool gasPool;
 
     function setUp() public virtual {
         _deployWETH(DEPLOYER);
@@ -94,6 +142,7 @@ abstract contract DeployBase is Test {
         _deployPeriphery(DEPLOYER);
         _setContracts(DEPLOYER);
         _satoshiXAppInit(DEPLOYER);
+        _deployGasPool(DEPLOYER);
     }
 
     function _setContracts(address deployer) internal {
@@ -599,6 +648,16 @@ abstract contract DeployBase is Test {
         return hintHelpersAddr;
     }
 
+    function _deployGasPool(address deployer) internal {
+        vm.startPrank(deployer);
+        // assert(gasPool == IGasPool(address(0))); // check if gas pool contract is not deployed
+        // gasPool = new GasPool();
+        // TODO: check gas
+        gasPool = IGasPool(address(satoshiXApp));
+        vm.stopPrank();
+    }
+
+
     function assertContractAddressHasCode(address contractAddress) public {
         // Check if the contract address has code
         uint256 codeSize;
@@ -613,5 +672,21 @@ abstract contract DeployBase is Test {
     /** */
     function borrowerOperationsProxy() public view returns (IBorrowerOperationsFacet) {
         return IBorrowerOperationsFacet(address(satoshiXApp));
+    }
+
+    function stabilityPoolProxy() public view returns (IStabilityPoolFacet) {
+        return IStabilityPoolFacet(address(satoshiXApp));
+    }
+
+    function debtTokenProxy() public view returns (IDebtToken) {
+        return debtToken;
+    }
+
+    function liquidationManagerProxy() public view returns (ILiquidationFacet) {
+        return ILiquidationFacet(address(satoshiXApp));
+    }
+
+    function oshiTokenProxy() public view returns (IOSHIToken) {
+        return oshiToken;
     }
 }
