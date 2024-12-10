@@ -104,7 +104,6 @@ contract SatoshiPeripheryTest is DeployBase, TroveBase {
         vm.stopPrank();
     }
 
-
     function testOpenTroveByRouter() public {
         LocalVars memory vars;
         // open trove params
@@ -112,7 +111,6 @@ contract SatoshiPeripheryTest is DeployBase, TroveBase {
         vars.debtAmt = 10000e18; // 10000 USD
 
         vm.startPrank(user);
-        deal(user, 1e18);
         collateral.mint(user, vars.collAmt);
 
         // state before
@@ -226,7 +224,7 @@ contract SatoshiPeripheryTest is DeployBase, TroveBase {
         vm.stopPrank();
     }
 
-    function testwithdrawCollByRouter() public {
+    function testWithdrawCollByRouter() public {
         LocalVars memory vars;
         // pre open trove
         vars.collAmt = 1e18; // price defined in `TestConfig.roundData`
@@ -365,7 +363,7 @@ contract SatoshiPeripheryTest is DeployBase, TroveBase {
         );
     }
 
-        function testRepayDebtByRouter() public {
+    function testRepayDebtByRouter() public {
         LocalVars memory vars;
         // pre open trove
         vars.collAmt = 1e18; // price defined in `TestConfig.roundData`

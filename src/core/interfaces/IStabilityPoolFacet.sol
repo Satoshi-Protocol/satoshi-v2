@@ -89,6 +89,6 @@ interface IStabilityPoolFacet {
     function P() external view returns (uint256);
 
     function setRewardRate(uint128 _newRewardRate) external;
-    function MAX_REWARD_RATE() external view returns (uint128);
 
+    function MAX_REWARD_RATE() external view returns (uint128);
 }

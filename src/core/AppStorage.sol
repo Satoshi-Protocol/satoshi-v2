@@ -20,6 +20,7 @@ library AppStorage {
     struct Layout {
         IXAppRouter xAppRouter;
         address feeReceiver;
+        address gasPool;
         IRewardManager rewardManager;
         ICommunityIssuance communityIssuance;
         address pendingOwner;

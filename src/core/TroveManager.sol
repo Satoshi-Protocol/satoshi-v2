@@ -43,6 +43,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     IDebtToken public debtToken;
     ICommunityIssuance public communityIssuance;
     address public satoshiXApp;
+    address public gasPool;
 
     // IPriceFeedAggregator public priceFeedAggregator;
     IERC20 public collateralToken;
@@ -159,7 +160,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     function initialize(
         address _owner,
         // ISatoshiCore _satoshiCore,
-        // IGasPool _gasPool,
+        address _gasPool,
         IDebtToken _debtToken,
         // IBorrowerOperations _borrowerOperations,
         // ILiquidationManager _liquidationManager,
@@ -172,7 +173,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         Utils.ensureNonzeroAddress(address(_communityIssuance));
 
         __Ownable_init_unchained(_owner);
-        // gasPool = _gasPool;
+        gasPool = _gasPool;
         debtToken = _debtToken;
         // borrowerOperations = _borrowerOperations;
         // liquidationManager = _liquidationManager;
@@ -1093,7 +1094,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         emit SystemSnapshotsUpdated(totalStakesSnapshot, totalCollateralSnapshot);
 
         // send gas compensation
-        debtToken.returnFromPool(satoshiXApp, _liquidator, _debtGasComp);
+        debtToken.returnFromPool(gasPool, _liquidator, _debtGasComp);
         uint256 collGasCompToLiquidator = _collGasComp / 2;
         uint256 collGasCompToFeeReceiver = _collGasComp - collGasCompToLiquidator;
         _sendCollateral(_liquidator, collGasCompToLiquidator);

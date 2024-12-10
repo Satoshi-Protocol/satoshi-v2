@@ -1,0 +1,148 @@
+# TODO
+
+- [ ] E2E LayerZero
+- [x] update GasPool from Xapp to new Contract
+- [x] check for all Facet initialize
+
+- [x] DebtTokenTest
+  - [x] test_deploy
+  - [x] testGetsBalanceOfUser
+  - [x] testGetsTotalSupply
+  - [x] testTokenName
+  - [x] testSymbol
+  - [x] testDecimals
+  - [x] testAllowance
+  - [x] testTransfer
+  - [x] testTransferFrom
+  - [x] testMint
+  - [x] testFailMintToZero
+  - [x] testFailBurnFromZero
+  - [x] testFailBurnInsufficientBalance
+  - [x] testFailApproveToZeroAddress
+  - [x] testFailTransferToZeroAddress
+  - [x] testFailTransferInsufficientBalance
+  - [x] testFailTransferFromInsufficientApprove
+  - [x] testPermit
+  - [x] testFlashloan
+  - [x] test_relyAndDeny
+  - [x] testFlashFee
+
+- [x] TroveManagerTest
+  - [x] test_getTotalActiveCollateral
+  - [x] test_hasPendingRewards
+  - [x] test_getRedemptionRate
+  - [x] test_getRedemptionRateWithDecay
+  - [x] test_getBorrowingRate
+  - [x] test_getBorrowingFee
+  - [x] test_setClaimStartTime
+  - [x] test_getTotalActiveDebt
+  - [x] test_getRedemptionFeeWithDecay
+  - [x] test_getTroveStake
+  - [x] test_getEntireSystemDebt
+  - [x] test_setPause
+  - [x] test_startSunset
+  - [x] test_collectInterests
+  - [x] test_removeTroveManager
+
+- [x] SatoshiPeripheryTest
+  - [x] testOpenTroveByRouter
+  - [x] testAddCollByRouter
+  - [x] testwithdrawCollByRouter
+  - [x] testWithdrawDebtByRouter
+  - [x] testRepayDebtByRouter
+  - [x] testAdjustTroveByRouter_AddCollAndRepayDebt
+  - [x] testAdjustTroveByRouter_AddCollAndWithdrawDebt
+  - [x] testAdjustTroveByRouter_WithdrawCollAndRepayDebt
+  - [x] testAdjustTroveByRouter_WithdrawCollAndWithdrawDebt
+  - [x] testCloseTroveByRouter
+  - [x] testRedeemByRouter
+  - [x] testLiquidateByRouter
+
+- [x] LiquidateTest
+  - [x] test_LiquidateICRLessThan100InRecoveryMode
+  - [x] test_LiquidateSPNotEnoughInNormalMode
+  - [x] test_LiquidateICRLargeThanMCRInRecoveryMode
+  - [x] test_liquidateTroves_LessThan100InRecoveryMode
+  - [x] test_liquidateTroves_2ICRLessThan100InRecoveryMode
+  - [x] test_Liquidate2ICRLessThan100InRecoveryMode
+  - [x] test_liquidateTroves_ICRLargeThanMCRInRecoveryMode
+  - [x] test_liquidateTroves_MaxICR
+
+- [x] StabilityPoolTest
+  - [x] testProvideToSP
+  - [x] testWithdrawFromSPFull
+  - [x] testLiquidateInNormalModeICRLessThanMCR
+  - [x] testLiquidateInNormalModeICRLessThan100
+  - [x] testCorrectUpdateSnapshot
+  - [x] testTryToProvideMoreThanBlanace
+  - [x] testTryToProvide0Blanace
+  - [x] testClaimCollGain
+  - [x] testCompoundedDebt
+  - [x] test_2lquidateAndProvide
+  - [x] testOSHIEmissionWhenEmissionEnd
+  - [x] test_setRewardrate
+  - [x] test_normalAfteremptySP
+  - [x] test_liquidateAndWithdrawFromSP
+  - [x] test_liquidateAndWithdrawFromSPAll
+  - [x] test_startCollateralSunset
+
+- [ ] RedeemTest
+  - [ ] test_getRedemptionHints
+  - [ ] test_PartialRedeem
+  - [ ] test_RedeemOnlyOneTrove
+  - [ ] test_redeem
+
+- [ ] RewardManagerTest
+  - [ ] test_AccrueInterst2TroveCorrect
+  - [ ] test_OneTimeBorrowFeeIncreaseF_SAT
+  - [ ] test_FeeReceiverReceiveCorrectAmount
+  - [ ] test_unstakeFromRMBeforeUnlock
+  - [ ] test_unstakeFromRMAfterUnlock
+  - [ ] test_stakeAndUnstakePartial
+  - [ ] test_unstake12MonthFromRMAfterUnlock
+  - [ ] test_StakeOSHIToRM
+  - [ ] test_getOSHIFromSP
+  - [ ] test_getPendingCollGain
+  - [ ] test_increaseSATPerUintStakedbyOwner
+
+- [ ] OSHITokenTest ???
+  - [ ] testGetsBalanceOfUser
+  - [ ] testGetsTotalSupply
+  - [ ] testTokenName
+  - [ ] testSymbol
+  - [ ] testDecimals
+  - [ ] testAllowance
+  - [ ] testTransfer
+  - [ ] testTransferFrom
+  - [ ] testFailApproveToZeroAddress
+  - [ ] testFailTransferToZeroAddress
+  - [ ] testFailTransferInsufficientBalance
+  - [ ] testFailTransferFromInsufficientApprove
+  - [ ] testPermit
+  - [ ] testBurnToken
+
+- [ ] NexusYieldTest
+  - [ ] test_swapInAndOut_noFee
+  - [ ] test_pause
+  - [ ] test_resume
+  - [ ] test_transerTokenToPrivilegedVault
+  - [ ] test_swapIn
+  - [ ] test_swapInZeroFee
+  - [ ] test_previewSwapSATForStable
+  - [ ] test_previewSwapStableForSAT
+  - [ ] test_scheduleSwapSATForStable
+  - [ ] test_scheduleTwice
+  - [ ] test_swapOutBalanceNotEnough
+  - [ ] test_mintCapReached
+  - [ ] test_sunsetAsset
+  - [ ] test_convertDebtTokenToAssetAmount
+  - [ ] test_convertAssetToDebtTokenAmount
+  - [ ] test_setAssetConfig
+  - [ ] test_setRewardManager
+  - [ ] test_isNotActive
+  - [ ] test_isNotPriviledge
+  - [ ] test_assetNotSupport
+  - [ ] test_zeroAddress
+  - [ ] test_amountTooSmall
+  - [ ] test_oraclePriceLessThan1
+  - [ ] test_priceOutOfRange

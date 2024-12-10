@@ -69,7 +69,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
 
         emit NewDeployment(collateralToken, priceFeed, troveManagerBeaconProxy, sortedTrovesBeaconProxy);
 
-        // return (troveManagerBeaconProxy, sortedTrovesBeaconProxy);
+        return (troveManagerBeaconProxy, sortedTrovesBeaconProxy);
     }
 
     function _enableCollateral(AppStorage.Layout storage s, IERC20 _collateral) internal {
@@ -122,7 +122,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
     }
 
     function _configureCollateral(AppStorage.Layout storage s, ITroveManager troveManager, IERC20 collateralToken)
-        internal
+    internal
     {
         s.troveManagersData[troveManager] = TroveManagerData(collateralToken, uint16(s.troveManagers.length));
         s.troveManagers.push(troveManager);
@@ -140,7 +140,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
 
     function _deployTroveManagerBeaconProxy(AppStorage.Layout storage s) internal returns (ITroveManager) {
         bytes memory data =
-            abi.encodeCall(ITroveManager.initialize, (_owner(), s.debtToken, s.communityIssuance, address(this)));
+            abi.encodeCall(ITroveManager.initialize, (_owner(), s.gasPool, s.debtToken, s.communityIssuance, address(this)));
         return ITroveManager(address(new BeaconProxy(address(s.troveManagerBeacon), data)));
     }
 

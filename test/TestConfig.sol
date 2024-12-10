@@ -29,7 +29,7 @@ uint256 constant MCR = 11 * 1e17; //  (110%)
 uint8 constant ORACLE_MOCK_DECIMALS = 8;
 uint256 constant ORACLE_MOCK_VERSION = 1;
 
-
 uint128 constant SP_MAX_REWARD_RATE = 63419583967529168;
 uint256 constant DEBT_GAS_COMPENSATION = 2e18;
-uint256 constant LIQUIDATION_FEE = 200; //  (0.5%)
+uint256 constant LIQUIDATION_FEE = 200; //  (0.2%)
+uint256 constant CCR = 1500000000000000000; // 150%

@@ -101,6 +101,7 @@ interface ITroveManager {
 
     function initialize(
         address _owner,
+        address _gasPool,
         IDebtToken _debtToken,
         ICommunityIssuance _communityIssuance,
         address _satoshiXApp

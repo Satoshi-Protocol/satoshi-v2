@@ -34,11 +34,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     uint256 public constant FLASH_LOAN_FEE = 9; // 1 = 0.0001%
 
     // // --- Addresses ---
-    // ISatoshiCore private satoshiCore;
-    // IStabilityPool public stabilityPool;
-    // IBorrowerOperations public borrowerOperations;
-    // IFactory public factory;
-    // IGasPool public gasPool;
+    address public gasPool;
     address public satoshiXApp;
 
     mapping(ITroveManager => bool) public troveManager;
@@ -75,11 +71,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     function initialize(
         string memory _name,
         string memory _symbol,
-        // IStabilityPool _stabilityPool,
-        // IBorrowerOperations _borrowerOperations,
-        // IFactory _factory,
-        // IGasPool _gasPool,
-        // uint256 _gasCompensation
+        address _gasPool,
         address _satoshiXApp,
         address _owner
     ) external initializer {
@@ -89,13 +81,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         __UUPSUpgradeable_init_unchained();
         __OFT_init(_name, _symbol, _owner);
         __Ownable_init(_owner);
-        // stabilityPool = _stabilityPool;
-        // satoshiCore = _satoshiCore;
-        // borrowerOperations = _borrowerOperations;
-        // factory = _factory;
-        // gasPool = _gasPool;
-
-        // DEBT_GAS_COMPENSATION = _gasCompensation;
+        gasPool = _gasPool;
         satoshiXApp = _satoshiXApp;
     }
 
@@ -109,7 +95,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
         require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _mint(_account, _amount);
-        _mint(satoshiXApp, Config.DEBT_GAS_COMPENSATION);
+        _mint(gasPool, Config.DEBT_GAS_COMPENSATION);
 
         return true;
     }
@@ -117,7 +103,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
         require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _burn(_account, _amount);
-        _burn(satoshiXApp, Config.DEBT_GAS_COMPENSATION);
+        _burn(gasPool, Config.DEBT_GAS_COMPENSATION);
 
         return true;
     }

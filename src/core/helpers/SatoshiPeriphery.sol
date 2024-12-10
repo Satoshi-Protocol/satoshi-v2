@@ -44,7 +44,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         __Ownable_init(_owner);
         __UUPSUpgradeable_init_unchained();
-
     }
 
     receive() external payable {
