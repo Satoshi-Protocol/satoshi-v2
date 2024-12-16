@@ -93,17 +93,17 @@
   - [ ] test_redeem
 
 - [x] RewardManagerTest
-  - [ ] test_AccrueInterst2TroveCorrect
-  - [ ] test_OneTimeBorrowFeeIncreaseF_SAT
-  - [ ] test_FeeReceiverReceiveCorrectAmount
-  - [ ] test_unstakeFromRMBeforeUnlock
-  - [ ] test_unstakeFromRMAfterUnlock
-  - [ ] test_stakeAndUnstakePartial
-  - [ ] test_unstake12MonthFromRMAfterUnlock
-  - [ ] test_StakeOSHIToRM
-  - [ ] test_getOSHIFromSP
-  - [ ] test_getPendingCollGain
-  - [ ] test_increaseSATPerUintStakedbyOwner
+  - [x] test_AccrueInterst2TroveCorrect
+  - [x] test_OneTimeBorrowFeeIncreaseF_SAT
+  - [x] test_FeeReceiverReceiveCorrectAmount
+  - [x] test_unstakeFromRMBeforeUnlock
+  - [x] test_unstakeFromRMAfterUnlock
+  - [x] test_stakeAndUnstakePartial
+  - [x] test_unstake12MonthFromRMAfterUnlock
+  - [x] test_StakeOSHIToRM
+  - [x] test_getOSHIFromSP
+  - [x] test_getPendingCollGain
+  - [x] test_increaseSATPerUintStakedbyOwner
 
 - [ ] OSHITokenTest ???
   - [ ] testGetsBalanceOfUser
