@@ -27,7 +27,7 @@ import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
  *
  */
 
-contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal, OwnableInternal {
+contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal {
     using SafeERC20 for IERC20;
     using SafeERC20 for IDebtToken;
     using BorrowerOperationsLib for *;
@@ -69,7 +69,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
 
     // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
     // // solhint-disable-next-line no-empty-blocks
-    // function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+    // function _authorizeUpgrade(address newImplementation) internal view override onlyRole(Config.OWNER_ROLE) {
     //     // No additional authorization logic is needed for this contract
     // }
 
@@ -98,7 +98,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         emit DelegateApprovalSet(msg.sender, _delegate, _isApproved);
     }
 
-    function setMinNetDebt(uint256 _minNetDebt) external onlyOwner {
+    function setMinNetDebt(uint256 _minNetDebt) external onlyRole(Config.OWNER_ROLE) {
         _setMinNetDebt(_minNetDebt);
     }
 

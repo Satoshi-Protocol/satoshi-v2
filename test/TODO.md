@@ -86,13 +86,13 @@
   - [x] test_liquidateAndWithdrawFromSPAll
   - [x] test_startCollateralSunset
 
-- [ ] RedeemTest
+- [x] RedeemTest
   - [ ] test_getRedemptionHints
   - [ ] test_PartialRedeem
   - [ ] test_RedeemOnlyOneTrove
   - [ ] test_redeem
 
-- [ ] RewardManagerTest
+- [x] RewardManagerTest
   - [ ] test_AccrueInterst2TroveCorrect
   - [ ] test_OneTimeBorrowFeeIncreaseF_SAT
   - [ ] test_FeeReceiverReceiveCorrectAmount
@@ -121,28 +121,28 @@
   - [ ] testPermit
   - [ ] testBurnToken
 
-- [ ] NexusYieldTest
-  - [ ] test_swapInAndOut_noFee
-  - [ ] test_pause
-  - [ ] test_resume
-  - [ ] test_transerTokenToPrivilegedVault
-  - [ ] test_swapIn
-  - [ ] test_swapInZeroFee
-  - [ ] test_previewSwapSATForStable
-  - [ ] test_previewSwapStableForSAT
-  - [ ] test_scheduleSwapSATForStable
-  - [ ] test_scheduleTwice
-  - [ ] test_swapOutBalanceNotEnough
-  - [ ] test_mintCapReached
-  - [ ] test_sunsetAsset
-  - [ ] test_convertDebtTokenToAssetAmount
-  - [ ] test_convertAssetToDebtTokenAmount
-  - [ ] test_setAssetConfig
-  - [ ] test_setRewardManager
-  - [ ] test_isNotActive
-  - [ ] test_isNotPriviledge
-  - [ ] test_assetNotSupport
-  - [ ] test_zeroAddress
-  - [ ] test_amountTooSmall
-  - [ ] test_oraclePriceLessThan1
-  - [ ] test_priceOutOfRange
+- [x] NexusYieldTest
+  - [x] test_swapInAndOut_noFee
+  - [x] test_pause
+  - [x] test_resume
+  - [x] test_transerTokenToPrivilegedVault
+  - [x] test_swapIn
+  - [x] test_swapInZeroFee
+  - [x] test_previewSwapSATForStable
+  - [x] test_previewSwapStableForSAT
+  - [x] test_scheduleSwapSATForStable
+  - [x] test_scheduleTwice
+  - [x] test_swapOutBalanceNotEnough
+  - [x] test_mintCapReached
+  - [x] test_sunsetAsset
+  - [x] test_convertDebtTokenToAssetAmount
+  - [x] test_convertAssetToDebtTokenAmount
+  - [x] test_setAssetConfig
+  - [x] test_setRewardManager
+  - [x] test_isNotActive
+  - [x] test_isNotPriviledge
+  - [x] test_assetNotSupport
+  - [x] test_zeroAddress
+  - [x] test_amountTooSmall
+  - [x] test_oraclePriceLessThan1
+  - [x] test_priceOutOfRange

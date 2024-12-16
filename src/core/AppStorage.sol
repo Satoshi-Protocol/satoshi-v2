@@ -96,7 +96,7 @@ library AppStorage {
         /* PriceFeedAggregatorFacet */
         mapping(IERC20 => OracleRecord) oracleRecords;
         /* Nexus Yield Manager */
-        bool isPaused;
+        bool isNymPaused;
         uint256 day;
         mapping(address => bool) isPrivileged;
         mapping(address => mapping(address => uint32)) withdrawalTime;

@@ -2,14 +2,13 @@
 pragma solidity ^0.8.20;
 
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {IPriceFeedAggregatorFacet, OracleRecord} from "../interfaces/IPriceFeedAggregatorFacet.sol";
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
 import {Config} from "../Config.sol";
 
-contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, OwnableInternal {
+contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, AccessControlInternal {
     // // Used to convert the raw price to an 18-digit precision uint
     // uint256 public constant TARGET_DIGITS = 18;
 
@@ -23,7 +22,7 @@ contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, OwnableInternal 
 
     // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
     // // solhint-disable-next-line no-empty-blocks
-    // function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
+    // function _authorizeUpgrade(address newImplementation) internal view override onlyRole(Config.OWNER_ROLE) {
     //     // No additional authorization logic is needed for this contract
     // }
 
@@ -34,7 +33,7 @@ contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, OwnableInternal 
 
     // Admin routines ---------------------------------------------------------------------------------------------------
 
-    function setPriceFeed(IERC20 _token, IPriceFeed _priceFeed) external onlyOwner {
+    function setPriceFeed(IERC20 _token, IPriceFeed _priceFeed) external onlyRole(Config.OWNER_ROLE) {
         _setPriceFeed(_token, _priceFeed);
     }
 

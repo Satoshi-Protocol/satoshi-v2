@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
@@ -15,12 +14,12 @@ import {Config} from "../Config.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 
-contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal, OwnableInternal {
+contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
     using SafeERC20 for IERC20;
     using StabilityPoolLib for AppStorage.Layout;
     uint128 public constant MAX_REWARD_RATE = 63419583967529168; // 10_000_000e18 / (5 * 31536000)
 
-    function setSPRewardRate(uint128 _newRewardRate) external onlyOwner {
+    function setSPRewardRate(uint128 _newRewardRate) external onlyRole(Config.OWNER_ROLE) {
         require(_newRewardRate <= Config.SP_MAX_REWARD_RATE, "StabilityPool: Reward rate too high");
         AppStorage.Layout storage s = AppStorage.layout();
         s._triggerOSHIIssuance();
@@ -35,7 +34,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal, Ownab
      *                     should be called on all TM linked to that collateral
      *     @param collateral Collateral to sunset
      */
-    function startCollateralSunset(IERC20 collateral) external onlyOwner {
+    function startCollateralSunset(IERC20 collateral) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s.indexByCollateral[collateral] > 0, "Collateral already sunsetting");
         s.sunsetIndexes[s.queue.nextSunsetIndexKey++] =
@@ -369,7 +368,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal, Ownab
     }
 
     // set the time when the OSHI claim starts
-    function setClaimStartTime(uint32 _claimStartTime) external onlyOwner {
+    function setClaimStartTime(uint32 _claimStartTime) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.claimStartTime = _claimStartTime;
         emit ClaimStartTimeSet(_claimStartTime);
@@ -450,7 +449,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal, Ownab
         return s.P;
     }
 
-    function setRewardRate(uint128 _newRewardRate) external onlyOwner {
+    function setRewardRate(uint128 _newRewardRate) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
 
         require(_newRewardRate <= MAX_REWARD_RATE, "StabilityPool: Reward rate too high");

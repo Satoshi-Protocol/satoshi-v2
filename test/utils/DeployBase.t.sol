@@ -317,7 +317,7 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(nexusYieldManagerFacet) == address(0)); // check if contract is not deployed
         nexusYieldManagerFacet = INexusYieldManagerFacet(address(new NexusYieldManagerFacet()));
-        bytes4[] memory selectors = new bytes4[](26);
+        bytes4[] memory selectors = new bytes4[](29);
         selectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
         selectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
         selectors[2] = INexusYieldManagerFacet.swapIn.selector;
@@ -344,6 +344,9 @@ abstract contract DeployBase is Test {
         selectors[23] = INexusYieldManagerFacet.debtTokenDailyMintCapRemain.selector;
         selectors[24] = INexusYieldManagerFacet.pendingWithdrawal.selector;
         selectors[25] = INexusYieldManagerFacet.pendingWithdrawals.selector;
+        selectors[26] = INexusYieldManagerFacet.isNymPaused.selector;
+        selectors[27] = INexusYieldManagerFacet.dailyMintCount.selector;
+        selectors[28] = INexusYieldManagerFacet.isAssetSupported.selector;
         vm.stopPrank();
         return (address(stabilityPoolFacet), selectors);
     }
@@ -678,5 +681,21 @@ abstract contract DeployBase is Test {
 
     function oshiTokenProxy() public view returns (IOSHIToken) {
         return oshiToken;
+    }
+
+    function nexusYieldManager() public view returns (INexusYieldManagerFacet) {
+        return INexusYieldManagerFacet(address(satoshiXApp));
+    }
+
+    function nexusYieldProxy() public view returns (INexusYieldManagerFacet) {
+        return INexusYieldManagerFacet(address(satoshiXApp));
+    }
+
+    function rewardManagerProxy() public view returns (IRewardManager) {
+        return rewardManager;
+    }
+
+    function priceFeedAggregatorProxy() public view returns (IPriceFeedAggregatorFacet) {
+        return IPriceFeedAggregatorFacet(address(satoshiXApp));
     }
 }

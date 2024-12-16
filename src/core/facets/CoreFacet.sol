@@ -11,12 +11,12 @@ import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
 import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
 import {Config} from "../Config.sol";
 
-contract CoreFacet is ICoreFacet, AccessControlInternal, OwnableInternal {
+contract CoreFacet is ICoreFacet, AccessControlInternal {
     /**
      * @notice Set the receiver of one time borrow fee in the protocol
      * @param _feeReceiver Address of the fee's recipient
      */
-    function setFeeReceiver(address _feeReceiver) external onlyOwner {
+    function setFeeReceiver(address _feeReceiver) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.feeReceiver = _feeReceiver;
         emit FeeReceiverSet(_feeReceiver);
@@ -26,7 +26,7 @@ contract CoreFacet is ICoreFacet, AccessControlInternal, OwnableInternal {
      * @notice Set the reward manager address
      * @param _rewardManager Reward manager address
      */
-    function setRewardManager(address _rewardManager) external onlyOwner {
+    function setRewardManager(address _rewardManager) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.rewardManager = IRewardManager(_rewardManager);
         emit RewardManagerSet(_rewardManager);

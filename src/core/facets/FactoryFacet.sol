@@ -17,7 +17,7 @@ import {TroveManagerData} from "../interfaces/IBorrowerOperationsFacet.sol";
 import {Queue, SunsetIndex} from "../interfaces/IStabilityPoolFacet.sol";
 import {Config} from "../Config.sol";
 
-contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
+contract FactoryFacet is IFactoryFacet, AccessControlInternal {
     function troveManagerCount() external view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s.troveManagers.length;
@@ -34,7 +34,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
 
     function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams calldata params)
         external
-        onlyOwner
+        onlyRole(Config.OWNER_ROLE)
         returns (ITroveManager troveManagerBeaconProxy, ISortedTroves sortedTrovesBeaconProxy)
     {
         AppStorage.Layout storage s = AppStorage.layout();
@@ -134,17 +134,17 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal, OwnableInternal {
     }
 
     function _deploySortedTrovesBeaconProxy(AppStorage.Layout storage s) internal returns (ISortedTroves) {
-        bytes memory data = abi.encodeCall(ISortedTroves.initialize, _owner());
+        bytes memory data = abi.encodeCall(ISortedTroves.initialize, msg.sender);
         return ISortedTroves(address(new BeaconProxy(address(s.sortedTrovesBeacon), data)));
     }
 
     function _deployTroveManagerBeaconProxy(AppStorage.Layout storage s) internal returns (ITroveManager) {
         bytes memory data =
-            abi.encodeCall(ITroveManager.initialize, (_owner(), s.gasPool, s.debtToken, s.communityIssuance, address(this)));
+            abi.encodeCall(ITroveManager.initialize, (msg.sender, s.gasPool, s.debtToken, s.communityIssuance, address(this)));
         return ITroveManager(address(new BeaconProxy(address(s.troveManagerBeacon), data)));
     }
 
-    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external onlyOwner {
+    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         // console.log("setTMRewardRate", _numerator.length, s.troveManagers.length);
         require(_numerator.length == s.troveManagers.length, "Factory: invalid length");
