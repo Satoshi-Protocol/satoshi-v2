@@ -60,4 +60,8 @@ library Config {
     uint256 constant MAX_DEBT = 1e18 * 1000000000; //  (1 billion)
 
     uint256 constant LIQUIDATION_FEE = 200; //  (0.2%)
+
+    /** Farming */
+    uint256 constant FARMING_PRECISION = 1e4;
+    
 }

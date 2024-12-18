@@ -1,5 +1,6 @@
 pragma solidity ^0.8.20;
 
+import {ISatoshiXApp} from "./ISatoshiXApp.sol";
 import {INYMVault} from "./INYMVault.sol";
 
 interface IVaultManager {
@@ -11,6 +12,7 @@ interface IVaultManager {
 
     function executeStrategy(address, uint256) external;
     function exitStrategy(address, uint256) external;
+    function initialize(ISatoshiXApp, address) external;
     function exitStrategyByTroveManager(uint256 amount) external;
     function setPriority(INYMVault[] memory _priority) external;
     function transferCollToTroveManager(uint256 amount) external;
