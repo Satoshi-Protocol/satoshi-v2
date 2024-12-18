@@ -176,10 +176,11 @@ contract RedeemTest is DeployBase, TroveBase {
         _openTrove(user3, 1e18, 80e18);
 
         uint256 redemptionAmount = 30e18;
+        (, uint256 beforeDebt3) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
 
         _redeemCollateral(user1, redemptionAmount);
         (, uint256 debt3) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
-        assertEq(debt3, 554e17);
+        assertEq(debt3,  beforeDebt3 - redemptionAmount);
     }
 
     function test_redeem() public {

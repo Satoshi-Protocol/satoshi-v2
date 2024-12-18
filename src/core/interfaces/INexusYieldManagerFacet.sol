@@ -150,7 +150,7 @@ error NotEnoughDebtToken(uint256 debtBalance, uint256 stableTknAmount);
 
     function setPrivileged(address account, bool isPrivileged_) external;
 
-    function transerTokenToPrivilegedVault(address token, address vault, uint256 amount) external;
+    function transferTokenToPrivilegedVault(address token, address vault, uint256 amount) external;
 
     function previewSwapOut(address asset, uint256 stableTknAmount) external returns (uint256, uint256);
 

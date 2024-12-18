@@ -182,14 +182,14 @@ contract NexusYieldTest is DeployBase, TroveBase {
         vm.stopPrank();
     }
 
-    function test_transerTokenToPrivilegedVault() public {
+    function test_transferTokenToPrivilegedVault() public {
         vm.startPrank(OWNER);
         deal(address(collateralMock), address(nexusYieldProxy()), 100e18);
         // transfer to non-privileged address should revert
         vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.NotPrivileged.selector, user1));
-        nexusYieldProxy().transerTokenToPrivilegedVault(address(collateralMock), user1, 100e18);
+        nexusYieldProxy().transferTokenToPrivilegedVault(address(collateralMock), user1, 100e18);
         nexusYieldProxy().setPrivileged(user1, true);
-        nexusYieldProxy().transerTokenToPrivilegedVault(address(collateralMock), user1, 100e18);
+        nexusYieldProxy().transferTokenToPrivilegedVault(address(collateralMock), user1, 100e18);
         assertEq(collateralMock.balanceOf(user1), 100e18);
         vm.stopPrank();
     }

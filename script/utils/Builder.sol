@@ -152,7 +152,7 @@ library Builder {
         selectors[selectorIndex++] = INexusYieldManagerFacet.resume.selector;
 
         selectors[selectorIndex++] = INexusYieldManagerFacet.setPrivileged.selector;
-        selectors[selectorIndex++] = INexusYieldManagerFacet.transerTokenToPrivilegedVault.selector;
+        selectors[selectorIndex++] = INexusYieldManagerFacet.transferTokenToPrivilegedVault.selector;
         selectors[selectorIndex++] = INexusYieldManagerFacet.previewSwapOut.selector;
         selectors[selectorIndex++] = INexusYieldManagerFacet.previewSwapIn.selector;
         selectors[selectorIndex++] = INexusYieldManagerFacet.swapOutPrivileged.selector;

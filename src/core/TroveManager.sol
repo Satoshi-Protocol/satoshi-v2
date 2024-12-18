@@ -744,7 +744,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
      * Any surplus collateral left in the trove can be later claimed by the borrower.
      */
     function _redeemCloseTrove(address _borrower, uint256 _debt, uint256 _collateral) internal {
-        debtToken.burn(satoshiXApp, _debt);
+        debtToken.burn(gasPool, _debt);
         totalActiveDebt = totalActiveDebt - _debt;
 
         surplusBalances[_borrower] += _collateral;

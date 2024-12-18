@@ -125,7 +125,7 @@
   - [x] test_swapInAndOut_noFee
   - [x] test_pause
   - [x] test_resume
-  - [x] test_transerTokenToPrivilegedVault
+  - [x] test_transferTokenToPrivilegedVault
   - [x] test_swapIn
   - [x] test_swapInZeroFee
   - [x] test_previewSwapSATForStable

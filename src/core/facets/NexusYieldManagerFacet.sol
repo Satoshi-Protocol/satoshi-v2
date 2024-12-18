@@ -79,7 +79,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param vault The address of the privileged vault.
      * @param amount The amount of token to transfer.
      */
-    function transerTokenToPrivilegedVault(address token, address vault, uint256 amount) external onlyRole(Config.OWNER_ROLE) {
+    function transferTokenToPrivilegedVault(address token, address vault, uint256 amount) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (!s.isPrivileged[vault]) {
             revert NotPrivileged(vault);

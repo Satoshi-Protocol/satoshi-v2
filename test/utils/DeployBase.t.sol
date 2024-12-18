@@ -324,7 +324,7 @@ abstract contract DeployBase is Test {
         selectors[3] = INexusYieldManagerFacet.pause.selector;
         selectors[4] = INexusYieldManagerFacet.resume.selector;
         selectors[5] = INexusYieldManagerFacet.setPrivileged.selector;
-        selectors[6] = INexusYieldManagerFacet.transerTokenToPrivilegedVault.selector;
+        selectors[6] = INexusYieldManagerFacet.transferTokenToPrivilegedVault.selector;
         selectors[7] = INexusYieldManagerFacet.previewSwapOut.selector;
         selectors[8] = INexusYieldManagerFacet.previewSwapIn.selector;
         selectors[9] = INexusYieldManagerFacet.swapOutPrivileged.selector;
@@ -681,10 +681,6 @@ abstract contract DeployBase is Test {
 
     function oshiTokenProxy() public view returns (IOSHIToken) {
         return oshiToken;
-    }
-
-    function nexusYieldManager() public view returns (INexusYieldManagerFacet) {
-        return INexusYieldManagerFacet(address(satoshiXApp));
     }
 
     function nexusYieldProxy() public view returns (INexusYieldManagerFacet) {
