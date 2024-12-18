@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] E2E LayerZero
+- [x] E2E LayerZero
 - [x] update GasPool from Xapp to new Contract
 - [x] check for all Facet initialize
 
@@ -87,10 +87,10 @@
   - [x] test_startCollateralSunset
 
 - [x] RedeemTest
-  - [ ] test_getRedemptionHints
-  - [ ] test_PartialRedeem
-  - [ ] test_RedeemOnlyOneTrove
-  - [ ] test_redeem
+  - [x] test_getRedemptionHints
+  - [x] test_PartialRedeem
+  - [x] test_RedeemOnlyOneTrove
+  - [x] test_redeem
 
 - [x] RewardManagerTest
   - [x] test_AccrueInterst2TroveCorrect
@@ -105,21 +105,21 @@
   - [x] test_getPendingCollGain
   - [x] test_increaseSATPerUintStakedbyOwner
 
-- [ ] OSHITokenTest ???
-  - [ ] testGetsBalanceOfUser
-  - [ ] testGetsTotalSupply
-  - [ ] testTokenName
-  - [ ] testSymbol
-  - [ ] testDecimals
-  - [ ] testAllowance
-  - [ ] testTransfer
-  - [ ] testTransferFrom
-  - [ ] testFailApproveToZeroAddress
-  - [ ] testFailTransferToZeroAddress
-  - [ ] testFailTransferInsufficientBalance
-  - [ ] testFailTransferFromInsufficientApprove
-  - [ ] testPermit
-  - [ ] testBurnToken
+- [x] OSHITokenTest
+  - [x] testGetsBalanceOfUser
+  - [x] testGetsTotalSupply
+  - [x] testTokenName
+  - [x] testSymbol
+  - [x] testDecimals
+  - [x] testAllowance
+  - [x] testTransfer
+  - [x] testTransferFrom
+  - [x] testFailApproveToZeroAddress
+  - [x] testFailTransferToZeroAddress
+  - [x] testFailTransferInsufficientBalance
+  - [x] testFailTransferFromInsufficientApprove
+  - [x] testPermit
+  - [x] testBurnToken
 
 - [x] NexusYieldTest
   - [x] test_swapInAndOut_noFee

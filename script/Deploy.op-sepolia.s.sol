@@ -51,9 +51,9 @@ import {GasPool} from "../src/core/GasPool.sol";
 import {IGasPool} from "../src/core/interfaces/IGasPool.sol";
 import {Config} from "../src/core/Config.sol";
 import {Deployer} from "./Deployer.sol";
-import "./configs/Config.arb-sepolia.sol";
+import "./configs/Config.op-sepolia.sol";
 
-contract DeployArbSepoliaScript is Deployer {
+contract DeployOpSepoliaScript is Deployer {
     string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN";
     string constant DEBT_TOKEN_SYMBOL = "TESTSAT";
     address internal LZ_ENDPOINT;
@@ -67,9 +67,9 @@ contract DeployArbSepoliaScript is Deployer {
         OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
         assert(OWNER_PRIVATE_KEY != 0);
         OWNER = vm.addr(OWNER_PRIVATE_KEY);
-        LZ_ENDPOINT = ARB_SEPOLIA_LZ_ENDPOINT;
+        LZ_ENDPOINT = OP_SEPOLIA_LZ_ENDPOINT;
         assert(LZ_ENDPOINT != address(0));
-        LZ_EID = ARB_SEPOLIA_LZ_EID;
+        LZ_EID = OP_SEPOLIA_LZ_EID;
         assert(LZ_ENDPOINT != address(0));
     }
 
@@ -94,13 +94,8 @@ contract DeployArbSepoliaScript is Deployer {
         _satoshiXAppInit(DEPLOYER);
         _setContracts(DEPLOYER);
 
-        // NOTE: For Test
-        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-        debtToken.rely(DEPLOYER);
-        debtToken.mint(DEPLOYER, 1000e18);
-        vm.stopBroadcast();
-
         consoleAllContract();
+        // vm.stopBroadcast();
     }
 
 

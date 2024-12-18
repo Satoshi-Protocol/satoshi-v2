@@ -234,12 +234,12 @@ contract RedeemTest is DeployBase, TroveBase {
         assertTrue(sortedTrovesBeaconProxy.contains(user4));
 
         uint256 price = troveManagerBeaconProxy.fetchPrice();
-        uint256 surplusBlance = troveManagerBeaconProxy.surplusBalances(user3);
+        uint256 surplusBalance = troveManagerBeaconProxy.surplusBalances(user3);
 
         vm.prank(user3);
         troveManagerBeaconProxy.claimCollateral(user3);
         uint256 expectedColl = coll3 - coll3 * (debt3 - DEBT_GAS_COMPENSATION) / price;
-        assertEq(collateralMock.balanceOf(user3), surplusBlance);
+        assertEq(collateralMock.balanceOf(user3), surplusBalance);
         assertEq(collateralMock.balanceOf(user3), expectedColl);
     }
 

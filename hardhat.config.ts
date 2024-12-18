@@ -10,12 +10,17 @@ import 'hardhat-contract-sizer'
 import '@nomiclabs/hardhat-ethers'
 import '@layerzerolabs/toolbox-hardhat'
 import '@openzeppelin/hardhat-upgrades'
+import '@nomicfoundation/hardhat-toolbox'
 import '@nomicfoundation/hardhat-foundry'
 
 // Add a blank line between import groups
 import { HardhatUserConfig, HttpNetworkAccountsUserConfig } from 'hardhat/types'
 
 import { EndpointId } from '@layerzerolabs/lz-definitions'
+// import { parseFoundryRemappings } from "./remappings"; // Assuming remappings.js exists and exports parseFoundryRemappings
+// const path = require("path");
+
+// const remappings = parseFoundryRemappings();
 
 // Set your preferred authentication method
 //
@@ -41,7 +46,8 @@ if (accounts == null) {
 const config: HardhatUserConfig = {
     paths: {
         cache: 'cache/hardhat',
-        sources: 'src',
+        sources: './src',
+        artifacts: "./artifacts",
     },
     solidity: {
         compilers: [
@@ -50,7 +56,7 @@ const config: HardhatUserConfig = {
                 settings: {
                     optimizer: {
                         enabled: true,
-                        runs: 200,
+                    runs: 200,
                     },
                 },
             },
@@ -99,6 +105,9 @@ const config: HardhatUserConfig = {
             default: 0, // wallet address of index[0], of the mnemonic in .env
         },
     },
+    // resolver: {
+    //     remappings,
+    // },
 }
 
 export default config

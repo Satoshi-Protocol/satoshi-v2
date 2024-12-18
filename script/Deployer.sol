@@ -2,6 +2,7 @@
 pragma solidity ^0.8.20;
 
 import {Script, console} from "forge-std/Script.sol";
+import {IAccessControl} from "@solidstate/contracts/access/access_control/IAccessControl.sol";
 import {IERC2535DiamondCutInternal} from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
@@ -50,22 +51,22 @@ import {IWETH} from "../src/core/helpers/interfaces/IWETH.sol";
 import {GasPool} from "../src/core/GasPool.sol";
 import {IGasPool} from "../src/core/interfaces/IGasPool.sol";
 import {Config} from "../src/core/Config.sol";
+import {RoundData, OracleMock} from "../test/mocks/OracleMock.sol";
+import {WETH9} from "../test/mocks/WETH9.sol";
+import {ERC20Mock} from "../test/mocks/ERC20Mock.sol";
+
+
+import "./configs/Config.testnet.sol";
 import "./configs/Config.arb-sepolia.sol";
 
 contract Deployer is Script, IERC2535DiamondCutInternal {
-    IWETH weth;
-    address public LZ_ENDPOINT;
-    uint256 public constant TOTAL_FACETS = 7;
-
-    uint256 internal DEPLOYMENT_PRIVATE_KEY;
+    address internal DEPLOYER;
+    address internal OWNER;
     uint256 internal OWNER_PRIVATE_KEY;
-    address public DEPLOYER;
-    address public OWNER;
+    uint256 internal DEPLOYMENT_PRIVATE_KEY;
 
-    // XApp
+    IWETH weth;
     ISatoshiXApp internal satoshiXApp;
-
-    // Facets
     IBorrowerOperationsFacet internal borrowerOperationsFacet;
     ICoreFacet internal coreFacet;
     IFactoryFacet internal factoryFacet;
@@ -74,20 +75,26 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     IStabilityPoolFacet internal stabilityPoolFacet;
     INexusYieldManagerFacet internal nexusYieldManagerFacet;
 
-    // Initializer
     Initializer internal initializer;
 
-    // Core contracts 
-    ISatoshiPeriphery internal satoshiPeriphery;
-    IGasPool internal gasPool;
     IDebtToken internal debtToken;
     IRewardManager internal rewardManager;
     ICommunityIssuance internal communityIssuance;
     IOSHIToken internal oshiToken;
+
     IBeacon internal sortedTrovesBeacon;
     IBeacon internal troveManagerBeacon;
 
+    ISatoshiPeriphery internal satoshiPeriphery;
+
+    IERC20 collateralMock;
+    RoundData internal initRoundData;
+
+    address internal oracleMockAddr;
+    IGasPool gasPool;
+
     function consoleAllContract() internal {
+        console.log("weth", address(weth));
         console.log("satoshiXApp", address(satoshiXApp));
         console.log("borrowerOperationsFacet", address(borrowerOperationsFacet));
         console.log("coreFacet", address(coreFacet));
@@ -110,17 +117,16 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         console.log("communityIssuance", address(communityIssuance));
     }
 
-
     function _setContracts(address deployer) internal {
-        vm.startBroadcast(deployer);
-        ICoreFacet core = ICoreFacet(address(satoshiXApp));
-        core.setRewardManager(address(rewardManager));
-        core.setFeeReceiver(OWNER);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        IAccessControl access = IAccessControl(address(satoshiXApp));
+        access.grantRole(Config.OWNER_ROLE, deployer);
+        access.grantRole(Config.GUARDIAN_ROLE, deployer);
         vm.stopBroadcast();
     }
 
     function _deployPeriphery(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         bytes memory data = abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), deployer));
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
@@ -128,7 +134,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deploySatoshiXApp(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(satoshiXApp) == address(0)); // check if contract is not deployed
         satoshiXApp = ISatoshiXApp(payable(address(new SatoshiXApp())));
 
@@ -139,9 +145,9 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         // deploy facets here
         address facetAddr;
         bytes4[] memory selectors;
-        (facetAddr, selectors) = _deployBorrowerOperationsFacet(deployer);
-        _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
         (facetAddr, selectors) = _deployCoreFacet(deployer);
+        _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
+        (facetAddr, selectors) = _deployBorrowerOperationsFacet(deployer);
         _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
         (facetAddr, selectors) = _deployFactoryFacet(deployer);
         _diamondCut(deployer, satoshiXApp, facetAddr, IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors);
@@ -156,7 +162,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployBorrowerOperationsFacet(address deployer) internal returns (address, bytes4[] memory) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(borrowerOperationsFacet) == address(0)); // check if contract is not deployed
         borrowerOperationsFacet = IBorrowerOperationsFacet(address(new BorrowerOperationsFacet()));
         bytes4[] memory selectors = new bytes4[](18);
@@ -183,7 +189,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployCoreFacet(address deployer) internal returns (address, bytes4[] memory) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(coreFacet) == address(0)); // check if contract is not deployed
         coreFacet = ICoreFacet(address(new CoreFacet()));
         bytes4[] memory selectors = new bytes4[](12);
@@ -204,7 +210,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployFactoryFacet(address deployer) internal returns (address, bytes4[] memory) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(factoryFacet) == address(0)); // check if contract is not deployed
         factoryFacet = IFactoryFacet(address(new FactoryFacet()));
         bytes4[] memory selectors = new bytes4[](5);
@@ -218,7 +224,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployLiquidationFacet(address deployer) internal returns (address, bytes4[] memory) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(liquidationFacet) == address(0)); // check if contract is not deployed
         liquidationFacet = ILiquidationFacet(address(new LiquidationFacet()));
         bytes4[] memory selectors = new bytes4[](3);
@@ -230,7 +236,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployPriceFeedAggregatorFacet(address deployer) internal returns (address, bytes4[] memory) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(priceFeedAggregatorFacet) == address(0)); // check if contract is not deployed
         priceFeedAggregatorFacet = IPriceFeedAggregatorFacet(address(new PriceFeedAggregatorFacet()));
         bytes4[] memory selectors = new bytes4[](4);
@@ -243,10 +249,10 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployStabilityPoolFacet(address deployer) internal returns (address, bytes4[] memory) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(stabilityPoolFacet) == address(0)); // check if contract is not deployed
         stabilityPoolFacet = IStabilityPoolFacet(address(new StabilityPoolFacet()));
-        bytes4[] memory selectors = new bytes4[](23);
+        bytes4[] memory selectors = new bytes4[](25);
         selectors[0] = IStabilityPoolFacet.claimCollateralGains.selector;
         selectors[1] = IStabilityPoolFacet.provideToSP.selector;
         selectors[2] = IStabilityPoolFacet.startCollateralSunset.selector;
@@ -270,15 +276,17 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         selectors[20] = IStabilityPoolFacet.isClaimStart.selector;
         selectors[21] = IStabilityPoolFacet.rewardRate.selector;
         selectors[22] = IStabilityPoolFacet.setSPRewardRate.selector;
+        selectors[23] = IStabilityPoolFacet.P.selector;
+        selectors[24] = IStabilityPoolFacet.setRewardRate.selector;
         vm.stopBroadcast();
         return (address(stabilityPoolFacet), selectors);
     }
 
     function _deployNexusYieldManagerFacet(address deployer) internal returns (address, bytes4[] memory) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(nexusYieldManagerFacet) == address(0)); // check if contract is not deployed
         nexusYieldManagerFacet = INexusYieldManagerFacet(address(new NexusYieldManagerFacet()));
-        bytes4[] memory selectors = new bytes4[](26);
+        bytes4[] memory selectors = new bytes4[](29);
         selectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
         selectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
         selectors[2] = INexusYieldManagerFacet.swapIn.selector;
@@ -305,25 +313,28 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         selectors[23] = INexusYieldManagerFacet.debtTokenDailyMintCapRemain.selector;
         selectors[24] = INexusYieldManagerFacet.pendingWithdrawal.selector;
         selectors[25] = INexusYieldManagerFacet.pendingWithdrawals.selector;
+        selectors[26] = INexusYieldManagerFacet.isNymPaused.selector;
+        selectors[27] = INexusYieldManagerFacet.dailyMintCount.selector;
+        selectors[28] = INexusYieldManagerFacet.isAssetSupported.selector;
         vm.stopBroadcast();
         return (address(stabilityPoolFacet), selectors);
     }
 
     function _deployInitializer(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(initializer) == address(0)); // check if contract is not deployed
         initializer = new Initializer();
         vm.stopBroadcast();
     }
 
     function _deployRewardManager(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(rewardManager) == address(0)); // check if contract is not deployed
         address rewardManagerImpl = address(new RewardManager());
-        bytes memory data = abi.encodeCall(IRewardManager.initialize, (OWNER));
+        bytes memory data = abi.encodeCall(IRewardManager.initialize, (deployer));
         rewardManager = IRewardManager(address(new ERC1967Proxy(address(rewardManagerImpl), data)));
         vm.stopBroadcast();
-        vm.startBroadcast(OWNER);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         rewardManager.setAddresses(
             address(satoshiXApp),
             weth,
@@ -333,50 +344,49 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
     }
 
-    function _deployDebtToken(address deployer) internal {
-        EndpointV2Mock endpointMock;
-        uint32 eid = 1;
-        endpointMock = new EndpointV2Mock(eid, address(this));
-
-        vm.startBroadcast(deployer);
+    function _deployDebtToken(
+        uint32 eid,
+        address endpoint,
+        address deployer, string memory debtTokenName, string memory debtTokenSymbol) internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(debtToken) == address(0)); // check if contract is not deployed
-        address debtTokenImpl = address(new DebtToken(address(endpointMock)));
+        address debtTokenImpl = address(new DebtToken(endpoint));
         bytes memory data =
-            abi.encodeCall(IDebtToken.initialize, (Config.DEBT_TOKEN_NAME, Config.DEBT_TOKEN_SYMBOL, address(gasPool), address(satoshiXApp), OWNER));
+            abi.encodeCall(IDebtToken.initialize, (debtTokenName, debtTokenSymbol, address(gasPool), address(satoshiXApp), deployer));
         debtToken = IDebtToken(address(new ERC1967Proxy(address(debtTokenImpl), data)));
         vm.stopBroadcast();
     }
 
     function _deployCommunityIssuance(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(communityIssuance) == address(0)); // check if contract is not deployed
         address communityIssuanceImpl = address(new CommunityIssuance());
-        bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (OWNER, oshiToken, address(satoshiXApp)));
+        bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (deployer, oshiToken, address(satoshiXApp)));
         communityIssuance = ICommunityIssuance(address(new ERC1967Proxy(address(communityIssuanceImpl), data)));
         vm.stopBroadcast();
     }
 
     function _deploySortedTrovesBeacon(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(sortedTrovesBeacon) == address(0)); // check if contract is not deployed
         address sortedTrovesImpl = address(new SortedTroves());
-        sortedTrovesBeacon = new UpgradeableBeacon(address(sortedTrovesImpl), OWNER);
+        sortedTrovesBeacon = new UpgradeableBeacon(address(sortedTrovesImpl), deployer);
         vm.stopBroadcast();
     }
 
     function _deployTroveManagerBeacon(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(troveManagerBeacon) == address(0)); // check if contract is not deployed
         address troveManagerImpl = address(new TroveManager());
-        troveManagerBeacon = new UpgradeableBeacon(address(troveManagerImpl), OWNER);
+        troveManagerBeacon = new UpgradeableBeacon(address(troveManagerImpl), deployer);
         vm.stopBroadcast();
     }
 
     function _deployOSHIToken(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(oshiToken) == address(0)); // check if contract is not deployed
         address oshiTokenImpl = address(new OSHIToken());
-        bytes memory data = abi.encodeCall(IOSHIToken.initialize, OWNER);
+        bytes memory data = abi.encodeCall(IOSHIToken.initialize, deployer);
         oshiToken = IOSHIToken(address(new ERC1967Proxy(address(oshiTokenImpl), data)));
         vm.stopBroadcast();
     }
@@ -393,7 +403,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         facetCut = IERC2535DiamondCutInternal.FacetCut({target: target, action: action, selectors: selectors});
         facetCuts[0] = facetCut;
 
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         diamond.diamondCut(facetCuts, address(0), "");
         vm.stopBroadcast();
     }
@@ -402,7 +412,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         assert(address(satoshiXApp) != address(0));
         assert(address(initializer) != address(0));
 
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](1);
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = Initializer.init.selector;
@@ -417,7 +427,8 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
             address(debtToken),
             address(communityIssuance),
             address(sortedTrovesBeacon),
-            address(troveManagerBeacon)
+            address(troveManagerBeacon),
+            address(gasPool)
         );
 
         bytes memory data = abi.encodeWithSelector(Initializer.init.selector, _data);
@@ -425,15 +436,95 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
     }
 
+    function _deployWETH(address deployer) internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        weth = IWETH(address(new WETH9()));
+        vm.stopBroadcast();
+    }
+
+    function _deployMockTroveManager(address deployer) internal returns (ISortedTroves, ITroveManager) {
+        collateralMock = new ERC20Mock("Collateral", "COLL");
+        initRoundData = RoundData({
+            answer: 4000000000000,
+            startedAt: block.timestamp,
+            updatedAt: block.timestamp,
+            answeredInRound: 1
+        });
+        DeploymentParams memory deploymentParams = DeploymentParams({
+            minuteDecayFactor: MINUTE_DECAY_FACTOR,
+            redemptionFeeFloor: REDEMPTION_FEE_FLOOR,
+            maxRedemptionFee: MAX_REDEMPTION_FEE,
+            borrowingFeeFloor: BORROWING_FEE_FLOOR,
+            maxBorrowingFee: MAX_BORROWING_FEE,
+            interestRateInBps: INTEREST_RATE_IN_BPS,
+            maxDebt: MAX_DEBT,
+            MCR: MCR,
+            rewardRate: REWARD_RATE,
+            OSHIAllocation: TM_ALLOCATION,
+            claimStartTime: TM_CLAIM_START_TIME
+        });
+
+        address priceFeedAddr =
+            _deployPriceFeed(deployer, ORACLE_MOCK_DECIMALS, ORACLE_MOCK_VERSION, initRoundData);
+        _setPriceFeedToPriceFeedAggregatorProxy(deployer, collateralMock, IPriceFeed(priceFeedAddr));
+
+        (ISortedTroves sortedTrovesBeaconProxy, ITroveManager troveManagerBeaconProxy) =
+            _deployNewInstance(deployer, collateralMock, IPriceFeed(priceFeedAddr), deploymentParams);
+
+        _setConfigByOwner(deployer, troveManagerBeaconProxy);
+
+        return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
+        vm.startPrank(deployer);
+        // vm.stopBroadcast();
+    }
+
+    function _deployNewInstance(
+        address owner,
+        IERC20 collateral,
+        IPriceFeed priceFeed,
+        DeploymentParams memory deploymentParams
+    ) internal returns (ISortedTroves, ITroveManager) {
+        // vm.startPrank(owner);
+
+        (
+            ITroveManager troveManagerBeaconProxy,
+            ISortedTroves sortedTrovesBeaconProxy
+        ) = IFactoryFacet(address(satoshiXApp)).deployNewInstance(collateral, priceFeed, deploymentParams);
+
+        vm.stopBroadcast();
+        return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
+    }
+
+    function _deployPriceFeed(address deployer, uint8 decimals, uint256 version, RoundData memory roundData)
+        internal
+        returns (address)
+    {
+        // deploy oracle mock contract to mock price feed source
+        oracleMockAddr = _deployOracleMock(deployer, decimals, version);
+        // update data to the oracle mock
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        OracleMock(oracleMockAddr).updateRoundData(roundData);
+        vm.stopBroadcast();
+        return oracleMockAddr;
+    }
+
+
+    function _deployOracleMock(address deployer, uint8 decimals, uint256 version) internal returns (address) {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        address oracleAddr = address(new OracleMock(decimals, version));
+        vm.stopBroadcast();
+        return oracleAddr;
+    }
+
     function _setPriceFeedToPriceFeedAggregatorProxy(address owner, IERC20 collateral, IPriceFeed priceFeed) internal {
-        vm.startBroadcast(owner);
+        // vm.startPrank(owner);
         IPriceFeedAggregatorFacet(address(satoshiXApp)).setPriceFeed(collateral, priceFeed);
         vm.stopBroadcast();
     }
 
 
     function _registerTroveManager(address owner, ITroveManager _troveManager) internal {
-        vm.startBroadcast(owner);
+        // vm.startPrank(owner);
         rewardManager.registerTroveManager(_troveManager);
         vm.stopBroadcast();
     }
@@ -443,35 +534,23 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         address[] memory _recipients = new address[](1);
         _recipients[0] = address(satoshiXApp);
         uint256[] memory _amount = new uint256[](1);
-        _amount[0] = Config.SP_ALLOCATION;
+        _amount[0] = SP_ALLOCATION;
         // _setRewardManager(owner, address(rewardManagerProxy));
         _setTMCommunityIssuanceAllocation(owner, troveManagerBeaconProxy);
         _setSPCommunityIssuanceAllocation(owner);
         // _setAddress(owner, address(satoshiXApp), weth, address(debtToken), address(oshiToken));
         _registerTroveManager(owner, troveManagerBeaconProxy);
-        _setClaimStartTime(owner, Config.SP_CLAIM_START_TIME);
+        _setClaimStartTime(owner, SP_CLAIM_START_TIME);
         _setSPRewardRate(owner);
         _setTMRewardRate(owner, troveManagerBeaconProxy);
     }
-
-    // function _setAddress(
-    //     address owner,
-    //     IBorrowerOperations _borrowerOperations,
-    //     IWETH _weth,
-    //     IDebtToken _debtToken,
-    //     IOSHIToken _oshiToken
-    // ) internal {
-    //     vm.startBroadcast(owner);
-    //     rewardManager.setAddresses(_borrowerOperations, _weth, _debtToken, _oshiToken);
-    //     vm.stopBroadcast();
-    // }
 
     function _setTMCommunityIssuanceAllocation(address owner, ITroveManager troveManagerBeaconProxy) internal {
         address[] memory _recipients = new address[](1);
         _recipients[0] = address(troveManagerBeaconProxy);
         uint256[] memory _amounts = new uint256[](1);
-        _amounts[0] = Config.TM_ALLOCATION;
-        vm.startBroadcast(owner);
+        _amounts[0] = TM_ALLOCATION;
+        // vm.startPrank(owner);
         communityIssuance.setAllocated(_recipients, _amounts);
         vm.stopBroadcast();
     }
@@ -480,14 +559,14 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         address[] memory _recipients = new address[](1);
         _recipients[0] = address(satoshiXApp);
         uint256[] memory _amounts = new uint256[](1);
-        _amounts[0] = Config.SP_ALLOCATION;
-        vm.startBroadcast(owner);
+        _amounts[0] = SP_ALLOCATION;
+        // vm.startPrank(owner);
         communityIssuance.setAllocated(_recipients, _amounts);
         vm.stopBroadcast();
     }
 
     function _setTMRewardRate(address owner, ITroveManager troveManagerBeaconProxy) internal {
-        vm.startBroadcast(owner);
+        // vm.startPrank(owner);
         uint128[] memory numerator = new uint128[](2);
         numerator[0] = 0;
         numerator[1] = 0;
@@ -498,21 +577,21 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _setSPRewardRate(address owner) internal {
-        vm.startBroadcast(owner);
+        // vm.startPrank(owner);
         IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
-        stabilityPoolProxy.setSPRewardRate(Config.SP_MAX_REWARD_RATE);
+        stabilityPoolProxy.setSPRewardRate(SP_MAX_REWARD_RATE);
         vm.stopBroadcast();
     }
 
     function _setClaimStartTime(address owner, uint32 _claimStartTime) internal {
-        vm.startBroadcast(owner);
+        // vm.startPrank(owner);
         IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
         stabilityPoolProxy.setClaimStartTime(_claimStartTime);
         vm.stopBroadcast();
     }
 
     function _deployHintHelpers(address deployer) internal returns (address) {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         address hintHelpersAddr = address(new MultiCollateralHintHelpers(address(satoshiXApp)));
         vm.stopBroadcast();
@@ -521,7 +600,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _deployGasPool(address deployer) internal {
-        vm.startBroadcast(deployer);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(gasPool == IGasPool(address(0))); // check if gas pool contract is not deployed
         gasPool = new GasPool();
         vm.stopBroadcast();
@@ -537,7 +616,44 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
 
         // Assert that the code size is greater than 0
         if(codeSize == 0) {
-            console.log("The address does not contain a contract.");
+            revert("The address does not contain a contract.");
         }
+    }
+
+    /** */
+    function borrowerOperationsProxy() public view returns (IBorrowerOperationsFacet) {
+        return IBorrowerOperationsFacet(address(satoshiXApp));
+    }
+
+    function stabilityPoolProxy() public view returns (IStabilityPoolFacet) {
+        return IStabilityPoolFacet(address(satoshiXApp));
+    }
+
+    function debtTokenProxy() public view returns (IDebtToken) {
+        return debtToken;
+    }
+
+    function liquidationManagerProxy() public view returns (ILiquidationFacet) {
+        return ILiquidationFacet(address(satoshiXApp));
+    }
+
+    function oshiTokenProxy() public view returns (IOSHIToken) {
+        return oshiToken;
+    }
+
+    function nexusYieldManager() public view returns (INexusYieldManagerFacet) {
+        return INexusYieldManagerFacet(address(satoshiXApp));
+    }
+
+    function nexusYieldProxy() public view returns (INexusYieldManagerFacet) {
+        return INexusYieldManagerFacet(address(satoshiXApp));
+    }
+
+    function rewardManagerProxy() public view returns (IRewardManager) {
+        return rewardManager;
+    }
+
+    function priceFeedAggregatorProxy() public view returns (IPriceFeedAggregatorFacet) {
+        return IPriceFeedAggregatorFacet(address(satoshiXApp));
     }
 }
