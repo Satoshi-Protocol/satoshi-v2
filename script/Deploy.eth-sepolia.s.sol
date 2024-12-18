@@ -50,14 +50,16 @@ import {IWETH} from "../src/core/helpers/interfaces/IWETH.sol";
 import {GasPool} from "../src/core/GasPool.sol";
 import {IGasPool} from "../src/core/interfaces/IGasPool.sol";
 import {Config} from "../src/core/Config.sol";
-import "./configs/Config.eth-sepolia.sol";
 import {Deployer} from "./Deployer.sol";
+import "./configs/Config.eth-sepolia.sol";
 
 contract DeployEthSepoliaScript is Deployer {
+    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN";
+    string constant DEBT_TOKEN_SYMBOL = "TESTSAT";
+    address internal LZ_ENDPOINT;
+    uint32 internal LZ_EID;
 
     function setUp() external {
-        weth = IWETH(ETH_SEPOLIA_WETH);
-
         DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
         assert(DEPLOYMENT_PRIVATE_KEY != 0);
         DEPLOYER = vm.addr(DEPLOYMENT_PRIVATE_KEY);
@@ -67,9 +69,13 @@ contract DeployEthSepoliaScript is Deployer {
         OWNER = vm.addr(OWNER_PRIVATE_KEY);
         LZ_ENDPOINT = ETH_SEPOLIA_LZ_ENDPOINT;
         assert(LZ_ENDPOINT != address(0));
+        LZ_EID = ETH_SEPOLIA_LZ_EID;
+        assert(LZ_ENDPOINT != address(0));
     }
 
     function run() public {
+        console.log("deployer:", DEPLOYER);
+        _deployWETH(DEPLOYER);
         _deploySortedTrovesBeacon(DEPLOYER);
         _deployTroveManagerBeacon(DEPLOYER);
         _deployInitializer(DEPLOYER);
@@ -77,12 +83,21 @@ contract DeployEthSepoliaScript is Deployer {
         _deployAndCutFacets(DEPLOYER);
         _deployOSHIToken(DEPLOYER);
         _deployGasPool(DEPLOYER);
-        _deployDebtToken(DEPLOYER);
+        _deployDebtToken(
+            LZ_EID,
+            LZ_ENDPOINT,
+            DEPLOYER, DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL);
         _deployCommunityIssuance(DEPLOYER);
         _deployRewardManager(DEPLOYER);
         _deployPeriphery(DEPLOYER);
-        _setContracts(DEPLOYER);
         _satoshiXAppInit(DEPLOYER);
+        _setContracts(DEPLOYER);
+
+        // NOTE: For Test
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        debtToken.rely(DEPLOYER);
+        debtToken.mint(DEPLOYER, 1000e18);
+        vm.stopBroadcast();
 
         consoleAllContract();
     }
