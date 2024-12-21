@@ -11,6 +11,7 @@
     "compile": "$npm_execpath run compile:forge && $npm_execpath run compile:hardhat",
     "compile:forge": "forge build",
     "compile:hardhat": "hardhat compile",
+    "c": "hardhat clean",
     "full-deploy:anvil": "forge script script/Deploy.s.sol --rpc-url 127.0.0.1:8545 --broadcast && forge script script/DeployHelpers.s.sol --rpc-url 127.0.0.1:8545 --broadcast",
     "full-deploy:arbitrum-sepolia": "forge script script/Deploy.s.sol --rpc-url arbitrum-sepolia --broadcast && forge script script/DeployHelpers.s.sol --rpc-url arbitrum-sepolia --broadcast",
     "full-deploy:holesky": "forge script script/Deploy.s.sol --rpc-url holesky --broadcast && forge script script/DeployHelpers.s.sol --rpc-url holesky --broadcast",
@@ -24,7 +25,8 @@
     "test:forge": "forge test",
     "test:hardhat": "hardhat test",
     "test:compile": "hardhat compile",
-    "lz:set": "hardhat lz:oapp:wire --oapp-config layerzero.config.ts"
+    "lz:set": "hardhat lz:oapp:wire --oapp-config layerzero.config.ts",
+    "test:send": "hardhat lz:oft:send"
   },
   "resolutions": {
     "ethers": "^5.7.2",
@@ -58,7 +60,7 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "~18.18.14",
     "chai": "^4.4.1",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.5",
     "eslint": "^8.55.0",
     "eslint-plugin-jest-extended": "~2.0.0",
     "ethers": "^5.7.2",
@@ -70,6 +72,7 @@
     "solhint": "^4.1.1",
     "solidity-bytes-utils": "^0.8.2",
     "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
     "typescript": "^5.4.4"
   },
   "engines": {

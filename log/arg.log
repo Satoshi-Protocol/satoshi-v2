@@ -1,5 +1,5 @@
-Compiling 245 files with Solc 0.8.22
-Solc 0.8.22 finished in 9.59s
+Compiling 3 files with Solc 0.8.22
+Solc 0.8.22 finished in 6.93s
 Compiler run successful with warnings:
 Warning (8760): This declaration has the same name as another declaration.
    --> src/core/facets/StabilityPoolFacet.sol:412:18:
@@ -228,39 +228,39 @@ Script ran successfully.
 
 == Logs ==
   deployer: 0xD26C9387F92EEa2cD030440A0799E403B225B8dD
-  weth 0xd8c6a39C5E800CA3b2D6D848f7a452c8468309bc
-  satoshiXApp 0xa7DB65e1a2f8b250c4750BBa4A35DdeF347e73E9
-  borrowerOperationsFacet 0x27f53f60A05E77935aE1D95C80e97FE395a0CbDb
-  coreFacet 0x4Ad6a32Cb44f17629b073A7057aa3EaE79e2F1f0
-  factoryFacet 0x2102a0047d81765a591D7e3965bf15ad5c044914
-  liquidationFacet 0xead01Cd42603223D001B6b79414d8a8834Ad530b
-  priceFeedAggregatorFacet 0x75c6822353eAaCFA8d037A49bbF96b4378cF20f7
-  stabilityPoolFacet 0x6f1aD0744dfAA47b140d5e69c9557a77511163eb
-  nexusYieldManagerFacet 0x3A73DfeafDc764ac6E486aD46fd4a013287c4ccC
-  initializer 0x00FDF401d02605806E65591c63eF8a300609383F
-  satoshiPeriphery 0x2659e82938F061a088a190b914d5eF1EbAD795A3
-  gasPool 0xFEEca42d482b33bDA41Ea7B4806b38fc4E13A23C
-  debtToken 0x3a054EA12a0EFFE69c7D3c1F44f87Ef0815045a7
-  rewardManager 0xDC0841837566c464646bb862B0037b658d605e11
-  communityIssuance 0x1203Bf3D8059ae2ce4934F74fa0cF8F0E7370f9b
-  oshiToken 0x01ddB0260F65dDf653074CE316e679989F09F092
-  sortedTrovesBeacon 0x180a1FB772E1Ef57D4c0505Ed881ef0C2B5f9036
-  troveManagerBeacon 0x7A39DE05BF3De55C1BAF83Fe685A1b75009d232E
-  rewardManager 0xDC0841837566c464646bb862B0037b658d605e11
-  oshiToken 0x01ddB0260F65dDf653074CE316e679989F09F092
-  communityIssuance 0x1203Bf3D8059ae2ce4934F74fa0cF8F0E7370f9b
+  weth 0x27f53f60A05E77935aE1D95C80e97FE395a0CbDb
+  satoshiXApp 0x75c6822353eAaCFA8d037A49bbF96b4378cF20f7
+  borrowerOperationsFacet 0x943A33A57baE566879E23E4A43e279F28485e425
+  coreFacet 0xBCb1f712cD43852bD52D3d621Db9A9737F6de535
+  factoryFacet 0x839c82aC71E24F8113A0Eb7b1ba47321Ad519093
+  liquidationFacet 0x01ddB0260F65dDf653074CE316e679989F09F092
+  priceFeedAggregatorFacet 0xC16aAF5d62690192578e9AD34233134588C753b4
+  stabilityPoolFacet 0x3f0b2d5DF89FC6e3ae17Db33e293c6fEf282dD28
+  nexusYieldManagerFacet 0x979969278fE38da9835a504e80b2c2e5FA041976
+  initializer 0xba1b863295df2d1d4cd2f1B2993e46dBb8d25244
+  satoshiPeriphery 0xD6a238ABb7467398c3AE33687acC81Dc99C241f2
+  gasPool 0x2659e82938F061a088a190b914d5eF1EbAD795A3
+  debtToken 0xD07a57DF618562A99DDf34c3Fcdadb1b143381f6
+  rewardManager 0x14883f327c2a99dc300C799670794F186780c41E
+  communityIssuance 0xaFb126FFAd30fdB2553eDd0655616A665d5c86Cb
+  oshiToken 0x84be528F4E8d7916179F64433A7f2a6d10D04C1b
+  sortedTrovesBeacon 0x2102a0047d81765a591D7e3965bf15ad5c044914
+  troveManagerBeacon 0xead01Cd42603223D001B6b79414d8a8834Ad530b
+  rewardManager 0x14883f327c2a99dc300C799670794F186780c41E
+  oshiToken 0x84be528F4E8d7916179F64433A7f2a6d10D04C1b
+  communityIssuance 0xaFb126FFAd30fdB2553eDd0655616A665d5c86Cb
 
 ## Setting up 1 EVM.
 
 ==========================
 
-Chain 17000
+Chain 421614
 
-Estimated gas price: 0.512645649 gwei
+Estimated gas price: 0.200000001 gwei
 
-Estimated total gas used for script: 54761912
+Estimated total gas used for script: 55054671
 
-Estimated amount required: 0.028073455917720888 ETH
+Estimated amount required: 0.011010934255054671 ETH
 
 ==========================
 
@@ -269,7 +269,7 @@ Estimated amount required: 0.028073455917720888 ETH
 
 ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
 
-Transactions saved to: /Users/abner.huang/Documents/satoshi-v2/broadcast/Deploy.eth-holesky.s.sol/17000/run-latest.json
+Transactions saved to: /Users/abner.huang/Documents/satoshi-v2/broadcast/Deploy.arb-sepolia.s.sol/421614/run-latest.json
 
-Sensitive values saved to: /Users/abner.huang/Documents/satoshi-v2/cache/Deploy.eth-holesky.s.sol/17000/run-latest.json
+Sensitive values saved to: /Users/abner.huang/Documents/satoshi-v2/cache/Deploy.arb-sepolia.s.sol/421614/run-latest.json
 

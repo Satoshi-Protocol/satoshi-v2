@@ -51,9 +51,9 @@ import {GasPool} from "../src/core/GasPool.sol";
 import {IGasPool} from "../src/core/interfaces/IGasPool.sol";
 import {Config} from "../src/core/Config.sol";
 import {Deployer} from "./Deployer.sol";
-import "./configs/Config.eth-sepolia.sol";
+import "./configs/Config.testnet.sol";
 
-contract DeployEthSepoliaScript is Deployer {
+contract DeployEthHoleskyScript is Deployer {
     string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN";
     string constant DEBT_TOKEN_SYMBOL = "TESTSAT";
     address internal LZ_ENDPOINT;
@@ -67,9 +67,9 @@ contract DeployEthSepoliaScript is Deployer {
         OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
         assert(OWNER_PRIVATE_KEY != 0);
         OWNER = vm.addr(OWNER_PRIVATE_KEY);
-        LZ_ENDPOINT = ETH_SEPOLIA_LZ_ENDPOINT;
+        LZ_ENDPOINT = ETH_HOLESKY_LZ_ENDPOINT;
         assert(LZ_ENDPOINT != address(0));
-        LZ_EID = ETH_SEPOLIA_LZ_EID;
+        LZ_EID = ETH_HOLESKY_LZ_EID;
         assert(LZ_ENDPOINT != address(0));
     }
 

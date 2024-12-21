@@ -6,18 +6,5 @@
   "solidity.formatter": "forge",
   "solidity.compileUsingRemoteVersion": "v0.8.20+commit.a1b79de6",
   "solidity.packageDefaultDependenciesContractsDirectory": "src",
-  "solidity.packageDefaultDependenciesDirectory": "lib",
-  "solidity.remappings": [
-    "@solidstate/contracts=lib/solidstate-solidity/contracts",
-    "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
-    "@openzeppelin/contracts-upgradeable=lib/openzeppelin-contracts-upgradeable/contracts",
-    "@layerzerolabs/solidity-examples=lib/solidity-examples",
-    "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
-    "@api3/contracts=lib/contracts/contracts",
-    "solmate=lib/solmate/src",
-    "@layerzerolabs/oapp-evm/=lib/devtools/packages/oapp-evm/",
-    "@layerzerolabs/lz-evm-protocol-v2/=lib/layerzero-v2/packages/layerzero-v2/evm/protocol",
-    "@layerzerolabs/oft-evm/=lib/devtools/packages/oft-evm/",
-    "@layerzerolabs/oapp-upgradeable/contracts=lib/LayerZero-v2.git/oapp/contracts"
-  ]
+  "solidity.packageDefaultDependenciesDirectory": "lib"
 }

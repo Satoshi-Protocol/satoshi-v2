@@ -1,24 +1,275 @@
+Compiling 1 files with Solc 0.8.22
+Solc 0.8.22 finished in 7.34s
+Compiler run successful with warnings:
+Warning (8760): This declaration has the same name as another declaration.
+   --> src/core/facets/StabilityPoolFacet.sol:412:18:
+    |
+412 |         returns (uint256 P, uint256 G, uint128 scale, uint128 epoch)
+    |                  ^^^^^^^^^
+Note: The other declaration is here:
+   --> src/core/facets/StabilityPoolFacet.sol:447:5:
+    |
+447 |     function P() external view returns (uint256) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2519): This declaration shadows an existing declaration.
+   --> script/Deployer.sol:578:9:
+    |
+578 |         IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+   --> script/Deployer.sol:625:5:
+    |
+625 |     function stabilityPoolProxy() public view returns (IStabilityPoolFacet) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2519): This declaration shadows an existing declaration.
+   --> script/Deployer.sol:585:9:
+    |
+585 |         IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+   --> script/Deployer.sol:625:5:
+    |
+625 |     function stabilityPoolProxy() public view returns (IStabilityPoolFacet) {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+ --> node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity/contracts/proxy/diamond/fallback/IDiamondFallback.sol:7:1:
+  |
+7 | interface IDiamondFallback is IDiamondBase {
+  | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+ --> node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity/contracts/proxy/IProxy.sol:8:5:
+  |
+8 |     fallback() external payable;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (3628): This contract has a payable fallback function, but no receive ether function. Consider adding a receive ether function.
+  --> node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity/contracts/proxy/diamond/fallback/DiamondFallback.sol:13:1:
+   |
+13 | abstract contract DiamondFallback is
+   | ^ (Relevant source part starts here and spans across multiple lines).
+Note: The payable fallback function is defined here.
+  --> node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity/contracts/proxy/Proxy.sol:19:5:
+   |
+19 |     fallback() external payable virtual {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (5740): Unreachable code.
+   --> script/Deployer.sol:474:9:
+    |
+474 |         vm.startPrank(deployer);
+    |         ^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:133:33:
+    |
+133 |     function _deploySatoshiXApp(address deployer) internal {
+    |                                 ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:161:45:
+    |
+161 |     function _deployBorrowerOperationsFacet(address deployer) internal returns (address, bytes4[] memory) {
+    |                                             ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:188:31:
+    |
+188 |     function _deployCoreFacet(address deployer) internal returns (address, bytes4[] memory) {
+    |                               ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:209:34:
+    |
+209 |     function _deployFactoryFacet(address deployer) internal returns (address, bytes4[] memory) {
+    |                                  ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:223:38:
+    |
+223 |     function _deployLiquidationFacet(address deployer) internal returns (address, bytes4[] memory) {
+    |                                      ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:235:46:
+    |
+235 |     function _deployPriceFeedAggregatorFacet(address deployer) internal returns (address, bytes4[] memory) {
+    |                                              ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:248:40:
+    |
+248 |     function _deployStabilityPoolFacet(address deployer) internal returns (address, bytes4[] memory) {
+    |                                        ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:282:44:
+    |
+282 |     function _deployNexusYieldManagerFacet(address deployer) internal returns (address, bytes4[] memory) {
+    |                                            ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:320:33:
+    |
+320 |     function _deployInitializer(address deployer) internal {
+    |                                 ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:345:9:
+    |
+345 |         uint32 eid,
+    |         ^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:392:9:
+    |
+392 |         address deployer,
+    |         ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:408:31:
+    |
+408 |     function _satoshiXAppInit(address deployer) internal {
+    |                               ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:436:26:
+    |
+436 |     function _deployWETH(address deployer) internal {
+    |                          ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:479:9:
+    |
+479 |         address owner,
+    |         ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:509:32:
+    |
+509 |     function _deployOracleMock(address deployer, uint8 decimals, uint256 version) internal returns (address) {
+    |                                ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:516:54:
+    |
+516 |     function _setPriceFeedToPriceFeedAggregatorProxy(address owner, IERC20 collateral, IPriceFeed priceFeed) internal {
+    |                                                      ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:523:36:
+    |
+523 |     function _registerTroveManager(address owner, ITroveManager _troveManager) internal {
+    |                                    ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:545:48:
+    |
+545 |     function _setTMCommunityIssuanceAllocation(address owner, ITroveManager troveManagerBeaconProxy) internal {
+    |                                                ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:555:48:
+    |
+555 |     function _setSPCommunityIssuanceAllocation(address owner) internal {
+    |                                                ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:565:31:
+    |
+565 |     function _setTMRewardRate(address owner, ITroveManager troveManagerBeaconProxy) internal {
+    |                               ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:565:46:
+    |
+565 |     function _setTMRewardRate(address owner, ITroveManager troveManagerBeaconProxy) internal {
+    |                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:576:31:
+    |
+576 |     function _setSPRewardRate(address owner) internal {
+    |                               ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:583:33:
+    |
+583 |     function _setClaimStartTime(address owner, uint32 _claimStartTime) internal {
+    |                                 ^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:590:33:
+    |
+590 |     function _deployHintHelpers(address deployer) internal returns (address) {
+    |                                 ^^^^^^^^^^^^^^^^
+
+Warning (5667): Unused function parameter. Remove or comment out the variable name to silence this warning.
+   --> script/Deployer.sol:599:29:
+    |
+599 |     function _deployGasPool(address deployer) internal {
+    |                             ^^^^^^^^^^^^^^^^
+
+Warning (2018): Function state mutability can be restricted to view
+  --> script/Deployer.sol:93:5:
+   |
+93 |     function consoleAllContract() internal {
+   |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Warning (2018): Function state mutability can be restricted to view
+   --> script/Deployer.sol:607:5:
+    |
+607 |     function assertContractAddressHasCode(address contractAddress) public {
+    |     ^ (Relevant source part starts here and spans across multiple lines).
+
+Script ran successfully.
 
 == Logs ==
   deployer: 0xD26C9387F92EEa2cD030440A0799E403B225B8dD
-  weth 0x6DE2Bd6a834C1552E5809F4A706348f37D730621
-  satoshiXApp 0x7254F76813bA19A227CBa082ea5beA504fE7828d
-  borrowerOperationsFacet 0xA8Bd5454534cC3522a0976C0F4747d2f83d55B1a
-  coreFacet 0xed8E29De731a0cE8D866127DB42f1A849B438b9D
-  factoryFacet 0xfcfF485f039061f3823678231eB1498DbD795F67
-  liquidationFacet 0xb35E4ba44e0d916E2e21ab4B5d818Ca5fEeb06E5
-  priceFeedAggregatorFacet 0x9633ad8322122d8AC1A1837dad98902748AD4614
-  stabilityPoolFacet 0x8895D8Cf18635B7A76211E4Ed97B71Cce01244F9
-  nexusYieldManagerFacet 0xcA83E9aD6192f59fA46CB1dbB7ebD920c86bc5F5
-  initializer 0x6987fd54790299cf65Db227263ee5C510eFB113b
-  satoshiPeriphery 0x886C79099Ee34805F8B4E2288E4CCb2c75cF78C0
-  gasPool 0xE03a7d04461ce6a7dBC44b1E2D4F307042AE2A44
-  debtToken 0x45186cf2F66f43cf0a777a753b4ABBcD812204E6
-  rewardManager 0x87da36Bc35849454Eb00713d8eBFB1cae9b3B6D8
-  communityIssuance 0x2fa7988e6936bb320F22fb9d48033EcE23416D30
-  oshiToken 0xE96B1B9480268ceF47e893dD6cD6A15837F9e825
-  sortedTrovesBeacon 0x6633D67716783Ccf182E46409941D2c46B856f49
-  troveManagerBeacon 0x6aB2e8E3C3A059f8D41335f301F1a63428C1FafC
-  rewardManager 0x87da36Bc35849454Eb00713d8eBFB1cae9b3B6D8
-  oshiToken 0xE96B1B9480268ceF47e893dD6cD6A15837F9e825
-  communityIssuance 0x2fa7988e6936bb320F22fb9d48033EcE23416D30
+  weth 0xb5Bdd420B537e7aCeFfdB8Ac4B5cE60D27e3c646
+  satoshiXApp 0xeC3Ebdf938Dc6613b99006941D7Bf20b67Fddf8a
+  borrowerOperationsFacet 0x87739884045C2148E28baDFf9998F69484a4023a
+  coreFacet 0x36Bb526AcA013EBf82A6C80Bf7726deb88B212A9
+  factoryFacet 0xc3722B7ca55F71677116cF01d2915B5e06040157
+  liquidationFacet 0xB0B72A10227e4c3592f586C86e59e1d8681722A0
+  priceFeedAggregatorFacet 0x66F0486269350CFdc79A3C9D2341E5A2c66c2843
+  stabilityPoolFacet 0x73ffBd0486D43Ffb1e2446E1621bd7dD835F1c85
+  nexusYieldManagerFacet 0x9747D0FF50aF602Cc92c2AC0df6a0A549f2CD75C
+  initializer 0x4900eF0DfAF6f681438f243b6A5663F7CbbEa035
+  satoshiPeriphery 0x3ceE176f0f36B649CDdcD6d065ba4098B7726509
+  gasPool 0xc391a0d2e09215671a006fD0286dbFD141Db9bA8
+  debtToken 0x512F0966853cE4f7F64094E42426a0deB16085Fb
+  rewardManager 0x2eBc73D7C606ee7e11011EA556Fe1FECb055B278
+  communityIssuance 0x63acd82FFC22Ba1247A25877fA5B0B95C2eb1d39
+  oshiToken 0xf51A3CF821D99c44E473f11918a6CB50D55a7930
+  sortedTrovesBeacon 0x9115441b819752FE3A274654D42464C7D4fc5D62
+  troveManagerBeacon 0xef505b1f1800Cf1e72fb23343C2668C755f57938
+  rewardManager 0x2eBc73D7C606ee7e11011EA556Fe1FECb055B278
+  oshiToken 0xf51A3CF821D99c44E473f11918a6CB50D55a7930
+  communityIssuance 0x63acd82FFC22Ba1247A25877fA5B0B95C2eb1d39
+
+## Setting up 1 EVM.
+
+==========================
+
+Chain 11155420
+
+Estimated gas price: 0.00100055 gwei
+
+Estimated total gas used for script: 54544717
+
+Estimated amount required: 0.00005457471659435 ETH
+
+==========================
+
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /Users/abner.huang/Documents/satoshi-v2/broadcast/Deploy.op-sepolia.s.sol/11155420/run-latest.json
+
+Sensitive values saved to: /Users/abner.huang/Documents/satoshi-v2/cache/Deploy.op-sepolia.s.sol/11155420/run-latest.json
+

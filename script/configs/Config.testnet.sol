@@ -3,6 +3,17 @@ pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
+/* LayerZero Settings */
+/* Ref: https://docs.layerzero.network/v2/developers/evm/technical-reference/deployed-contracts */
+address constant ETH_HOLESKY_LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
+uint32 constant ETH_HOLESKY_LZ_EID = 40217;
+
+address constant ARB_SEPOLIA_LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
+uint32 constant ARB_SEPOLIA_LZ_EID = 40231;
+
+address constant OP_SEPOLIA_LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
+uint32 constant OP_SEPOLIA_LZ_EID = 40232;
+
 /* Deploy setup */
 uint32 constant SP_CLAIM_START_TIME = 0;
 uint32 constant TM_CLAIM_START_TIME = 0;

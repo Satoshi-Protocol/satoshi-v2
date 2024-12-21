@@ -51,7 +51,7 @@ import {GasPool} from "../src/core/GasPool.sol";
 import {IGasPool} from "../src/core/interfaces/IGasPool.sol";
 import {Config} from "../src/core/Config.sol";
 import {Deployer} from "./Deployer.sol";
-import "./configs/Config.op-sepolia.sol";
+import "./configs/Config.testnet.sol";
 
 contract DeployOpSepoliaScript is Deployer {
     string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN";

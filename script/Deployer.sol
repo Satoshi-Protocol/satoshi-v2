@@ -54,10 +54,7 @@ import {Config} from "../src/core/Config.sol";
 import {RoundData, OracleMock} from "../test/mocks/OracleMock.sol";
 import {WETH9} from "../test/mocks/WETH9.sol";
 import {ERC20Mock} from "../test/mocks/ERC20Mock.sol";
-
-
 import "./configs/Config.testnet.sol";
-import "./configs/Config.arb-sepolia.sol";
 
 contract Deployer is Script, IERC2535DiamondCutInternal {
     address internal DEPLOYER;

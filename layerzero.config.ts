@@ -8,28 +8,29 @@ import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/tool
 //     address: '0x45186cf2F66f43cf0a777a753b4ABBcD812204E6',
 // }
 
+export const holeskyContract: OmniPointHardhat = {
+    eid: EndpointId.HOLESKY_V2_TESTNET,
+    contractName: 'DebtToken',
+    address: '0x3a054EA12a0EFFE69c7D3c1F44f87Ef0815045a7',
+}
+
+
 export const arbitrumSepoliaContract: OmniPointHardhat = {
     eid: EndpointId.ARBITRUM_V2_TESTNET,
     contractName: 'DebtToken',
-    address: '0x3ceE176f0f36B649CDdcD6d065ba4098B7726509',
+    address: '0xD07a57DF618562A99DDf34c3Fcdadb1b143381f6',
 }
 
-// const optimismSepoliaContract: OmniPointHardhat = {
-//     eid: EndpointId.OPTSEP_V2_TESTNET,
-//     contractName: 'DebtToken',
-//     address: '0x45186cf2F66f43cf0a777a753b4ABBcD812204E6',
-// }
+export const optimismSepoliaContract: OmniPointHardhat = {
+    eid: EndpointId.OPTSEP_V2_TESTNET,
+    contractName: 'DebtToken',
+    address: '0x512F0966853cE4f7F64094E42426a0deB16085Fb',
+}
 
 // const baseSepoliaContract: OmniPointHardhat = {
 //     eid: EndpointId.BASE_V2_TESTNET,
 //     contractName: 'DebtToken',
 // }
-
-export const holeskyContract: OmniPointHardhat = {
-    eid: EndpointId.HOLESKY_V2_TESTNET,
-    contractName: 'DebtToken',
-    address: '0x64F6Ca5F68D940384764c68274FD682E4e1677B5',
-}
 
 
 // send & received library related to the DVN on lz
@@ -43,6 +44,9 @@ const config: OAppOmniGraphHardhat = {
         {
             contract: holeskyContract,
         },
+        {
+            contract: optimismSepoliaContract,
+        },
         // {
         //     contract: baseSepoliaContract,
         // },
@@ -55,31 +59,28 @@ const config: OAppOmniGraphHardhat = {
         {
             from: arbitrumSepoliaContract,
             to: holeskyContract,
-            // config: {
-            //     sendLibrary: '0xcc1ae8Cf5D3904Cef3360A9532B477529b177cCE',
-            // },
         },
-        // {
-        //     from: sepoliaContract,
-        //     to: arbitrumSepoliaContract,
-        // },
+
+        {
+            from: arbitrumSepoliaContract,
+            to: optimismSepoliaContract,
+        },
         {
             from: holeskyContract,
             to: arbitrumSepoliaContract,
         },
-        // {
-        //     from: holeskyContract,
-        //     to: arbitrumSepoliaContract,
-        // },
-        // {
-        //     from: arbitrumSepoliaContract,
-        //     to: sepoliaContract,
-        // },
-
-        // {
-        //     from: arbitrumSepoliaContract,
-        //     to: holeskyContract,
-        // },
+        {
+            from: holeskyContract,
+            to: optimismSepoliaContract,
+        },
+        {
+            from: optimismSepoliaContract,
+            to: arbitrumSepoliaContract,
+        },
+        {
+            from: optimismSepoliaContract,
+            to: holeskyContract,
+        },
     ],
 }
 
