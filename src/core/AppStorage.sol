@@ -104,7 +104,6 @@ library AppStorage {
         mapping(address => AssetConfig) assetConfigs;
         mapping(address => bool) isAssetSupported;
         mapping(address => uint256) dailyMintCount;
-        mapping(address => uint256) assetPrice;
     }
 
     function layout() internal pure returns (Layout storage s) {

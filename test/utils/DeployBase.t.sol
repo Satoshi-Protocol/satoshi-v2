@@ -348,7 +348,7 @@ abstract contract DeployBase is Test {
         selectors[27] = INexusYieldManagerFacet.dailyMintCount.selector;
         selectors[28] = INexusYieldManagerFacet.isAssetSupported.selector;
         vm.stopPrank();
-        return (address(stabilityPoolFacet), selectors);
+        return (address(nexusYieldManagerFacet), selectors);
     }
 
     function _deployInitializer(address deployer) internal {
@@ -683,7 +683,7 @@ abstract contract DeployBase is Test {
         return oshiToken;
     }
 
-    function nexusYieldProxy() public view returns (INexusYieldManagerFacet) {
+    function getNexusYieldProxy() public view returns (INexusYieldManagerFacet) {
         return INexusYieldManagerFacet(address(satoshiXApp));
     }
 

@@ -44,7 +44,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     function setAssetConfig(address asset, AssetConfig calldata assetConfig_) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (assetConfig_.feeIn >= Config.BASIS_POINTS_DIVISOR || assetConfig_.feeOut >= Config.BASIS_POINTS_DIVISOR) {
-            revert InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
+            revert INexusYieldManagerFacet.InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
         }
         AssetConfig storage assetConfig = s.assetConfigs[asset];
         assetConfig.decimals = assetConfig_.decimals;
@@ -384,7 +384,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param amount The amount of debt tokens used for swap.
      * @return The amount of asset that would be taken from the user.
      */
-    function previewSwapOut(address asset, uint256 amount) external view returns (uint256, uint256) {
+    function previewSwapOut(address asset, uint256 amount) external returns (uint256, uint256) {
         _ensureNonzeroAmount(amount);
         _ensureAssetSupported(asset);
 
@@ -400,7 +400,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param assetAmount The amount of stable tokens provided for the swap.
      * @return The amount of debtToken that would be sent to the receiver.
      */
-    function previewSwapIn(address asset, uint256 assetAmount) external view returns (uint256, uint256) {
+    function previewSwapIn(address asset, uint256 assetAmount) external returns (uint256, uint256) {
         _ensureNonzeroAmount(assetAmount);
         _ensureAssetSupported(asset);
 
@@ -458,7 +458,6 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      */
     function _previewTokenUSDAmount(address asset, uint256 amount, FeeDirection direction)
         internal
-        view
         returns (uint256)
     {
         return (convertAssetToDebtTokenAmount(asset, amount) * _getPriceInUSD(asset, direction)) / Config.MANTISSA_ONE;
@@ -471,7 +470,6 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      */
     function _previewAssetAmountFromDebtToken(address asset, uint256 amount, FeeDirection direction)
         internal
-        view
         returns (uint256)
     {
         return (convertDebtTokenToAssetAmount(asset, amount) * Config.MANTISSA_ONE) / _getPriceInUSD(asset, direction);
@@ -482,7 +480,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @dev This function gets the price of the asset in USD.
      * @return The price in USD, adjusted based on the selected direction.
      */
-    function _getPriceInUSD(address asset, FeeDirection direction) internal view returns (uint256) {
+    function _getPriceInUSD(address asset, FeeDirection direction) internal returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         AssetConfig storage assetConfig = s.assetConfigs[asset];
         if (!assetConfig.isUsingOracle) {
@@ -490,7 +488,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         }
 
         // get price with decimals 18
-        uint256 price = s.assetPrice[asset];
+        uint256 price = s.assetConfigs[asset].oracle.fetchPrice(IERC20(asset));
 
         if (price > assetConfig.maxPrice || price < assetConfig.minPrice) {
             revert InvalidPrice(price);

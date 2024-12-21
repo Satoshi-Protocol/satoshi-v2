@@ -232,7 +232,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
             "Debt: Cannot transfer tokens directly to the Debt token contract or the zero address"
         );
         require(
-            _recipient != satoshiXApp && !troveManager[ITroveManager(_recipient)],
+            !troveManager[ITroveManager(_recipient)],
             "Debt: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
         );
     }

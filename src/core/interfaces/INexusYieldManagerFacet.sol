@@ -100,7 +100,7 @@ interface INexusYieldManagerFacet {
     error ZeroAmount();
 
     /// @notice thrown when the user doesn't have enough debtToken balance to provide for the amount of stable tokens he wishes to get
-error NotEnoughDebtToken(uint256 debtBalance, uint256 stableTknAmount);
+    error NotEnoughDebtToken(uint256 debtBalance, uint256 stableTknAmount);
 
     /// @notice thrown when the amount of debtToken to be burnt exceeds the debtTokenMinted amount
     error DebtTokenMintedUnderflow(uint256 debtTokenMinted, uint256 stableTknAmount);
