@@ -12,7 +12,7 @@ const targetAmount = '10';
 // const sourceContract = arbitrumSepoliaContract;
 // const destinationContract = optimismSepoliaContract;
 
-const sourceContract = optimismSepoliaContract;
+const sourceContract = holeskyContract;
 const destinationContract = arbitrumSepoliaContract;
 
 task('lz:oft:send', 'Send tokens cross-chain using LayerZero technology')

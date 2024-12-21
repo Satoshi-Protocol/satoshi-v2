@@ -54,8 +54,8 @@ import {Deployer} from "./Deployer.sol";
 import "./configs/Config.testnet.sol";
 
 contract DeployArbSepoliaScript is Deployer {
-    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN";
-    string constant DEBT_TOKEN_SYMBOL = "TESTSAT";
+    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN_ARB";
+    string constant DEBT_TOKEN_SYMBOL = "TESTSAT.arb";
     address internal LZ_ENDPOINT;
     uint32 internal LZ_EID;
 

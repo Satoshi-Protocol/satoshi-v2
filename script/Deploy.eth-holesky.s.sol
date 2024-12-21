@@ -54,10 +54,10 @@ import {Deployer} from "./Deployer.sol";
 import "./configs/Config.testnet.sol";
 
 contract DeployEthHoleskyScript is Deployer {
-    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN";
-    string constant DEBT_TOKEN_SYMBOL = "TESTSAT";
-    address internal LZ_ENDPOINT;
-    uint32 internal LZ_EID;
+    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN_HOLESKY";
+    string constant DEBT_TOKEN_SYMBOL = "TESTSAT.holesky";
+    address internal LZ_ENDPOINT = ETH_HOLESKY_LZ_ENDPOINT;
+    uint32 internal LZ_EID = ETH_HOLESKY_LZ_EID;
 
     function setUp() external {
         DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
@@ -67,13 +67,12 @@ contract DeployEthHoleskyScript is Deployer {
         OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
         assert(OWNER_PRIVATE_KEY != 0);
         OWNER = vm.addr(OWNER_PRIVATE_KEY);
-        LZ_ENDPOINT = ETH_HOLESKY_LZ_ENDPOINT;
         assert(LZ_ENDPOINT != address(0));
-        LZ_EID = ETH_HOLESKY_LZ_EID;
         assert(LZ_ENDPOINT != address(0));
     }
 
     function run() public {
+        // vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         console.log("deployer:", DEPLOYER);
         _deployWETH(DEPLOYER);
         _deploySortedTrovesBeacon(DEPLOYER);

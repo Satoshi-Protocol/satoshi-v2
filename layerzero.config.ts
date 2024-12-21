@@ -11,7 +11,7 @@ import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/tool
 export const holeskyContract: OmniPointHardhat = {
     eid: EndpointId.HOLESKY_V2_TESTNET,
     contractName: 'DebtToken',
-    address: '0x3a054EA12a0EFFE69c7D3c1F44f87Ef0815045a7',
+    address: '0x4716c7b4fb7d8eD75B4D8904209b213308de837f',
 }
 
 
