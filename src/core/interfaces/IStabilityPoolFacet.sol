@@ -189,8 +189,4 @@ interface IStabilityPoolFacet {
     /// @notice Sets the reward rate
     /// @param _newRewardRate The new reward rate
     function setRewardRate(uint128 _newRewardRate) external;
-
-    /// @notice Returns the maximum reward rate
-    /// @return The maximum reward rate
-    function MAX_REWARD_RATE() external view returns (uint128);
 }

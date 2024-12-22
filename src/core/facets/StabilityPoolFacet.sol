@@ -17,7 +17,6 @@ import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
 contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
     using SafeERC20 for IERC20;
     using StabilityPoolLib for AppStorage.Layout;
-    uint128 public constant MAX_REWARD_RATE = 63419583967529168; // 10_000_000e18 / (5 * 31536000)
 
     function setSPRewardRate(uint128 _newRewardRate) external onlyRole(Config.OWNER_ROLE) {
         require(_newRewardRate <= Config.SP_MAX_REWARD_RATE, "StabilityPool: Reward rate too high");
@@ -452,7 +451,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
     function setRewardRate(uint128 _newRewardRate) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
 
-        require(_newRewardRate <= MAX_REWARD_RATE, "StabilityPool: Reward rate too high");
+        require(_newRewardRate <= Config.SP_MAX_REWARD_RATE, "StabilityPool: Reward rate too high");
         s._triggerOSHIIssuance();
         s.spRewardRate = _newRewardRate;
         emit RewardRateUpdated(_newRewardRate);

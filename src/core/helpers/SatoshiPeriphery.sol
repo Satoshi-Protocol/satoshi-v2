@@ -323,9 +323,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
             );
 
             // Step 2: Quote the fee
-            // TODO: payInLzToken
             require(lzSendParam.fee.lzTokenFee == 0, "SatoshiPeriphery: lzTokenFee not supported");
-            // TODO: check collateral token is native token?
             require(msg.value == lzSendParam.fee.nativeFee, "SatoshiPeriphery: nativeFee not sent");
 
             MessagingFee memory expectFee = debtToken.quoteSend(_sendParam, lzSendParam.fee.lzTokenFee > 0);

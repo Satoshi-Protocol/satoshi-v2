@@ -60,7 +60,6 @@ const config: OAppOmniGraphHardhat = {
             from: arbitrumSepoliaContract,
             to: holeskyContract,
         },
-
         {
             from: arbitrumSepoliaContract,
             to: optimismSepoliaContract,
