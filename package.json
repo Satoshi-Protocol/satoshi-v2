@@ -23,7 +23,9 @@
     "test": "$npm_execpath run test:forge && $npm_execpath run test:hardhat",
     "test:forge": "forge test",
     "test:hardhat": "hardhat test",
-    "wire:debt-token": "hardhat lz:oapp:wire --oapp-config layerzero.config.ts"
+    "test:compile": "hardhat compile",
+    "lz:set": "hardhat lz:oapp:wire --oapp-config layerzero.config.ts",
+    "test:send": "hardhat lz:oft:send"
   },
   "resolutions": {
     "ethers": "^5.7.2",
@@ -57,7 +59,7 @@
     "@types/mocha": "^10.0.6",
     "@types/node": "~18.18.14",
     "chai": "^4.4.1",
-    "dotenv": "^16.4.1",
+    "dotenv": "^16.4.5",
     "eslint": "^8.55.0",
     "eslint-plugin-jest-extended": "~2.0.0",
     "ethers": "^5.7.2",
@@ -69,6 +71,7 @@
     "solhint": "^4.1.1",
     "solidity-bytes-utils": "^0.8.2",
     "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
     "typescript": "^5.4.4"
   },
   "engines": {

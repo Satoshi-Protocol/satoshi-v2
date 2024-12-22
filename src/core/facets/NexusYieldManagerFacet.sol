@@ -2,7 +2,6 @@
 pragma solidity ^0.8.19;
 
 import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {ReentrancyGuard} from "@solidstate/contracts/security/reentrancy_guard/ReentrancyGuard.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
@@ -21,7 +20,7 @@ import {Config} from "../Config.sol";
  * https://github.com/VenusProtocol/venus-protocol/blob/develop/contracts/PegStability/PegStability.sol
  * @notice Contract for swapping stable token for debtToken token and vice versa to maintain the peg stability between them.
  */
-contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInternal, OwnableInternal, ReentrancyGuard {
+contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInternal, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
     /**
@@ -29,7 +28,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      */
     modifier isActive() {
         AppStorage.Layout storage s = AppStorage.layout();
-        if (s.isPaused) revert Paused();
+        if (s.isNymPaused) revert Paused();
         _;
     }
 
@@ -42,10 +41,10 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         _;
     }
 
-    function setAssetConfig(address asset, AssetConfig calldata assetConfig_) external onlyOwner {
+    function setAssetConfig(address asset, AssetConfig calldata assetConfig_) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (assetConfig_.feeIn >= Config.BASIS_POINTS_DIVISOR || assetConfig_.feeOut >= Config.BASIS_POINTS_DIVISOR) {
-            revert InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
+            revert INexusYieldManagerFacet.InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
         }
         AssetConfig storage assetConfig = s.assetConfigs[asset];
         assetConfig.decimals = assetConfig_.decimals;
@@ -80,7 +79,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param vault The address of the privileged vault.
      * @param amount The amount of token to transfer.
      */
-    function transerTokenToPrivilegedVault(address token, address vault, uint256 amount) external onlyOwner {
+    function transferTokenToPrivilegedVault(address token, address vault, uint256 amount) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (!s.isPrivileged[vault]) {
             revert NotPrivileged(vault);
@@ -343,10 +342,10 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     // @custom:event Emits NYMPaused event.
     function pause() external {
         AppStorage.Layout storage s = AppStorage.layout();
-        if (s.isPaused) {
+        if (s.isNymPaused) {
             revert AlreadyPaused();
         }
-        s.isPaused = true;
+        s.isNymPaused = true;
         emit NYMPaused(msg.sender);
     }
 
@@ -357,10 +356,10 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     // @custom:event Emits NYMResumed event.
     function resume() external {
         AppStorage.Layout storage s = AppStorage.layout();
-        if (!s.isPaused) {
+        if (!s.isNymPaused) {
             revert NotPaused();
         }
-        s.isPaused = false;
+        s.isNymPaused = false;
         emit NYMResumed(msg.sender);
     }
 
@@ -385,7 +384,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param amount The amount of debt tokens used for swap.
      * @return The amount of asset that would be taken from the user.
      */
-    function previewSwapOut(address asset, uint256 amount) external view returns (uint256, uint256) {
+    function previewSwapOut(address asset, uint256 amount) external returns (uint256, uint256) {
         _ensureNonzeroAmount(amount);
         _ensureAssetSupported(asset);
 
@@ -401,7 +400,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param assetAmount The amount of stable tokens provided for the swap.
      * @return The amount of debtToken that would be sent to the receiver.
      */
-    function previewSwapIn(address asset, uint256 assetAmount) external view returns (uint256, uint256) {
+    function previewSwapIn(address asset, uint256 assetAmount) external returns (uint256, uint256) {
         _ensureNonzeroAmount(assetAmount);
         _ensureAssetSupported(asset);
 
@@ -459,7 +458,6 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      */
     function _previewTokenUSDAmount(address asset, uint256 amount, FeeDirection direction)
         internal
-        view
         returns (uint256)
     {
         return (convertAssetToDebtTokenAmount(asset, amount) * _getPriceInUSD(asset, direction)) / Config.MANTISSA_ONE;
@@ -472,7 +470,6 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      */
     function _previewAssetAmountFromDebtToken(address asset, uint256 amount, FeeDirection direction)
         internal
-        view
         returns (uint256)
     {
         return (convertDebtTokenToAssetAmount(asset, amount) * Config.MANTISSA_ONE) / _getPriceInUSD(asset, direction);
@@ -483,7 +480,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @dev This function gets the price of the asset in USD.
      * @return The price in USD, adjusted based on the selected direction.
      */
-    function _getPriceInUSD(address asset, FeeDirection direction) internal view returns (uint256) {
+    function _getPriceInUSD(address asset, FeeDirection direction) internal returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         AssetConfig storage assetConfig = s.assetConfigs[asset];
         if (!assetConfig.isUsingOracle) {
@@ -491,7 +488,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         }
 
         // get price with decimals 18
-        uint256 price = s.assetPrice[asset];
+        uint256 price = s.assetConfigs[asset].oracle.fetchPrice(IERC20(asset));
 
         if (price > assetConfig.maxPrice || price < assetConfig.minPrice) {
             revert InvalidPrice(price);
@@ -617,6 +614,11 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         return s.assetConfigs[asset].dailyDebtTokenMintCap - s.dailyMintCount[asset];
     }
 
+    function dailyMintCount(address asset) external view returns (uint256) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.dailyMintCount[asset];
+    }
+
     // @notice Get the pending withdrawal amount and time for the given asset and account.
     function pendingWithdrawal(address asset, address account) external view returns (uint256, uint32) {
         AppStorage.Layout storage s = AppStorage.layout();
@@ -638,6 +640,16 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         }
 
         return (amounts, times);
+    }
+
+    function isNymPaused() external view returns (bool) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.isNymPaused;
+    }
+
+    function isAssetSupported(address asset) external view returns (bool) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.isAssetSupported[asset];
     }
 
     receive() external payable {}

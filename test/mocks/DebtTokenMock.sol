@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.0;
 
-import {SendParam} from "@layerzerolabs/oapp-upgradeable/contracts/oft/OFTCoreUpgradeable.sol";
+import {SendParam} from "@layerzerolabs-oapp-upgradeable/contracts/oft/OFTCoreUpgradeable.sol";
 import {DebtToken} from "../../src/core/DebtToken.sol";
 
 contract DebtTokenMock is DebtToken {

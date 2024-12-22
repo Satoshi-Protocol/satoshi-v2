@@ -12,7 +12,7 @@ import {
     OFTFeeDetail,
     MessagingReceipt,
     MessagingFee
-} from "@layerzerolabs/oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
@@ -44,7 +44,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         __Ownable_init(_owner);
         __UUPSUpgradeable_init_unchained();
-
     }
 
     receive() external payable {

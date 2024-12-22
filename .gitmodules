@@ -1,33 +1,15 @@
-[submodule "lib/forge-std"]
-	path = lib/forge-std
-	url = https://github.com/foundry-rs/forge-std
-[submodule "lib/pyth-sdk-solidity"]
-	path = lib/pyth-sdk-solidity
-	url = https://github.com/pyth-network/pyth-sdk-solidity
-[submodule "lib/contracts"]
-	path = lib/contracts
-	url = https://github.com/api3dao/contracts
-[submodule "lib/solmate"]
-	path = lib/solmate
-	url = https://github.com/transmissions11/solmate
-[submodule "lib/solidstate-solidity"]
-	path = lib/solidstate-solidity
+[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity"]
+	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity
 	url = https://github.com/solidstate-network/solidstate-solidity
-[submodule "lib/devtools"]
-	path = lib/devtools
-	url = https://github.com/LayerZero-Labs/devtools
-[submodule "lib/layerzero-v2"]
-	path = lib/layerzero-v2
-	url = https://github.com/LayerZero-Labs/layerzero-v2
-[submodule "lib/openzeppelin-contracts"]
-	path = lib/openzeppelin-contracts
-	url = https://github.com/OpenZeppelin/openzeppelin-contracts
-[submodule "lib/openzeppelin-contracts-upgradeable"]
-	path = lib/openzeppelin-contracts-upgradeable
-	url = https://github.com/OpenZeppelin/openzeppelin-contracts-upgradeable
-[submodule "lib/LayerZero-v2.git"]
-	path = lib/LayerZero-v2.git
+[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/contracts"]
+	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/contracts
+	url = https://github.com/api3dao/contracts
+[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/pyth-sdk-solidity"]
+	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/pyth-sdk-solidity
+	url = https://github.com/pyth-network/pyth-sdk-solidity
+[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solmate"]
+	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solmate
+	url = https://github.com/transmissions11/solmate
+[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git"]
+	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git
 	url = https://github.com/JorgeAtPaladin/LayerZero-v2.git
-[submodule "lib/solidity-bytes-utils"]
-	path = lib/solidity-bytes-utils
-	url = https://github.com/GNSPS/solidity-bytes-utils

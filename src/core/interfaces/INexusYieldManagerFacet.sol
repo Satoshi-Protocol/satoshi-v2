@@ -138,58 +138,216 @@ interface INexusYieldManagerFacet {
 
     error AssetNotEnough(uint256 assetAmount, uint256 transferAmount);
 
+    /**
+     * @notice Sets the configuration for a specific asset.
+     * @param asset The address of the asset.
+     * @param config The configuration parameters for the asset.
+     */
     function setAssetConfig(address asset, AssetConfig calldata config) external;
 
+    /**
+     * @notice Sunsets a specific asset, disabling its use.
+     * @param asset The address of the asset to sunset.
+     */
     function sunsetAsset(address asset) external;
 
+    /**
+     * @notice Swaps a specified amount of an asset for debt tokens.
+     * @param asset The address of the asset to swap.
+     * @param receiver The address to receive the debt tokens.
+     * @param assetAmount The amount of the asset to swap.
+     * @return The amount of debt tokens received.
+     */
     function swapIn(address asset, address receiver, uint256 assetAmount) external returns (uint256);
 
+    /**
+     * @notice Pauses the contract, disabling certain functions.
+     */
     function pause() external;
 
+    /**
+     * @notice Resumes the contract, re-enabling certain functions.
+     */
     function resume() external;
 
+    /**
+     * @notice Sets the privileged status of an account.
+     * @param account The address of the account.
+     * @param isPrivileged_ The privileged status to set.
+     */
     function setPrivileged(address account, bool isPrivileged_) external;
 
-    function transerTokenToPrivilegedVault(address token, address vault, uint256 amount) external;
+    /**
+     * @notice Transfers a specified amount of tokens to a privileged vault.
+     * @param token The address of the token to transfer.
+     * @param vault The address of the privileged vault.
+     * @param amount The amount of tokens to transfer.
+     */
+    function transferTokenToPrivilegedVault(address token, address vault, uint256 amount) external;
 
+    /**
+     * @notice Previews the amount of debt tokens that would be received for a specified amount of stable tokens.
+     * @param asset The address of the asset.
+     * @param stableTknAmount The amount of stable tokens.
+     * @return The amount of debt tokens and the fee.
+     */
     function previewSwapOut(address asset, uint256 stableTknAmount) external returns (uint256, uint256);
 
+    /**
+     * @notice Previews the amount of stable tokens that would be received for a specified amount of debt tokens.
+     * @param asset The address of the asset.
+     * @param stableTknAmount The amount of stable tokens.
+     * @return The amount of debt tokens and the fee.
+     */
     function previewSwapIn(address asset, uint256 stableTknAmount) external returns (uint256, uint256);
 
+    /**
+     * @notice Swaps a specified amount of stable tokens for debt tokens for a privileged account.
+     * @param asset The address of the asset.
+     * @param receiver The address to receive the debt tokens.
+     * @param stableTknAmount The amount of stable tokens to swap.
+     * @return The amount of debt tokens received.
+     */
     function swapOutPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
 
+    /**
+     * @notice Swaps a specified amount of debt tokens for stable tokens for a privileged account.
+     * @param asset The address of the asset.
+     * @param receiver The address to receive the stable tokens.
+     * @param stableTknAmount The amount of stable tokens to swap.
+     * @return The amount of debt tokens received.
+     */
     function swapInPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
 
+    /**
+     * @notice Schedules a swap out of a specified amount of an asset.
+     * @param asset The address of the asset.
+     * @param amount The amount of the asset to swap out.
+     * @return The scheduled time for the swap out.
+     */
     function scheduleSwapOut(address asset, uint256 amount) external returns (uint256);
 
+    /**
+     * @notice Withdraws a previously scheduled swap out.
+     * @param asset The address of the asset.
+     */
     function withdraw(address asset) external;
 
+    /**
+     * @notice Converts a specified amount of debt tokens to the equivalent amount of an asset.
+     * @param asset The address of the asset.
+     * @param amount The amount of debt tokens.
+     * @return The equivalent amount of the asset.
+     */
     function convertDebtTokenToAssetAmount(address asset, uint256 amount) external view returns (uint256);
 
+    /**
+     * @notice Converts a specified amount of an asset to the equivalent amount of debt tokens.
+     * @param asset The address of the asset.
+     * @param amount The amount of the asset.
+     * @return The equivalent amount of debt tokens.
+     */
     function convertAssetToDebtTokenAmount(address asset, uint256 amount) external view returns (uint256);
 
+    /**
+     * @notice Returns the oracle for a specific asset.
+     * @param asset The address of the asset.
+     * @return The oracle interface.
+     */
     function oracle(address asset) external view returns (IPriceFeedAggregatorFacet);
 
+    /**
+     * @notice Returns the incoming fee for a specific asset.
+     * @param asset The address of the asset.
+     * @return The incoming fee.
+     */
     function feeIn(address asset) external view returns (uint256);
 
+    /**
+     * @notice Returns the outgoing fee for a specific asset.
+     * @param asset The address of the asset.
+     * @return The outgoing fee.
+     */
     function feeOut(address asset) external view returns (uint256);
 
+    /**
+     * @notice Returns the mint cap for debt tokens for a specific asset.
+     * @param asset The address of the asset.
+     * @return The mint cap.
+     */
     function debtTokenMintCap(address asset) external view returns (uint256);
 
+    /**
+     * @notice Returns the daily mint cap for debt tokens for a specific asset.
+     * @param asset The address of the asset.
+     * @return The daily mint cap.
+     */
     function dailyDebtTokenMintCap(address asset) external view returns (uint256);
 
+    /**
+     * @notice Returns the total amount of debt tokens minted for a specific asset.
+     * @param asset The address of the asset.
+     * @return The total amount of debt tokens minted.
+     */
     function debtTokenMinted(address asset) external view returns (uint256);
 
+    /**
+     * @notice Returns whether an oracle is being used for a specific asset.
+     * @param asset The address of the asset.
+     * @return True if an oracle is being used, false otherwise.
+     */
     function isUsingOracle(address asset) external view returns (bool);
 
+    /**
+     * @notice Returns the waiting period for swaps for a specific asset.
+     * @param asset The address of the asset.
+     * @return The waiting period.
+     */
     function swapWaitingPeriod(address asset) external view returns (uint256);
 
+    /**
+     * @notice Returns the remaining daily mint cap for debt tokens for a specific asset.
+     * @param asset The address of the asset.
+     * @return The remaining daily mint cap.
+     */
     function debtTokenDailyMintCapRemain(address asset) external view returns (uint256);
 
+    /**
+     * @notice Returns the pending withdrawal amount and time for a specific asset and account.
+     * @param asset The address of the asset.
+     * @param account The address of the account.
+     * @return The pending withdrawal amount and time.
+     */
     function pendingWithdrawal(address asset, address account) external view returns (uint256, uint32);
 
+    /**
+     * @notice Returns the pending withdrawals for multiple assets and an account.
+     * @param assets The array of asset addresses.
+     * @param account The address of the account.
+     * @return The array of pending withdrawal amounts and times.
+     */
     function pendingWithdrawals(address[] memory assets, address account)
         external
         view
         returns (uint256[] memory, uint32[] memory);
+
+    /**
+     * @notice Returns whether the contract is paused.
+     * @return True if the contract is paused, false otherwise.
+     */
+    function isNymPaused() external view returns (bool);
+    
+    /**
+     * @notice Returns the daily mint count for a specific asset.
+     * @param asset The address of the asset.
+     * @return The daily mint count.
+     */
+    function dailyMintCount(address asset) external view returns (uint256);
+
+    /**
+     * @notice Returns whether a specific asset is supported.
+     * @param asset The address of the asset.
+     * @return True if the asset is supported, false otherwise.
+     */
+    function isAssetSupported(address asset) external view returns (bool);
 }

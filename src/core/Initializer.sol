@@ -28,16 +28,16 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
             address debtToken,
             address communityIssuance,
             address sortedTrovesBeacon,
-            address troveManagerBeacon
-        ) = abi.decode(data, (address, address, address, address, address));
+            address troveManagerBeacon,
+            address gasPool
+        ) = abi.decode(data, (address, address, address, address, address, address));
         rewardManager.ensureNonzeroAddress();
 
         // set roles
         _setRoleAdmin(Config.OWNER_ROLE, Config.OWNER_ROLE);
         _setRoleAdmin(Config.GUARDIAN_ROLE, Config.OWNER_ROLE);
-        _grantRole(Config.OWNER_ROLE, InitialConfig.OWNER);
-        _grantRole(Config.GUARDIAN_ROLE, InitialConfig.GUARDIAN);
-        _setOwner(InitialConfig.OWNER);
+        _grantRole(Config.OWNER_ROLE, msg.sender);
+        _grantRole(Config.GUARDIAN_ROLE, msg.sender);
 
         AppStorage.Layout storage s = AppStorage.layout();
         s.feeReceiver = InitialConfig.FEE_RECEIVER;
@@ -45,10 +45,44 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         s.debtToken = DebtToken(debtToken);
         s.communityIssuance = ICommunityIssuance(communityIssuance);
         s.startTime = block.timestamp;
+        s.gasPool = gasPool;
 
-        /* factory facet */
-        // set beacons
+        /** BorrowerOperationsFacet */
+        // gasCompensation
+        // debtToken
+        // _setMinNetDebt
+        s.minNetDebt = Config.MIN_NET_DEBT_AMOUNT;
+
+        /** CoreFacet */
+        // feeReceiver
+        // rewardManager
+        // startTime
+        // guardian
+
+        /** FactoryFacet */
         s.sortedTrovesBeacon = IBeacon(sortedTrovesBeacon);
         s.troveManagerBeacon = IBeacon(troveManagerBeacon);
+
+        /** LiquidationFacet */
+        // stabilityPool
+        // borrowerOperations
+        // factory
+
+        /** PriceFeedAggregatorFacet */
+        // None
+
+        /** StabilityPoolFacet */
+        // debtToken
+        // factory
+        // liquidationManager
+        // communityIssuance = _communityIssuance;
+        s.P = Config.DEBT_TOKEN_DECIMALS_BASE;
+        s.lastUpdate = uint32(block.timestamp);
+
+        /** NexusYieldManagerFacet */
+        // debtToken
+        // rewardManager
+
+
     }
 }

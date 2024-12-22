@@ -20,6 +20,7 @@ library AppStorage {
     struct Layout {
         IXAppRouter xAppRouter;
         address feeReceiver;
+        address gasPool;
         IRewardManager rewardManager;
         ICommunityIssuance communityIssuance;
         address pendingOwner;
@@ -95,7 +96,7 @@ library AppStorage {
         /* PriceFeedAggregatorFacet */
         mapping(IERC20 => OracleRecord) oracleRecords;
         /* Nexus Yield Manager */
-        bool isPaused;
+        bool isNymPaused;
         uint256 day;
         mapping(address => bool) isPrivileged;
         mapping(address => mapping(address => uint32)) withdrawalTime;
@@ -103,7 +104,6 @@ library AppStorage {
         mapping(address => AssetConfig) assetConfigs;
         mapping(address => bool) isAssetSupported;
         mapping(address => uint256) dailyMintCount;
-        mapping(address => uint256) assetPrice;
     }
 
     function layout() internal pure returns (Layout storage s) {
