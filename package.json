@@ -11,7 +11,6 @@
     "compile": "$npm_execpath run compile:forge && $npm_execpath run compile:hardhat",
     "compile:forge": "forge build",
     "compile:hardhat": "hardhat compile",
-    "c": "hardhat clean",
     "full-deploy:anvil": "forge script script/Deploy.s.sol --rpc-url 127.0.0.1:8545 --broadcast && forge script script/DeployHelpers.s.sol --rpc-url 127.0.0.1:8545 --broadcast",
     "full-deploy:arbitrum-sepolia": "forge script script/Deploy.s.sol --rpc-url arbitrum-sepolia --broadcast && forge script script/DeployHelpers.s.sol --rpc-url arbitrum-sepolia --broadcast",
     "full-deploy:holesky": "forge script script/Deploy.s.sol --rpc-url holesky --broadcast && forge script script/DeployHelpers.s.sol --rpc-url holesky --broadcast",
