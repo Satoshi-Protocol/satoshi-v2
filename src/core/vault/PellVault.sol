@@ -11,9 +11,11 @@ import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 
 contract PellVault is CDPVaultCore {
     address public pellStrategy;
+
     function initialize(bytes calldata data) external override initializer {
         __UUPSUpgradeable_init_unchained();
-        (ISatoshiXApp _satoshiCore, address tokenAddress_, address vaultManager_, address pellStrategy_) = _decodeInitializeData(data);
+        (ISatoshiXApp _satoshiCore, address tokenAddress_, address vaultManager_, address pellStrategy_) =
+            _decodeInitializeData(data);
         __SatoshiOwnable_init(_satoshiCore);
         TOKEN_ADDRESS = tokenAddress_;
         vaultManager = vaultManager_;
@@ -41,11 +43,8 @@ contract PellVault is CDPVaultCore {
         shares[0] = amount;
 
         QueuedWithdrawalParams[] memory queuedWithdrawal = new QueuedWithdrawalParams[](1);
-        queuedWithdrawal[0] = QueuedWithdrawalParams({
-            strategies: strategies,
-            shares: shares,
-            withdrawer: address(this)
-        });
+        queuedWithdrawal[0] =
+            QueuedWithdrawalParams({strategies: strategies, shares: shares, withdrawer: address(this)});
 
         // withdraw token from lending
         IDelegationManager(0x230B442c0802fE83DAf3d2656aaDFD16ca1E1F66).queueWithdrawals(queuedWithdrawal);
@@ -66,7 +65,11 @@ contract PellVault is CDPVaultCore {
         return abi.encode(amount);
     }
 
-    function _decodeInitializeData(bytes calldata data) internal pure returns (ISatoshiXApp, address, address, address) {
+    function _decodeInitializeData(bytes calldata data)
+        internal
+        pure
+        returns (ISatoshiXApp, address, address, address)
+    {
         return abi.decode(data, (ISatoshiXApp, address, address, address));
     }
 
@@ -76,5 +79,9 @@ contract PellVault is CDPVaultCore {
 
     function _decodeExitData(bytes calldata data) internal pure returns (uint256 amount) {
         return abi.decode(data, (uint256));
+    }
+
+    function getPosition() external view override returns (address, uint256) {
+        return (TOKEN_ADDRESS, IStrategy(pellStrategy).userUnderlyingView(address(this)));
     }
 }
