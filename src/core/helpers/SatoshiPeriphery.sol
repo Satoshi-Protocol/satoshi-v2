@@ -35,7 +35,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     DebtToken public debtToken;
     address public xApp;
 
-    function initialize(DebtToken _debtToken,  address _xApp, address _owner) external initializer {
+    function initialize(DebtToken _debtToken, address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
         if (_xApp == address(0)) revert InvalidZeroAddress();
 
@@ -331,7 +331,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
             require(expectFee.lzTokenFee == lzSendParam.fee.lzTokenFee, "SatoshiPeriphery: lzTokenFee incorrect");
 
             // Step 3: Send the Debt tokens to the other chain
-            debtToken.send(_sendParam, lzSendParam.fee, account);
+            debtToken.send{value: msg.value}(_sendParam, lzSendParam.fee, account);
         }
     }
 
