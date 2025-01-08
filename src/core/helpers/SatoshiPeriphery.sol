@@ -230,38 +230,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         _afterWithdrawColl(collateralToken, userCollAmount);
     }
 
-    function redeemCollateral(
-        ITroveManager troveManager,
-        uint256 _debtAmount,
-        address _firstRedemptionHint,
-        address _upperPartialRedemptionHint,
-        address _lowerPartialRedemptionHint,
-        uint256 _partialRedemptionHintNICR,
-        uint256 _maxIterations,
-        uint256 _maxFeePercentage
-    ) external {
-        IERC20 collateralToken = troveManager.collateralToken();
-
-        _beforeRepayDebt(_debtAmount);
-
-        uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
-
-        troveManager.redeemCollateral(
-            _debtAmount,
-            _firstRedemptionHint,
-            _upperPartialRedemptionHint,
-            _lowerPartialRedemptionHint,
-            _partialRedemptionHintNICR,
-            _maxIterations,
-            _maxFeePercentage
-        );
-
-        uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
-        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
-
-        _afterWithdrawColl(collateralToken, userCollAmount);
-    }
-
     function liquidateTroves(
         ITroveManager troveManager,
         uint256 maxTrovesToLiquidate,
