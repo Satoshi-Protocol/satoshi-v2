@@ -651,6 +651,4 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         AppStorage.Layout storage s = AppStorage.layout();
         return s.isAssetSupported[asset];
     }
-
-    receive() external payable {}
 }
