@@ -194,7 +194,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function increaseCollPerUintStaked(uint256 _amount) external {
-        _isVaildCaller();
+        _isValidCaller();
 
         address collateralToken = address(ITroveManager(msg.sender).collateralToken());
         uint256 index = collTokenIndex[collateralToken];
@@ -217,7 +217,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function increaseSATPerUintStaked(uint256 _amount) external {
-        _isVaildCaller();
+        _isValidCaller();
 
         debtToken.transferFrom(msg.sender, address(this), _amount);
 
@@ -376,7 +376,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
 
     // --- Require ---
 
-    function _isVaildCaller() internal view {
+    function _isValidCaller() internal view {
         bool isRegistered;
         if (
             msg.sender == satoshiXApp || IAccessControl(satoshiXApp).hasRole(Config.OWNER_ROLE, msg.sender)
