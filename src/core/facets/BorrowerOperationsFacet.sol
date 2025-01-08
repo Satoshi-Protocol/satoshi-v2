@@ -369,7 +369,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
             BorrowerOperationsLib._requireValidMaxFeePercentage(_maxFeePercentage);
 
             vars.netDebtChange +=
-                _triggerBorrowingFee(s, troveManager, collateralToken, msg.sender, _maxFeePercentage, _debtChange);
+                _triggerBorrowingFee(s, troveManager, collateralToken, account, _maxFeePercentage, _debtChange);
         }
 
         // Calculate old and new ICRs and check if adjustment satisfies all conditions for the current system mode
