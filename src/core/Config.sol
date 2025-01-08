@@ -8,6 +8,8 @@ library Config {
     string constant DEBT_TOKEN_NAME = "SATOSHI_STABLECOIN";
     string constant DEBT_TOKEN_SYMBOL = "satUSD";
 
+    // During bootsrap period redemptions are not allowed
+    uint256 public constant BOOTSTRAP_PERIOD = 14 days;
     uint256 internal constant CCR = 1500000000000000000; // 150%
 
     uint256 internal constant PERCENT_DIVISOR = 200; // dividing by 200 yields 0.5%
@@ -61,7 +63,8 @@ library Config {
 
     uint256 constant LIQUIDATION_FEE = 200; //  (0.2%)
 
-    /** Farming */
+    /**
+     * Farming
+     */
     uint256 constant FARMING_PRECISION = 1e4;
-    
 }

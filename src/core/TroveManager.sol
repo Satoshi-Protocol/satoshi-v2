@@ -64,9 +64,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     uint256 public constant MAX_INTEREST_RATE_IN_BPS = 10000; // 100%
     uint256 public constant SUNSETTING_INTEREST_RATE = (INTEREST_PRECISION * 5000) / (10000 * SECONDS_IN_YEAR); //50%
 
-    // During bootsrap period redemptions are not allowed
-    uint256 public constant BOOTSTRAP_PERIOD = 14 days;
-
     /*
      * BETA: 18 digit decimal. Parameter by which to divide the redeemed fraction, in order to calc the new base rate from a redemption.
      * Corresponds to (1 / ALPHA) in the white paper.
@@ -587,7 +584,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         require(
             _maxFeePercentage >= redemptionFeeFloor && _maxFeePercentage <= maxRedemptionFee, "Max fee 0.5% to 100%"
         );
-        require(block.timestamp >= systemDeploymentTime + BOOTSTRAP_PERIOD, "BOOTSTRAP_PERIOD");
+        require(block.timestamp >= systemDeploymentTime + Config.BOOTSTRAP_PERIOD, "BOOTSTRAP_PERIOD");
         totals.price = fetchPrice();
         uint256 _MCR = MCR;
         require(IBorrowerOperationsFacet(satoshiXApp).getTCR() >= _MCR, "Cannot redeem when TCR < MCR");
@@ -1387,5 +1384,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
     function refillPercentage() external view returns (uint256) {
         return farmingParams.refillPercentage;
+    }
+
+    function BOOTSTRAP_PERIOD() external view returns (uint256) {
+        return Config.BOOTSTRAP_PERIOD;
     }
 }
