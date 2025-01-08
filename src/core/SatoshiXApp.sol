@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SolidStateDiamond} from "@solidstate/contracts/proxy/diamond/SolidStateDiamond.sol";
 import {AccessControl} from "@solidstate/contracts/access/access_control/AccessControl.sol";
+import {SolidStateDiamond} from "../library/proxy/SolidStateDiamond.sol";
 
 /**
  * @title SatoshiXAPP Diamond Proxy
