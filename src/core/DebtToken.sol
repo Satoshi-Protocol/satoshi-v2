@@ -233,7 +233,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         );
         require(
             !troveManager[ITroveManager(_recipient)],
-            "Debt: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
+            "Debt: Cannot transfer tokens directly to the TroveManager"
         );
     }
 }
