@@ -5,6 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {IPool} from "../../library/interfaces/vault/IPool.sol";
 import {CDPVaultCore} from "./CDPVaultCore.sol";
+import {DataTypes} from '../../library/interfaces/vault/DataTypes.sol';
 
 contract AvalonVault is CDPVaultCore {
     function initialize(bytes calldata data) external override initializer {
@@ -56,6 +57,7 @@ contract AvalonVault is CDPVaultCore {
     }
 
     function getPosition() external view override returns (address, uint256) {
-        return (TOKEN_ADDRESS, IERC20(strategyAddr).balanceOf(address(this)));
+        DataTypes.ReserveData memory data = IPool(strategyAddr).getReserveData(TOKEN_ADDRESS);
+        return (TOKEN_ADDRESS, IERC20(data.aTokenAddress).balanceOf(address(this)));
     }
 }
