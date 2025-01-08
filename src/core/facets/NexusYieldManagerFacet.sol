@@ -66,7 +66,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @notice Removes support for an asset and marks it as sunset.
      * @param asset The address of the asset to sunset.
      */
-    function sunsetAsset(address asset) external {
+    function sunsetAsset(address asset) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.isAssetSupported[asset] = false;
 
@@ -340,7 +340,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @dev Reverts if the contract is already paused.
      */
     // @custom:event Emits NYMPaused event.
-    function pause() external {
+    function pause() external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (s.isNymPaused) {
             revert AlreadyPaused();
@@ -354,7 +354,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @dev Reverts if the contract is not paused.
      */
     // @custom:event Emits NYMResumed event.
-    function resume() external {
+    function resume() external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (!s.isNymPaused) {
             revert NotPaused();
@@ -368,7 +368,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param account The address to set the privileged status.
      * @param isPrivileged_ The privileged status to set.
      */
-    function setPrivileged(address account, bool isPrivileged_) external {
+    function setPrivileged(address account, bool isPrivileged_) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.isPrivileged[account] = isPrivileged_;
         emit PrivilegedSet(account, isPrivileged_);

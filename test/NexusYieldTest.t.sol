@@ -581,6 +581,23 @@ contract NexusYieldTest is DeployBase, TroveBase {
         nexusYieldProxy.swapIn(address(collateralMock), user1, amount);
     }
 
+    function test_permission() public {
+        address someone = makeAddr("someone");
+        vm.startPrank(someone);
+        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        nexusYieldProxy.pause();
+
+        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        nexusYieldProxy.resume();
+
+        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        nexusYieldProxy.sunsetAsset(address(collateralMock));
+
+        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        nexusYieldProxy.setPrivileged(user1, true);
+        vm.stopPrank();
+    }
+
     /** utils */
     function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
     TroveBase.openTrove(
