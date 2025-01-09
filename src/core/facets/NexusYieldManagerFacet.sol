@@ -201,7 +201,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         }
 
         if (fee != 0) {
-            s.debtToken.transferFrom(msg.sender, address(this), fee);
+            s.debtToken.sendToXApp(msg.sender, fee);
             s.debtToken.approve(address(s.rewardManager), fee);
             s.rewardManager.increaseSATPerUintStaked(fee);
         }

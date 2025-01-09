@@ -121,7 +121,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         _burn(_account, _amount);
     }
 
-    function sendToSP(address _sender, uint256 _amount) external {
+    function sendToXApp(address _sender, uint256 _amount) external {
         require(msg.sender == satoshiXApp, "Debt: Caller not SatoshiXapp");
         _transfer(_sender, msg.sender, _amount);
     }
@@ -231,9 +231,10 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
             _recipient != address(0) && _recipient != address(this),
             "Debt: Cannot transfer tokens directly to the Debt token contract or the zero address"
         );
+        // NOTE: it is not allowing transfers to the SatoshiXApp or TroveManager contracts, if needed, only use sendToXApp or returnFromPool functions
         require(
-            !troveManager[ITroveManager(_recipient)],
-            "Debt: Cannot transfer tokens directly to the TroveManager"
+            _recipient != satoshiXApp && !troveManager[ITroveManager(_recipient)],
+            "Debt: Cannot transfer tokens directly to the SatoshiXApp or TroveManager"
         );
     }
 }

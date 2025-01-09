@@ -70,7 +70,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
 
         _accrueRewards(s, msg.sender);
 
-        s.debtToken.sendToSP(msg.sender, _amount);
+        s.debtToken.sendToXApp(msg.sender, _amount);
         uint256 newTotalDebtTokenDeposits = s.totalDebtTokenDeposits + _amount;
         s.totalDebtTokenDeposits = newTotalDebtTokenDeposits;
         emit StabilityPoolLib.StabilityPoolDebtBalanceUpdated(newTotalDebtTokenDeposits);

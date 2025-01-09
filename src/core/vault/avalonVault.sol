@@ -44,6 +44,11 @@ contract AvalonVault is CDPVaultCore {
         return abi.encode(amount);
     }
 
+    function getPosition() external view override returns (address, uint256) {
+        DataTypes.ReserveData memory data = IPool(strategyAddr).getReserveData(TOKEN_ADDRESS);
+        return (TOKEN_ADDRESS, IERC20(data.aTokenAddress).balanceOf(address(this)));
+    }
+
     function _decodeInitializeData(bytes calldata data) internal pure returns (ISatoshiXApp, address, address) {
         return abi.decode(data, (ISatoshiXApp, address, address));
     }
@@ -56,8 +61,4 @@ contract AvalonVault is CDPVaultCore {
         return abi.decode(data, (uint256));
     }
 
-    function getPosition() external view override returns (address, uint256) {
-        DataTypes.ReserveData memory data = IPool(strategyAddr).getReserveData(TOKEN_ADDRESS);
-        return (TOKEN_ADDRESS, IERC20(data.aTokenAddress).balanceOf(address(this)));
-    }
 }

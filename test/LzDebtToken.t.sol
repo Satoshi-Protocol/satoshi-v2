@@ -139,12 +139,12 @@ contract LzDebtTokenTest is TestHelperOz5 {
         assertEq(amount, beforeUserAmount - afterUserAmount);
     }
 
-    function test_sendToSP() external {
+    function test_sendToXApp() external {
         uint256 amount = 10 ether;
         uint256 beforeUserAmount = debtTokenA.balanceOf(userA);
 
         vm.prank(satoshiXApp);
-        debtTokenA.sendToSP(userA, amount);
+        debtTokenA.sendToXApp(userA, amount);
 
         uint256 afterUserAmount = debtTokenA.balanceOf(userA);
         assertEq(amount, beforeUserAmount - afterUserAmount);
