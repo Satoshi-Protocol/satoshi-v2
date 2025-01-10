@@ -46,7 +46,9 @@ interface IFactoryFacet {
     /// @param priceFeed The price feed to use
     /// @param params The deployment parameters
     /// @return The trove manager and sorted troves instances
-    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params) external returns (ITroveManager, ISortedTroves);
+    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params)
+        external
+        returns (ITroveManager, ISortedTroves);
 
     /// @notice Returns the count of trove managers
     /// @return The number of trove managers

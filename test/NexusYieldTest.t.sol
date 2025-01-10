@@ -51,7 +51,6 @@ import {TroveBase} from "./utils/TroveBase.t.sol";
 import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
 
-
 contract mock6 is ERC20Mock {
     constructor() ERC20Mock("MOCK", "MOCK") {}
 
@@ -107,10 +106,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
         user5 = vm.addr(6);
 
         // setup contracts and deploy one instance
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
         collateral = ERC20Mock(address(collateralMock));
         nexusYieldProxy = getNexusYieldProxy();
@@ -324,7 +320,9 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
         (, uint32 withdrawalTime) = nexusYieldProxy.pendingWithdrawal(address(collateralMock), user1);
 
-        vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.WithdrawalAlreadyScheduled.selector, withdrawalTime));
+        vm.expectRevert(
+            abi.encodeWithSelector(INexusYieldManagerFacet.WithdrawalAlreadyScheduled.selector, withdrawalTime)
+        );
         nexusYieldProxy.scheduleSwapOut(address(collateralMock), amount);
     }
 
@@ -372,13 +370,19 @@ contract NexusYieldTest is DeployBase, TroveBase {
         uint256 debtTokenMintCap = nexusYieldProxy.debtTokenMintCap(address(collateralMock));
         vm.expectRevert(
             abi.encodeWithSelector(
-                INexusYieldManagerFacet.DebtTokenMintCapReached.selector, debtTokenMinted, amountToMint, debtTokenMintCap
+                INexusYieldManagerFacet.DebtTokenMintCapReached.selector,
+                debtTokenMinted,
+                amountToMint,
+                debtTokenMintCap
             )
         );
         nexusYieldProxy.swapIn(address(collateralMock), user1, 1000000e18);
         vm.expectRevert(
             abi.encodeWithSelector(
-                INexusYieldManagerFacet.DebtTokenMintCapReached.selector, debtTokenMinted, amountToMint, debtTokenMintCap
+                INexusYieldManagerFacet.DebtTokenMintCapReached.selector,
+                debtTokenMinted,
+                amountToMint,
+                debtTokenMintCap
             )
         );
         nexusYieldProxy.swapInPrivileged(address(collateralMock), user1, 1000000e18);
@@ -419,22 +423,20 @@ contract NexusYieldTest is DeployBase, TroveBase {
         uint256 feeIn = 100000;
         uint256 feeOut = 10;
         AssetConfig memory config = AssetConfig(
-                priceFeedAggregatorProxy(),
-                feeIn,
-                feeOut,
-                10000e18,
-                1000e18,
-                0,
-                false,
-                3 days,
-                1.1e18,
-                0.9e18,
-                uint256(collateral.decimals())
-            );
-        vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.InvalidFee.selector, feeIn, feeOut));
-        nexusYieldProxy.setAssetConfig(
-            address(collateral), config
+            priceFeedAggregatorProxy(),
+            feeIn,
+            feeOut,
+            10000e18,
+            1000e18,
+            0,
+            false,
+            3 days,
+            1.1e18,
+            0.9e18,
+            uint256(collateral.decimals())
         );
+        vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.InvalidFee.selector, feeIn, feeOut));
+        nexusYieldProxy.setAssetConfig(address(collateral), config);
         nexusYieldProxy.setAssetConfig(
             address(collateral),
             AssetConfig(
@@ -531,8 +533,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
         collateralMock.approve(address(nexusYieldProxy), amount);
         nexusYieldProxy.swapIn(address(collateralMock), user1, amount);
         (, uint256 previewFee) = nexusYieldProxy.previewSwapIn(address(collateralMock), amount);
-        uint256 fee =
-            amount * 9 / 10 * nexusYieldProxy.feeIn(address(collateralMock)) / Config.BASIS_POINTS_DIVISOR;
+        uint256 fee = amount * 9 / 10 * nexusYieldProxy.feeIn(address(collateralMock)) / Config.BASIS_POINTS_DIVISOR;
         assertEq(previewFee, fee);
         assertEq(debtTokenProxy().balanceOf(user1), 90e18 - fee);
     }
@@ -584,35 +585,45 @@ contract NexusYieldTest is DeployBase, TroveBase {
     function test_permission() public {
         address someone = makeAddr("someone");
         vm.startPrank(someone);
-        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
         nexusYieldProxy.pause();
 
-        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
         nexusYieldProxy.resume();
 
-        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
         nexusYieldProxy.sunsetAsset(address(collateralMock));
 
-        vm.expectRevert('AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e');
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
         nexusYieldProxy.setPrivileged(user1, true);
         vm.stopPrank();
     }
 
-    /** utils */
+    /**
+     * utils
+     */
     function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
-    TroveBase.openTrove(
-        borrowerOperationsProxy(),
-        sortedTrovesBeaconProxy,
-        troveManagerBeaconProxy,
-        hintHelpers,
-        DEBT_GAS_COMPENSATION,
-        caller,
-        caller,
-        collateralMock,
-        collateralAmt,
-        debtAmt,
-        0.05e18
-    );
+        TroveBase.openTrove(
+            borrowerOperationsProxy(),
+            sortedTrovesBeaconProxy,
+            troveManagerBeaconProxy,
+            hintHelpers,
+            DEBT_GAS_COMPENSATION,
+            caller,
+            caller,
+            collateralMock,
+            collateralAmt,
+            debtAmt,
+            0.05e18
+        );
     }
 
     function _provideToSP(address caller, uint256 amount) internal {
@@ -634,7 +645,6 @@ contract NexusYieldTest is DeployBase, TroveBase {
         stabilityPoolProxy().claimCollateralGains(caller, collateralIndexes);
         vm.stopPrank();
     }
-
 
     function _troveClaimOSHIReward(address caller) internal returns (uint256 amount) {
         vm.startPrank(caller);
@@ -717,5 +727,4 @@ contract NexusYieldTest is DeployBase, TroveBase {
         vars.claimableTroveReward[3] = troveManagerBeaconProxy.claimableReward(user4);
         vars.claimableTroveReward[4] = troveManagerBeaconProxy.claimableReward(user5);
     }
-
 }

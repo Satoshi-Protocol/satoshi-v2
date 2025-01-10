@@ -47,31 +47,43 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         s.startTime = block.timestamp;
         s.gasPool = gasPool;
 
-        /** BorrowerOperationsFacet */
+        /**
+         * BorrowerOperationsFacet
+         */
         // gasCompensation
         // debtToken
         // _setMinNetDebt
         s.minNetDebt = Config.MIN_NET_DEBT_AMOUNT;
 
-        /** CoreFacet */
+        /**
+         * CoreFacet
+         */
         // feeReceiver
         // rewardManager
         // startTime
         // guardian
 
-        /** FactoryFacet */
+        /**
+         * FactoryFacet
+         */
         s.sortedTrovesBeacon = IBeacon(sortedTrovesBeacon);
         s.troveManagerBeacon = IBeacon(troveManagerBeacon);
 
-        /** LiquidationFacet */
+        /**
+         * LiquidationFacet
+         */
         // stabilityPool
         // borrowerOperations
         // factory
 
-        /** PriceFeedAggregatorFacet */
+        /**
+         * PriceFeedAggregatorFacet
+         */
         // None
 
-        /** StabilityPoolFacet */
+        /**
+         * StabilityPoolFacet
+         */
         // debtToken
         // factory
         // liquidationManager
@@ -79,10 +91,10 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         s.P = Config.DEBT_TOKEN_DECIMALS_BASE;
         s.lastUpdate = uint32(block.timestamp);
 
-        /** NexusYieldManagerFacet */
+        /**
+         * NexusYieldManagerFacet
+         */
         // debtToken
         // rewardManager
-
-
     }
 }

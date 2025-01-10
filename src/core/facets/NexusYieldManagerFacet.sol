@@ -79,12 +79,15 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param vault The address of the privileged vault.
      * @param amount The amount of token to transfer.
      */
-    function transferTokenToPrivilegedVault(address token, address vault, uint256 amount) external onlyRole(Config.OWNER_ROLE) {
+    function transferTokenToPrivilegedVault(address token, address vault, uint256 amount)
+        external
+        onlyRole(Config.OWNER_ROLE)
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         if (!s.isPrivileged[vault]) {
             revert NotPrivileged(vault);
         }
-        IERC20(token).transfer(vault, amount);
+        IERC20(token).safeTransfer(vault, amount);
         emit TokenTransferred(token, vault, amount);
     }
 
@@ -456,10 +459,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param amount The amount of stable tokens.
      * @return The USD value of the given amount of stable tokens scaled by 1e18 taking into account the direction of the swap
      */
-    function _previewTokenUSDAmount(address asset, uint256 amount, FeeDirection direction)
-        internal
-        returns (uint256)
-    {
+    function _previewTokenUSDAmount(address asset, uint256 amount, FeeDirection direction) internal returns (uint256) {
         return (convertAssetToDebtTokenAmount(asset, amount) * _getPriceInUSD(asset, direction)) / Config.MANTISSA_ONE;
     }
 

@@ -54,13 +54,9 @@ contract TroveManagerTest is DeployBase, TroveBase {
 
     function setUp() public override {
         super.setUp();
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
     }
-
 
     function test_getTotalActiveCollateral() public {
         assertEq(troveManagerBeaconProxy.getTotalActiveCollateral(), 0);
@@ -167,8 +163,9 @@ contract TroveManagerTest is DeployBase, TroveBase {
         borrowerOperationsProxy().removeTroveManager(troveManagerBeaconProxy);
     }
 
-
-    /** utils */
+    /**
+     * utils
+     */
     function _updateRoundData(RoundData memory data) internal {
         updateRoundData(oracleMockAddr, DEPLOYER, data);
     }

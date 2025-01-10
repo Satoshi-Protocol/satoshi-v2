@@ -82,10 +82,7 @@ contract DeployEthHoleskyScript is Deployer {
         _deployAndCutFacets(DEPLOYER);
         _deployOSHIToken(DEPLOYER);
         _deployGasPool(DEPLOYER);
-        _deployDebtToken(
-            LZ_EID,
-            LZ_ENDPOINT,
-            DEPLOYER, DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL);
+        _deployDebtToken(LZ_EID, LZ_ENDPOINT, DEPLOYER, DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL);
         _deployCommunityIssuance(DEPLOYER);
         _deployRewardManager(DEPLOYER);
         _deployPeriphery(DEPLOYER);
@@ -100,6 +97,4 @@ contract DeployEthHoleskyScript is Deployer {
 
         consoleAllContract();
     }
-
-
 }

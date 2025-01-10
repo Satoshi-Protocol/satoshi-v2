@@ -40,13 +40,15 @@ contract LzDebtTokenTest is TestHelperOz5 {
         setUpEndpoints(2, LibraryType.UltraLightNode);
 
         address debtTokenImplA = address(new DebtToken(endpoints[aEid]));
-        bytes memory dataA =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner));
+        bytes memory dataA = abi.encodeCall(
+            IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner)
+        );
         debtTokenA = IDebtToken(address(new ERC1967Proxy(debtTokenImplA, dataA)));
 
         address debtTokenImplB = address(new DebtToken(endpoints[bEid]));
-        bytes memory dataB =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner));
+        bytes memory dataB = abi.encodeCall(
+            IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner)
+        );
         debtTokenB = IDebtToken(address(new ERC1967Proxy(debtTokenImplB, dataB)));
 
         address[] memory ofts = new address[](2);

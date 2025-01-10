@@ -122,7 +122,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
     }
 
     function _configureCollateral(AppStorage.Layout storage s, ITroveManager troveManager, IERC20 collateralToken)
-    internal
+        internal
     {
         s.troveManagersData[troveManager] = TroveManagerData(collateralToken, uint16(s.troveManagers.length));
         s.troveManagers.push(troveManager);
@@ -139,12 +139,16 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
     }
 
     function _deployTroveManagerBeaconProxy(AppStorage.Layout storage s) internal returns (ITroveManager) {
-        bytes memory data =
-            abi.encodeCall(ITroveManager.initialize, (msg.sender, s.gasPool, s.debtToken, s.communityIssuance, address(this)));
+        bytes memory data = abi.encodeCall(
+            ITroveManager.initialize, (msg.sender, s.gasPool, s.debtToken, s.communityIssuance, address(this))
+        );
         return ITroveManager(address(new BeaconProxy(address(s.troveManagerBeacon), data)));
     }
 
-    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external onlyRole(Config.OWNER_ROLE) {
+    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator)
+        external
+        onlyRole(Config.OWNER_ROLE)
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         // console.log("setTMRewardRate", _numerator.length, s.troveManagers.length);
         require(_numerator.length == s.troveManagers.length, "Factory: invalid length");

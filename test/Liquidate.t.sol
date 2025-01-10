@@ -49,63 +49,58 @@ import {TroveBase} from "./utils/TroveBase.t.sol";
 import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
 
-
 contract LiquidateTest is DeployBase, TroveBase {
-  using Math for uint256;
+    using Math for uint256;
 
-  uint256 maxFeePercentage = 0.05e18; // 5%
-  ISortedTroves sortedTrovesBeaconProxy;
-  ITroveManager troveManagerBeaconProxy;
-  IMultiCollateralHintHelpers hintHelpers;
-  address user;
-  address user1;
-  address user2;
-  address user3;
-  address user4;
-  address user5;
-  ERC20Mock collateral;
+    uint256 maxFeePercentage = 0.05e18; // 5%
+    ISortedTroves sortedTrovesBeaconProxy;
+    ITroveManager troveManagerBeaconProxy;
+    IMultiCollateralHintHelpers hintHelpers;
+    address user;
+    address user1;
+    address user2;
+    address user3;
+    address user4;
+    address user5;
+    ERC20Mock collateral;
 
-  struct LiquidationVars {
-      uint256 entireTroveDebt;
-      uint256 entireTroveColl;
-      uint256 collGasCompensation;
-      uint256 debtGasCompensation;
-      uint256 debtToOffset;
-      uint256 collToSendToSP;
-      uint256 debtToRedistribute;
-      uint256 collToRedistribute;
-      uint256 collSurplus;
-      // user state
-      uint256[5] userCollBefore;
-      uint256[5] userCollAfter;
-      uint256[5] userDebtBefore;
-      uint256[5] userDebtAfter;
-  }
+    struct LiquidationVars {
+        uint256 entireTroveDebt;
+        uint256 entireTroveColl;
+        uint256 collGasCompensation;
+        uint256 debtGasCompensation;
+        uint256 debtToOffset;
+        uint256 collToSendToSP;
+        uint256 debtToRedistribute;
+        uint256 collToRedistribute;
+        uint256 collSurplus;
+        // user state
+        uint256[5] userCollBefore;
+        uint256[5] userCollAfter;
+        uint256[5] userDebtBefore;
+        uint256[5] userDebtAfter;
+    }
 
-  function setUp() public override {
-      super.setUp();
-      // testing user
-      user = vm.addr(5);
-      user1 = vm.addr(1);
-      user2 = vm.addr(2);
-      user3 = vm.addr(3);
-      user4 = vm.addr(4);
-      user5 = vm.addr(6);
+    function setUp() public override {
+        super.setUp();
+        // testing user
+        user = vm.addr(5);
+        user1 = vm.addr(1);
+        user2 = vm.addr(2);
+        user3 = vm.addr(3);
+        user4 = vm.addr(4);
+        user5 = vm.addr(6);
 
-      // setup contracts and deploy one instance
-      (
-          sortedTrovesBeaconProxy,
-          troveManagerBeaconProxy
-      ) = _deployMockTroveManager(DEPLOYER);
-      hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
-      collateral = ERC20Mock(address(collateralMock));
+        // setup contracts and deploy one instance
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
+        hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
+        collateral = ERC20Mock(address(collateralMock));
 
-      // user set delegate approval for satoshiPeriphery
-      vm.startPrank(user);
-      borrowerOperationsProxy().setDelegateApproval(address(satoshiPeriphery), true);
-      vm.stopPrank();
-  }
-
+        // user set delegate approval for satoshiPeriphery
+        vm.startPrank(user);
+        borrowerOperationsProxy().setDelegateApproval(address(satoshiPeriphery), true);
+        vm.stopPrank();
+    }
 
     function test_LiquidateICRLessThan100InRecoveryMode() public {
         LiquidationVars memory vars;
@@ -498,60 +493,59 @@ contract LiquidateTest is DeployBase, TroveBase {
         liquidationManagerProxy().liquidateTroves(troveManagerBeaconProxy, 10, MCR);
     }
 
+    function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
+        TroveBase.openTrove(
+            borrowerOperationsProxy(),
+            sortedTrovesBeaconProxy,
+            troveManagerBeaconProxy,
+            hintHelpers,
+            DEBT_GAS_COMPENSATION,
+            caller,
+            caller,
+            collateralMock,
+            collateralAmt,
+            debtAmt,
+            0.05e18
+        );
+    }
 
-  function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
-    TroveBase.openTrove(
-        borrowerOperationsProxy(),
-        sortedTrovesBeaconProxy,
-        troveManagerBeaconProxy,
-        hintHelpers,
-        DEBT_GAS_COMPENSATION,
-        caller,
-        caller,
-        collateralMock,
-        collateralAmt,
-        debtAmt,
-        0.05e18
-    );
-  }
+    function _provideToSP(address caller, uint256 amount) internal {
+        TroveBase.provideToSP(stabilityPoolProxy(), caller, amount);
+    }
 
-  function _provideToSP(address caller, uint256 amount) internal {
-      TroveBase.provideToSP(stabilityPoolProxy(), caller, amount);
-  }
+    function _withdrawFromSP(address caller, uint256 amount) internal {
+        TroveBase.withdrawFromSP(stabilityPoolProxy(), caller, amount);
+    }
 
-  function _withdrawFromSP(address caller, uint256 amount) internal {
-      TroveBase.withdrawFromSP(stabilityPoolProxy(), caller, amount);
-  }
+    function _updateRoundData(RoundData memory data) internal {
+        TroveBase.updateRoundData(oracleMockAddr, DEPLOYER, data);
+    }
 
-  function _updateRoundData(RoundData memory data) internal {
-      TroveBase.updateRoundData(oracleMockAddr, DEPLOYER, data);
-  }
+    function _claimCollateralGains(address caller) internal {
+        vm.startPrank(caller);
+        uint256[] memory collateralIndexes = new uint256[](1);
+        collateralIndexes[0] = 0;
+        stabilityPoolProxy().claimCollateralGains(caller, collateralIndexes);
+        vm.stopPrank();
+    }
 
-  function _claimCollateralGains(address caller) internal {
-      vm.startPrank(caller);
-      uint256[] memory collateralIndexes = new uint256[](1);
-      collateralIndexes[0] = 0;
-      stabilityPoolProxy().claimCollateralGains(caller, collateralIndexes);
-      vm.stopPrank();
-  }
+    function _convertDebtToColl(uint256 debt, uint256 price) internal pure returns (uint256) {
+        return debt * 1e18 / price;
+    }
 
-  function _convertDebtToColl(uint256 debt, uint256 price) internal pure returns (uint256) {
-      return debt * 1e18 / price;
-  }
+    function _recordUserStateBeforeToVar(LiquidationVars memory vars) internal view {
+        (vars.userCollBefore[0], vars.userDebtBefore[0]) = troveManagerBeaconProxy.getTroveCollAndDebt(user1);
+        (vars.userCollBefore[1], vars.userDebtBefore[1]) = troveManagerBeaconProxy.getTroveCollAndDebt(user2);
+        (vars.userCollBefore[2], vars.userDebtBefore[2]) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
+        (vars.userCollBefore[3], vars.userDebtBefore[3]) = troveManagerBeaconProxy.getTroveCollAndDebt(user4);
+        (vars.userCollBefore[4], vars.userDebtBefore[4]) = troveManagerBeaconProxy.getTroveCollAndDebt(user5);
+    }
 
-  function _recordUserStateBeforeToVar(LiquidationVars memory vars) internal view {
-      (vars.userCollBefore[0], vars.userDebtBefore[0]) = troveManagerBeaconProxy.getTroveCollAndDebt(user1);
-      (vars.userCollBefore[1], vars.userDebtBefore[1]) = troveManagerBeaconProxy.getTroveCollAndDebt(user2);
-      (vars.userCollBefore[2], vars.userDebtBefore[2]) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
-      (vars.userCollBefore[3], vars.userDebtBefore[3]) = troveManagerBeaconProxy.getTroveCollAndDebt(user4);
-      (vars.userCollBefore[4], vars.userDebtBefore[4]) = troveManagerBeaconProxy.getTroveCollAndDebt(user5);
-  }
-
-  function _recordUserStateAfterToVar(LiquidationVars memory vars) internal view {
-      (vars.userCollAfter[0], vars.userDebtAfter[0]) = troveManagerBeaconProxy.getTroveCollAndDebt(user1);
-      (vars.userCollAfter[1], vars.userDebtAfter[1]) = troveManagerBeaconProxy.getTroveCollAndDebt(user2);
-      (vars.userCollAfter[2], vars.userDebtAfter[2]) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
-      (vars.userCollAfter[3], vars.userDebtAfter[3]) = troveManagerBeaconProxy.getTroveCollAndDebt(user4);
-      (vars.userCollAfter[4], vars.userDebtAfter[4]) = troveManagerBeaconProxy.getTroveCollAndDebt(user5);
-  }
+    function _recordUserStateAfterToVar(LiquidationVars memory vars) internal view {
+        (vars.userCollAfter[0], vars.userDebtAfter[0]) = troveManagerBeaconProxy.getTroveCollAndDebt(user1);
+        (vars.userCollAfter[1], vars.userDebtAfter[1]) = troveManagerBeaconProxy.getTroveCollAndDebt(user2);
+        (vars.userCollAfter[2], vars.userDebtAfter[2]) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
+        (vars.userCollAfter[3], vars.userDebtAfter[3]) = troveManagerBeaconProxy.getTroveCollAndDebt(user4);
+        (vars.userCollAfter[4], vars.userDebtAfter[4]) = troveManagerBeaconProxy.getTroveCollAndDebt(user5);
+    }
 }

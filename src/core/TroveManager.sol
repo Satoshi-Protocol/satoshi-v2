@@ -774,7 +774,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         surplusBalances[msg.sender] = 0;
 
-        collateralToken.safeTransfer(_receiver, claimableColl);
+        _sendSurplus(_receiver, claimableColl);
+
+        // collateralToken.safeTransfer(_receiver, claimableColl);
 
         if (interestPayable > 0) {
             collectInterests();
@@ -843,7 +845,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         if (_debtChange > 0) {
             if (_isDebtIncrease) {
                 newDebt = newDebt + _netDebtChange;
-                // if (!_isRecoveryMode) _updateMintVolume(_borrower, _netDebtChange);
                 _increaseDebt(_receiver, _netDebtChange, _debtChange);
             } else {
                 newDebt = newDebt - _netDebtChange;
@@ -1145,9 +1146,32 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     // --- Trove property setters ---
 
     function _sendCollateral(address _account, uint256 _amount) private {
-        uint256 boundary = totalActiveCollateral * farmingParams.retainPercentage / FARMING_PRECISION;
-        uint256 remainColl = totalActiveCollateral - collateralOutput;
-        uint256 target = (totalActiveCollateral - _amount) * farmingParams.refillPercentage / FARMING_PRECISION;
+        _exitCollFromStrategy(_amount);
+
+        if (_amount > 0) {
+            totalActiveCollateral = totalActiveCollateral - _amount;
+            emit CollateralSent(_account, _amount);
+
+            collateralToken.safeTransfer(_account, _amount);
+        }
+    }
+
+    function _sendSurplus(address _account, uint256 _amount) private {
+        _exitCollFromStrategy(_amount);
+
+        if (_amount > 0) {
+            emit CollateralSent(_account, _amount);
+
+            collateralToken.safeTransfer(_account, _amount);
+        }
+    }
+
+    function _exitCollFromStrategy(uint256 _amount) internal {
+        uint256 totalColl = getEntireSystemColl();
+        uint256 newTotal = totalColl - _amount;
+        uint256 boundary = newTotal * farmingParams.retainPercentage / FARMING_PRECISION;
+        uint256 remainColl = totalColl - collateralOutput;
+        uint256 target = newTotal * farmingParams.refillPercentage / FARMING_PRECISION;
 
         // remain collateral is not enough, must refill
         if (_amount > remainColl) {
@@ -1158,13 +1182,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         } else if (remainColl - _amount < boundary) {
             uint256 refillAmount = _amount + target - remainColl;
             vaultManager.exitStrategyByTroveManager(refillAmount);
-        }
-
-        if (_amount > 0) {
-            totalActiveCollateral = totalActiveCollateral - _amount;
-            emit CollateralSent(_account, _amount);
-
-            collateralToken.safeTransfer(_account, _amount);
         }
     }
 
@@ -1353,7 +1370,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         emit FarmingParamsSet(retainPercentage_, refillPercentage_);
     }
 
-    function transferCollToPrivilegedVault(address vault, uint256 amount) external onlyOwner {
+    function transferCollToPrivilegedVault(uint256 amount) external onlyOwner {
         // check the output amount does not exceed the limit
         require(
             collateralOutput + amount
@@ -1364,7 +1381,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         // record the collateral output
         collateralOutput += amount;
         collateralToken.transfer(address(vaultManager), amount);
-        emit CollateralTransferred(vault, amount);
+        emit CollateralTransferred(address(vaultManager), amount);
     }
 
     function receiveCollFromPrivilegedVault(uint256 amount) external {
