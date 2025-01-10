@@ -28,7 +28,7 @@ import {Config} from "./Config.sol";
 import {IPriceFeedAggregatorFacet} from "./interfaces/IPriceFeedAggregatorFacet.sol";
 import {IBorrowerOperationsFacet} from "./interfaces/IBorrowerOperationsFacet.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
-import {IVaultManager} from "./interfaces/IVaultManager.sol";
+import {IVaultManager} from "./interfaces/vault/IVaultManager.sol";
 import {Utils} from "../library/Utils.sol";
 
 contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {

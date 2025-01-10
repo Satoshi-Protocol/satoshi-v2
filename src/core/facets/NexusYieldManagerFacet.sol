@@ -8,8 +8,6 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {INexusYieldManagerFacet, AssetConfig, ChainConfig} from "../interfaces/INexusYieldManagerFacet.sol";
 import {IPriceFeedAggregatorFacet} from "../interfaces/IPriceFeedAggregatorFacet.sol";
-import {IRollupMinter} from "../interfaces/IRollupMinter.sol";
-import {IRollupNYM} from "../interfaces/IRollupNYM.sol";
 import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {Config} from "../Config.sol";

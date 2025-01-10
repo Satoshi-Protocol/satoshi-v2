@@ -6,7 +6,7 @@ import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SatoshiOwnable} from "./SatoshiOwnable.sol";
-import {INYMVault} from "../interfaces/vault/INYMVault.sol";
+import {IVault} from "../interfaces/vault/IVault.sol";
 import {IVaultManager} from "../interfaces/vault/IVaultManager.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";
@@ -30,7 +30,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
     mapping(address => bool) public troveManagers;
 
     // troveManager => vaults
-    mapping(address => INYMVault[]) public priority;
+    mapping(address => IVault[]) public priority;
 
     constructor() {
         _disableInitializers();
@@ -51,17 +51,17 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
     // --- External functions ---
     function executeStrategy(address vault, bytes calldata data) external onlyOwner {
         _checkWhitelistedVault(vault);
-        address token = INYMVault(vault).decodeTokenAddress(data);
+        address token = IVault(vault).decodeTokenAddress(data);
         if (token != address(0)) {
             IERC20(token).approve(vault, type(uint256).max);
         }
-        INYMVault(vault).executeStrategy(data);
+        IVault(vault).executeStrategy(data);
         emit ExecuteStrategy(vault, data);
     }
 
     function executeCall(address vault, address dest, bytes calldata data) external onlyOwner {
         _checkWhitelistedVault(vault);
-        INYMVault(vault).executeCall(dest, data);
+        IVault(vault).executeCall(dest, data);
         emit ExecuteCall(vault, dest, data);
     }
 
@@ -77,7 +77,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
         for (uint256 i; i < priority[msg.sender].length; i++) {
             if (balanceAfter >= amount) break;
             uint256 balanceBefore = collateralToken.balanceOf(address(this));
-            INYMVault vault = priority[msg.sender][i];
+            IVault vault = priority[msg.sender][i];
             bytes memory data = vault.constructExitByTroveManagerData(address(collateralToken), withdrawAmount);
             try vault.executeStrategy(data) {
                 balanceAfter = collateralToken.balanceOf(address(this));
@@ -98,7 +98,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
         ITroveManager(msg.sender).receiveCollFromPrivilegedVault(actualTransferAmount);
     }
 
-    function setPriority(address troveManager_, INYMVault[] memory _priority) external onlyOwner {
+    function setPriority(address troveManager_, IVault[] memory _priority) external onlyOwner {
         delete priority[troveManager_];
         for (uint256 i; i < _priority.length; i++) {
             priority[troveManager_].push(_priority[i]);
