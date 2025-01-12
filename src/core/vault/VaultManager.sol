@@ -73,7 +73,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
 
         // assign a value to balanceAfter to prevent the priority being empty
         uint256 balanceAfter = collateralToken.balanceOf(address(this));
-        uint256 withdrawAmount = amount;
+        uint256 withdrawAmount = max(amount - balanceAfter, 0);
         for (uint256 i; i < priority[msg.sender].length; i++) {
             if (balanceAfter >= amount) break;
             uint256 balanceBefore = collateralToken.balanceOf(address(this));
