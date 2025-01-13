@@ -6,6 +6,7 @@ import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SatoshiOwnable} from "./SatoshiOwnable.sol";
+import {SatoshiMath} from "../../library/SatoshiMath.sol";
 import {IVault} from "../interfaces/vault/IVault.sol";
 import {IVaultManager} from "../interfaces/vault/IVaultManager.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
@@ -73,7 +74,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
 
         // assign a value to balanceAfter to prevent the priority being empty
         uint256 balanceAfter = collateralToken.balanceOf(address(this));
-        uint256 withdrawAmount = max(amount - balanceAfter, 0);
+        uint256 withdrawAmount = SatoshiMath._max(amount - balanceAfter, 0);
         for (uint256 i; i < priority[msg.sender].length; i++) {
             if (balanceAfter >= amount) break;
             uint256 balanceBefore = collateralToken.balanceOf(address(this));
