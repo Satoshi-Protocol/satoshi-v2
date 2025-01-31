@@ -42,7 +42,8 @@ import {IPriceFeed} from "../src/priceFeed/IPriceFeed.sol";
 import {AggregatorV3Interface} from "../src/priceFeed/AggregatorV3Interface.sol";
 import {MultiCollateralHintHelpers} from "../src/core/helpers/MultiCollateralHintHelpers.sol";
 import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-
+import {MultiTroveGetter} from "../src/core/helpers/MultiTroveGetter.sol";
+import {IMultiTroveGetter} from "../src/core/helpers/interfaces/IMultiTroveGetter.sol";
 import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
 import {OSHIToken} from "../src/OSHI/OSHIToken.sol";
 import {ISatoshiPeriphery} from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
@@ -440,10 +441,15 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
     }
 
-    function _deployMockTroveManager(address deployer) internal returns (ISortedTroves, ITroveManager) {
+    function _deployMockTroveManager(address deployer)
+        internal
+        returns (ISortedTroves, ITroveManager, IERC20, address)
+    {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         collateralMock = new ERC20Mock("Collateral", "COLL");
+        vm.stopBroadcast();
         initRoundData = RoundData({
-            answer: 4000000000000,
+            answer: 9000000000000,
             startedAt: block.timestamp,
             updatedAt: block.timestamp,
             answeredInRound: 1
@@ -469,10 +475,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
             _deployNewInstance(deployer, collateralMock, IPriceFeed(priceFeedAddr), deploymentParams);
 
         _setConfigByOwner(deployer, troveManagerBeaconProxy);
-
-        return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
-        vm.startPrank(deployer);
-        // vm.stopBroadcast();
+        return (sortedTrovesBeaconProxy, troveManagerBeaconProxy, collateralMock, priceFeedAddr);
     }
 
     function _deployNewInstance(
@@ -481,8 +484,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         IPriceFeed priceFeed,
         DeploymentParams memory deploymentParams
     ) internal returns (ISortedTroves, ITroveManager) {
-        // vm.startPrank(owner);
-
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         (ITroveManager troveManagerBeaconProxy, ISortedTroves sortedTrovesBeaconProxy) =
             IFactoryFacet(address(satoshiXApp)).deployNewInstance(collateral, priceFeed, deploymentParams);
 
@@ -511,13 +513,13 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _setPriceFeedToPriceFeedAggregatorProxy(address owner, IERC20 collateral, IPriceFeed priceFeed) internal {
-        // vm.startPrank(owner);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         IPriceFeedAggregatorFacet(address(satoshiXApp)).setPriceFeed(collateral, priceFeed);
         vm.stopBroadcast();
     }
 
     function _registerTroveManager(address owner, ITroveManager _troveManager) internal {
-        // vm.startPrank(owner);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         rewardManager.registerTroveManager(_troveManager);
         vm.stopBroadcast();
     }
@@ -539,27 +541,27 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _setTMCommunityIssuanceAllocation(address owner, ITroveManager troveManagerBeaconProxy) internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         address[] memory _recipients = new address[](1);
         _recipients[0] = address(troveManagerBeaconProxy);
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = TM_ALLOCATION;
-        // vm.startPrank(owner);
         communityIssuance.setAllocated(_recipients, _amounts);
         vm.stopBroadcast();
     }
 
     function _setSPCommunityIssuanceAllocation(address owner) internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         address[] memory _recipients = new address[](1);
         _recipients[0] = address(satoshiXApp);
         uint256[] memory _amounts = new uint256[](1);
         _amounts[0] = SP_ALLOCATION;
-        // vm.startPrank(owner);
         communityIssuance.setAllocated(_recipients, _amounts);
         vm.stopBroadcast();
     }
 
     function _setTMRewardRate(address owner, ITroveManager troveManagerBeaconProxy) internal {
-        // vm.startPrank(owner);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         uint128[] memory numerator = new uint128[](2);
         numerator[0] = 0;
         numerator[1] = 0;
@@ -570,14 +572,14 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _setSPRewardRate(address owner) internal {
-        // vm.startPrank(owner);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
         stabilityPoolProxy.setSPRewardRate(SP_MAX_REWARD_RATE);
         vm.stopBroadcast();
     }
 
     function _setClaimStartTime(address owner, uint32 _claimStartTime) internal {
-        // vm.startPrank(owner);
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
         stabilityPoolProxy.setClaimStartTime(_claimStartTime);
         vm.stopBroadcast();
@@ -590,6 +592,33 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
 
         return hintHelpersAddr;
+    }
+
+    function _deployMultiTroveGetter(address deployer) internal returns (address) {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+
+        address multiTroveGetterAddr = address(new MultiTroveGetter());
+        vm.stopBroadcast();
+
+        return multiTroveGetterAddr;
+    }
+
+    function deployMockCollateral(address deployer)
+        internal
+        returns (IERC20, ISortedTroves, ITroveManager, IMultiCollateralHintHelpers, IMultiTroveGetter, address)
+    {
+        (
+            ISortedTroves sortedTrovesBeaconProxy,
+            ITroveManager troveManagerBeaconProxy,
+            IERC20 collateral,
+            address oracleMock
+        ) = _deployMockTroveManager(DEPLOYER);
+        IMultiCollateralHintHelpers hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
+        IMultiTroveGetter multiTroveGetter = IMultiTroveGetter(_deployMultiTroveGetter(DEPLOYER));
+
+        return (
+            collateralMock, sortedTrovesBeaconProxy, troveManagerBeaconProxy, hintHelpers, multiTroveGetter, oracleMock
+        );
     }
 
     function _deployGasPool(address deployer) internal {

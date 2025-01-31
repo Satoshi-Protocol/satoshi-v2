@@ -41,8 +41,6 @@ import {IPriceFeed} from "../src/priceFeed/IPriceFeed.sol";
 import {AggregatorV3Interface} from "../src/priceFeed/AggregatorV3Interface.sol";
 import {MultiCollateralHintHelpers} from "../src/core/helpers/MultiCollateralHintHelpers.sol";
 import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-import {MultiTroveGetter} from "../src/core/helpers/MultiTroveGetter.sol";
-import {IMultiTroveGetter} from "../src/core/helpers/interfaces/IMultiTroveGetter.sol";
 
 import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
 import {OSHIToken} from "../src/OSHI/OSHIToken.sol";
@@ -53,16 +51,13 @@ import {GasPool} from "../src/core/GasPool.sol";
 import {IGasPool} from "../src/core/interfaces/IGasPool.sol";
 import {Config} from "../src/core/Config.sol";
 import {Deployer} from "./Deployer.sol";
-import {ERC20Mock} from "../test/mocks/ERC20Mock.sol";
-import {RoundData, OracleMock} from "../test/mocks/OracleMock.sol";
-
 import "./configs/Config.testnet.sol";
 
-contract DeployArbSepoliaScript is Deployer {
-    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN_ARB";
-    string constant DEBT_TOKEN_SYMBOL = "TESTSAT.arb";
-    address internal LZ_ENDPOINT = ARB_SEPOLIA_LZ_ENDPOINT;
-    uint32 internal LZ_EID = ARB_SEPOLIA_LZ_EID;
+contract DeployCoreSepoliaScript is Deployer {
+    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN_core";
+    string constant DEBT_TOKEN_SYMBOL = "TESTSAT.core";
+    address internal LZ_ENDPOINT = CORE_SEPOLIA_LZ_ENDPOINT;
+    uint32 internal LZ_EID = CORE_SEPOLIA_LZ_EID;
 
     function setUp() external {
         DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
@@ -77,17 +72,6 @@ contract DeployArbSepoliaScript is Deployer {
     }
 
     function run() public {
-        RoundData memory roundData = RoundData({
-            answer: 11500000000000,
-            startedAt: block.timestamp,
-            updatedAt: block.timestamp,
-            answeredInRound: 1
-        });
-        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-        OracleMock(0x1D5C2A9bAA52eb0F0C15d5ADa03328Bb6C51990E).updateRoundData(roundData);
-        vm.stopBroadcast();
-
-        return;
         // vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         console.log("deployer:", DEPLOYER);
         _deployWETH(DEPLOYER);
@@ -105,32 +89,12 @@ contract DeployArbSepoliaScript is Deployer {
         _satoshiXAppInit(DEPLOYER);
         _setContracts(DEPLOYER);
 
-        consoleAllContract();
-
-        (
-            IERC20 collateralMock,
-            ISortedTroves sortedTrovesBeaconProxy,
-            ITroveManager troveManagerBeaconProxy,
-            IMultiCollateralHintHelpers hintHelpers,
-            IMultiTroveGetter multiTroveGetter,
-            address oracleMock
-        ) = deployMockCollateral(DEPLOYER);
-        console.log("collateralMock:", address(collateralMock));
-        console.log("sortedTrovesBeaconProxy:", address(sortedTrovesBeaconProxy));
-        console.log("troveManagerBeaconProxy:", address(troveManagerBeaconProxy));
-        console.log("hintHelpers:", address(hintHelpers));
-        console.log("multiTroveGetter:", address(multiTroveGetter));
-        console.log("oracleMock:", address(oracleMock));
-
         // NOTE: For Test
-        ERC20Mock coll = ERC20Mock(address(collateralMock));
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-        coll.mint(DEPLOYER, 1000 * (10 ** coll.decimals()));
         debtToken.rely(DEPLOYER);
-        debtToken.mint(DEPLOYER, 10000e18);
-        coll.mint(0x317d2da746d1360F4c113E7962a33394DB2A1A4e, 1000 * (10 ** coll.decimals()));
-        debtToken.rely(0x317d2da746d1360F4c113E7962a33394DB2A1A4e);
-        debtToken.mint(0x317d2da746d1360F4c113E7962a33394DB2A1A4e, 10000e18);
+        debtToken.mint(DEPLOYER, 1000e18);
         vm.stopBroadcast();
+
+        consoleAllContract();
     }
 }

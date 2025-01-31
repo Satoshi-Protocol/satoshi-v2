@@ -59,10 +59,10 @@ import {RoundData, OracleMock} from "../test/mocks/OracleMock.sol";
 import "./configs/Config.testnet.sol";
 
 contract DeployArbSepoliaScript is Deployer {
-    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN_ARB";
-    string constant DEBT_TOKEN_SYMBOL = "TESTSAT.arb";
-    address internal LZ_ENDPOINT = ARB_SEPOLIA_LZ_ENDPOINT;
-    uint32 internal LZ_EID = ARB_SEPOLIA_LZ_EID;
+    string constant DEBT_TOKEN_NAME = "TEST_STABLECOIN_BASE";
+    string constant DEBT_TOKEN_SYMBOL = "TESTSAT.base";
+    address internal LZ_ENDPOINT = BASE_SEPOLIA_LZ_ENDPOINT;
+    uint32 internal LZ_EID = BASE_SEPOLIA_LZ_EID;
 
     function setUp() external {
         DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
@@ -78,17 +78,17 @@ contract DeployArbSepoliaScript is Deployer {
 
     function run() public {
         RoundData memory roundData = RoundData({
-            answer: 11500000000000,
+            answer: 9900000000000,
             startedAt: block.timestamp,
             updatedAt: block.timestamp,
             answeredInRound: 1
         });
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-        OracleMock(0x1D5C2A9bAA52eb0F0C15d5ADa03328Bb6C51990E).updateRoundData(roundData);
+        OracleMock(0x6f4495b43B943FCBde43A610E1246042457FDE0B).updateRoundData(roundData);
         vm.stopBroadcast();
 
         return;
-        // vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+
         console.log("deployer:", DEPLOYER);
         _deployWETH(DEPLOYER);
         _deploySortedTrovesBeacon(DEPLOYER);

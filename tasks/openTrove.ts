@@ -15,7 +15,7 @@ const targetAmount = '10';
 const sourceContract = arbitrumSepoliaContract;
 const destinationContract = base_sepoliaContract;
 
-task('lz:oft:send', 'Send tokens cross-chain using LayerZero technology')
+task('lz:oft:open', 'Send tokens cross-chain using LayerZero technology')
 .setAction(async (taskArgs, hre) => {
     const eidA = sourceContract.eid;
     const eidB = destinationContract.eid;
@@ -76,9 +76,17 @@ task('lz:oft:send', 'Send tokens cross-chain using LayerZero technology')
             gasPrice: gasPrice.mul(2),
             nonce,
         })
+        console.log('Transaction hash:', tx.hash)
         await tx.wait()
+        console.log(
+            `Tokens sent successfully to the recipient on the destination chain. View on LayerZero Scan: https://layerzeroscan.com/tx/${tx.hash}`
+        )
         const afterBalanceOfUserA = await oftA.balanceOf(walletA.address)
         const expectedBalanceA = beforeBalanceOfUserA.sub(amount)
+        console.log({
+            beforeBalanceOfUserA: beforeBalanceOfUserA.toString(),
+            afterBalanceOfUserA: afterBalanceOfUserA.toString(),
+        })
         if(afterBalanceOfUserA.eq(expectedBalanceA)) {
             console.log('Tokens sent successfully on the source chain');
         } else {
