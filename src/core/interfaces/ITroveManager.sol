@@ -125,12 +125,14 @@ interface ITroveManager {
     /// @param _debtToken The address of the debt token
     /// @param _communityIssuance The address of the community issuance contract
     /// @param _satoshiXApp The address of the SatoshiX app
+    /// @param _debtGasCompensation The debt gas compensation
     function initialize(
         address _owner,
         address _gasPool,
         IDebtToken _debtToken,
         ICommunityIssuance _communityIssuance,
-        address _satoshiXApp
+        address _satoshiXApp,
+        uint256 _debtGasCompensation
     ) external;
 
     /// @notice Adds collateral surplus for a borrower

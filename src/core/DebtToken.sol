@@ -16,13 +16,12 @@ import {
     OFTFeeDetail,
     MessagingReceipt,
     MessagingFee
-} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 
 import {ITroveManager} from "./interfaces/ITroveManager.sol";
 import {IDebtToken} from "./interfaces/IDebtToken.sol";
 import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
-import {Config} from "./Config.sol";
 import {Utils} from "../library/Utils.sol";
 import {OFTPermitUpgradeable} from "./libs/OFTPermitUpgradeable.sol";
 
@@ -33,14 +32,13 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     bytes32 private constant _RETURN_VALUE = keccak256("ERC3156FlashBorrower.onFlashLoan");
     uint256 public constant FLASH_LOAN_FEE = 9; // 1 = 0.0001%
 
-    // // --- Addresses ---
+    // --- Addresses ---
     address public gasPool;
     address public satoshiXApp;
 
-    mapping(ITroveManager => bool) public troveManager;
+    uint256 internal _debtGasCompensation;
 
-    // // Amount of debt to be locked in gas pool on opening troves
-    // uint256 public DEBT_GAS_COMPENSATION;
+    mapping(ITroveManager => bool) public troveManager;
 
     // --- Auth ---
     mapping(address => bool) public wards;
@@ -73,7 +71,8 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         string memory _symbol,
         address _gasPool,
         address _satoshiXApp,
-        address _owner
+        address _owner,
+        uint256 debtGasCompensation_
     ) external initializer {
         Utils.ensureNonzeroAddress(_satoshiXApp);
         Utils.ensureNonzeroAddress(_owner);
@@ -83,6 +82,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         __Ownable_init(_owner);
         gasPool = _gasPool;
         satoshiXApp = _satoshiXApp;
+        _debtGasCompensation = debtGasCompensation_;
     }
 
     function enableTroveManager(ITroveManager _troveManager) external {
@@ -95,7 +95,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
         require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _mint(_account, _amount);
-        _mint(gasPool, Config.DEBT_GAS_COMPENSATION);
+        _mint(gasPool, _debtGasCompensation);
 
         return true;
     }
@@ -103,7 +103,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
         require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _burn(_account, _amount);
-        _burn(gasPool, Config.DEBT_GAS_COMPENSATION);
+        _burn(gasPool, _debtGasCompensation);
 
         return true;
     }
@@ -147,8 +147,8 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         return super.transferFrom(sender, recipient, amount);
     }
 
-    function DEBT_GAS_COMPENSATION() external pure returns (uint256) {
-        return Config.DEBT_GAS_COMPENSATION;
+    function DEBT_GAS_COMPENSATION() external view returns (uint256) {
+        return _debtGasCompensation;
     }
 
     // --- ERC 3156 Functions ---

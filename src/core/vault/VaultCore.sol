@@ -7,7 +7,6 @@ import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {INYMVault} from "../interfaces/INYMVault.sol";
 import {SatoshiOwnable} from "./SatoshiOwnable.sol";
 
-
 abstract contract VaultCore is INYMVault, SatoshiOwnable, UUPSUpgradeable {
     address public strategyAddr;
     address public nymAddr;

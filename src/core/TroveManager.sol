@@ -44,6 +44,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     ICommunityIssuance public communityIssuance;
     address public satoshiXApp;
     address public gasPool;
+    uint256 public debtGasCompensation;
 
     // IPriceFeedAggregator public priceFeedAggregator;
     IERC20 public collateralToken;
@@ -159,14 +160,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
     function initialize(
         address _owner,
-        // ISatoshiCore _satoshiCore,
         address _gasPool,
         IDebtToken _debtToken,
-        // IBorrowerOperations _borrowerOperations,
-        // ILiquidationManager _liquidationManager,
-        // IPriceFeedAggregator _priceFeedAggregator,
         ICommunityIssuance _communityIssuance,
-        address _satoshiXApp
+        address _satoshiXApp,
+        uint256 _debtGasCompensation
     ) external initializer {
         Utils.ensureNonzeroAddress(_owner);
         Utils.ensureNonzeroAddress(address(_debtToken));
@@ -175,9 +173,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         __Ownable_init_unchained(_owner);
         gasPool = _gasPool;
         debtToken = _debtToken;
-        // borrowerOperations = _borrowerOperations;
-        // liquidationManager = _liquidationManager;
-        // priceFeedAggregator = _priceFeedAggregator;
+        debtGasCompensation = _debtGasCompensation;
+
         communityIssuance = _communityIssuance;
         lastUpdate = block.timestamp;
         satoshiXApp = _satoshiXApp;
@@ -683,7 +680,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     ) internal returns (SingleRedemptionValues memory singleRedemption) {
         Trove storage t = troves[_borrower];
         // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
-        singleRedemption.debtLot = SatoshiMath._min(_maxDebtAmount, t.debt - Config.DEBT_GAS_COMPENSATION);
+        singleRedemption.debtLot = SatoshiMath._min(_maxDebtAmount, t.debt - debtGasCompensation);
 
         // Get the CollateralLot of equivalent value in USD
         singleRedemption.collateralLot = SatoshiMath._getOriginalCollateralAmount(
@@ -695,11 +692,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         uint256 newDebt = (t.debt) - singleRedemption.debtLot;
         uint256 newColl = (t.coll) - singleRedemption.collateralLot;
 
-        if (newDebt == Config.DEBT_GAS_COMPENSATION) {
+        if (newDebt == debtGasCompensation) {
             // No debt left in the Trove (except for the liquidation reserve), therefore the trove gets closed
             _removeStake(_borrower);
             _closeTrove(_borrower, Status.closedByRedemption);
-            _redeemCloseTrove(_borrower, Config.DEBT_GAS_COMPENSATION, newColl);
+            _redeemCloseTrove(_borrower, debtGasCompensation, newColl);
             emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.redeemCollateral);
         } else {
             uint256 newNICR = SatoshiMath._computeNominalCR(newColl, newDebt);
@@ -717,7 +714,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
                     : newNICR - _partialRedemptionHintNICR;
                 if (
                     icrError > 5e14
-                        || SatoshiMath._getNetDebt(newDebt) < IBorrowerOperationsFacet(satoshiXApp).minNetDebt()
+                        || SatoshiMath._getNetDebt(newDebt, debtGasCompensation)
+                            < IBorrowerOperationsFacet(satoshiXApp).minNetDebt()
                 ) {
                     singleRedemption.cancelledPartial = true;
                     return singleRedemption;

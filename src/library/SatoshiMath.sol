@@ -178,12 +178,12 @@ library SatoshiMath {
     // --- Gas compensation functions ---
 
     // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
-    function _getCompositeDebt(uint256 _debt) internal pure returns (uint256) {
-        return _debt + Config.DEBT_GAS_COMPENSATION;
+    function _getCompositeDebt(uint256 _debt, uint256 _gasCompensation) internal pure returns (uint256) {
+        return _debt + _gasCompensation;
     }
 
-    function _getNetDebt(uint256 _debt) internal pure returns (uint256) {
-        return _debt - Config.DEBT_GAS_COMPENSATION;
+    function _getNetDebt(uint256 _debt, uint256 _gasCompensation) internal pure returns (uint256) {
+        return _debt - _gasCompensation;
     }
 
     // Return the amount of collateral to be drawn from a trove's collateral and sent as gas compensation.

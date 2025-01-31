@@ -47,12 +47,12 @@ import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMulti
 import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
 import {HintLib} from "./utils/HintLib.sol";
 import {TroveBase} from "./utils/TroveBase.t.sol";
-import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+import {MessagingFee} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
-
 
 contract OSHITokenTest is DeployBase, TroveBase {
     using Math for uint256;
+
     bytes32 private immutable _PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
 
     uint256 maxFeePercentage = 0.05e18; // 5%
@@ -93,10 +93,7 @@ contract OSHITokenTest is DeployBase, TroveBase {
         user4 = vm.addr(4);
 
         // setup contracts and deploy one instance
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
         collateral = ERC20Mock(address(collateralMock));
 
@@ -213,8 +210,9 @@ contract OSHITokenTest is DeployBase, TroveBase {
         vm.stopPrank();
     }
 
-    /** utils */
-
+    /**
+     * utils
+     */
     function getDigest(address owner, address spender, uint256 amount, uint256 nonce, uint256 deadline)
         public
         view

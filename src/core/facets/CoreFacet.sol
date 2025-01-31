@@ -87,7 +87,7 @@ contract CoreFacet is ICoreFacet, AccessControlInternal {
         return AppStorage.layout().communityIssuance;
     }
 
-    function gasCompensation() external pure returns (uint256) {
-        return Config.DEBT_GAS_COMPENSATION;
+    function gasCompensation() external view returns (uint256) {
+        return AppStorage.layout().gasCompensation;
     }
 }

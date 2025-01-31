@@ -86,10 +86,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
         user4 = vm.addr(4);
 
         // setup contracts and deploy one instance
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
 
         // mint some tokens to vault and community issuance
@@ -264,12 +261,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
 
         // attempt to provide 1 wei more than his balance
         vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC20Errors.ERC20InsufficientBalance.selector,
-                user1,
-                amount,
-                amount + 1
-            )
+            abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, user1, amount, amount + 1)
         );
         TroveBase.provideToSP(stabilityPoolProxy(), user1, amount + 1);
     }
@@ -601,7 +593,6 @@ contract StabilityPoolTest is DeployBase, TroveBase {
 
         assertEq(stabilityPoolProxy().indexByCollateral(collateralMock), 0);
     }
-    
 
     // utils
     function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {

@@ -158,7 +158,9 @@ abstract contract DeployBase is Test {
 
     function _deployPeriphery(address deployer) internal {
         vm.startPrank(deployer);
-        bytes memory data = abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), deployer));
+        bytes memory data = abi.encodeCall(
+            ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), deployer)
+        );
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
         vm.stopPrank();
@@ -366,12 +368,7 @@ abstract contract DeployBase is Test {
         rewardManager = IRewardManager(address(new ERC1967Proxy(address(rewardManagerImpl), data)));
         vm.stopPrank();
         vm.startPrank(OWNER);
-        rewardManager.setAddresses(
-            address(satoshiXApp),
-            weth,
-            debtToken,
-            oshiToken
-        );
+        rewardManager.setAddresses(address(satoshiXApp), weth, debtToken, oshiToken);
         vm.stopPrank();
     }
 
@@ -383,8 +380,10 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(debtToken) == address(0)); // check if contract is not deployed
         address debtTokenImpl = address(new DebtToken(address(endpointMock)));
-        bytes memory data =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(gasPool), address(satoshiXApp), OWNER));
+        bytes memory data = abi.encodeCall(
+            IDebtToken.initialize,
+            (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(gasPool), address(satoshiXApp), OWNER, DEBT_GAS_COMPENSATION)
+        );
         debtToken = IDebtToken(address(new ERC1967Proxy(address(debtTokenImpl), data)));
         vm.stopPrank();
     }
@@ -496,8 +495,7 @@ abstract contract DeployBase is Test {
             claimStartTime: TM_CLAIM_START_TIME
         });
 
-        address priceFeedAddr =
-            _deployPriceFeed(deployer, ORACLE_MOCK_DECIMALS, ORACLE_MOCK_VERSION, initRoundData);
+        address priceFeedAddr = _deployPriceFeed(deployer, ORACLE_MOCK_DECIMALS, ORACLE_MOCK_VERSION, initRoundData);
         _setPriceFeedToPriceFeedAggregatorProxy(OWNER, collateralMock, IPriceFeed(priceFeedAddr));
 
         (ISortedTroves sortedTrovesBeaconProxy, ITroveManager troveManagerBeaconProxy) =
@@ -518,10 +516,8 @@ abstract contract DeployBase is Test {
     ) internal returns (ISortedTroves, ITroveManager) {
         vm.startPrank(owner);
 
-        (
-            ITroveManager troveManagerBeaconProxy,
-            ISortedTroves sortedTrovesBeaconProxy
-        ) = IFactoryFacet(address(satoshiXApp)).deployNewInstance(collateral, priceFeed, deploymentParams);
+        (ITroveManager troveManagerBeaconProxy, ISortedTroves sortedTrovesBeaconProxy) =
+            IFactoryFacet(address(satoshiXApp)).deployNewInstance(collateral, priceFeed, deploymentParams);
 
         vm.stopPrank();
         return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
@@ -540,7 +536,6 @@ abstract contract DeployBase is Test {
         return oracleMockAddr;
     }
 
-
     function _deployOracleMock(address deployer, uint8 decimals, uint256 version) internal returns (address) {
         vm.startPrank(deployer);
         address oracleAddr = address(new OracleMock(decimals, version));
@@ -553,7 +548,6 @@ abstract contract DeployBase is Test {
         IPriceFeedAggregatorFacet(address(satoshiXApp)).setPriceFeed(collateral, priceFeed);
         vm.stopPrank();
     }
-
 
     function _registerTroveManager(address owner, ITroveManager _troveManager) internal {
         vm.startPrank(owner);
@@ -574,7 +568,7 @@ abstract contract DeployBase is Test {
         _registerTroveManager(owner, troveManagerBeaconProxy);
         _setClaimStartTime(owner, SP_CLAIM_START_TIME);
         _setSPRewardRate(owner);
-        _setTMRewardRate(owner, troveManagerBeaconProxy);
+        _setTMRewardRate(owner, 1);
     }
 
     // function _setAddress(
@@ -609,28 +603,28 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
-    function _setTMRewardRate(address owner, ITroveManager troveManagerBeaconProxy) internal {
+    function _setTMRewardRate(address owner, uint128 denominator) internal {
         vm.startPrank(owner);
         uint128[] memory numerator = new uint128[](2);
         numerator[0] = 0;
         numerator[1] = 0;
         IFactoryFacet factoryProxy = IFactoryFacet(address(satoshiXApp));
-        factoryProxy.setTMRewardRate(numerator, 1);
+        factoryProxy.setTMRewardRate(numerator, denominator);
         // assertEq(troveManagerBeaconProxy.rewardRate(), factoryProxy.maxRewardRate());
         vm.stopPrank();
     }
 
     function _setSPRewardRate(address owner) internal {
         vm.startPrank(owner);
-        IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
-        stabilityPoolProxy.setSPRewardRate(SP_MAX_REWARD_RATE);
+        IStabilityPoolFacet stabilityPool = IStabilityPoolFacet(address(satoshiXApp));
+        stabilityPool.setSPRewardRate(SP_MAX_REWARD_RATE);
         vm.stopPrank();
     }
 
     function _setClaimStartTime(address owner, uint32 _claimStartTime) internal {
         vm.startPrank(owner);
-        IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
-        stabilityPoolProxy.setClaimStartTime(_claimStartTime);
+        IStabilityPoolFacet stabilityPool = IStabilityPoolFacet(address(satoshiXApp));
+        stabilityPool.setClaimStartTime(_claimStartTime);
         vm.stopPrank();
     }
 
@@ -650,7 +644,6 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
-
     function assertContractAddressHasCode(address contractAddress) public {
         // Check if the contract address has code
         uint256 codeSize;
@@ -662,7 +655,8 @@ abstract contract DeployBase is Test {
         assertTrue(codeSize > 0, "The address does not contain a contract.");
     }
 
-    /** */
+    /**
+     */
     function borrowerOperationsProxy() public view returns (IBorrowerOperationsFacet) {
         return IBorrowerOperationsFacet(address(satoshiXApp));
     }

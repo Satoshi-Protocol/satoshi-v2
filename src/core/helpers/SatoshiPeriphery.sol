@@ -12,13 +12,14 @@ import {
     OFTFeeDetail,
     MessagingReceipt,
     MessagingFee
-} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
 import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
 import {ILiquidationFacet} from "../interfaces/ILiquidationFacet.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
+import {ICoreFacet} from "../interfaces/ICoreFacet.sol";
 import {DebtToken} from "../DebtToken.sol";
 import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
@@ -216,7 +217,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @param troveManager The TroveManager contract
     function closeTrove(ITroveManager troveManager) external {
         (uint256 collAmount, uint256 debtAmount) = troveManager.getTroveCollAndDebt(msg.sender);
-        uint256 netDebtAmount = debtAmount - Config.DEBT_GAS_COMPENSATION;
+        uint256 netDebtAmount = debtAmount - ICoreFacet(xApp).gasCompensation();
         _beforeRepayDebt(netDebtAmount);
 
         IERC20 collateralToken = troveManager.collateralToken();

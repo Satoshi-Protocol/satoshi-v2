@@ -1,4 +1,6 @@
-// Forge imports
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
 import "forge-std/console.sol";
 
 // DevTools imports
@@ -8,6 +10,7 @@ import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
 import {FlashloanTester} from "../src/test/FlashloanTester.sol";
 import {DebtToken} from "../src/core/DebtToken.sol";
 import {Config} from "../src/core/Config.sol";
+import {DEBT_GAS_COMPENSATION} from "./TestConfig.sol";
 
 import {OptionsBuilder} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 import {IOFT, SendParam, OFTReceipt} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
@@ -40,13 +43,17 @@ contract LzDebtTokenTest is TestHelperOz5 {
         setUpEndpoints(2, LibraryType.UltraLightNode);
 
         address debtTokenImplA = address(new DebtToken(endpoints[aEid]));
-        bytes memory dataA =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner));
+        bytes memory dataA = abi.encodeCall(
+            IDebtToken.initialize,
+            (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner, DEBT_GAS_COMPENSATION)
+        );
         debtTokenA = IDebtToken(address(new ERC1967Proxy(debtTokenImplA, dataA)));
 
         address debtTokenImplB = address(new DebtToken(endpoints[bEid]));
-        bytes memory dataB =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner));
+        bytes memory dataB = abi.encodeCall(
+            IDebtToken.initialize,
+            (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner, DEBT_GAS_COMPENSATION)
+        );
         debtTokenB = IDebtToken(address(new ERC1967Proxy(debtTokenImplB, dataB)));
 
         address[] memory ofts = new address[](2);
@@ -76,7 +83,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         vm.expectEmit(false, true, false, false);
         emit IOFT.OFTSent(bytes32(0), 0, userA, tokensToSend, tokensToSend);
         vm.prank(userA);
-        (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) =
+        (, OFTReceipt memory oftReceipt) =
             _debtTokenA.send{value: fee.nativeFee}(sendParam, fee, payable(address(this)));
         verifyPackets(bEid, addressToBytes32(address(debtTokenB))); // Manually trigger `lzReceive`
 
@@ -106,13 +113,13 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 afterUserAmount = debtTokenA.balanceOf(userA);
         uint256 afterAppAmount = debtTokenA.balanceOf(satoshiXApp);
         assertEq(amount, afterUserAmount - beforeUserAmount);
-        assertEq(Config.DEBT_GAS_COMPENSATION, afterAppAmount - beforeAppAmount);
+        assertEq(DEBT_GAS_COMPENSATION, afterAppAmount - beforeAppAmount);
     }
 
     function test_burnWithGasCompensation() external {
         uint256 amount = 10 ether;
         deal(address(debtTokenA), userA, amount);
-        deal(address(debtTokenA), satoshiXApp, Config.DEBT_GAS_COMPENSATION);
+        deal(address(debtTokenA), satoshiXApp, DEBT_GAS_COMPENSATION);
         uint256 beforeUserAmount = debtTokenA.balanceOf(userA);
         uint256 beforeAppAmount = debtTokenA.balanceOf(satoshiXApp);
 
@@ -122,7 +129,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 afterUserAmount = debtTokenA.balanceOf(userA);
         uint256 afterAppAmount = debtTokenA.balanceOf(satoshiXApp);
         assertEq(amount, beforeUserAmount - afterUserAmount);
-        assertEq(Config.DEBT_GAS_COMPENSATION, beforeAppAmount - afterAppAmount);
+        assertEq(DEBT_GAS_COMPENSATION, beforeAppAmount - afterAppAmount);
     }
 
     function test_burn() external {
@@ -220,7 +227,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
     // Test the `DEBT_GAS_COMPENSATION` function
     function test_DEBT_GAS_COMPENSATION() external {
         uint256 compensation = debtTokenA.DEBT_GAS_COMPENSATION();
-        assertEq(compensation, Config.DEBT_GAS_COMPENSATION, "Gas compensation should match config");
+        assertEq(compensation, DEBT_GAS_COMPENSATION, "Gas compensation should match config");
     }
 
     function test_maxFlashLoan() external {

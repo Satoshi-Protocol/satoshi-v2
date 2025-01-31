@@ -74,11 +74,11 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 break;
             }
             if (ICR <= Config._100_PCT && _inRecoveryMode()) {
-                singleLiquidation = _liquidateWithoutSP(troveManager, account);
+                singleLiquidation = _liquidateWithoutSP(s, troveManager, account);
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
             } else if (ICR < troveManagerValues.MCR) {
                 singleLiquidation =
-                    _liquidateNormalMode(troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
+                    _liquidateNormalMode(s, troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
                 debtInStabPool -= singleLiquidation.debtToOffset;
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
             } else {
@@ -181,10 +181,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
             // closed / non-existent troves return an ICR of type(uint).max and are ignored
             uint256 ICR = troveManager.getCurrentICR(account, troveManagerValues.price);
             if (ICR <= Config._100_PCT && _inRecoveryMode()) {
-                singleLiquidation = _liquidateWithoutSP(troveManager, account);
+                singleLiquidation = _liquidateWithoutSP(s, troveManager, account);
             } else if (ICR < troveManagerValues.MCR) {
                 singleLiquidation =
-                    _liquidateNormalMode(troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
+                    _liquidateNormalMode(s, troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
                 debtInStabPool -= singleLiquidation.debtToOffset;
             } else {
                 // As soon as we find a trove with ICR >= MCR we need to start tracking the global TCR with the next loop
@@ -209,10 +209,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                     ++troveIter;
                 }
                 if (ICR <= Config._100_PCT && _inRecoveryMode()) {
-                    singleLiquidation = _liquidateWithoutSP(troveManager, account);
+                    singleLiquidation = _liquidateWithoutSP(s, troveManager, account);
                 } else if (ICR < troveManagerValues.MCR) {
                     singleLiquidation =
-                        _liquidateNormalMode(troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
+                        _liquidateNormalMode(s, troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
                 } else {
                     if (troveManagerValues.sunsetting) continue;
                     uint256 TCR = SatoshiMath._computeCR(entireSystemColl, entireSystemDebt);
@@ -267,6 +267,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
      *          remaining debt and collateral are redistributed between active troves.
      */
     function _liquidateNormalMode(
+        AppStorage.Layout storage s,
         ITroveManager troveManager,
         address _borrower,
         uint256 _debtInStabPool,
@@ -281,7 +282,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
         troveManager.movePendingTroveRewardsToActiveBalances(pendingDebtReward, pendingCollReward);
 
         singleLiquidation.collGasCompensation = SatoshiMath._getCollGasCompensation(singleLiquidation.entireTroveColl);
-        singleLiquidation.debtGasCompensation = Config.DEBT_GAS_COMPENSATION;
+        singleLiquidation.debtGasCompensation = s.gasCompensation;
         uint256 collToLiquidate = singleLiquidation.entireTroveColl - singleLiquidation.collGasCompensation;
 
         (
@@ -334,7 +335,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
         );
 
         singleLiquidation.collGasCompensation = SatoshiMath._getCollGasCompensation(collToOffset);
-        singleLiquidation.debtGasCompensation = Config.DEBT_GAS_COMPENSATION;
+        singleLiquidation.debtGasCompensation = AppStorage.layout().gasCompensation;
 
         singleLiquidation.debtToOffset = entireTroveDebt;
         singleLiquidation.collToSendToSP = collToOffset - singleLiquidation.collGasCompensation;
@@ -354,7 +355,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
      * @dev Liquidate a trove without using the stability pool. All debt and collateral
      *          are distributed porportionally between the remaining active troves.
      */
-    function _liquidateWithoutSP(ITroveManager troveManager, address _borrower)
+    function _liquidateWithoutSP(AppStorage.Layout storage s, ITroveManager troveManager, address _borrower)
         internal
         returns (LiquidationValues memory singleLiquidation)
     {
@@ -365,7 +366,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
             troveManager.getEntireDebtAndColl(_borrower);
 
         singleLiquidation.collGasCompensation = SatoshiMath._getCollGasCompensation(singleLiquidation.entireTroveColl);
-        singleLiquidation.debtGasCompensation = Config.DEBT_GAS_COMPENSATION;
+        singleLiquidation.debtGasCompensation = s.gasCompensation;
         troveManager.movePendingTroveRewardsToActiveBalances(pendingDebtReward, pendingCollReward);
 
         singleLiquidation.debtToOffset = 0;

@@ -8,12 +8,11 @@ import {DeployBase} from "./utils/DeployBase.t.sol";
 import {EndpointV2Mock} from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
 
 import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {InitialConfig} from "../src/core/InitialConfig.sol";
 import {Config} from "../src/core/Config.sol";
-import {DEPLOYER, OWNER} from "./TestConfig.sol";
+import {DEPLOYER, OWNER, FEE_RECEIVER, DEBT_GAS_COMPENSATION} from "./TestConfig.sol";
 
 contract CoreFacetTest is DeployBase {
-    address owner = InitialConfig.OWNER;
+    address owner = OWNER;
 
     function setUp() public virtual override {
         super.setUp();
@@ -22,7 +21,7 @@ contract CoreFacetTest is DeployBase {
 
     function test_feeReceiver() public {
         address feeReceiver = ICoreFacet(address(satoshiXApp)).feeReceiver();
-        assertEq(feeReceiver, InitialConfig.FEE_RECEIVER);
+        assertEq(feeReceiver, FEE_RECEIVER);
     }
 
     function test_setFeeReceiver() public {
@@ -78,6 +77,6 @@ contract CoreFacetTest is DeployBase {
 
     function test_gasCompensation() public {
         uint256 gasCompensation = ICoreFacet(address(satoshiXApp)).gasCompensation();
-        assertEq(gasCompensation, Config.DEBT_GAS_COMPENSATION);
+        assertEq(gasCompensation, DEBT_GAS_COMPENSATION);
     }
 }

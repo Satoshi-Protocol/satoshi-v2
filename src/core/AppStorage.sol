@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -29,6 +28,7 @@ library AppStorage {
         uint256 startTime;
         IDebtToken debtToken;
         uint256 minNetDebt;
+        uint256 gasCompensation;
         // owner => caller => isApproved
         mapping(address => mapping(address => bool)) isApprovedDelegate;
         /* Factory */

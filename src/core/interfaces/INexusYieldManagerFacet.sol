@@ -336,7 +336,7 @@ interface INexusYieldManagerFacet {
      * @return True if the contract is paused, false otherwise.
      */
     function isNymPaused() external view returns (bool);
-    
+
     /**
      * @notice Returns the daily mint count for a specific asset.
      * @param asset The address of the asset.

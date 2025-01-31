@@ -136,13 +136,15 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @param _gasPool The address of the gas pool.
      * @param _satoshiXApp The address of the SatoshiX application.
      * @param _owner The address of the owner.
+     * @param _debtGasCompensation The gas compensation amount for debt operations.
      */
     function initialize(
         string memory _name,
         string memory _symbol,
         address _gasPool,
         address _satoshiXApp,
-        address _owner
+        address _owner,
+        uint256 _debtGasCompensation
     ) external;
 
     /**

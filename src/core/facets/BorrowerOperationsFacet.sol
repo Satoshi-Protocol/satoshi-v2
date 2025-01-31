@@ -49,6 +49,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 debtChange;
         address account;
         uint256 MCR;
+        uint256 debtGasCompensation;
     }
 
     struct LocalVariables_openTrove {
@@ -81,8 +82,6 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
     //     uint256 _gasCompensation
     // ) external initializer {
     //     __UUPSUpgradeable_init_unchained();
-    //     __SatoshiOwnable_init(_satoshiCore);
-    //     __SatoshiBase_init(_gasCompensation);
     //     debtToken = _debtToken;
     //     factory = _factory;
     //     _setMinNetDebt(_minNetDebt);
@@ -149,8 +148,8 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         return BorrowerOperationsLib._checkRecoveryMode(TCR);
     }
 
-    function getCompositeDebt(uint256 _debt) external pure returns (uint256) {
-        return SatoshiMath._getCompositeDebt(_debt);
+    function getCompositeDebt(uint256 _debt) external view returns (uint256) {
+        return SatoshiMath._getCompositeDebt(_debt, AppStorage.layout().gasCompensation);
     }
 
     // --- Borrower Trove Operations ---
@@ -186,7 +185,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 scaledCollateralAmount = SatoshiMath._getScaledCollateralAmount(_collateralAmount, decimals);
 
         // ICR is based on the composite debt, i.e. the requested Debt amount + Debt borrowing fee + Debt gas comp.
-        vars.compositeDebt = SatoshiMath._getCompositeDebt(vars.netDebt);
+        vars.compositeDebt = SatoshiMath._getCompositeDebt(vars.netDebt, s.gasCompensation);
         vars.ICR = SatoshiMath._computeCR(scaledCollateralAmount, vars.compositeDebt, vars.price);
         vars.NICR = SatoshiMath._computeNominalCR(_collateralAmount, vars.compositeDebt);
 
@@ -363,6 +362,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         vars.debtChange = _debtChange;
         vars.account = account;
         vars.MCR = troveManager.MCR();
+        vars.debtGasCompensation = s.gasCompensation;
 
         if (_isDebtIncrease) {
             require(_debtChange != 0, "BorrowerOps: Debt increase requires non-zero debtChange");
@@ -380,7 +380,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
 
         // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough Debt
         if (!_isDebtIncrease && _debtChange != 0) {
-            BorrowerOperationsLib._requireAtLeastMinNetDebt(s, SatoshiMath._getNetDebt(vars.debt) - vars.netDebtChange);
+            BorrowerOperationsLib._requireAtLeastMinNetDebt(
+                s, SatoshiMath._getNetDebt(vars.debt, vars.debtGasCompensation) - vars.netDebtChange
+            );
         }
 
         // If we are incrasing collateral, send tokens to the trove manager prior to adjusting the trove
@@ -423,7 +425,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         troveManager.closeTrove(account, msg.sender, coll, debt);
 
         // Burn the repaid Debt from the user's balance and the gas compensation from the Gas Pool
-        s.debtToken.burnWithGasCompensation(msg.sender, debt - Config.DEBT_GAS_COMPENSATION);
+        s.debtToken.burnWithGasCompensation(msg.sender, debt - s.gasCompensation);
 
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {

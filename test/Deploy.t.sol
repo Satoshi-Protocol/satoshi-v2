@@ -8,7 +8,7 @@ contract DeployTest is DeployBase {
         super.setUp();
     }
 
-    function test_deploy() public {
-        address[] memory addresses = satoshiXApp.facetAddresses();
+    function test_deploy() public view {
+        satoshiXApp.facetAddresses();
     }
 }

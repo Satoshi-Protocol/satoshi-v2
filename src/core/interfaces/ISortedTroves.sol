@@ -106,15 +106,22 @@ interface ISortedTroves {
 
 // Information for a node in the list
 struct Node {
-    bool exists; ///< Indicates if the node exists in the list.
-    address nextId; ///< Id of next node (smaller NICR) in the list.
-    address prevId; ///< Id of previous node (larger NICR) in the list.
+    bool exists;
+    ///< Indicates if the node exists in the list.
+    address nextId;
+    ///< Id of next node (smaller NICR) in the list.
+    address prevId;
 }
+///< Id of previous node (larger NICR) in the list.
 
 // Information for the list
 struct Data {
-    address head; ///< Head of the list. Also the node in the list with the largest NICR.
-    address tail; ///< Tail of the list. Also the node in the list with the smallest NICR.
-    uint256 size; ///< Current size of the list.
-    mapping(address => Node) nodes; ///< Track the corresponding ids for each node in the list.
+    address head;
+    ///< Head of the list. Also the node in the list with the largest NICR.
+    address tail;
+    ///< Tail of the list. Also the node in the list with the smallest NICR.
+    uint256 size;
+    ///< Current size of the list.
+    mapping(address => Node) nodes;
 }
+///< Track the corresponding ids for each node in the list.

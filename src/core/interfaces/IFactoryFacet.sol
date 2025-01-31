@@ -5,6 +5,7 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
+import {IDebtToken} from "../interfaces/IDebtToken.sol";
 
 /// @notice Parameters for deploying a new instance
 struct DeploymentParams {
@@ -46,7 +47,9 @@ interface IFactoryFacet {
     /// @param priceFeed The price feed to use
     /// @param params The deployment parameters
     /// @return The trove manager and sorted troves instances
-    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params) external returns (ITroveManager, ISortedTroves);
+    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params)
+        external
+        returns (ITroveManager, ISortedTroves);
 
     /// @notice Returns the count of trove managers
     /// @return The number of trove managers
@@ -65,18 +68,4 @@ interface IFactoryFacet {
     /// @notice Returns the maximum reward rate for trove managers
     /// @return The maximum reward rate
     function maxTMRewardRate() external view returns (uint128);
-
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IDebtToken _debtToken,
-    //     IGasPool _gasPool,
-    //     IPriceFeedAggregator _priceFeedAggregatorProxy,
-    //     IBorrowerOperations _borrowerOperationsProxy,
-    //     ILiquidationManager _liquidationManagerProxy,
-    //     IStabilityPool _stabilityPoolProxy,
-    //     IBeacon _sortedTrovesBeacon,
-    //     IBeacon _troveManagerBeacon,
-    //     ICommunityIssuance _communityIssuance,
-    //     uint256 _gasCompensation
-    // ) external;
 }

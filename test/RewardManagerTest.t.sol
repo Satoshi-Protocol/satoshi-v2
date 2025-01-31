@@ -46,9 +46,8 @@ import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMulti
 import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
 import {HintLib} from "./utils/HintLib.sol";
 import {TroveBase} from "./utils/TroveBase.t.sol";
-import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+import {MessagingFee} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
-
 
 contract RewardManagerTest is DeployBase, TroveBase {
     using Math for uint256;
@@ -88,10 +87,7 @@ contract RewardManagerTest is DeployBase, TroveBase {
         user5 = vm.addr(6);
 
         // setup contracts and deploy one instance
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
         collateral = ERC20Mock(address(collateralMock));
 
@@ -102,23 +98,23 @@ contract RewardManagerTest is DeployBase, TroveBase {
         vm.stopPrank();
     }
 
-
-
-    /** utils */
+    /**
+     * utils
+     */
     function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
-    TroveBase.openTrove(
-        borrowerOperationsProxy(),
-        sortedTrovesBeaconProxy,
-        troveManagerBeaconProxy,
-        hintHelpers,
-        DEBT_GAS_COMPENSATION,
-        caller,
-        caller,
-        collateralMock,
-        collateralAmt,
-        debtAmt,
-        0.05e18
-    );
+        TroveBase.openTrove(
+            borrowerOperationsProxy(),
+            sortedTrovesBeaconProxy,
+            troveManagerBeaconProxy,
+            hintHelpers,
+            DEBT_GAS_COMPENSATION,
+            caller,
+            caller,
+            collateralMock,
+            collateralAmt,
+            debtAmt,
+            0.05e18
+        );
     }
 
     function _provideToSP(address caller, uint256 amount) internal {
@@ -140,7 +136,6 @@ contract RewardManagerTest is DeployBase, TroveBase {
         stabilityPoolProxy().claimCollateralGains(caller, collateralIndexes);
         vm.stopPrank();
     }
-
 
     function _troveClaimOSHIReward(address caller) internal returns (uint256 amount) {
         vm.prank(caller);
@@ -223,5 +218,4 @@ contract RewardManagerTest is DeployBase, TroveBase {
         vars.claimableTroveReward[3] = troveManagerBeaconProxy.claimableReward(user4);
         vars.claimableTroveReward[4] = troveManagerBeaconProxy.claimableReward(user5);
     }
-
 }

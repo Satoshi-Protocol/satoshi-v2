@@ -45,3 +45,5 @@ pnpm-error.log
 .idea
 
 log
+
+lib

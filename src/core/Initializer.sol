@@ -6,7 +6,6 @@ import {AccessControlInternal} from "@solidstate/contracts/access/access_control
 import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import {AppStorage} from "./AppStorage.sol";
-import {InitialConfig} from "./InitialConfig.sol";
 import {Config} from "./Config.sol";
 import {Utils} from "../library/Utils.sol";
 // import {IDebtToken} from "./interfaces/IDebtToken.sol";
@@ -29,49 +28,66 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
             address communityIssuance,
             address sortedTrovesBeacon,
             address troveManagerBeacon,
-            address gasPool
-        ) = abi.decode(data, (address, address, address, address, address, address));
+            address gasPool,
+            address owner,
+            address guardian,
+            address feeReceiver,
+            uint256 minNetDebt,
+            uint256 gasCompensation
+        ) = abi.decode(
+            data, (address, address, address, address, address, address, address, address, address, uint256, uint256)
+        );
         rewardManager.ensureNonzeroAddress();
 
         // set roles
         _setRoleAdmin(Config.OWNER_ROLE, Config.OWNER_ROLE);
         _setRoleAdmin(Config.GUARDIAN_ROLE, Config.OWNER_ROLE);
-        _grantRole(Config.OWNER_ROLE, msg.sender);
-        _grantRole(Config.GUARDIAN_ROLE, msg.sender);
+        _grantRole(Config.OWNER_ROLE, owner);
+        _grantRole(Config.GUARDIAN_ROLE, guardian);
 
         AppStorage.Layout storage s = AppStorage.layout();
-        s.feeReceiver = InitialConfig.FEE_RECEIVER;
+        s.feeReceiver = feeReceiver;
         s.rewardManager = IRewardManager(rewardManager);
         s.debtToken = DebtToken(debtToken);
         s.communityIssuance = ICommunityIssuance(communityIssuance);
         s.startTime = block.timestamp;
         s.gasPool = gasPool;
 
-        /** BorrowerOperationsFacet */
-        // gasCompensation
-        // debtToken
-        // _setMinNetDebt
-        s.minNetDebt = Config.MIN_NET_DEBT_AMOUNT;
+        /**
+         * BorrowerOperationsFacet
+         */
+        s.minNetDebt = minNetDebt;
+        s.gasCompensation = gasCompensation;
 
-        /** CoreFacet */
+        /**
+         * CoreFacet
+         */
         // feeReceiver
         // rewardManager
         // startTime
         // guardian
 
-        /** FactoryFacet */
+        /**
+         * FactoryFacet
+         */
         s.sortedTrovesBeacon = IBeacon(sortedTrovesBeacon);
         s.troveManagerBeacon = IBeacon(troveManagerBeacon);
 
-        /** LiquidationFacet */
+        /**
+         * LiquidationFacet
+         */
         // stabilityPool
         // borrowerOperations
         // factory
 
-        /** PriceFeedAggregatorFacet */
+        /**
+         * PriceFeedAggregatorFacet
+         */
         // None
 
-        /** StabilityPoolFacet */
+        /**
+         * StabilityPoolFacet
+         */
         // debtToken
         // factory
         // liquidationManager
@@ -79,10 +95,10 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         s.P = Config.DEBT_TOKEN_DECIMALS_BASE;
         s.lastUpdate = uint32(block.timestamp);
 
-        /** NexusYieldManagerFacet */
+        /**
+         * NexusYieldManagerFacet
+         */
         // debtToken
         // rewardManager
-
-
     }
 }

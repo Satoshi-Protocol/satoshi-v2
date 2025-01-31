@@ -46,9 +46,8 @@ import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMulti
 import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
 import {HintLib} from "./utils/HintLib.sol";
 import {TroveBase} from "./utils/TroveBase.t.sol";
-import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+import {MessagingFee} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
-
 
 contract RedeemTest is DeployBase, TroveBase {
     using Math for uint256;
@@ -89,14 +88,10 @@ contract RedeemTest is DeployBase, TroveBase {
         user4 = vm.addr(4);
 
         // setup contracts and deploy one instance
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
         collateral = ERC20Mock(address(collateralMock));
     }
-
 
     function test_getRedemptionHints() public {
         _openTrove(user1, 1e18, 13333e18);
@@ -180,7 +175,7 @@ contract RedeemTest is DeployBase, TroveBase {
 
         _redeemCollateral(user1, redemptionAmount);
         (, uint256 debt3) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
-        assertEq(debt3,  beforeDebt3 - redemptionAmount);
+        assertEq(debt3, beforeDebt3 - redemptionAmount);
     }
 
     function test_redeem() public {
@@ -244,7 +239,9 @@ contract RedeemTest is DeployBase, TroveBase {
         assertEq(collateralMock.balanceOf(user3), expectedColl);
     }
 
-    /** utils */
+    /**
+     * utils
+     */
     function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
         TroveBase.openTrove(
             borrowerOperationsProxy(),

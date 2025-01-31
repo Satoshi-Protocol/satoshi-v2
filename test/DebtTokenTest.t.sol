@@ -106,7 +106,6 @@ contract DebtTokenTest is DeployBase {
         assertEq(debtToken.balanceOf(user1), 200);
     }
 
-
     function testFailMintToZero() public {
         vm.prank(address(satoshiXApp));
         debtToken.mint(address(0), 1e18);
@@ -145,7 +144,6 @@ contract DebtTokenTest is DeployBase {
         debtToken.transferFrom(user1, user2, 20);
     }
 
-    
     function testPermit() public {
         IERC20Permit debtTokenPermit = IERC20Permit(address(debtToken));
         uint256 ownerPrivateKey = 0xA11CE;
@@ -197,7 +195,6 @@ contract DebtTokenTest is DeployBase {
         assertEq(debtToken.flashFee(address(0), 1000e18), 0);
         assertEq(debtToken.flashFee(address(debtToken), 1000e18), 1000e18 * 9 / 10000);
     }
-    
 
     function getDigest(address owner, address spender, uint256 amount, uint256 nonce, uint256 deadline)
         public
@@ -212,5 +209,4 @@ contract DebtTokenTest is DeployBase {
             )
         );
     }
-
 }
