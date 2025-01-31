@@ -20,9 +20,7 @@ libs = [
 remappings = [
     "ds-test/=node_modules/@layerzerolabs/toolbox-foundry/lib/ds-test/",
     "forge-std/=node_modules/@layerzerolabs/toolbox-foundry/lib/forge-std/",
-    
     "@layerzerolabs/=node_modules/@layerzerolabs/",
-    "@layerzerolabs-oapp-upgradeable/=node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git/oapp/",
     "@openzeppelin/=node_modules/@openzeppelin/",
     "@solidstate/contracts/=node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity/contracts/",
 

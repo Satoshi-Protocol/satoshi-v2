@@ -12,7 +12,7 @@ import {
     OFTFeeDetail,
     MessagingReceipt,
     MessagingFee
-} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {IWETH} from "./interfaces/IWETH.sol";
