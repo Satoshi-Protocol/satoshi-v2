@@ -16,7 +16,7 @@ import {
     OFTFeeDetail,
     MessagingReceipt,
     MessagingFee
-} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 
 import {ITroveManager} from "./interfaces/ITroveManager.sol";
 import {IDebtToken} from "./interfaces/IDebtToken.sol";

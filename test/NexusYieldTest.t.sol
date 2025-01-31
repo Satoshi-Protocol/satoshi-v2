@@ -48,7 +48,7 @@ import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMulti
 import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
 import {HintLib} from "./utils/HintLib.sol";
 import {TroveBase} from "./utils/TroveBase.t.sol";
-import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+import {MessagingFee} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import {ERC20Mock} from "./mocks/ERC20Mock.sol";
 
 contract mock6 is ERC20Mock {
