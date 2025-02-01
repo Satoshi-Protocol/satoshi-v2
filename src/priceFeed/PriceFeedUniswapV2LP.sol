@@ -30,7 +30,7 @@ contract PriceFeedUniswapV2LPOracle is Ownable {
     IPriceFeed oracle1;
     uint8 internal immutable _decimals;
 
-    constructor(address pair_, address oracle0_, address oracle1_, uint8 decimals_) {
+    constructor(address pair_, address oracle0_, address oracle1_, uint8 decimals_) Ownable(msg.sender) {
         pair = IUniswapV2Pair(pair_);
         _decimals = decimals_;
         oracle0 = IPriceFeed(oracle0_);

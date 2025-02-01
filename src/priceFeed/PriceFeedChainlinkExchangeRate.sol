@@ -21,7 +21,7 @@ contract PriceFeedChainlinkExchangeRate is Ownable {
     uint8 public constant TARGET_DIGITS = 18;
     SourceConfig[] public sources;
 
-    constructor(SourceConfig[] memory _sources) {
+    constructor(SourceConfig[] memory _sources) Ownable(msg.sender) {
         require(_sources.length == 2, "PriceFeedChainlinkExchangeRate: Invalid sources length");
         for (uint256 i; i < _sources.length; ++i) {
             sources.push(_sources[i]);

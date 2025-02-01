@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-/* Satoshi Core Address */
-address constant SATOSHI_CORE_ADDRESS = 0xA8480eBe583D597C34a8B4B831EFDbe2fe0a10B3;
-
 /* Chainlink Integration Config */
 //NOTE: chainlink price feed source address
-address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0 = 0xE0dBd230E320625fa30B85b1f2a68d0aaDDD367a;
+address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0 = 0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165;
 address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_1 = 0xe428fF95CD0aaE852DF0e22127C578A5De4Cf461;
 uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_0 = 3600;
 uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_1 = 10 days;

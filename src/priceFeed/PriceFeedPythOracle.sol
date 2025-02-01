@@ -17,7 +17,7 @@ contract PriceFeedPythOracle is IPriceFeed, Ownable {
     string internal _key;
     uint256 public maxTimeThreshold;
 
-    constructor(IPyth pyth_, uint8 decimals_, bytes32 priceID_, uint256 _maxTimeThreshold) {
+    constructor(IPyth pyth_, uint8 decimals_, bytes32 priceID_, uint256 _maxTimeThreshold) Ownable(msg.sender) {
         pyth = pyth_;
         _decimals = decimals_;
         priceID = priceID_;

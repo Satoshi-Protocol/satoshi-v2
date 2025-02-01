@@ -12,7 +12,7 @@ interface IVaultManager {
 
     function executeStrategy(address, uint256) external;
     function exitStrategy(address, uint256) external;
-    function initialize(ISatoshiXApp, address) external;
+    function initialize(address) external;
     function exitStrategyByTroveManager(uint256 amount) external;
     function setPriority(INYMVault[] memory _priority) external;
     function transferCollToTroveManager(uint256 amount) external;

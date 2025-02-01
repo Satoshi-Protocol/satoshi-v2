@@ -2,7 +2,6 @@
 pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {INexusYieldManagerFacet} from "../interfaces/INexusYieldManagerFacet.sol";
 import {IUniswapV2Router01} from "../../library/interfaces/vault/IUniswapV2Router01.sol";
 import {VaultCore} from "./VaultCore.sol";
@@ -13,7 +12,7 @@ contract UniV2Vault is VaultCore {
 
     function initialize(bytes calldata data) external override initializer {
         __UUPSUpgradeable_init_unchained();
-        (ISatoshiXApp _satoshiCore, address stableTokenAddress_, address satAddress_, address pair_) =
+        (address stableTokenAddress_, address satAddress_, address pair_) =
             _decodeInitializeData(data);
 
         STABLE_TOKEN_ADDRESS = stableTokenAddress_;
@@ -64,9 +63,9 @@ contract UniV2Vault is VaultCore {
     function _decodeInitializeData(bytes calldata data)
         internal
         pure
-        returns (ISatoshiXApp, address, address, address)
+        returns (address, address, address)
     {
-        return abi.decode(data, (ISatoshiXApp, address, address, address));
+        return abi.decode(data, (address, address, address));
     }
 
     function _decodeExecuteData(bytes calldata data) internal pure returns (uint256, uint256, uint256, uint256) {

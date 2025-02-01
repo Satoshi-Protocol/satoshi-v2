@@ -16,8 +16,7 @@ contract PriceFeedCurveLPOracle is Ownable {
     ICurvePool internal immutable _source;
     uint8 internal immutable _decimals;
 
-    constructor(address source_, uint8 decimals_, ISatoshiCore _satoshiCore) {
-
+    constructor(address source_, uint8 decimals_) Ownable(msg.sender) {
         _source = ICurvePool(source_);
         _decimals = decimals_;
     }

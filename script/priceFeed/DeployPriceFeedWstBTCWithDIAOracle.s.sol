@@ -8,7 +8,6 @@ import {
 } from "../../src/priceFeed/PriceFeedWstBTCWithDIAOracle.sol";
 import {IDIAOracleV2} from "../../src/priceFeed/interfaces/IDIAOracleV2.sol";
 import {
-    SATOSHI_CORE_ADDRESS,
     DIA_ORACLE_PRICE_FEED_SOURCE_ADDRESS,
     DIA_ORACLE_PRICE_FEED_DECIMALS,
     DIA_ORACLE_PRICE_FEED_KEY,

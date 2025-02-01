@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+address constant SATOSHI_X_APP_ADDRESS = 0x07BbC5A83B83a5C440D1CAedBF1081426d0AA4Ec;
 address constant REWARD_MANAGER_ADDRESS = 0xA11c3CAC45606C5b341B729332c2FA31bE896eb2;
 
 //NOTE: custom `PriceFeed.sol` contract for the collateral should be deploy first
-address constant PRICE_FEED_ADDRESS = 0x896a6a8937C38A0f89BfD8Db8B071BE4D4cdfB83;
+address constant PRICE_FEED_ADDRESS = 0x00072C48501f53Cb2Bb9EFCdD7A0Ee569cF9428f;
 address constant COLLATERAL_ADDRESS = 0x980B62Da83eFf3D4576C647993b0c1D7faf17c73;
 
 uint256 constant MINUTE_DECAY_FACTOR = 999037758833783500; //  (half life of 12 hours)

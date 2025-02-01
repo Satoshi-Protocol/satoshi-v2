@@ -2,19 +2,17 @@
 pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {IStrategyManager} from "../../library/interfaces/vault/IStrategyManager.sol";
 import {IDelegationManager, QueuedWithdrawalParams} from "../../library/interfaces/vault/IDelegationManager.sol";
 import {IStrategy} from "../../library/interfaces/vault/IStrategy.sol";
 import {CDPVaultCore} from "./CDPVaultCore.sol";
-import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 
 contract PellVault is CDPVaultCore {
     address public pellStrategy;
 
     function initialize(bytes calldata data) external override initializer {
         __UUPSUpgradeable_init_unchained();
-        (ISatoshiXApp _satoshiCore, address tokenAddress_, address vaultManager_, address pellStrategy_) =
+        (address tokenAddress_, address vaultManager_, address pellStrategy_) =
             _decodeInitializeData(data);
 
         TOKEN_ADDRESS = tokenAddress_;
@@ -68,9 +66,9 @@ contract PellVault is CDPVaultCore {
     function _decodeInitializeData(bytes calldata data)
         internal
         pure
-        returns (ISatoshiXApp, address, address, address)
+        returns (address, address, address)
     {
-        return abi.decode(data, (ISatoshiXApp, address, address, address));
+        return abi.decode(data, (address, address, address));
     }
 
     function _decodeExecuteData(bytes calldata data) internal pure returns (uint256 amount) {

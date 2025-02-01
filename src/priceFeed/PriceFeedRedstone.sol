@@ -17,12 +17,10 @@ contract PriceFeedRedstone is IPriceFeed, Ownable {
 
     constructor(
         IPriceCalculator source_,
-        ISatoshiCore _satoshiCore,
         address asset_,
         uint8 decimals_,
         uint256 _maxTimeThreshold
-    ) {
-
+    ) Ownable(msg.sender) {
         _source = source_;
         maxTimeThreshold = _maxTimeThreshold;
         _decimals = decimals_;

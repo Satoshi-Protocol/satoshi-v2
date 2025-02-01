@@ -5,9 +5,10 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {ICDPVault} from "../interfaces/vault/ICDPVault.sol";
-import {SatoshiOwnable} from "./SatoshiOwnable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-abstract contract CDPVaultCore is ICDPVault, SatoshiOwnable, UUPSUpgradeable {
+
+abstract contract CDPVaultCore is ICDPVault, UUPSUpgradeable, OwnableUpgradeable {
     address public strategyAddr;
     address public TOKEN_ADDRESS;
     address public vaultManager;

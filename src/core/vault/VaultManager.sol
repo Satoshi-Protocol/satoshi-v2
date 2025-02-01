@@ -2,21 +2,20 @@
 pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SatoshiOwnable} from "./SatoshiOwnable.sol";
 
 import {INYMVault} from "../interfaces/INYMVault.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 /* 
     * @title VaultManager
     * @dev The contract is responsible for managing the vaults
     * Each TroveManager has a VaultManager
     */
 
-contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
+contract VaultManager is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     address public troveManager;
     IERC20 public collateralToken;
 
@@ -30,7 +29,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(ISatoshiXApp _satoshiCore, address troveManager_) external override initializer {
+    function initialize(address troveManager_) external override initializer {
         __UUPSUpgradeable_init_unchained();
 
         troveManager = troveManager_;

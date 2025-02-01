@@ -6,7 +6,6 @@ import {Script, console} from "forge-std/Script.sol";
 import {PriceFeedRedstone} from "../../src/priceFeed/PriceFeedRedstone.sol";
 import {IPriceCalculator} from "../../src/priceFeed/interfaces/IPriceCalculator.sol";
 import {
-    SATOSHI_CORE_ADDRESS,
     REDSTONE_MAX_TIME_THRESHOLD,
     REDSTONE_ORACLE_PRICE_FEED_DECIMAL,
     REDSTONE_ORACLE_PRICE_FEED_SOURCE_ADDRESS,
@@ -27,10 +26,8 @@ contract DeployPriceFeedRedstoneScript is Script {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         IPriceCalculator source = IPriceCalculator(REDSTONE_ORACLE_PRICE_FEED_SOURCE_ADDRESS);
-        ISatoshiCore satoshiCore = ISatoshiCore(SATOSHI_CORE_ADDRESS);
         priceFeedRedstoneOracle = new PriceFeedRedstone(
             source,
-            satoshiCore,
             REDSTONE_ORACLE_ASSET_ADDRESS,
             REDSTONE_ORACLE_PRICE_FEED_DECIMAL,
             REDSTONE_MAX_TIME_THRESHOLD

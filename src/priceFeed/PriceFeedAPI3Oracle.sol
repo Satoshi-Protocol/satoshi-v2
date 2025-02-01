@@ -15,7 +15,7 @@ contract PriceFeedAPI3Oracle is IPriceFeed, Ownable {
     string internal _key;
     uint256 public maxTimeThreshold;
 
-    constructor(IProxy source_, uint8 decimals_, uint256 _maxTimeThreshold) {
+    constructor(IProxy source_, uint8 decimals_, uint256 _maxTimeThreshold) Ownable(msg.sender) {
         _source = source_;
         _decimals = decimals_;
         maxTimeThreshold = _maxTimeThreshold;

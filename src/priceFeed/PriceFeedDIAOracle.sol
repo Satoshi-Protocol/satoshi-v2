@@ -20,7 +20,7 @@ contract PriceFeedDIAOracle is IPriceFeed, Ownable {
         uint8 decimals_,
         string memory key_,
         uint256 _maxTimeThreshold
-    ) {
+    ) Ownable(msg.sender) {
         _source = source_;
         _decimals = decimals_;
         _key = key_;

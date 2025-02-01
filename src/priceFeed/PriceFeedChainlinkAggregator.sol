@@ -14,7 +14,7 @@ contract PriceFeedChainlinkAggregator is IPriceFeed, Ownable {
     uint8 public constant TARGET_DIGITS = 18;
     SourceConfig[] public sources;
 
-    constructor(SourceConfig[] memory _sources) {
+    constructor(SourceConfig[] memory _sources) Ownable(msg.sender) {
         uint256 length = _sources.length;
         for (uint256 i; i < length; ++i) {
             sources.push(_sources[i]);

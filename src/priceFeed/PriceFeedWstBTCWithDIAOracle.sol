@@ -34,7 +34,7 @@ contract PriceFeedWstBTCWithDIAOracle is IPriceFeed, Ownable {
         string memory key_,
         uint256 _maxTimeThreshold,
         IWstBTCPartial wstBTC_
-    ) {
+    ) Ownable(msg.sender) {
         _source = source_;
         _decimals = decimals_;
         _key = key_;

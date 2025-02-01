@@ -13,8 +13,7 @@ contract PriceFeedChainlink is IPriceFeed, Ownable {
     AggregatorV3Interface internal immutable _source;
     uint256 public maxTimeThreshold;
 
-    constructor(AggregatorV3Interface source_, ISatoshiCore _satoshiCore) {
-
+    constructor(AggregatorV3Interface source_) Ownable(msg.sender) {
         _source = source_;
         maxTimeThreshold = 86400;
         emit MaxTimeThresholdUpdated(86400);

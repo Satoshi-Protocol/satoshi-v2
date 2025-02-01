@@ -14,7 +14,7 @@ contract PriceFeedRedstoneBTC is IPriceFeed, Ownable {
     uint256 public maxTimeThreshold;
     uint8 internal immutable _decimals;
 
-    constructor(IPriceCalculator source_, uint8 decimals_, uint256 _maxTimeThreshold) {
+    constructor(IPriceCalculator source_, uint8 decimals_, uint256 _maxTimeThreshold) Ownable(msg.sender) {
         _source = source_;
         maxTimeThreshold = _maxTimeThreshold;
         _decimals = decimals_;

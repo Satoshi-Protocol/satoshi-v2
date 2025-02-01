@@ -2,14 +2,13 @@
 pragma solidity ^0.8.20;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {IPool} from "../../library/interfaces/vault/IPool.sol";
 import {CDPVaultCore} from "./CDPVaultCore.sol";
 
 contract AvalonVault is CDPVaultCore {
     function initialize(bytes calldata data) external override initializer {
         __UUPSUpgradeable_init_unchained();
-        (ISatoshiXApp _satoshiCore, address tokenAddress_, address vaultManager_) = _decodeInitializeData(data);
+        (address tokenAddress_, address vaultManager_) = _decodeInitializeData(data);
 
         TOKEN_ADDRESS = tokenAddress_;
         vaultManager = vaultManager_;
@@ -43,8 +42,8 @@ contract AvalonVault is CDPVaultCore {
         return abi.encode(amount);
     }
 
-    function _decodeInitializeData(bytes calldata data) internal pure returns (ISatoshiXApp, address, address) {
-        return abi.decode(data, (ISatoshiXApp, address, address));
+    function _decodeInitializeData(bytes calldata data) internal pure returns (address, address) {
+        return abi.decode(data, ( address, address));
     }
 
     function _decodeExecuteData(bytes calldata data) internal pure returns (uint256 amount) {

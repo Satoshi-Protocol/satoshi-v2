@@ -5,9 +5,10 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
 import {INYMVault} from "../interfaces/INYMVault.sol";
-import {SatoshiOwnable} from "./SatoshiOwnable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-abstract contract VaultCore is INYMVault, SatoshiOwnable, UUPSUpgradeable {
+
+abstract contract VaultCore is INYMVault, UUPSUpgradeable, OwnableUpgradeable {
     address public strategyAddr;
     address public nymAddr;
     address public STABLE_TOKEN_ADDRESS;

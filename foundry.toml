@@ -28,6 +28,7 @@ remappings = [
     "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
     "solidity-bytes-utils/=node_modules/solidity-bytes-utils/",
     "solmate/=lib/solmate/",
+    "@api3/contracts=lib/contracts/contracts",
 ]
 
 [profile.default.rpc_endpoints]

@@ -25,7 +25,7 @@ contract PriceFeedSupraOracle is IPriceFeed, Ownable {
         uint8 decimals_,
         uint256 _maxTimeThreshold,
         uint256 _pairIndex
-    ) {
+    ) Ownable(msg.sender) {
         _source = source_;
         _pullSource = pullSource_;
         _decimals = decimals_;

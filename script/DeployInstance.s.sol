@@ -13,6 +13,7 @@ import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggreg
 import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
 import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
 import {
+    SATOSHI_X_APP_ADDRESS,
     PRICE_FEED_ADDRESS,
     COLLATERAL_ADDRESS,
     MINUTE_DECAY_FACTOR,
@@ -43,6 +44,7 @@ contract DeployInstanceScript is Script {
         OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
         collateral = IERC20(COLLATERAL_ADDRESS);
         priceFeed = IPriceFeed(PRICE_FEED_ADDRESS);
+        satoshiXApp = SATOSHI_X_APP_ADDRESS;
         communityIssuance = ICoreFacet(satoshiXApp).communityIssuance();
         assert(address(communityIssuance) != address(0));
         debtToken = ICoreFacet(satoshiXApp).debtToken();
