@@ -11,7 +11,7 @@ import {ISatoshiOwnable} from "../interfaces/ISatoshiOwnable.sol";
  *        https://github.com/prisma-fi/prisma-contracts/blob/main/contracts/dependencies/PrismaOwnable.sol
  *
  */
-abstract contract SatoshiOwnable is Initializable, ISatoshiOwnable {
+abstract contract SatoshiOwnable is Initializable, IOwnable {
     ISatoshiXApp public SATOSHI_CORE;
 
     error InvalidSatoshiCore();

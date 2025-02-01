@@ -32,7 +32,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
 
     function initialize(ISatoshiXApp _satoshiCore, address troveManager_) external override initializer {
         __UUPSUpgradeable_init_unchained();
-        __SatoshiOwnable_init(_satoshiCore);
+
         troveManager = troveManager_;
         collateralToken = ITroveManager(troveManager_).collateralToken();
     }

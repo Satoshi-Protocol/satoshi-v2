@@ -16,7 +16,7 @@ contract PellVault is CDPVaultCore {
         __UUPSUpgradeable_init_unchained();
         (ISatoshiXApp _satoshiCore, address tokenAddress_, address vaultManager_, address pellStrategy_) =
             _decodeInitializeData(data);
-        __SatoshiOwnable_init(_satoshiCore);
+
         TOKEN_ADDRESS = tokenAddress_;
         vaultManager = vaultManager_;
         pellStrategy = pellStrategy_;

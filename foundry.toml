@@ -25,9 +25,9 @@ remappings = [
     "@openzeppelin/=node_modules/@openzeppelin/",
     "@solidstate/contracts/=lib/solidstate-solidity/contracts/",
 
-    "pyth-sdk-solidity/=node_modules/@layerzerolabs/toolbox-foundry/lib/pyth-sdk-solidity/",
+    "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
     "solidity-bytes-utils/=node_modules/solidity-bytes-utils/",
-    "solmate/=node_modules/@layerzerolabs/toolbox-foundry/lib/solmate/",
+    "solmate/=lib/solmate/",
 ]
 
 [profile.default.rpc_endpoints]

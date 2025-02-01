@@ -42,8 +42,8 @@ import {SortedTroves} from "../../src/core/SortedTroves.sol";
 import {TroveManager} from "../../src/core/TroveManager.sol";
 import "../TestConfig.sol";
 import {ISortedTroves} from "../../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../../src/priceFeed/IPriceFeed.sol";
-import {AggregatorV3Interface} from "../../src/priceFeed/AggregatorV3Interface.sol";
+import {IPriceFeed} from "../../src/priceFeed/interfaces/IPriceFeed.sol";
+import {AggregatorV3Interface} from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
 import {MultiCollateralHintHelpers} from "../../src/core/helpers/MultiCollateralHintHelpers.sol";
 import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
 

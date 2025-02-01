@@ -5,7 +5,7 @@ import {Script, console} from "forge-std/Script.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
 import {ISortedTroves} from "../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../src/priceFeed/IPriceFeed.sol";
+import {IPriceFeed} from "../src/priceFeed/interfaces/IPriceFeed.sol";
 import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
 import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
 import {DeploymentParams, IFactoryFacet} from "../src/core/facets/FactoryFacet.sol";

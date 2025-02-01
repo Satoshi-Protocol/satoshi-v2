@@ -22,7 +22,7 @@ import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {ICoreFacet} from "../interfaces/ICoreFacet.sol";
 import {DebtToken} from "../DebtToken.sol";
 import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
-import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
+import {IPriceFeed} from "../../priceFeed/interfaces/IPriceFeed.sol";
 import {Config} from "../Config.sol";
 
 /**

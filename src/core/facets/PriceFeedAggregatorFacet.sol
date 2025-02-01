@@ -5,7 +5,7 @@ import {AccessControlInternal} from "@solidstate/contracts/access/access_control
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {IPriceFeedAggregatorFacet, OracleRecord} from "../interfaces/IPriceFeedAggregatorFacet.sol";
-import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
+import {IPriceFeed} from "../../priceFeed/interfaces/IPriceFeed.sol";
 import {Config} from "../Config.sol";
 
 contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, AccessControlInternal {

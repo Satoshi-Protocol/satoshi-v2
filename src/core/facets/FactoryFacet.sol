@@ -10,7 +10,7 @@ import {AppStorage} from "../AppStorage.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {IDebtToken} from "../interfaces/IDebtToken.sol";
 import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
+import {IPriceFeed} from "../../priceFeed/interfaces/IPriceFeed.sol";
 import {DeploymentParams, IFactoryFacet} from "../interfaces/IFactoryFacet.sol";
 import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
 import {TroveManagerData} from "../interfaces/IBorrowerOperationsFacet.sol";

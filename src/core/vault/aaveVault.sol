@@ -10,7 +10,7 @@ contract AAVEVault is VaultCore {
     function initialize(bytes calldata data) external override initializer {
         __UUPSUpgradeable_init_unchained();
         (ISatoshiXApp _satoshiCore, address stableTokenAddress_) = _decodeInitializeData(data);
-        __SatoshiOwnable_init(_satoshiCore);
+
         STABLE_TOKEN_ADDRESS = stableTokenAddress_;
     }
 

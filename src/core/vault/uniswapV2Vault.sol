@@ -15,7 +15,7 @@ contract UniV2Vault is VaultCore {
         __UUPSUpgradeable_init_unchained();
         (ISatoshiXApp _satoshiCore, address stableTokenAddress_, address satAddress_, address pair_) =
             _decodeInitializeData(data);
-        __SatoshiOwnable_init(_satoshiCore);
+
         STABLE_TOKEN_ADDRESS = stableTokenAddress_;
         SAT_ADDRESS = satAddress_;
         PAIR_ADDRESS = pair_;

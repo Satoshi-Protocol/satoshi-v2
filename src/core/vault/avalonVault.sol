@@ -10,7 +10,7 @@ contract AvalonVault is CDPVaultCore {
     function initialize(bytes calldata data) external override initializer {
         __UUPSUpgradeable_init_unchained();
         (ISatoshiXApp _satoshiCore, address tokenAddress_, address vaultManager_) = _decodeInitializeData(data);
-        __SatoshiOwnable_init(_satoshiCore);
+
         TOKEN_ADDRESS = tokenAddress_;
         vaultManager = vaultManager_;
     }

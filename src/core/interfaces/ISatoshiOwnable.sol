@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {ISatoshiXApp} from "./ISatoshiXApp.sol";
 
-interface ISatoshiOwnable {
+interface IOwnable {
     /**
      * @notice Returns the Satoshi Core application instance
      * @return The Satoshi Core application instance
