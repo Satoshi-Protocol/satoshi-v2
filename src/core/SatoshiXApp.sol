@@ -12,5 +12,5 @@ import {AccessControl} from "@solidstate/contracts/access/access_control/AccessC
  */
 // solhint-disable-next-line no-empty-blocks
 contract SatoshiXApp is SolidStateDiamond, AccessControl {
-    constructor() {}
+// No extra logic
 }

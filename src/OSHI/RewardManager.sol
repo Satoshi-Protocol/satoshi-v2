@@ -69,11 +69,20 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         // No additional authorization logic is needed for this contract
     }
 
-    function initialize(address owner) external initializer {
-        Utils.ensureNonzeroAddress(owner);
+    function initialize(address _owner, address _satoshiXApp, address _weth, address _debtToken, address _oshiToken)
+        external
+        initializer
+    {
+        Utils.ensureNonzeroAddress(_owner);
+        Utils.ensureNonzeroAddress(_satoshiXApp);
+        Utils.ensureNonzeroAddress(_weth);
+        Utils.ensureNonzeroAddress(_debtToken);
+        Utils.ensureNonzeroAddress(_oshiToken);
+
+        _setAddresses(_satoshiXApp, _weth, _debtToken, _oshiToken);
 
         __UUPSUpgradeable_init_unchained();
-        __Ownable_init_unchained(owner);
+        __Ownable_init_unchained(_owner);
     }
 
     // --- External Functions ---
@@ -305,17 +314,11 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         emit TroveManagerRemoved(_troveManager);
     }
 
-    function setAddresses(address _satoshiXPP, IWETH _weth, IDebtToken _debtToken, IOSHIToken _oshiToken)
+    function setAddresses(address _satoshiXApp, address _weth, address _debtToken, address _oshiToken)
         external
         onlyOwner
     {
-        satoshiXApp = _satoshiXPP;
-        weth = _weth;
-        debtToken = _debtToken;
-        oshiToken = _oshiToken;
-        emit SatoshiXappSet(_satoshiXPP);
-        emit DebtTokenSet(_debtToken);
-        emit WETHSet(_weth);
+        _setAddresses(_satoshiXApp, _weth, _debtToken, _oshiToken);
     }
 
     function claimFee() external onlyOwner {
@@ -372,6 +375,22 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         if (debtAmount == 0) return;
 
         debtToken.transfer(msg.sender, debtAmount);
+    }
+
+    function _setAddresses(address _satoshiXApp, address _weth, address _debtToken, address _oshiToken) internal {
+        Utils.ensureNonzeroAddress(_satoshiXApp);
+        Utils.ensureNonzeroAddress(_weth);
+        Utils.ensureNonzeroAddress(_debtToken);
+        Utils.ensureNonzeroAddress(_oshiToken);
+
+        satoshiXApp = _satoshiXApp;
+        weth = IWETH(_weth);
+        debtToken = IDebtToken(_debtToken);
+        oshiToken = IOSHIToken(_oshiToken);
+        emit SatoshiXappSet(_satoshiXApp);
+        emit DebtTokenSet(_debtToken);
+        emit OSHITokenSet(_oshiToken);
+        emit WETHSet(_weth);
     }
 
     // --- Require ---

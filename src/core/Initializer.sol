@@ -37,7 +37,18 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         ) = abi.decode(
             data, (address, address, address, address, address, address, address, address, address, uint256, uint256)
         );
+
         rewardManager.ensureNonzeroAddress();
+        debtToken.ensureNonzeroAddress();
+        communityIssuance.ensureNonzeroAddress();
+        sortedTrovesBeacon.ensureNonzeroAddress();
+        troveManagerBeacon.ensureNonzeroAddress();
+        gasPool.ensureNonzeroAddress();
+        owner.ensureNonzeroAddress();
+        guardian.ensureNonzeroAddress();
+        feeReceiver.ensureNonzeroAddress();
+        minNetDebt.ensureNonZero();
+        gasCompensation.ensureNonZero();
 
         // set roles
         _setRoleAdmin(Config.OWNER_ROLE, Config.OWNER_ROLE);
@@ -57,11 +68,11 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
          * BorrowerOperationsFacet
          */
         s.minNetDebt = minNetDebt;
-        s.gasCompensation = gasCompensation;
 
         /**
          * CoreFacet
          */
+        s.gasCompensation = gasCompensation;
         // feeReceiver
         // rewardManager
         // startTime
@@ -76,9 +87,7 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         /**
          * LiquidationFacet
          */
-        // stabilityPool
-        // borrowerOperations
-        // factory
+        // None
 
         /**
          * PriceFeedAggregatorFacet
@@ -88,10 +97,7 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         /**
          * StabilityPoolFacet
          */
-        // debtToken
-        // factory
-        // liquidationManager
-        // communityIssuance = _communityIssuance;
+        // communityIssuance
         s.P = Config.DEBT_TOKEN_DECIMALS_BASE;
         s.lastUpdate = uint32(block.timestamp);
 

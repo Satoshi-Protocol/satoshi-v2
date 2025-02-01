@@ -108,7 +108,6 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function run() external {
-        console.log("deployer:", deployer);
         _deploySortedTrovesBeacon();
         _deployTroveManagerBeacon();
         _deployInitializer();
@@ -124,33 +123,11 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         _deployHintHelpers();
         _setContracts();
 
+        // set config
         _setConfigByOwner();
 
+        // console.log all contracts
         _consoleAllContract();
-    }
-
-    function _consoleAllContract() internal view {
-        console.log("satoshiXApp", address(satoshiXApp));
-        console.log("borrowerOperationsFacet", address(borrowerOperationsFacet));
-        console.log("coreFacet", address(coreFacet));
-        console.log("factoryFacet", address(factoryFacet));
-        console.log("liquidationFacet", address(liquidationFacet));
-        console.log("priceFeedAggregatorFacet", address(priceFeedAggregatorFacet));
-        console.log("stabilityPoolFacet", address(stabilityPoolFacet));
-        console.log("nexusYieldManagerFacet", address(nexusYieldManagerFacet));
-        console.log("initializer", address(initializer));
-        console.log("satoshiPeriphery", address(satoshiPeriphery));
-        console.log("gasPool", address(gasPool));
-        console.log("debtToken", address(debtToken));
-        console.log("rewardManager", address(rewardManager));
-        console.log("communityIssuance", address(communityIssuance));
-        console.log("oshiToken", address(oshiToken));
-        console.log("sortedTrovesBeacon", address(sortedTrovesBeacon));
-        console.log("troveManagerBeacon", address(troveManagerBeacon));
-        console.log("rewardManager", address(rewardManager));
-        console.log("oshiToken", address(oshiToken));
-        console.log("communityIssuance", address(communityIssuance));
-        console.log("hintHelpers", address(hintHelpers));
     }
 
     function _setContracts() internal {
@@ -206,7 +183,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(borrowerOperationsFacet) == address(0)); // check if contract is not deployed
         borrowerOperationsFacet = IBorrowerOperationsFacet(address(new BorrowerOperationsFacet()));
-        bytes4[] memory selectors = new bytes4[](17);
+        bytes4[] memory selectors = new bytes4[](18);
         selectors[0] = IBorrowerOperationsFacet.addColl.selector;
         selectors[1] = IBorrowerOperationsFacet.adjustTrove.selector;
         selectors[2] = IBorrowerOperationsFacet.checkRecoveryMode.selector;
@@ -372,11 +349,11 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(rewardManager) == address(0)); // check if contract is not deployed
         address rewardManagerImpl = address(new RewardManager());
-        bytes memory data = abi.encodeCall(IRewardManager.initialize, (owner));
+        bytes memory data = abi.encodeCall(
+            IRewardManager.initialize,
+            (owner, address(satoshiXApp), WETH_ADDRESS, address(debtToken), address(oshiToken))
+        );
         rewardManager = IRewardManager(address(new ERC1967Proxy(address(rewardManagerImpl), data)));
-        vm.stopBroadcast();
-        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-        rewardManager.setAddresses(address(satoshiXApp), IWETH(WETH_ADDRESS), debtToken, oshiToken);
         vm.stopBroadcast();
     }
 
@@ -402,6 +379,13 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         address communityIssuanceImpl = address(new CommunityIssuance());
         bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (owner, oshiToken, address(satoshiXApp)));
         communityIssuance = ICommunityIssuance(address(new ERC1967Proxy(address(communityIssuanceImpl), data)));
+        vm.stopBroadcast();
+    }
+
+    function _deployGasPool() internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        assert(gasPool == IGasPool(address(0))); // check if gas pool contract is not deployed
+        gasPool = new GasPool();
         vm.stopBroadcast();
     }
 
@@ -486,33 +470,15 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
     }
 
-    function _registerTroveManager(ITroveManager _troveManager) internal {
-        vm.startBroadcast(OWNER_PRIVATE_KEY);
-        rewardManager.registerTroveManager(_troveManager);
-        vm.stopBroadcast();
-    }
-
     function _setConfigByOwner() internal {
-        // set allocation for the stability pool
-        address[] memory _recipients = new address[](1);
-        _recipients[0] = address(satoshiXApp);
-        uint256[] memory _amount = new uint256[](1);
-        _amount[0] = SP_ALLOCATION;
         _setRewardManager(address(rewardManager));
         _setSPCommunityIssuanceAllocation();
-        _setAddress(address(satoshiXApp), WETH_ADDRESS, debtToken, oshiToken);
         _setClaimStartTime(SP_CLAIM_START_TIME);
     }
 
     function _setRewardManager(address _rewardManager) internal {
         vm.startBroadcast(OWNER_PRIVATE_KEY);
         ICoreFacet(address(satoshiXApp)).setRewardManager(_rewardManager);
-        vm.stopBroadcast();
-    }
-
-    function _setAddress(address _satoshiXApp, address _weth, IDebtToken _debtToken, IOSHIToken _oshiToken) internal {
-        vm.startBroadcast(OWNER_PRIVATE_KEY);
-        rewardManager.setAddresses(_satoshiXApp, IWETH(_weth), _debtToken, _oshiToken);
         vm.stopBroadcast();
     }
 
@@ -540,10 +506,28 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
     }
 
-    function _deployGasPool() internal {
-        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-        assert(gasPool == IGasPool(address(0))); // check if gas pool contract is not deployed
-        gasPool = new GasPool();
-        vm.stopBroadcast();
+    function _consoleAllContract() internal view {
+        console.log("deployer:", deployer);
+        console.log("satoshiXApp", address(satoshiXApp));
+        console.log("borrowerOperationsFacet", address(borrowerOperationsFacet));
+        console.log("coreFacet", address(coreFacet));
+        console.log("factoryFacet", address(factoryFacet));
+        console.log("liquidationFacet", address(liquidationFacet));
+        console.log("priceFeedAggregatorFacet", address(priceFeedAggregatorFacet));
+        console.log("stabilityPoolFacet", address(stabilityPoolFacet));
+        console.log("nexusYieldManagerFacet", address(nexusYieldManagerFacet));
+        console.log("initializer", address(initializer));
+        console.log("satoshiPeriphery", address(satoshiPeriphery));
+        console.log("gasPool", address(gasPool));
+        console.log("debtToken", address(debtToken));
+        console.log("rewardManager", address(rewardManager));
+        console.log("communityIssuance", address(communityIssuance));
+        console.log("oshiToken", address(oshiToken));
+        console.log("sortedTrovesBeacon", address(sortedTrovesBeacon));
+        console.log("troveManagerBeacon", address(troveManagerBeacon));
+        console.log("rewardManager", address(rewardManager));
+        console.log("oshiToken", address(oshiToken));
+        console.log("communityIssuance", address(communityIssuance));
+        console.log("hintHelpers", address(hintHelpers));
     }
 }

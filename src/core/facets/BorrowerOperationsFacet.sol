@@ -19,20 +19,11 @@ import {
 import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
 import {Config} from "../Config.sol";
 import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
-/**
- * @title Borrower Operations Contract (Upgradable)
- *        Mutated from:
- *        https://github.com/prisma-fi/prisma-contracts/blob/main/contracts/core/BorrowerOperations.sol
- *        https://github.com/liquity/dev/blob/main/packages/contracts/contracts/BorrowerOperations.sol
- *
- */
 
 contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal {
     using SafeERC20 for IERC20;
     using SafeERC20 for IDebtToken;
     using BorrowerOperationsLib for *;
-
-    // IFactory public factory;
 
     struct LocalVariables_adjustTrove {
         uint256 price;
@@ -63,29 +54,6 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 stake;
         uint256 arrayIndex;
     }
-
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
-    // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
-    // // solhint-disable-next-line no-empty-blocks
-    // function _authorizeUpgrade(address newImplementation) internal view override onlyRole(Config.OWNER_ROLE) {
-    //     // No additional authorization logic is needed for this contract
-    // }
-
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IDebtToken _debtToken,
-    //     IFactory _factory,
-    //     uint256 _minNetDebt,
-    //     uint256 _gasCompensation
-    // ) external initializer {
-    //     __UUPSUpgradeable_init_unchained();
-    //     debtToken = _debtToken;
-    //     factory = _factory;
-    //     _setMinNetDebt(_minNetDebt);
-    // }
 
     function isApprovedDelegate(address _account, address _delegate) external view returns (bool) {
         return AppStorage.layout().isApprovedDelegate[_account][_delegate];

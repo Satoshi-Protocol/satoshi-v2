@@ -20,8 +20,8 @@ uint256 constant NUMBER_OF_LOCK_DURATIONS = 4;
 interface IRewardManager {
     event TroveManagerRegistered(ITroveManager);
     event TroveManagerRemoved(ITroveManager);
-    event DebtTokenSet(IDebtToken);
-    event WETHSet(IWETH);
+    event DebtTokenSet(address);
+    event WETHSet(address);
     event TotalOSHIStakedUpdated(uint256);
     event StakeChanged(address, uint256);
     event StakingGainsWithdrawn(address, uint256[], uint256);
@@ -30,6 +30,7 @@ interface IRewardManager {
     event F_SATUpdated(uint256);
     event WhitelistCallerSet(address, bool);
     event SatoshiXappSet(address);
+    event OSHITokenSet(address);
 
     error NativeTokenTransferFailed();
 
@@ -50,7 +51,8 @@ interface IRewardManager {
         uint32[NUMBER_OF_LOCK_DURATIONS] nextUnlockIndex;
     }
 
-    function initialize(address owner) external;
+    function initialize(address owner, address _satoshiXApp, address _weth, address _debtToken, address _oshiToken)
+        external;
     function stake(uint256 _amount, LockDuration _duration) external;
     function unstake(uint256 _amount) external;
     function claimReward() external;
@@ -61,7 +63,7 @@ interface IRewardManager {
     function getPendingSATGain(address _user) external view returns (uint256);
     function registerTroveManager(ITroveManager _troveManager) external;
     function removeTroveManager(ITroveManager _troveManager) external;
-    function setAddresses(address _satoshiXPP, IWETH _weth, IDebtToken _debtToken, IOSHIToken _oshiToken) external;
+    function setAddresses(address _satoshiXApp, address _weth, address _debtToken, address _oshiToken) external;
     function F_SAT() external view returns (uint256);
     function F_COLL(uint256) external view returns (uint256);
     function collForFeeReceiver(uint256) external view returns (uint256);

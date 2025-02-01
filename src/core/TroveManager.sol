@@ -167,8 +167,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         uint256 _debtGasCompensation
     ) external initializer {
         Utils.ensureNonzeroAddress(_owner);
+        Utils.ensureNonzeroAddress(_gasPool);
         Utils.ensureNonzeroAddress(address(_debtToken));
         Utils.ensureNonzeroAddress(address(_communityIssuance));
+        Utils.ensureNonzeroAddress(_satoshiXApp);
+        Utils.ensureNonZero(_debtGasCompensation);
 
         __Ownable_init_unchained(_owner);
         gasPool = _gasPool;

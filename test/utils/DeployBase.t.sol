@@ -364,11 +364,11 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(rewardManager) == address(0)); // check if contract is not deployed
         address rewardManagerImpl = address(new RewardManager());
-        bytes memory data = abi.encodeCall(IRewardManager.initialize, (OWNER));
+        bytes memory data = abi.encodeCall(
+            IRewardManager.initialize,
+            (OWNER, address(satoshiXApp), address(weth), address(debtToken), address(oshiToken))
+        );
         rewardManager = IRewardManager(address(new ERC1967Proxy(address(rewardManagerImpl), data)));
-        vm.stopPrank();
-        vm.startPrank(OWNER);
-        rewardManager.setAddresses(address(satoshiXApp), weth, debtToken, oshiToken);
         vm.stopPrank();
     }
 

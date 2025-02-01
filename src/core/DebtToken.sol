@@ -76,6 +76,8 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     ) external initializer {
         Utils.ensureNonzeroAddress(_satoshiXApp);
         Utils.ensureNonzeroAddress(_owner);
+        Utils.ensureNonzeroAddress(_gasPool);
+        Utils.ensureNonZero(debtGasCompensation_);
 
         __UUPSUpgradeable_init_unchained();
         __OFT_init(_name, _symbol, _owner);

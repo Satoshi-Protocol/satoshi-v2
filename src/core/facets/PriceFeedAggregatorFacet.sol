@@ -9,30 +9,6 @@ import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
 import {Config} from "../Config.sol";
 
 contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, AccessControlInternal {
-    // // Used to convert the raw price to an 18-digit precision uint
-    // uint256 public constant TARGET_DIGITS = 18;
-
-    // State ------------------------------------------------------------------------------------------------------------
-
-    // mapping(IERC20 => OracleRecord) public oracleRecords;
-
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
-    // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
-    // // solhint-disable-next-line no-empty-blocks
-    // function _authorizeUpgrade(address newImplementation) internal view override onlyRole(Config.OWNER_ROLE) {
-    //     // No additional authorization logic is needed for this contract
-    // }
-
-    // function initialize(ISatoshiCore _satoshiCore) external initializer {
-    //     __UUPSUpgradeable_init_unchained();
-    //     __SatoshiOwnable_init(_satoshiCore);
-    // }
-
-    // Admin routines ---------------------------------------------------------------------------------------------------
-
     function setPriceFeed(IERC20 _token, IPriceFeed _priceFeed) external onlyRole(Config.OWNER_ROLE) {
         _setPriceFeed(_token, _priceFeed);
     }

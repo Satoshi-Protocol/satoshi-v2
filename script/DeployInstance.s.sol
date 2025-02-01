@@ -13,7 +13,6 @@ import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggreg
 import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
 import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
 import {
-    FACTORY_ADDRESS,
     PRICE_FEED_ADDRESS,
     COLLATERAL_ADDRESS,
     MINUTE_DECAY_FACTOR,
@@ -70,25 +69,15 @@ contract DeployInstanceScript is Script {
 
         IPriceFeedAggregatorFacet(satoshiXApp).setPriceFeed(collateral, priceFeed);
         DeploymentParams memory params = deploymentParams;
-        // (ISortedTroves sortedTrovesBeaconProxy, ITroveManager troveManagerBeaconProxy) =
-        IFactoryFacet(satoshiXApp).deployNewInstance(collateral, priceFeed, params);
-
-        uint256 troveManagerCount = IFactoryFacet(satoshiXApp).troveManagerCount();
-        ITroveManager troveManagerBeaconProxy = IFactoryFacet(satoshiXApp).troveManagers(troveManagerCount - 1);
-        ISortedTroves sortedTrovesBeaconProxy = troveManagerBeaconProxy.sortedTroves();
-
-        // get the first trove manager
-        ITroveManager troveManagerBeaconProxyBTC = IFactoryFacet(satoshiXApp).troveManagers(0);
+        (ITroveManager troveManagerBeaconProxy, ISortedTroves sortedTrovesBeaconProxy) =
+            IFactoryFacet(satoshiXApp).deployNewInstance(collateral, priceFeed, params);
 
         // set reward manager settings
         rewardManager.registerTroveManager(troveManagerBeaconProxy);
 
         // set community issuance allocation & addresses
         _setCommunityIssuanceAllocation(address(troveManagerBeaconProxy), params.OSHIAllocation);
-        _setCommunityIssuanceAllocation(address(troveManagerBeaconProxyBTC), params.OSHIAllocation);
-
         require(communityIssuance.allocated(address(troveManagerBeaconProxy)) == params.OSHIAllocation);
-        require(communityIssuance.allocated(address(troveManagerBeaconProxyBTC)) == params.OSHIAllocation);
 
         console.log("SortedTrovesBeaconProxy: address:", address(sortedTrovesBeaconProxy));
         console.log("TroveManagerBeaconProxy: address:", address(troveManagerBeaconProxy));

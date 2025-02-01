@@ -408,12 +408,12 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
     function depositSnapshots(address depositor)
         external
         view
-        returns (uint256 P, uint256 G, uint128 scale, uint128 epoch)
+        returns (uint256 _P, uint256 _G, uint128 scale, uint128 epoch)
     {
         AppStorage.Layout storage s = AppStorage.layout();
         Snapshots memory snapshots = s.depositSnapshots[depositor];
-        P = snapshots.P;
-        G = snapshots.G;
+        _P = snapshots.P;
+        _G = snapshots.G;
         scale = snapshots.scale;
         epoch = snapshots.epoch;
     }
