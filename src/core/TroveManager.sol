@@ -746,6 +746,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         surplusBalances[_borrower] += _collateral;
         totalActiveCollateral -= _collateral;
+
+        // get coll from the vault
+        _exitColl(_collateral);
     }
 
     function _isValidFirstRedemptionHint(
@@ -773,10 +776,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         require(claimableColl > 0, "No collateral available to claim");
 
         surplusBalances[msg.sender] = 0;
-
-        _sendSurplus(_receiver, claimableColl);
-
-        // collateralToken.safeTransfer(_receiver, claimableColl);
+        collateralToken.safeTransfer(_receiver, claimableColl);
 
         if (interestPayable > 0) {
             collectInterests();
@@ -1156,16 +1156,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         }
     }
 
-    function _sendSurplus(address _account, uint256 _amount) private {
-        _exitCollFromStrategy(_amount);
-
-        if (_amount > 0) {
-            emit CollateralSent(_account, _amount);
-
-            collateralToken.safeTransfer(_account, _amount);
-        }
-    }
-
     function _exitCollFromStrategy(uint256 _amount) internal {
         uint256 totalColl = getEntireSystemColl();
         uint256 newTotal = totalColl - _amount;
@@ -1183,6 +1173,10 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
             uint256 refillAmount = _amount + target - remainColl;
             vaultManager.exitStrategyByTroveManager(refillAmount);
         }
+    }
+
+    function _exitColl(uint256 collAmount) internal {
+        vaultManager.exitStrategyByTroveManager(collAmount);
     }
 
     function _increaseDebt(address account, uint256 netDebtAmount, uint256 debtAmount) internal {
