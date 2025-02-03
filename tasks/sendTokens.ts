@@ -1,4 +1,4 @@
-import { arbitrumSepoliaContract, holeskyContract, optimismSepoliaContract } from '../layerzero.config';
+import { arbitrumSepoliaContract, base_sepoliaContract } from '../layerzero.config';
 import { ethers } from 'ethers'
 import { task } from 'hardhat/config'
 
@@ -12,8 +12,8 @@ const targetAmount = '10';
 // const sourceContract = arbitrumSepoliaContract;
 // const destinationContract = optimismSepoliaContract;
 
-const sourceContract = holeskyContract;
-const destinationContract = arbitrumSepoliaContract;
+const sourceContract = arbitrumSepoliaContract;
+const destinationContract = base_sepoliaContract;
 
 task('lz:oft:send', 'Send tokens cross-chain using LayerZero technology')
 .setAction(async (taskArgs, hre) => {
@@ -68,7 +68,7 @@ task('lz:oft:send', 'Send tokens cross-chain using LayerZero technology')
         nativeFee: hre.ethers.utils.formatEther(nativeFee),
     })
 
-    return;
+    
     // Sending the tokens with increased gas price
     try {
         const tx = await oftA.send(sendParam, feeParam, walletA.address, {
@@ -76,17 +76,9 @@ task('lz:oft:send', 'Send tokens cross-chain using LayerZero technology')
             gasPrice: gasPrice.mul(2),
             nonce,
         })
-        console.log('Transaction hash:', tx.hash)
         await tx.wait()
-        console.log(
-            `Tokens sent successfully to the recipient on the destination chain. View on LayerZero Scan: https://layerzeroscan.com/tx/${tx.hash}`
-        )
         const afterBalanceOfUserA = await oftA.balanceOf(walletA.address)
         const expectedBalanceA = beforeBalanceOfUserA.sub(amount)
-        console.log({
-            beforeBalanceOfUserA: beforeBalanceOfUserA.toString(),
-            afterBalanceOfUserA: afterBalanceOfUserA.toString(),
-        })
         if(afterBalanceOfUserA.eq(expectedBalanceA)) {
             console.log('Tokens sent successfully on the source chain');
         } else {

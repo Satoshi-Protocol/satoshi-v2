@@ -72,17 +72,6 @@ interface ISatoshiPeriphery {
 
     function closeTrove(ITroveManager troveManager) external;
 
-    function redeemCollateral(
-        ITroveManager troveManager,
-        uint256 _debtAmount,
-        address _firstRedemptionHint,
-        address _upperPartialRedemptionHint,
-        address _lowerPartialRedemptionHint,
-        uint256 _partialRedemptionHintNICR,
-        uint256 _maxIterations,
-        uint256 _maxFeePercentage
-    ) external;
-
     function liquidateTroves(
         ITroveManager troveManager,
         uint256 maxTrovesToLiquidate,

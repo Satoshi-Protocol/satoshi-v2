@@ -50,12 +50,10 @@ contract TroveManagerTest is DeployBase, TroveBase {
     uint256 maxFeePercentage = 0.05e18; // 5%
     ISortedTroves sortedTrovesBeaconProxy;
     ITroveManager troveManagerBeaconProxy;
-    IMultiCollateralHintHelpers hintHelpers;
 
     function setUp() public override {
         super.setUp();
         (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
-        hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
     }
 
     function test_getTotalActiveCollateral() public {

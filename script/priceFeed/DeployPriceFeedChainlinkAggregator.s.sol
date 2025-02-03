@@ -38,7 +38,7 @@ contract DeployPriceFeedChainlinkAggregatorScript is Script {
             weight: CHAINLINK_SOURCE_WEIGHT_1
         });
 
-        priceFeedChainlink = new PriceFeedChainlinkAggregator( sources);
+        priceFeedChainlink = new PriceFeedChainlinkAggregator(sources);
         assert(priceFeedChainlink.fetchPrice() > 0);
         console.log("PriceFeedChainlink deployed at:", address(priceFeedChainlink));
 

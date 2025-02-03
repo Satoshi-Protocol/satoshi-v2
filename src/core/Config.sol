@@ -5,6 +5,8 @@ library Config {
     bytes32 internal constant OWNER_ROLE = keccak256("OWNER_ROLE");
     bytes32 internal constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
 
+    // During bootsrap period redemptions are not allowed
+    uint256 public constant BOOTSTRAP_PERIOD = 14 days;
     uint256 internal constant CCR = 1500000000000000000; // 150%
 
     uint256 internal constant PERCENT_DIVISOR = 200; // dividing by 200 yields 0.5%

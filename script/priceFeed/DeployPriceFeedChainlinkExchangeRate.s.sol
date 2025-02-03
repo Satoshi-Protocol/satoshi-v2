@@ -37,7 +37,7 @@ contract DeployPriceFeedChainlinkExchangeRateScript is Script {
             weight: 0
         });
 
-        priceFeedChainlink = new PriceFeedChainlinkExchangeRate( sources);
+        priceFeedChainlink = new PriceFeedChainlinkExchangeRate(sources);
         (, int256 answer,,,) = priceFeedChainlink.latestRoundData();
         assert(answer > 0);
         console.log("PriceFeedChainlink deployed at:", address(priceFeedChainlink));

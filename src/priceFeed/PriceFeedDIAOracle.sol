@@ -15,12 +15,9 @@ contract PriceFeedDIAOracle is IPriceFeed, Ownable {
     string internal _key;
     uint256 public maxTimeThreshold;
 
-    constructor(
-        IDIAOracleV2 source_,
-        uint8 decimals_,
-        string memory key_,
-        uint256 _maxTimeThreshold
-    ) Ownable(msg.sender) {
+    constructor(IDIAOracleV2 source_, uint8 decimals_, string memory key_, uint256 _maxTimeThreshold)
+        Ownable(msg.sender)
+    {
         _source = source_;
         _decimals = decimals_;
         _key = key_;

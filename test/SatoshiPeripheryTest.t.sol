@@ -55,7 +55,6 @@ contract SatoshiPeripheryTest is DeployBase, TroveBase {
     uint256 maxFeePercentage = 0.05e18; // 5%
     ISortedTroves sortedTrovesBeaconProxy;
     ITroveManager troveManagerBeaconProxy;
-    IMultiCollateralHintHelpers hintHelpers;
     address user;
     address user1;
     address user2;
@@ -91,7 +90,6 @@ contract SatoshiPeripheryTest is DeployBase, TroveBase {
 
         // setup contracts and deploy one instance
         (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
-        hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
         collateral = ERC20Mock(address(collateralMock));
 
         // user set delegate approval for satoshiPeriphery
@@ -798,91 +796,6 @@ contract SatoshiPeripheryTest is DeployBase, TroveBase {
         // assertEq(vars.troveManagerCollateralAmtAfter, vars.troveManagerCollateralAmtBefore - vars.collAmt);
 
         vm.stopPrank();
-    }
-
-    function testRedeemByRouter() public {
-        LocalVars memory vars;
-        // pre open trove
-        vars.collAmt = 1e18; // price defined in `TestConfig.roundData`
-        vars.debtAmt = 10000e18; // 10000 USD
-        vars.maxFeePercentage = 0.05e18; // 5%
-        TroveBase.openTrove(
-            borrowerOperationsProxy(),
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy,
-            hintHelpers,
-            DEBT_GAS_COMPENSATION,
-            user,
-            user,
-            collateral,
-            vars.collAmt,
-            vars.debtAmt,
-            vars.maxFeePercentage
-        );
-
-        vm.startPrank(user);
-        //  mock user debt token balance
-        vars.borrowingFee = troveManagerBeaconProxy.getBorrowingFeeWithDecay(vars.debtAmt);
-        vars.repayDebtAmt = vars.debtAmt + vars.borrowingFee;
-        deal(address(debtToken), user, vars.repayDebtAmt);
-        debtToken.approve(address(satoshiPeriphery), vars.repayDebtAmt);
-
-        // state before
-        vars.debtTokenTotalSupplyBefore = debtToken.totalSupply();
-        vars.userBalanceBefore = collateral.balanceOf(user);
-        vars.troveManagerCollateralAmtBefore = collateral.balanceOf(address(troveManagerBeaconProxy));
-
-        vm.stopPrank();
-
-        vm.warp(block.timestamp + 14 days);
-        // price drop
-        _updateRoundData(
-            RoundData({
-                answer: 40000_00_000_000,
-                startedAt: block.timestamp,
-                updatedAt: block.timestamp,
-                answeredInRound: 1
-            })
-        );
-
-        uint256 redemptionAmount = 500e18;
-        deal(address(debtToken), user2, redemptionAmount);
-
-        vars.price = troveManagerBeaconProxy.fetchPrice();
-        (vars.firstRedemptionHint, vars.partialRedemptionHintNICR, vars.truncatedDebtAmount) =
-            hintHelpers.getRedemptionHints(troveManagerBeaconProxy, redemptionAmount, vars.price, 0);
-        (address hintAddress,,) =
-            hintHelpers.getApproxHint(troveManagerBeaconProxy, vars.partialRedemptionHintNICR, 10, 42);
-
-        (vars.upperPartialRedemptionHint, vars.lowerPartialRedemptionHint) =
-            sortedTrovesBeaconProxy.findInsertPosition(vars.partialRedemptionHintNICR, hintAddress, hintAddress);
-
-        // redeem
-        vm.startPrank(user2);
-        debtToken.approve(address(satoshiPeriphery), vars.truncatedDebtAmount);
-        satoshiPeriphery.redeemCollateral(
-            troveManagerBeaconProxy,
-            vars.truncatedDebtAmount,
-            vars.firstRedemptionHint,
-            vars.upperPartialRedemptionHint,
-            vars.lowerPartialRedemptionHint,
-            vars.partialRedemptionHintNICR,
-            0,
-            0.05e18
-        );
-        vm.stopPrank();
-        // _redeemCollateral(user2, redemptionAmount);
-
-        // state after
-        (vars.userCollAmtAfter, vars.userDebtAmtAfter) = troveManagerBeaconProxy.getTroveCollAndDebt(user);
-        assertGt(vars.collAmt, vars.userCollAmtAfter);
-        assertGt(vars.debtAmt, vars.userDebtAmtAfter);
-
-        vars.userBalanceAfter = collateral.balanceOf(user2);
-
-        // uint256 price = troveManagerBeaconProxy.fetchPrice();
-        // uint256 expectedAmt = redemptionAmount * 1e18 * 995 / 1000 / price;
-        // assertEq(vars.userBalanceAfter, expectedAmt);
     }
 
     function testLiquidateByRouter() public {

@@ -24,8 +24,7 @@ contract DeployPriceFeedAPI3Script is Script {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         IProxy source = IProxy(API3_ORACLE_PRICE_FEED_SOURCE_ADDRESS);
-        priceFeedAPI3Oracle =
-            new PriceFeedAPI3Oracle(source, API3_ORACLE_PRICE_FEED_DECIMAL, API3_MAX_TIME_THRESHOLD);
+        priceFeedAPI3Oracle = new PriceFeedAPI3Oracle(source, API3_ORACLE_PRICE_FEED_DECIMAL, API3_MAX_TIME_THRESHOLD);
         assert(priceFeedAPI3Oracle.fetchPrice() > 0);
         console.log("PriceFeedAPI3Oracle deployed at:", address(priceFeedAPI3Oracle));
 

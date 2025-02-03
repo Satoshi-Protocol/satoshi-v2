@@ -55,7 +55,6 @@ contract RewardManagerTest is DeployBase, TroveBase {
     uint256 maxFeePercentage = 0.05e18; // 5%
     ISortedTroves sortedTrovesBeaconProxy;
     ITroveManager troveManagerBeaconProxy;
-    IMultiCollateralHintHelpers hintHelpers;
     address user;
     address user1;
     address user2;
@@ -88,7 +87,6 @@ contract RewardManagerTest is DeployBase, TroveBase {
 
         // setup contracts and deploy one instance
         (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
-        hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
         collateral = ERC20Mock(address(collateralMock));
 
         // mint some tokens to vault and community issuance

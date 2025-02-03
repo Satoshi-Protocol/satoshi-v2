@@ -27,10 +27,7 @@ contract DeployPriceFeedRedstoneScript is Script {
 
         IPriceCalculator source = IPriceCalculator(REDSTONE_ORACLE_PRICE_FEED_SOURCE_ADDRESS);
         priceFeedRedstoneOracle = new PriceFeedRedstone(
-            source,
-            REDSTONE_ORACLE_ASSET_ADDRESS,
-            REDSTONE_ORACLE_PRICE_FEED_DECIMAL,
-            REDSTONE_MAX_TIME_THRESHOLD
+            source, REDSTONE_ORACLE_ASSET_ADDRESS, REDSTONE_ORACLE_PRICE_FEED_DECIMAL, REDSTONE_MAX_TIME_THRESHOLD
         );
         assert(priceFeedRedstoneOracle.fetchPrice() > 0);
         console.log("priceFeedRedstone deployed at:", address(priceFeedRedstoneOracle));

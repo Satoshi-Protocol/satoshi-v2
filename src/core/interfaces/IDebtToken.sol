@@ -70,7 +70,7 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @param _sender The address sending the tokens.
      * @param _amount The amount of tokens to send.
      */
-    function sendToSP(address _sender, uint256 _amount) external;
+    function sendToXApp(address _sender, uint256 _amount) external;
 
     /**
      * @notice Transfers a specific amount of tokens to a recipient.

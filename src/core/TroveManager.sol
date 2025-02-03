@@ -28,7 +28,7 @@ import {Config} from "./Config.sol";
 import {IPriceFeedAggregatorFacet} from "./interfaces/IPriceFeedAggregatorFacet.sol";
 import {IBorrowerOperationsFacet} from "./interfaces/IBorrowerOperationsFacet.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
-import {IVaultManager} from "./interfaces/IVaultManager.sol";
+import {IVaultManager} from "./interfaces/vault/IVaultManager.sol";
 import {Utils} from "../library/Utils.sol";
 
 contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
@@ -64,9 +64,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     // so that over time the actual TCR becomes greater than the calculated TCR.
     uint256 public constant MAX_INTEREST_RATE_IN_BPS = 10000; // 100%
     uint256 public constant SUNSETTING_INTEREST_RATE = (INTEREST_PRECISION * 5000) / (10000 * SECONDS_IN_YEAR); //50%
-
-    // During bootsrap period redemptions are not allowed
-    uint256 public constant BOOTSTRAP_PERIOD = 14 days;
 
     /*
      * BETA: 18 digit decimal. Parameter by which to divide the redeemed fraction, in order to calc the new base rate from a redemption.
@@ -587,7 +584,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         require(
             _maxFeePercentage >= redemptionFeeFloor && _maxFeePercentage <= maxRedemptionFee, "Max fee 0.5% to 100%"
         );
-        require(block.timestamp >= systemDeploymentTime + BOOTSTRAP_PERIOD, "BOOTSTRAP_PERIOD");
+        require(block.timestamp >= systemDeploymentTime + Config.BOOTSTRAP_PERIOD, "BOOTSTRAP_PERIOD");
         totals.price = fetchPrice();
         uint256 _MCR = MCR;
         require(IBorrowerOperationsFacet(satoshiXApp).getTCR() >= _MCR, "Cannot redeem when TCR < MCR");
@@ -750,6 +747,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         surplusBalances[_borrower] += _collateral;
         totalActiveCollateral -= _collateral;
+
+        // get coll from the vault
+        _exitColl(_collateral);
     }
 
     function _isValidFirstRedemptionHint(
@@ -777,7 +777,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         require(claimableColl > 0, "No collateral available to claim");
 
         surplusBalances[msg.sender] = 0;
-
         collateralToken.safeTransfer(_receiver, claimableColl);
 
         if (interestPayable > 0) {
@@ -847,7 +846,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         if (_debtChange > 0) {
             if (_isDebtIncrease) {
                 newDebt = newDebt + _netDebtChange;
-                // if (!_isRecoveryMode) _updateMintVolume(_borrower, _netDebtChange);
                 _increaseDebt(_receiver, _netDebtChange, _debtChange);
             } else {
                 newDebt = newDebt - _netDebtChange;
@@ -1149,9 +1147,22 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     // --- Trove property setters ---
 
     function _sendCollateral(address _account, uint256 _amount) private {
-        uint256 boundary = totalActiveCollateral * farmingParams.retainPercentage / FARMING_PRECISION;
-        uint256 remainColl = totalActiveCollateral - collateralOutput;
-        uint256 target = (totalActiveCollateral - _amount) * farmingParams.refillPercentage / FARMING_PRECISION;
+        _exitCollFromStrategy(_amount);
+
+        if (_amount > 0) {
+            totalActiveCollateral = totalActiveCollateral - _amount;
+            emit CollateralSent(_account, _amount);
+
+            collateralToken.safeTransfer(_account, _amount);
+        }
+    }
+
+    function _exitCollFromStrategy(uint256 _amount) internal {
+        uint256 totalColl = getEntireSystemColl();
+        uint256 newTotal = totalColl - _amount;
+        uint256 boundary = newTotal * farmingParams.retainPercentage / FARMING_PRECISION;
+        uint256 remainColl = totalColl - collateralOutput;
+        uint256 target = newTotal * farmingParams.refillPercentage / FARMING_PRECISION;
 
         // remain collateral is not enough, must refill
         if (_amount > remainColl) {
@@ -1163,13 +1174,10 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
             uint256 refillAmount = _amount + target - remainColl;
             vaultManager.exitStrategyByTroveManager(refillAmount);
         }
+    }
 
-        if (_amount > 0) {
-            totalActiveCollateral = totalActiveCollateral - _amount;
-            emit CollateralSent(_account, _amount);
-
-            collateralToken.safeTransfer(_account, _amount);
-        }
+    function _exitColl(uint256 collAmount) internal {
+        vaultManager.exitStrategyByTroveManager(collAmount);
     }
 
     function _increaseDebt(address account, uint256 netDebtAmount, uint256 debtAmount) internal {
@@ -1357,7 +1365,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         emit FarmingParamsSet(retainPercentage_, refillPercentage_);
     }
 
-    function transferCollToPrivilegedVault(address vault, uint256 amount) external onlyOwner {
+    function transferCollToPrivilegedVault(uint256 amount) external onlyOwner {
         // check the output amount does not exceed the limit
         require(
             collateralOutput + amount
@@ -1368,7 +1376,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         // record the collateral output
         collateralOutput += amount;
         collateralToken.transfer(address(vaultManager), amount);
-        emit CollateralTransferred(vault, amount);
+        emit CollateralTransferred(address(vaultManager), amount);
     }
 
     function receiveCollFromPrivilegedVault(uint256 amount) external {
@@ -1388,5 +1396,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
     function refillPercentage() external view returns (uint256) {
         return farmingParams.refillPercentage;
+    }
+
+    function BOOTSTRAP_PERIOD() external pure returns (uint256) {
+        return Config.BOOTSTRAP_PERIOD;
     }
 }

@@ -130,6 +130,8 @@ abstract contract DeployBase is Test {
     address internal oracleMockAddr;
     IGasPool gasPool;
 
+    IMultiCollateralHintHelpers internal hintHelpers;
+
     function setUp() public virtual {
         _deployWETH(DEPLOYER);
         _deploySortedTrovesBeacon(DEPLOYER);
@@ -144,13 +146,13 @@ abstract contract DeployBase is Test {
         _deployRewardManager(DEPLOYER);
         _deployPeriphery(DEPLOYER);
         _satoshiXAppInit(DEPLOYER);
+        _deployHintHelpers(DEPLOYER);
         _setContracts(DEPLOYER);
     }
 
     function _setContracts(address deployer) internal {
         vm.startPrank(deployer);
         IAccessControl access = IAccessControl(address(satoshiXApp));
-        // core.setOwner(OWNER);
         access.grantRole(Config.OWNER_ROLE, OWNER);
         access.grantRole(Config.GUARDIAN_ROLE, OWNER);
         vm.stopPrank();
@@ -158,9 +160,11 @@ abstract contract DeployBase is Test {
 
     function _deployPeriphery(address deployer) internal {
         vm.startPrank(deployer);
-        bytes memory data = abi.encodeCall(
-            ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), deployer)
-        );
+        assert(address(satoshiPeriphery) == address(0)); // check if contract is not deployed
+        assert(address(debtToken) != address(0)); // check if debtToken is deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
+        bytes memory data =
+            abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), OWNER));
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
         vm.stopPrank();
@@ -379,6 +383,8 @@ abstract contract DeployBase is Test {
 
         vm.startPrank(deployer);
         assert(address(debtToken) == address(0)); // check if contract is not deployed
+        assert(address(gasPool) != address(0)); // check if gasPool is deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
         address debtTokenImpl = address(new DebtToken(address(endpointMock)));
         bytes memory data = abi.encodeCall(
             IDebtToken.initialize,
@@ -391,6 +397,8 @@ abstract contract DeployBase is Test {
     function _deployCommunityIssuance(address deployer) internal {
         vm.startPrank(deployer);
         assert(address(communityIssuance) == address(0)); // check if contract is not deployed
+        assert(address(oshiToken) != address(0)); // check if oshiToken is deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
         address communityIssuanceImpl = address(new CommunityIssuance());
         bytes memory data = abi.encodeCall(ICommunityIssuance.initialize, (OWNER, oshiToken, address(satoshiXApp)));
         communityIssuance = ICommunityIssuance(address(new ERC1967Proxy(address(communityIssuanceImpl), data)));
@@ -453,13 +461,25 @@ abstract contract DeployBase is Test {
             selectors: selectors
         });
 
+        assert(address(debtToken) != address(0));
+        assert(address(rewardManager) != address(0));
+        assert(address(communityIssuance) != address(0));
+        assert(address(sortedTrovesBeacon) != address(0));
+        assert(address(troveManagerBeacon) != address(0));
+        assert(address(gasPool) != address(0));
+
         bytes memory _data = abi.encode(
             address(rewardManager),
             address(debtToken),
             address(communityIssuance),
             address(sortedTrovesBeacon),
             address(troveManagerBeacon),
-            address(gasPool)
+            address(gasPool),
+            OWNER,
+            GUARDIAN,
+            FEE_RECEIVER,
+            MIN_NET_DEBT,
+            DEBT_GAS_COMPENSATION
         );
 
         bytes memory data = abi.encodeWithSelector(Initializer.init.selector, _data);
@@ -628,13 +648,11 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
-    function _deployHintHelpers(address deployer) internal returns (address) {
+    function _deployHintHelpers(address deployer) internal {
         vm.startPrank(deployer);
 
-        address hintHelpersAddr = address(new MultiCollateralHintHelpers(address(satoshiXApp)));
+        hintHelpers = IMultiCollateralHintHelpers(address(new MultiCollateralHintHelpers(address(satoshiXApp))));
         vm.stopPrank();
-
-        return hintHelpersAddr;
     }
 
     function _deployGasPool(address deployer) internal {

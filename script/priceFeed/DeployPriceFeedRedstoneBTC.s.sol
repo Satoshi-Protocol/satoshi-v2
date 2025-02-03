@@ -24,9 +24,8 @@ contract DeployPriceFeedRedstoneBTCScript is Script {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
         IPriceCalculator source = IPriceCalculator(REDSTONE_ORACLE_PRICE_FEED_SOURCE_ADDRESS);
-        priceFeedRedstoneOracle = new PriceFeedRedstoneBTC(
-            source, REDSTONE_ORACLE_PRICE_FEED_DECIMAL, REDSTONE_MAX_TIME_THRESHOLD
-        );
+        priceFeedRedstoneOracle =
+            new PriceFeedRedstoneBTC(source, REDSTONE_ORACLE_PRICE_FEED_DECIMAL, REDSTONE_MAX_TIME_THRESHOLD);
         assert(priceFeedRedstoneOracle.fetchPrice() > 0);
         console.log("priceFeedRedstone deployed at:", address(priceFeedRedstoneOracle));
 

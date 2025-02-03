@@ -8,8 +8,6 @@ import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IER
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {INexusYieldManagerFacet, AssetConfig, ChainConfig} from "../interfaces/INexusYieldManagerFacet.sol";
 import {IPriceFeedAggregatorFacet} from "../interfaces/IPriceFeedAggregatorFacet.sol";
-import {IRollupMinter} from "../interfaces/IRollupMinter.sol";
-import {IRollupNYM} from "../interfaces/IRollupNYM.sol";
 import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
 import {AppStorage} from "../AppStorage.sol";
 import {Config} from "../Config.sol";
@@ -66,7 +64,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @notice Removes support for an asset and marks it as sunset.
      * @param asset The address of the asset to sunset.
      */
-    function sunsetAsset(address asset) external {
+    function sunsetAsset(address asset) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.isAssetSupported[asset] = false;
 
@@ -87,7 +85,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         if (!s.isPrivileged[vault]) {
             revert NotPrivileged(vault);
         }
-        IERC20(token).transfer(vault, amount);
+        IERC20(token).safeTransfer(vault, amount);
         emit TokenTransferred(token, vault, amount);
     }
 
@@ -204,7 +202,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         }
 
         if (fee != 0) {
-            s.debtToken.transferFrom(msg.sender, address(this), fee);
+            s.debtToken.sendToXApp(msg.sender, fee);
             s.debtToken.approve(address(s.rewardManager), fee);
             s.rewardManager.increaseSATPerUintStaked(fee);
         }
@@ -245,7 +243,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @notice Swaps debtToken for a asset.
      * @param receiver The address where the stablecoin will be sent.
      * @param amount The amount of stable tokens to receive.
-     * @return The amount of asset received.
+     * @return The amount of stable tokens to swap.
      */
     // @custom:event Emits DebtTokenForAssetSwapped event.
     function swapOutPrivileged(address asset, address receiver, uint256 amount)
@@ -343,7 +341,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @dev Reverts if the contract is already paused.
      */
     // @custom:event Emits NYMPaused event.
-    function pause() external {
+    function pause() external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (s.isNymPaused) {
             revert AlreadyPaused();
@@ -357,7 +355,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @dev Reverts if the contract is not paused.
      */
     // @custom:event Emits NYMResumed event.
-    function resume() external {
+    function resume() external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (!s.isNymPaused) {
             revert NotPaused();
@@ -371,7 +369,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param account The address to set the privileged status.
      * @param isPrivileged_ The privileged status to set.
      */
-    function setPrivileged(address account, bool isPrivileged_) external {
+    function setPrivileged(address account, bool isPrivileged_) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.isPrivileged[account] = isPrivileged_;
         emit PrivilegedSet(account, isPrivileged_);
@@ -651,6 +649,4 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         AppStorage.Layout storage s = AppStorage.layout();
         return s.isAssetSupported[asset];
     }
-
-    receive() external payable {}
 }

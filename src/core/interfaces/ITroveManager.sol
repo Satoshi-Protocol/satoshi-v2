@@ -601,9 +601,8 @@ interface ITroveManager {
     function claimStartTime() external view returns (uint32);
 
     /// @notice Transfers collateral to a privileged vault
-    /// @param vault The address of the vault
     /// @param amount The amount of collateral
-    function transferCollToPrivilegedVault(address vault, uint256 amount) external;
+    function transferCollToPrivilegedVault(uint256 amount) external;
 
     /// @notice Receives collateral from a privileged vault
     /// @param amount The amount of collateral

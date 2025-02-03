@@ -73,7 +73,6 @@ contract NexusYieldTest is DeployBase, TroveBase {
     uint256 maxFeePercentage = 0.05e18; // 5%
     ISortedTroves sortedTrovesBeaconProxy;
     ITroveManager troveManagerBeaconProxy;
-    IMultiCollateralHintHelpers hintHelpers;
     address user;
     address user1;
     address user2;
@@ -107,7 +106,6 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
         // setup contracts and deploy one instance
         (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
-        hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
         collateral = ERC20Mock(address(collateralMock));
         nexusYieldProxy = getNexusYieldProxy();
 
@@ -580,6 +578,31 @@ contract NexusYieldTest is DeployBase, TroveBase {
         collateralMock.approve(address(nexusYieldProxy), amount);
         vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.InvalidPrice.selector, 1.2e18));
         nexusYieldProxy.swapIn(address(collateralMock), user1, amount);
+    }
+
+    function test_permission() public {
+        address someone = makeAddr("someone");
+        vm.startPrank(someone);
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.pause();
+
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.resume();
+
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.sunsetAsset(address(collateralMock));
+
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.setPrivileged(user1, true);
+        vm.stopPrank();
     }
 
     /**

@@ -15,12 +15,9 @@ contract PriceFeedRedstone is IPriceFeed, Ownable {
     uint8 internal immutable _decimals;
     address public asset;
 
-    constructor(
-        IPriceCalculator source_,
-        address asset_,
-        uint8 decimals_,
-        uint256 _maxTimeThreshold
-    ) Ownable(msg.sender) {
+    constructor(IPriceCalculator source_, address asset_, uint8 decimals_, uint256 _maxTimeThreshold)
+        Ownable(msg.sender)
+    {
         _source = source_;
         maxTimeThreshold = _maxTimeThreshold;
         _decimals = decimals_;
