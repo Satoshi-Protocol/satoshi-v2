@@ -237,9 +237,11 @@ contract PellVault is VaultCore {
      * @dev Reverts if withdrawal time is not yet available
      */
     function checkWithdrawalTimeAvailable(uint256 index) public view {
+        IStrategy[] memory strategy_ = new IStrategy[](1);
+        strategy_[0] = withdrawalQueue[index].strategies[0];
         if (
-            uint256(withdrawalQueue[index].startTimestamp) + IDelegationManager(delegationManager).minWithdrawalDelay()
-                > block.timestamp
+            uint256(withdrawalQueue[index].startTimestamp)
+                + IDelegationManager(delegationManager).getWithdrawalDelay(strategy_) > block.timestamp
         ) {
             revert WithdrawalTimeNotAvailable();
         }
