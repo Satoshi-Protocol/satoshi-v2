@@ -114,14 +114,6 @@
 //         console.log("communityIssuance", address(communityIssuance));
 //     }
 
-//     function _setContracts(address deployer) internal {
-//         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-//         IAccessControl access = IAccessControl(address(satoshiXApp));
-//         access.grantRole(Config.OWNER_ROLE, deployer);
-//         access.grantRole(Config.GUARDIAN_ROLE, deployer);
-//         vm.stopBroadcast();
-//     }
-
 //     function _deployPeriphery(address deployer) internal {
 //         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 //         bytes memory data = abi.encodeCall(

@@ -2,11 +2,11 @@
 pragma solidity ^0.8.19;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IStrategyManager} from "../interfaces/dependencies/vault/IStrategyManager.sol";
-import {IDelegationManager} from "../interfaces/dependencies/vault/IDelegationManager.sol";
-import {IStrategy} from "../interfaces/dependencies/vault/IStrategy.sol";
-import {VaultCore} from "./VaultCore.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
+import {IDelegationManager} from "./interfaces/IDelegationManager.sol";
+import {IStrategy} from "./interfaces/IStrategy.sol";
+import {VaultCore} from "./VaultCore.sol";
 
 /**
  * @title PellVault

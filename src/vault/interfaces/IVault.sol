@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {ISatoshiXApp} from "../ISatoshiXApp.sol";
-import {IDelegationManager} from "../dependencies/vault/IDelegationManager.sol";
+import {ISatoshiXApp} from "../../core/interfaces/ISatoshiXApp.sol";
+import {IDelegationManager} from "./IDelegationManager.sol";
 
 interface IVault {
     event StrategyAddrSet(address strategyAddr);

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {IPoolAddressesProvider} from "./IPoolAddressesProvider.sol";
-import {DataTypes} from "../../../../library/interfaces/vault/DataTypes.sol";
+import {DataTypes} from "../../library/interfaces/vault/DataTypes.sol";
 
 /**
  * @title IPool

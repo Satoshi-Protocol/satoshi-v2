@@ -3,12 +3,12 @@ pragma solidity ^0.8.19;
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {IVaultManager} from "../interfaces/vault/IVaultManager.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
-import {INonfungiblePositionManager} from "../interfaces/dependencies/uniswapV3/INonfungiblePositionManager.sol";
-import {VaultCore} from "./VaultCore.sol";
-import {TickHelper} from "../../dependencies/uniswapV3/TickHelper.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {IVaultManager} from "./interfaces/IVaultManager.sol";
+import {IDebtToken} from "../core/interfaces/IDebtToken.sol";
+import {INonfungiblePositionManager} from "./interfaces/INonfungiblePositionManager.sol";
+import {VaultCore} from "./VaultCore.sol";
+import {TickHelper} from "../dependencies/uniswapV3/TickHelper.sol";
 
 contract UniV3DexVault is VaultCore {
     using SafeERC20 for IERC20;

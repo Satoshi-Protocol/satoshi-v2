@@ -3,10 +3,10 @@ pragma solidity ^0.8.19;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ISatoshiXApp} from "../interfaces/ISatoshiXApp.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IVault} from "../interfaces/vault/IVault.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {ISatoshiXApp} from "../core/interfaces/ISatoshiXApp.sol";
+import {IVault} from "./interfaces/IVault.sol";
 
 abstract contract VaultCore is IVault, UUPSUpgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;

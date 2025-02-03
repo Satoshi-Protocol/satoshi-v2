@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {ISatoshiXApp} from "../ISatoshiXApp.sol";
+import {ISatoshiXApp} from "../../core/interfaces/ISatoshiXApp.sol";
 import {IVault} from "./IVault.sol";
-import {IDebtToken} from "../IDebtToken.sol";
+import {IDebtToken} from "../../core/interfaces/IDebtToken.sol";
 
 interface IVaultManager {
     event WhiteListVaultSet(address vault, bool isWhitelisted);

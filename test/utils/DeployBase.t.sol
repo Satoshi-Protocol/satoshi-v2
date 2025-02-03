@@ -147,15 +147,6 @@ abstract contract DeployBase is Test {
         _deployPeriphery(DEPLOYER);
         _satoshiXAppInit(DEPLOYER);
         _deployHintHelpers(DEPLOYER);
-        _setContracts(DEPLOYER);
-    }
-
-    function _setContracts(address deployer) internal {
-        vm.startPrank(deployer);
-        IAccessControl access = IAccessControl(address(satoshiXApp));
-        access.grantRole(Config.OWNER_ROLE, OWNER);
-        access.grantRole(Config.GUARDIAN_ROLE, OWNER);
-        vm.stopPrank();
     }
 
     function _deployPeriphery(address deployer) internal {

@@ -121,22 +121,12 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         _deployPeriphery();
         _satoshiXAppInit();
         _deployHintHelpers();
-        _setContracts();
 
         // set config
         _setConfigByOwner();
 
         // console.log all contracts
         _consoleAllContract();
-    }
-
-    function _setContracts() internal {
-        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
-        assert(address(satoshiXApp) != address(0));
-        IAccessControl access = IAccessControl(address(satoshiXApp));
-        access.grantRole(Config.OWNER_ROLE, owner);
-        access.grantRole(Config.GUARDIAN_ROLE, owner);
-        vm.stopBroadcast();
     }
 
     function _deployPeriphery() internal {

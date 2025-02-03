@@ -6,11 +6,11 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {IVault} from "../interfaces/vault/IVault.sol";
-import {IVaultManager} from "../interfaces/vault/IVaultManager.sol";
-import {ITroveManager} from "../../core/interfaces/ITroveManager.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
+import {SatoshiMath} from "../library/SatoshiMath.sol";
+import {IVault} from "./interfaces/IVault.sol";
+import {IVaultManager} from "./interfaces/IVaultManager.sol";
+import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
+import {IDebtToken} from "../../src/core/interfaces/IDebtToken.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /* 

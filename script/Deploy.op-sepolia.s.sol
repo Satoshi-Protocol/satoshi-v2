@@ -88,7 +88,6 @@
 //         _deployRewardManager(DEPLOYER);
 //         _deployPeriphery(DEPLOYER);
 //         _satoshiXAppInit(DEPLOYER);
-//         _setContracts(DEPLOYER);
 
 //         consoleAllContract();
 //         // vm.stopBroadcast();
