@@ -10,7 +10,7 @@ address constant WETH_ADDRESS = 0x980B62Da83eFf3D4576C647993b0c1D7faf17c73;
 address constant LZ_ENDPOINT = 0x6EDCE65403992e310A62460808c4b910D972f10f;
 
 string constant DEBT_TOKEN_NAME = "Satoshi Stablecoin V2";
-string constant DEBT_TOKEN_SYMBOL = "satUSD";
+string constant DEBT_TOKEN_SYMBOL = "satUSD V2";
 
 uint256 constant MIN_NET_DEBT = 10e18; // 10 SAT
 uint256 constant DEBT_GAS_COMPENSATION = 2e18; // 2 SAT
