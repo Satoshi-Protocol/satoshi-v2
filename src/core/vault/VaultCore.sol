@@ -11,7 +11,6 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 abstract contract VaultCore is IVault, SatoshiOwnable, UUPSUpgradeable {
     using SafeERC20 for IERC20;
 
-    address public nexusYieldManager;
     address public vaultManager;
     address public debtToken;
 
@@ -37,17 +36,6 @@ abstract contract VaultCore is IVault, SatoshiOwnable, UUPSUpgradeable {
     // solhint-disable-next-line no-empty-blocks
     function _authorizeUpgrade(address newImplementation) internal view virtual override onlyOwner {
         // No additional authorization logic is needed for this contract
-    }
-
-    function setNYMAddr(address nexusYieldManager_) external virtual onlyOwner {
-        nexusYieldManager = nexusYieldManager_;
-        emit NYMAddrSet(nexusYieldManager_);
-    }
-
-    function transferTokenToNYM(address token, uint256 amount) external virtual onlyOwner {
-        // @todo check the transfer amount
-        IERC20(token).safeTransfer(nexusYieldManager, amount);
-        emit TokenTransferredToNYM(amount);
     }
 
     function transferToken(address token, address to, uint256 amount) external virtual onlyOwner {

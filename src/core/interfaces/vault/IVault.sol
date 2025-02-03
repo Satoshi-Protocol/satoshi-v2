@@ -31,7 +31,6 @@ interface IVault {
     error WithdrawalTimeNotAvailable();
     error IndexOutOfRange(uint256 index);
 
-    function setNYMAddr(address _nymAddr) external;
     function executeStrategy(bytes calldata data) external;
     function executeCall(address dest, bytes calldata data) external;
     function initialize(bytes calldata data) external;

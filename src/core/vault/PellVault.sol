@@ -181,12 +181,13 @@ contract PellVault is VaultCore {
         });
 
         uint256 nonce = IDelegationManager(delegationManager).cumulativeWithdrawalsQueued(address(this));
+        address operator = IDelegationManager(delegationManager).delegatedTo(address(this));
 
         IDelegationManager(delegationManager).queueWithdrawals(queuedWithdrawal);
 
         IDelegationManager.Withdrawal memory withdrawal = IDelegationManager.Withdrawal({
             staker: address(this),
-            delegatedTo: address(0),
+            delegatedTo: operator,
             withdrawer: address(this),
             nonce: nonce,
             startTimestamp: uint32(block.timestamp),

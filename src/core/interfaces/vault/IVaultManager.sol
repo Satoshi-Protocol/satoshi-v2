@@ -12,12 +12,15 @@ interface IVaultManager {
     event ExecuteStrategy(address vault, bytes data);
     event ExitStrategy(address vault, bytes data);
     event ExecuteCall(address vault, address dest, bytes data);
+    event NexusYieldManagerSet(address nexusYieldManager);
+    event TokenTransferredToNYM(address token, uint256 amount);
+    event TroveManagerSet(address troveManager, bool status);
 
     error VaultNotWhitelisted();
     error CallerIsNotTroveManager();
 
     function executeStrategy(address, bytes calldata) external;
-    function initialize(ISatoshiXApp, address) external;
+    function initialize(ISatoshiXApp, address, address) external;
     function exitStrategyByTroveManager(uint256 amount) external;
     function setPriority(address token, IVault[] memory _priority) external;
     function transferCollToTroveManager(address troveManager, uint256 amount) external;

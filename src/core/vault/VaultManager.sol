@@ -33,14 +33,22 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
     // troveManager => vaults
     mapping(address => IVault[]) public priority;
 
+    address public nexusYieldManager;
+
     constructor() {
         _disableInitializers();
     }
 
-    function initialize(ISatoshiXApp _satoshiCore, address _debtToken) external override initializer {
+    function initialize(ISatoshiXApp _satoshiCore, address _debtToken, address _nexusYieldManager)
+        external
+        initializer
+    {
         __UUPSUpgradeable_init_unchained();
         __SatoshiOwnable_init(_satoshiCore);
         debtToken = IDebtToken(_debtToken);
+        nexusYieldManager = _nexusYieldManager;
+
+        emit NexusYieldManagerSet(_nexusYieldManager);
     }
 
     /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
@@ -74,7 +82,7 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
 
         // assign a value to balanceAfter to prevent the priority being empty
         uint256 balanceAfter = collateralToken.balanceOf(address(this));
-        uint256 withdrawAmount = SatoshiMath._max(amount - balanceAfter, 0);
+        uint256 withdrawAmount = amount > balanceAfter ? amount - balanceAfter : 0;
         for (uint256 i; i < priority[msg.sender].length; i++) {
             if (balanceAfter >= amount) break;
             uint256 balanceBefore = collateralToken.balanceOf(address(this));
@@ -112,12 +120,28 @@ contract VaultManager is IVaultManager, SatoshiOwnable, UUPSUpgradeable {
         emit WhiteListVaultSet(vault, status);
     }
 
+    function setNexusYieldManager(address nexusYieldManager_) external onlyOwner {
+        nexusYieldManager = nexusYieldManager_;
+        emit NexusYieldManagerSet(nexusYieldManager_);
+    }
+
+    function setTrovesManager(address troveManager, bool status) external onlyOwner {
+        troveManagers[troveManager] = status;
+
+        emit TroveManagerSet(troveManager, status);
+    }
+
     function transferCollToTroveManager(address troveManager_, uint256 amount) external onlyOwner {
         _checkTroveManager(troveManager_);
-        ITroveManager(troveManager_).collateralToken().approve(troveManager_, amount);
+        ITroveManager(troveManager_).collateralToken().forceApprove(troveManager_, amount);
         ITroveManager(troveManager_).receiveCollFromPrivilegedVault(amount);
 
         emit CollateralTransferredToTroveManager(troveManager_, amount);
+    }
+
+    function transferTokenToNYM(address token, uint256 amount) external onlyOwner {
+        IERC20(token).safeTransfer(nexusYieldManager, amount);
+        emit TokenTransferredToNYM(token, amount);
     }
 
     function mintDebtToken(uint256 amount) external {
