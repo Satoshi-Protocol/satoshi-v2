@@ -40,8 +40,9 @@ contract VaultManager is IVaultManager, OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(address _debtToken, address _nexusYieldManager) external override initializer {
+    function initialize(address _debtToken, address _nexusYieldManager, address _owner) external override initializer {
         __UUPSUpgradeable_init_unchained();
+        __Ownable_init(_owner);
 
         debtToken = IDebtToken(_debtToken);
         nexusYieldManager = _nexusYieldManager;
@@ -123,7 +124,7 @@ contract VaultManager is IVaultManager, OwnableUpgradeable, UUPSUpgradeable {
         emit NexusYieldManagerSet(nexusYieldManager_);
     }
 
-    function setTrovesManager(address troveManager_, bool status) external onlyOwner {
+    function setTroveManager(address troveManager_, bool status) external onlyOwner {
         troveManagers[troveManager_] = status;
 
         emit TroveManagerSet(troveManager_, status);

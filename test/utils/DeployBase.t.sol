@@ -61,8 +61,12 @@ import { Config } from "../../src/core/Config.sol";
 import { GasPool } from "../../src/core/GasPool.sol";
 import { SatoshiPeriphery } from "../../src/core/helpers/SatoshiPeriphery.sol";
 import { ISatoshiPeriphery } from "../../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+
 import { IWETH } from "../../src/core/helpers/interfaces/IWETH.sol";
 import { IGasPool } from "../../src/core/interfaces/IGasPool.sol";
+
+import { VaultManager } from "../../src/vault/VaultManager.sol";
+import { IVaultManager } from "../../src/vault/interfaces/IVaultManager.sol";
 import { WETH9 } from "../mocks/WETH9.sol";
 
 struct LocalVars {
@@ -126,6 +130,7 @@ abstract contract DeployBase is Test {
     IRewardManager internal rewardManager;
     ICommunityIssuance internal communityIssuance;
     IOSHIToken internal oshiToken;
+    IVaultManager internal vaultManager;
 
     IBeacon internal sortedTrovesBeacon;
     IBeacon internal troveManagerBeacon;
@@ -155,6 +160,7 @@ abstract contract DeployBase is Test {
         _deployPeriphery(DEPLOYER);
         _satoshiXAppInit(DEPLOYER);
         _deployHintHelpers(DEPLOYER);
+        _deployVaultManager(DEPLOYER);
     }
 
     function _deployPeriphery(address deployer) internal {
@@ -429,6 +435,15 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
+    function _deployVaultManager(address deployer) internal {
+        vm.startPrank(deployer);
+        assert(address(vaultManager) == address(0)); // check if contract is not deployed
+        address vaultManagerImpl = address(new VaultManager());
+        bytes memory data = abi.encodeCall(IVaultManager.initialize, (address(debtToken), address(satoshiXApp), OWNER));
+        vaultManager = IVaultManager(address(new ERC1967Proxy(address(vaultManagerImpl), data)));
+        vm.stopPrank();
+    }
+
     function _diamondCut(
         address deployer,
         ISatoshiXApp diamond,
@@ -598,6 +613,7 @@ abstract contract DeployBase is Test {
         _setClaimStartTime(owner, SP_CLAIM_START_TIME);
         _setSPRewardRate(owner);
         _setTMRewardRate(owner, 1);
+        _setCDPFarming(owner, troveManagerBeaconProxy);
     }
 
     // function _setAddress(
@@ -640,6 +656,14 @@ abstract contract DeployBase is Test {
         IFactoryFacet factoryProxy = IFactoryFacet(address(satoshiXApp));
         factoryProxy.setTMRewardRate(numerator, denominator);
         // assertEq(troveManagerBeaconProxy.rewardRate(), factoryProxy.maxRewardRate());
+        vm.stopPrank();
+    }
+
+    function _setCDPFarming(address owner, ITroveManager troveManagerBeaconProxy) internal {
+        vm.startPrank(owner);
+        troveManagerBeaconProxy.setFarmingParams(3000, 3500);
+        troveManagerBeaconProxy.setVaultManager(address(vaultManager));
+        vaultManager.setTroveManager(address(troveManagerBeaconProxy), true);
         vm.stopPrank();
     }
 

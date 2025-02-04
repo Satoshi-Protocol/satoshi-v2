@@ -21,6 +21,7 @@ contract AvalonVault is VaultCore {
 
     function initialize(bytes calldata data) external override checkInitAddress initializer {
         __UUPSUpgradeable_init_unchained();
+        __Ownable_init(msg.sender);
         (address vaultManager_, address debtToken_) = _decodeInitializeData(data);
         Utils.ensureNonzeroAddress(vaultManager_);
         Utils.ensureNonzeroAddress(debtToken_);
