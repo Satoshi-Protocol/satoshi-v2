@@ -13,8 +13,9 @@ libs = [
 remappings = [
     "solidity-bytes-utils/=node_modules/solidity-bytes-utils/",
     "@layerzerolabs/=node_modules/@layerzerolabs/",
-    "@openzeppelin/=node_modules/@openzeppelin/",
 
+    "@openzeppelin/contracts=lib/openzeppelin-contracts/contracts",
+    "@openzeppelin/contracts-upgradeable=lib/openzeppelin-contracts-upgradeable/contracts",
     "@solidstate/contracts/=lib/solidstate-solidity/contracts/",
     "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
     "solmate/=lib/solmate/",
