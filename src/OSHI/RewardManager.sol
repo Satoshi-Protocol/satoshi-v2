@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IAccessControl} from "@solidstate/contracts/access/access_control/IAccessControl.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {SatoshiMath} from "../library/SatoshiMath.sol";
-import {IRewardManager, LockDuration, NUMBER_OF_LOCK_DURATIONS} from "./interfaces/IRewardManager.sol";
-import {IDebtToken} from "../core/interfaces/IDebtToken.sol";
-import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
-import {ITroveManager} from "../core/interfaces/ITroveManager.sol";
-import {IWETH} from "../core/helpers/interfaces/IWETH.sol";
-import {ICoreFacet} from "../core/interfaces/ICoreFacet.sol";
-import {Config} from "../core/Config.sol";
-import {Utils} from "../library/Utils.sol";
+import { Config } from "../core/Config.sol";
+import { IWETH } from "../core/helpers/interfaces/IWETH.sol";
+import { ICoreFacet } from "../core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../core/interfaces/IDebtToken.sol";
+import { ITroveManager } from "../core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../library/SatoshiMath.sol";
+
+import { Utils } from "../library/Utils.sol";
+import { IOSHIToken } from "./interfaces/IOSHIToken.sol";
+import { IRewardManager, LockDuration, NUMBER_OF_LOCK_DURATIONS } from "./interfaces/IRewardManager.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IAccessControl } from "@solidstate/contracts/access/access_control/IAccessControl.sol";
 
 /**
  * @title Reward Manager Contract
@@ -69,7 +70,13 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         // No additional authorization logic is needed for this contract
     }
 
-    function initialize(address _owner, address _satoshiXApp, address _weth, address _debtToken, address _oshiToken)
+    function initialize(
+        address _owner,
+        address _satoshiXApp,
+        address _weth,
+        address _debtToken,
+        address _oshiToken
+    )
         external
         initializer
     {
@@ -314,7 +321,12 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         emit TroveManagerRemoved(_troveManager);
     }
 
-    function setAddresses(address _satoshiXApp, address _weth, address _debtToken, address _oshiToken)
+    function setAddresses(
+        address _satoshiXApp,
+        address _weth,
+        address _debtToken,
+        address _oshiToken
+    )
         external
         onlyOwner
     {
@@ -364,7 +376,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
 
         if (address(collateralToken) == address(weth)) {
             IWETH(weth).withdraw(collAmount);
-            (bool success,) = payable(msg.sender).call{value: collAmount}("");
+            (bool success,) = payable(msg.sender).call{ value: collAmount }("");
             if (!success) revert NativeTokenTransferFailed();
         } else {
             collateralToken.safeTransfer(msg.sender, collAmount);

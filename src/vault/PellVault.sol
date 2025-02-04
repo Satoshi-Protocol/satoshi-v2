@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IStrategyManager} from "./interfaces/IStrategyManager.sol";
-import {IDelegationManager} from "./interfaces/IDelegationManager.sol";
-import {IStrategy} from "./interfaces/IStrategy.sol";
-import {VaultCore} from "./VaultCore.sol";
+import { VaultCore } from "./VaultCore.sol";
+import { IDelegationManager } from "./interfaces/IDelegationManager.sol";
+import { IStrategy } from "./interfaces/IStrategy.sol";
+import { IStrategyManager } from "./interfaces/IStrategyManager.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title PellVault

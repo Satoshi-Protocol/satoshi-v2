@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IOSHIToken} from "./IOSHIToken.sol";
+import { IOSHIToken } from "./IOSHIToken.sol";
 
 interface ICommunityIssuance {
     event SetAllocation(address indexed receiver, uint256 amount);

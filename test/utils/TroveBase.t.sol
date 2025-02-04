@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std/Test.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IBorrowerOperationsFacet} from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {ISortedTroves} from "../../src/core/interfaces/ISortedTroves.sol";
-import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
-import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-import {IStabilityPoolFacet} from "../../src/core/interfaces/IStabilityPoolFacet.sol";
-import {RoundData, OracleMock} from "../mocks/OracleMock.sol";
-import {HintLib} from "./HintLib.sol";
+import { IMultiCollateralHintHelpers } from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { IBorrowerOperationsFacet } from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { ISortedTroves } from "../../src/core/interfaces/ISortedTroves.sol";
+import { IStabilityPoolFacet } from "../../src/core/interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager } from "../../src/core/interfaces/ITroveManager.sol";
+import { OracleMock, RoundData } from "../mocks/OracleMock.sol";
+import { HintLib } from "./HintLib.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Test, console } from "forge-std/Test.sol";
 
 interface IOracleMock {
     function updateRoundData(RoundData memory roundData) external;
@@ -29,7 +29,9 @@ abstract contract TroveBase is Test {
         uint256 collateralAmt,
         uint256 debtAmt,
         uint256 maxFeePercentage
-    ) internal {
+    )
+        internal
+    {
         vm.startPrank(caller);
 
         deal(address(collateral), caller, collateralAmt);
@@ -51,7 +53,9 @@ abstract contract TroveBase is Test {
         IBorrowerOperationsFacet borrowerOperationsProxy,
         ITroveManager troveManagerBeaconProxy,
         address caller
-    ) internal {
+    )
+        internal
+    {
         vm.startPrank(caller);
         borrowerOperationsProxy.closeTrove(troveManagerBeaconProxy, caller);
         vm.stopPrank();

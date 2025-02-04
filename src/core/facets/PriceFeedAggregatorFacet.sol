@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {IPriceFeedAggregatorFacet, OracleRecord} from "../interfaces/IPriceFeedAggregatorFacet.sol";
-import {IPriceFeed} from "../../priceFeed/interfaces/IPriceFeed.sol";
-import {Config} from "../Config.sol";
+import { IPriceFeed } from "../../priceFeed/interfaces/IPriceFeed.sol";
+import { AppStorage } from "../AppStorage.sol";
+import { Config } from "../Config.sol";
+import { IPriceFeedAggregatorFacet, OracleRecord } from "../interfaces/IPriceFeedAggregatorFacet.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 
 contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, AccessControlInternal {
     function setPriceFeed(IERC20 _token, IPriceFeed _priceFeed) external onlyRole(Config.OWNER_ROLE) {
@@ -22,7 +22,7 @@ contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, AccessControlInt
         }
 
         AppStorage.Layout storage s = AppStorage.layout();
-        OracleRecord memory record = OracleRecord({priceFeed: _priceFeed, decimals: _priceFeed.decimals()});
+        OracleRecord memory record = OracleRecord({ priceFeed: _priceFeed, decimals: _priceFeed.decimals() });
         s.oracleRecords[_token] = record;
 
         emit NewOracleRegistered(_token, _priceFeed);

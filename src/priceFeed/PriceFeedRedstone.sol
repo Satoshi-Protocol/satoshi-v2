@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {IPriceCalculator} from "./interfaces/IPriceCalculator.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { IPriceCalculator } from "./interfaces/IPriceCalculator.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title PriceFeed Contract to integrate with Chainlink
@@ -15,7 +15,12 @@ contract PriceFeedRedstone is IPriceFeed, Ownable {
     uint8 internal immutable _decimals;
     address public asset;
 
-    constructor(IPriceCalculator source_, address asset_, uint8 decimals_, uint256 _maxTimeThreshold)
+    constructor(
+        IPriceCalculator source_,
+        address asset_,
+        uint8 decimals_,
+        uint256 _maxTimeThreshold
+    )
         Ownable(msg.sender)
     {
         _source = source_;

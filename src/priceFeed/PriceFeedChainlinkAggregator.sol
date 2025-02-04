@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed, SourceConfig} from "./interfaces/IPriceFeed.sol";
-import {AggregatorV3Interface} from "./interfaces/AggregatorV3Interface.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { AggregatorV3Interface } from "./interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed, SourceConfig } from "./interfaces/IPriceFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title PriceFeed Contract to integrate with Chainlink

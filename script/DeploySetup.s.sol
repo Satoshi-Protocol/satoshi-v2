@@ -1,70 +1,79 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Script, console} from "forge-std/Script.sol";
-import {IAccessControl} from "@solidstate/contracts/access/access_control/IAccessControl.sol";
-import {IERC2535DiamondCutInternal} from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import { IBeacon } from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import { UpgradeableBeacon } from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IAccessControl } from "@solidstate/contracts/access/access_control/IAccessControl.sol";
+import { IERC2535DiamondCutInternal } from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
+import { Script, console } from "forge-std/Script.sol";
 
-import {SatoshiXApp} from "../src/core/SatoshiXApp.sol";
-import {ISatoshiXApp} from "../src/core/interfaces/ISatoshiXApp.sol";
-import {BorrowerOperationsFacet} from "../src/core/facets/BorrowerOperationsFacet.sol";
-import {IBorrowerOperationsFacet} from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {CoreFacet} from "../src/core/facets/CoreFacet.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
-import {IWETH} from "../src/core/helpers/interfaces/IWETH.sol";
+import { SatoshiXApp } from "../src/core/SatoshiXApp.sol";
 
-import {FactoryFacet} from "../src/core/facets/FactoryFacet.sol";
-import {IFactoryFacet, DeploymentParams} from "../src/core/interfaces/IFactoryFacet.sol";
-import {LiquidationFacet} from "../src/core/facets/LiquidationFacet.sol";
-import {ILiquidationFacet} from "../src/core/interfaces/ILiquidationFacet.sol";
-import {PriceFeedAggregatorFacet} from "../src/core/facets/PriceFeedAggregatorFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
-import {StabilityPoolFacet} from "../src/core/facets/StabilityPoolFacet.sol";
-import {IStabilityPoolFacet} from "../src/core/interfaces/IStabilityPoolFacet.sol";
-import {INexusYieldManagerFacet} from "../src/core/interfaces/INexusYieldManagerFacet.sol";
-import {NexusYieldManagerFacet} from "../src/core/facets/NexusYieldManagerFacet.sol";
-import {Initializer} from "../src/core/Initializer.sol";
-import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
-import {RewardManager} from "../src/OSHI/RewardManager.sol";
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
-import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
-import {CommunityIssuance} from "../src/OSHI/CommunityIssuance.sol";
-import {SortedTroves} from "../src/core/SortedTroves.sol";
-import {TroveManager} from "../src/core/TroveManager.sol";
-import {ISortedTroves} from "../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../src/priceFeed/interfaces/IPriceFeed.sol";
-import {AggregatorV3Interface} from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
-import {MultiCollateralHintHelpers} from "../src/core/helpers/MultiCollateralHintHelpers.sol";
-import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { BorrowerOperationsFacet } from "../src/core/facets/BorrowerOperationsFacet.sol";
 
-import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
-import {OSHIToken} from "../src/OSHI/OSHIToken.sol";
-import {ISatoshiPeriphery} from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
-import {SatoshiPeriphery} from "../src/core/helpers/SatoshiPeriphery.sol";
-import {GasPool} from "../src/core/GasPool.sol";
-import {IGasPool} from "../src/core/interfaces/IGasPool.sol";
-import {Config} from "../src/core/Config.sol";
+import { CoreFacet } from "../src/core/facets/CoreFacet.sol";
+
+import { IWETH } from "../src/core/helpers/interfaces/IWETH.sol";
+import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
+import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+
+import { CommunityIssuance } from "../src/OSHI/CommunityIssuance.sol";
+import { RewardManager } from "../src/OSHI/RewardManager.sol";
+import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
+import { DebtToken } from "../src/core/DebtToken.sol";
+import { Initializer } from "../src/core/Initializer.sol";
+
+import { SortedTroves } from "../src/core/SortedTroves.sol";
+import { TroveManager } from "../src/core/TroveManager.sol";
+import { FactoryFacet } from "../src/core/facets/FactoryFacet.sol";
+import { LiquidationFacet } from "../src/core/facets/LiquidationFacet.sol";
+import { NexusYieldManagerFacet } from "../src/core/facets/NexusYieldManagerFacet.sol";
+import { PriceFeedAggregatorFacet } from "../src/core/facets/PriceFeedAggregatorFacet.sol";
+import { StabilityPoolFacet } from "../src/core/facets/StabilityPoolFacet.sol";
+
+import { MultiCollateralHintHelpers } from "../src/core/helpers/MultiCollateralHintHelpers.sol";
+import { IMultiCollateralHintHelpers } from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { DeploymentParams, IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
+import { INexusYieldManagerFacet } from "../src/core/interfaces/INexusYieldManagerFacet.sol";
+import { IPriceFeedAggregatorFacet } from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
+
+import { ISortedTroves } from "../src/core/interfaces/ISortedTroves.sol";
+import { IStabilityPoolFacet } from "../src/core/interfaces/IStabilityPoolFacet.sol";
+
+import { AggregatorV3Interface } from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "../src/priceFeed/interfaces/IPriceFeed.sol";
+
+import { OSHIToken } from "../src/OSHI/OSHIToken.sol";
+import { IOSHIToken } from "../src/OSHI/interfaces/IOSHIToken.sol";
+
+import { Config } from "../src/core/Config.sol";
+import { GasPool } from "../src/core/GasPool.sol";
+import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
+import { ISatoshiPeriphery } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+
+import { IGasPool } from "../src/core/interfaces/IGasPool.sol";
 import {
-    WETH_ADDRESS,
-    LZ_ENDPOINT,
+    DEBT_GAS_COMPENSATION,
     DEBT_TOKEN_NAME,
     DEBT_TOKEN_SYMBOL,
-    OWNER,
+    FEE_RECEIVER,
+    FEE_RECEIVER,
     GUARDIAN,
-    FEE_RECEIVER,
+    LZ_ENDPOINT,
     MIN_NET_DEBT,
-    FEE_RECEIVER,
-    DEBT_GAS_COMPENSATION,
+    OWNER,
     SP_ALLOCATION,
     SP_CLAIM_START_TIME,
+    SP_CLAIM_START_TIME,
     SP_REWARD_RATE,
-    SP_CLAIM_START_TIME
+    WETH_ADDRESS
 } from "./DeploySetupConfig.s.sol";
 
 contract Deployer is Script, IERC2535DiamondCutInternal {
@@ -409,10 +418,12 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         address target,
         IERC2535DiamondCutInternal.FacetCutAction action,
         bytes4[] memory selectors
-    ) internal {
+    )
+        internal
+    {
         IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](1);
         IERC2535DiamondCutInternal.FacetCut memory facetCut;
-        facetCut = IERC2535DiamondCutInternal.FacetCut({target: target, action: action, selectors: selectors});
+        facetCut = IERC2535DiamondCutInternal.FacetCut({ target: target, action: action, selectors: selectors });
         facetCuts[0] = facetCut;
 
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);

@@ -4,19 +4,22 @@ pragma solidity ^0.8.20;
 import "forge-std/console.sol";
 
 // DevTools imports
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {FlashloanTester} from "../src/test/FlashloanTester.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
-import {Config} from "../src/core/Config.sol";
-import {DEBT_GAS_COMPENSATION} from "./TestConfig.sol";
 
-import {OptionsBuilder} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
-import {IOFT, SendParam, OFTReceipt} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
-import {MessagingFee, MessagingReceipt} from "@layerzerolabs/oft-evm/contracts/OFTCore.sol";
-import {TestHelperOz5} from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import { Config } from "../src/core/Config.sol";
+import { DebtToken } from "../src/core/DebtToken.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+import { FlashloanTester } from "../src/test/FlashloanTester.sol";
+
+import { DEBT_GAS_COMPENSATION } from "./TestConfig.sol";
+
+import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
+
+import { MessagingFee, MessagingReceipt } from "@layerzerolabs/oft-evm/contracts/OFTCore.sol";
+import { IOFT, OFTReceipt, SendParam } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
+import { TestHelperOz5 } from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
+import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract LzDebtTokenTest is TestHelperOz5 {
     using OptionsBuilder for bytes;
@@ -75,7 +78,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 beforeUserBDebtB = debtTokenB.balanceOf(userB);
 
         // Quote send to get fee
-        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
         SendParam memory sendParam =
             SendParam(bEid, addressToBytes32(userB), tokensToSend, tokensToSend, options, "", "");
         MessagingFee memory fee = _debtTokenA.quoteSend(sendParam, false);
@@ -84,7 +87,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         emit IOFT.OFTSent(bytes32(0), 0, userA, tokensToSend, tokensToSend);
         vm.prank(userA);
         (, OFTReceipt memory oftReceipt) =
-            _debtTokenA.send{value: fee.nativeFee}(sendParam, fee, payable(address(this)));
+            _debtTokenA.send{ value: fee.nativeFee }(sendParam, fee, payable(address(this)));
         verifyPackets(bEid, addressToBytes32(address(debtTokenB))); // Manually trigger `lzReceive`
 
         uint256 afterUserADebtA = debtTokenA.balanceOf(userA);
@@ -248,7 +251,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 debtFlashFee = debtTokenA.flashFee(address(debtTokenA), amount);
 
         assertEq(tokenFlashFee, 0, "Flash fee should match config");
-        assertEq(debtFlashFee, (amount * debtTokenA.FLASH_LOAN_FEE()) / 10000, "Flash fee should match config");
+        assertEq(debtFlashFee, (amount * debtTokenA.FLASH_LOAN_FEE()) / 10_000, "Flash fee should match config");
     }
 
     /// ---- FAIL TESTS ---- ///

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IPool} from "./interfaces/IPool.sol";
-import {VaultCore} from "./VaultCore.sol";
-import {DataTypes} from "../library/interfaces/vault/DataTypes.sol";
-import {Utils} from "../library/Utils.sol";
+import { Utils } from "../library/Utils.sol";
+import { DataTypes } from "../library/interfaces/vault/DataTypes.sol";
+import { VaultCore } from "./VaultCore.sol";
+import { IPool } from "./interfaces/IPool.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract AvalonVault is VaultCore {
     using SafeERC20 for IERC20;
@@ -62,7 +62,10 @@ contract AvalonVault is VaultCore {
         return abi.encode(Option.WITHDRAW, token, amount);
     }
 
-    function constructExitByTroveManagerData(address token, uint256 amount)
+    function constructExitByTroveManagerData(
+        address token,
+        uint256 amount
+    )
         external
         view
         override

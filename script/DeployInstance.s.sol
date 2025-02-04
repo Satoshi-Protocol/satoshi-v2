@@ -1,34 +1,36 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
-import {ISortedTroves} from "../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../src/priceFeed/interfaces/IPriceFeed.sol";
-import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
-import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
-import {DeploymentParams, IFactoryFacet} from "../src/core/facets/FactoryFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
+import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
+import { DeploymentParams, IFactoryFacet } from "../src/core/facets/FactoryFacet.sol";
+
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { IPriceFeedAggregatorFacet } from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
+import { ISortedTroves } from "../src/core/interfaces/ISortedTroves.sol";
+import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+import { IPriceFeed } from "../src/priceFeed/interfaces/IPriceFeed.sol";
+
 import {
-    SATOSHI_X_APP_ADDRESS,
-    PRICE_FEED_ADDRESS,
-    COLLATERAL_ADDRESS,
-    MINUTE_DECAY_FACTOR,
-    REDEMPTION_FEE_FLOOR,
-    MAX_REDEMPTION_FEE,
     BORROWING_FEE_FLOOR,
-    MAX_BORROWING_FEE,
+    COLLATERAL_ADDRESS,
     INTEREST_RATE_IN_BPS,
+    MAX_BORROWING_FEE,
     MAX_DEBT,
+    MAX_REDEMPTION_FEE,
     MCR,
+    MINUTE_DECAY_FACTOR,
+    PRICE_FEED_ADDRESS,
+    REDEMPTION_FEE_FLOOR,
+    REWARD_MANAGER_ADDRESS,
     REWARD_RATE,
+    SATOSHI_X_APP_ADDRESS,
     TM_ALLOCATION,
-    TM_CLAIM_START_TIME,
-    REWARD_MANAGER_ADDRESS
+    TM_CLAIM_START_TIME
 } from "./DeployInstanceConfig.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Script, console } from "forge-std/Script.sol";
 
 contract DeployInstanceScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;

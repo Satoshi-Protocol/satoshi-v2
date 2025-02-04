@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
-import {PriceFeedPythOracle} from "../../src/priceFeed/PriceFeedPythOracle.sol";
-import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+import { PriceFeedPythOracle } from "../../src/priceFeed/PriceFeedPythOracle.sol";
+
 import {
     PYTH_MAX_TIME_THRESHOLD,
+    PYTH_ORACLE_PRICEID,
     PYTH_ORACLE_PRICE_FEED_DECIMAL,
-    PYTH_ORACLE_PRICE_FEED_SOURCE_ADDRESS,
-    PYTH_ORACLE_PRICEID
+    PYTH_ORACLE_PRICE_FEED_SOURCE_ADDRESS
 } from "./DeployPriceFeedConfig.sol";
+import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+import { Script, console } from "forge-std/Script.sol";
 
 contract DeployPriceFeedChainlinkScript is Script {
     PriceFeedPythOracle internal priceFeedPythOracle;

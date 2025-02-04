@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ITroveManager} from "../../interfaces/ITroveManager.sol";
+import { ITroveManager } from "../../interfaces/ITroveManager.sol";
 
 struct CombinedTroveData {
     address owner;
@@ -19,7 +19,12 @@ struct CombinedTroveData {
 }
 
 interface IMultiTroveGetter {
-    function getMultipleSortedTroves(ITroveManager troveManager, int256 _startIdx, uint256 _count, uint256 price)
+    function getMultipleSortedTroves(
+        ITroveManager troveManager,
+        int256 _startIdx,
+        uint256 _count,
+        uint256 price
+    )
         external
         view
         returns (CombinedTroveData[] memory _troves);

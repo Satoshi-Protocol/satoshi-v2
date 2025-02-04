@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {AggregatorV3Interface} from "./AggregatorV3Interface.sol";
+import { AggregatorV3Interface } from "./AggregatorV3Interface.sol";
 
 struct SourceConfig {
     AggregatorV3Interface source;

@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {ISupraSValueFeed} from "./interfaces/ISupraSValueFeed.sol";
-import {ISupraOraclePull} from "./interfaces/ISupraOraclePull.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+
+import { ISupraOraclePull } from "./interfaces/ISupraOraclePull.sol";
+import { ISupraSValueFeed } from "./interfaces/ISupraSValueFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title PriceFeed Contract to integrate with Supra Oracle
@@ -24,7 +25,9 @@ contract PriceFeedSupraOracle is IPriceFeed, Ownable {
         uint8 decimals_,
         uint256 _maxTimeThreshold,
         uint256 _pairIndex
-    ) Ownable(msg.sender) {
+    )
+        Ownable(msg.sender)
+    {
         _source = source_;
         _pullSource = pullSource_;
         _decimals = decimals_;

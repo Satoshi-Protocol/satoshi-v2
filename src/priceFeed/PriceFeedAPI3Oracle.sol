@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {IProxy} from "@api3/contracts/api3-server-v1/proxies/interfaces/IProxy.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+import { IProxy } from "@api3/contracts/api3-server-v1/proxies/interfaces/IProxy.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title PriceFeed Contract to integrate with API3 Oracle

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {IPyth} from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
-import {PythStructs} from "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { IPyth } from "@pythnetwork/pyth-sdk-solidity/IPyth.sol";
+import { PythStructs } from "@pythnetwork/pyth-sdk-solidity/PythStructs.sol";
 
 /**
  * @title PriceFeed Contract to integrate with DIA Oracle

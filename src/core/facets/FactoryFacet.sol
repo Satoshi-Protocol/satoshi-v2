@@ -1,21 +1,23 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {console} from "forge-std/Test.sol";
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
-import {BeaconProxy} from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
-import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../../priceFeed/interfaces/IPriceFeed.sol";
-import {DeploymentParams, IFactoryFacet} from "../interfaces/IFactoryFacet.sol";
-import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
-import {TroveManagerData} from "../interfaces/IBorrowerOperationsFacet.sol";
-import {Queue, SunsetIndex} from "../interfaces/IStabilityPoolFacet.sol";
-import {Config} from "../Config.sol";
+import { ICommunityIssuance } from "../../OSHI/interfaces/ICommunityIssuance.sol";
+import { IPriceFeed } from "../../priceFeed/interfaces/IPriceFeed.sol";
+import { AppStorage } from "../AppStorage.sol";
+
+import { Config } from "../Config.sol";
+import { TroveManagerData } from "../interfaces/IBorrowerOperationsFacet.sol";
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
+import { DeploymentParams, IFactoryFacet } from "../interfaces/IFactoryFacet.sol";
+import { ISortedTroves } from "../interfaces/ISortedTroves.sol";
+
+import { Queue, SunsetIndex } from "../interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+import { BeaconProxy } from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
+import { console } from "forge-std/Test.sol";
 
 contract FactoryFacet is IFactoryFacet, AccessControlInternal {
     function troveManagerCount() external view returns (uint256) {
@@ -32,7 +34,11 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
         return Config.TM_MAX_REWARD_RATE;
     }
 
-    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams calldata params)
+    function deployNewInstance(
+        IERC20 collateralToken,
+        IPriceFeed priceFeed,
+        DeploymentParams calldata params
+    )
         external
         onlyRole(Config.OWNER_ROLE)
         returns (ITroveManager troveManagerBeaconProxy, ISortedTroves sortedTrovesBeaconProxy)
@@ -121,7 +127,11 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
         s.collateralTokens[idx] = _newCollateral;
     }
 
-    function _configureCollateral(AppStorage.Layout storage s, ITroveManager troveManager, IERC20 collateralToken)
+    function _configureCollateral(
+        AppStorage.Layout storage s,
+        ITroveManager troveManager,
+        IERC20 collateralToken
+    )
         internal
     {
         s.troveManagersData[troveManager] = TroveManagerData(collateralToken, uint16(s.troveManagers.length));
@@ -146,7 +156,10 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
         return ITroveManager(address(new BeaconProxy(address(s.troveManagerBeacon), data)));
     }
 
-    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator)
+    function setTMRewardRate(
+        uint128[] calldata _numerator,
+        uint128 _denominator
+    )
         external
         onlyRole(Config.OWNER_ROLE)
     {

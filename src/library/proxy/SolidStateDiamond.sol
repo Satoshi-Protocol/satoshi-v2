@@ -2,18 +2,19 @@
 
 pragma solidity ^0.8.20;
 
-import {IOwnable, Ownable, OwnableInternal} from "@solidstate/contracts/access/ownable/Ownable.sol";
-import {ISafeOwnable, SafeOwnable} from "@solidstate/contracts/access/ownable/SafeOwnable.sol";
-import {IERC165} from "@solidstate/contracts/interfaces/IERC165.sol";
-import {IERC173} from "@solidstate/contracts/interfaces/IERC173.sol";
-import {IERC2535DiamondCut} from "@solidstate/contracts/interfaces/IERC2535DiamondCut.sol";
-import {IERC2535DiamondLoupe} from "@solidstate/contracts/interfaces/IERC2535DiamondLoupe.sol";
-import {ERC165Base, ERC165BaseStorage} from "@solidstate/contracts/introspection/ERC165/base/ERC165Base.sol";
-import {DiamondBase} from "@solidstate/contracts/proxy/diamond/base/DiamondBase.sol";
-import {DiamondFallback, IDiamondFallback} from "@solidstate/contracts/proxy/diamond/fallback/DiamondFallback.sol";
-import {DiamondReadable} from "@solidstate/contracts/proxy/diamond/readable/DiamondReadable.sol";
-import {DiamondWritable} from "@solidstate/contracts/proxy/diamond/writable/DiamondWritable.sol";
-import {ISolidStateDiamond} from "@solidstate/contracts/proxy/diamond/ISolidStateDiamond.sol";
+import { IOwnable, Ownable, OwnableInternal } from "@solidstate/contracts/access/ownable/Ownable.sol";
+import { ISafeOwnable, SafeOwnable } from "@solidstate/contracts/access/ownable/SafeOwnable.sol";
+import { IERC165 } from "@solidstate/contracts/interfaces/IERC165.sol";
+import { IERC173 } from "@solidstate/contracts/interfaces/IERC173.sol";
+import { IERC2535DiamondCut } from "@solidstate/contracts/interfaces/IERC2535DiamondCut.sol";
+import { IERC2535DiamondLoupe } from "@solidstate/contracts/interfaces/IERC2535DiamondLoupe.sol";
+import { ERC165Base, ERC165BaseStorage } from "@solidstate/contracts/introspection/ERC165/base/ERC165Base.sol";
+
+import { ISolidStateDiamond } from "@solidstate/contracts/proxy/diamond/ISolidStateDiamond.sol";
+import { DiamondBase } from "@solidstate/contracts/proxy/diamond/base/DiamondBase.sol";
+import { DiamondFallback, IDiamondFallback } from "@solidstate/contracts/proxy/diamond/fallback/DiamondFallback.sol";
+import { DiamondReadable } from "@solidstate/contracts/proxy/diamond/readable/DiamondReadable.sol";
+import { DiamondWritable } from "@solidstate/contracts/proxy/diamond/writable/DiamondWritable.sol";
 
 /**
  * @title SolidState "Diamond" proxy reference implementation
@@ -73,7 +74,7 @@ abstract contract SolidStateDiamond is
 
         FacetCut[] memory facetCuts = new FacetCut[](1);
 
-        facetCuts[0] = FacetCut({target: address(this), action: FacetCutAction.ADD, selectors: selectors});
+        facetCuts[0] = FacetCut({ target: address(this), action: FacetCutAction.ADD, selectors: selectors });
 
         _diamondCut(facetCuts, address(0), "");
 
@@ -82,7 +83,7 @@ abstract contract SolidStateDiamond is
         _setOwner(msg.sender);
     }
 
-    receive() external payable {}
+    receive() external payable { }
 
     function _transferOwnership(address account) internal virtual override(OwnableInternal, SafeOwnable) {
         super._transferOwnership(account);

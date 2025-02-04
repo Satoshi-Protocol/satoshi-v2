@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ICoreFacet} from "./ICoreFacet.sol";
-import {ITroveManager} from "./ITroveManager.sol";
+import { ICoreFacet } from "./ICoreFacet.sol";
+import { ITroveManager } from "./ITroveManager.sol";
 
 /// @notice Represents values related to a Trove Manager
 struct TroveManagerValues {

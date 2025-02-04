@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {FixedPointMathLib} from "solmate/src/utils/FixedPointMathLib.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { FixedPointMathLib } from "solmate/src/utils/FixedPointMathLib.sol";
 
 interface IERC20 {
     function decimals() external view returns (uint8);

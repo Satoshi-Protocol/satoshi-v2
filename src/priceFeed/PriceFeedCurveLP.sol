@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 interface ICurvePool {
     function add_liquidity(uint256[2] memory amounts, uint256 min_mint_amount) external payable returns (uint256);

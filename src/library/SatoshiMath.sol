@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Config} from "../core/Config.sol";
+import { Config } from "../core/Config.sol";
 
 /**
  * @title Satoshi Math Library Contract
@@ -66,8 +66,8 @@ library SatoshiMath {
      * In function 2), the difference in tokens issued at 1000 years and any time > 1000 years, will be negligible
      */
     function _decPow(uint256 _base, uint256 _minutes) internal pure returns (uint256) {
-        if (_minutes > 525600000) {
-            _minutes = 525600000;
+        if (_minutes > 525_600_000) {
+            _minutes = 525_600_000;
         } // cap to avoid overflow
 
         if (_minutes == 0) {
@@ -155,7 +155,10 @@ library SatoshiMath {
         return scaledAmount;
     }
 
-    function _getOriginalCollateralAmount(uint256 _scaledCollateralAmount, uint8 _decimals)
+    function _getOriginalCollateralAmount(
+        uint256 _scaledCollateralAmount,
+        uint8 _decimals
+    )
         internal
         pure
         returns (uint256)

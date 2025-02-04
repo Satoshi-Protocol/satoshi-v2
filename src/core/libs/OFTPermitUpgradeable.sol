@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.20;
 
-import {ERC20PermitUpgradeable} from
+import { IOFT, OFTCoreUpgradeable } from "@layerzerolabs/oft-evm-upgradeable/contracts/oft/OFTCoreUpgradeable.sol";
+import { ERC20PermitUpgradeable } from
     "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-import {IOFT, OFTCoreUpgradeable} from "@layerzerolabs/oft-evm-upgradeable/contracts/oft/OFTCoreUpgradeable.sol";
 
 /**
  * @title OFT Contract
@@ -15,7 +15,7 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
      * @dev Constructor for the OFT contract.
      * @param _lzEndpoint The LayerZero endpoint address.
      */
-    constructor(address _lzEndpoint) OFTCoreUpgradeable(decimals(), _lzEndpoint) {}
+    constructor(address _lzEndpoint) OFTCoreUpgradeable(decimals(), _lzEndpoint) { }
 
     /**
      * @dev Initializes the OFT with the provided name, symbol, and delegate.
@@ -33,7 +33,7 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
         __OFTCore_init(_delegate);
     }
 
-    function __OFT_init_unchained() internal onlyInitializing {}
+    function __OFT_init_unchained() internal onlyInitializing { }
 
     /**
      * @dev Retrieves the address of the underlying ERC20 implementation.
@@ -64,7 +64,12 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
      * @return amountSentLD The amount sent in local decimals.
      * @return amountReceivedLD The amount received in local decimals on the remote.
      */
-    function _debit(address _from, uint256 _amountLD, uint256 _minAmountLD, uint32 _dstEid)
+    function _debit(
+        address _from,
+        uint256 _amountLD,
+        uint256 _minAmountLD,
+        uint32 _dstEid
+    )
         internal
         virtual
         override
@@ -86,7 +91,11 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
      * @dev _srcEid The source chain ID.
      * @return amountReceivedLD The amount of tokens ACTUALLY received in local decimals.
      */
-    function _credit(address _to, uint256 _amountLD, uint32 /*_srcEid*/ )
+    function _credit(
+        address _to,
+        uint256 _amountLD,
+        uint32 /*_srcEid*/
+    )
         internal
         virtual
         override

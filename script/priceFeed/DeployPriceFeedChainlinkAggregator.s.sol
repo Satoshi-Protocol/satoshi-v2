@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
+import { Script, console } from "forge-std/Script.sol";
 
-import {PriceFeedChainlinkAggregator} from "../../src/priceFeed/PriceFeedChainlinkAggregator.sol";
-import {AggregatorV3Interface} from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
-import {SourceConfig} from "../../src/priceFeed/interfaces/IPriceFeed.sol";
+import { PriceFeedChainlinkAggregator } from "../../src/priceFeed/PriceFeedChainlinkAggregator.sol";
+import { AggregatorV3Interface } from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { SourceConfig } from "../../src/priceFeed/interfaces/IPriceFeed.sol";
 import {
+    CHAINLINK_MAX_TIME_THRESHOLD_0,
     CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0,
     CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_1,
-    CHAINLINK_MAX_TIME_THRESHOLD_0,
     CHAINLINK_SOURCE_WEIGHT_0,
     CHAINLINK_SOURCE_WEIGHT_1
 } from "./DeployPriceFeedConfig.sol";

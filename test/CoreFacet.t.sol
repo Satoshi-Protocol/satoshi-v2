@@ -2,14 +2,14 @@
 
 pragma solidity ^0.8.20;
 
-import {console} from "forge-std/console.sol";
-import {Test} from "forge-std/Test.sol";
-import {DeployBase} from "./utils/DeployBase.t.sol";
-import {EndpointV2Mock} from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
+import { DeployBase } from "./utils/DeployBase.t.sol";
+import { EndpointV2Mock } from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
+import { Test } from "forge-std/Test.sol";
+import { console } from "forge-std/console.sol";
 
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {Config} from "../src/core/Config.sol";
-import {DEPLOYER, OWNER, FEE_RECEIVER, DEBT_GAS_COMPENSATION} from "./TestConfig.sol";
+import { Config } from "../src/core/Config.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { DEBT_GAS_COMPENSATION, DEPLOYER, FEE_RECEIVER, OWNER } from "./TestConfig.sol";
 
 contract CoreFacetTest is DeployBase {
     address owner = OWNER;

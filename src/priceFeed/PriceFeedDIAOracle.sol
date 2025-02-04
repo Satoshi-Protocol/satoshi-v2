@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {IDIAOracleV2} from "./interfaces/IDIAOracleV2.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { IDIAOracleV2 } from "./interfaces/IDIAOracleV2.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title PriceFeed Contract to integrate with DIA Oracle
@@ -15,7 +15,12 @@ contract PriceFeedDIAOracle is IPriceFeed, Ownable {
     string internal _key;
     uint256 public maxTimeThreshold;
 
-    constructor(IDIAOracleV2 source_, uint8 decimals_, string memory key_, uint256 _maxTimeThreshold)
+    constructor(
+        IDIAOracleV2 source_,
+        uint8 decimals_,
+        string memory key_,
+        uint256 _maxTimeThreshold
+    )
         Ownable(msg.sender)
     {
         _source = source_;

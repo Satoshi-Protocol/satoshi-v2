@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {Snapshots} from "../interfaces/IStabilityPoolFacet.sol";
-import {Config} from "../Config.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+import { AppStorage } from "../AppStorage.sol";
+
+import { Config } from "../Config.sol";
+import { Snapshots } from "../interfaces/IStabilityPoolFacet.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 library StabilityPoolLib {
     event G_Updated(uint256 _G, uint128 _epoch, uint128 _scale);
@@ -20,7 +21,12 @@ library StabilityPoolLib {
      * Cancels out the specified debt against the Debt contained in the Stability Pool (as far as possible)
      */
 
-    function _offset(AppStorage.Layout storage s, IERC20 collateral, uint256 _debtToOffset, uint256 _collToAdd)
+    function _offset(
+        AppStorage.Layout storage s,
+        IERC20 collateral,
+        uint256 _debtToOffset,
+        uint256 _collToAdd
+    )
         internal
     {
         uint256 idx = s.indexByCollateral[collateral];
@@ -83,7 +89,10 @@ library StabilityPoolLib {
         uint256 _debtToOffset,
         uint256 _totalDebtTokenDeposits,
         uint256 idx
-    ) internal returns (uint256 collateralGainPerUnitStaked, uint256 debtLossPerUnitStaked) {
+    )
+        internal
+        returns (uint256 collateralGainPerUnitStaked, uint256 debtLossPerUnitStaked)
+    {
         /*
          * Compute the Debt and collateral rewards. Uses a "feedback" error correction, to keep
          * the cumulative error in the P and S state variables low:
@@ -123,7 +132,9 @@ library StabilityPoolLib {
         uint256 _collateralGainPerUnitStaked,
         uint256 _debtLossPerUnitStaked,
         uint256 idx
-    ) internal {
+    )
+        internal
+    {
         uint256 currentP = s.P;
         uint256 newP;
 
@@ -181,7 +192,10 @@ library StabilityPoolLib {
         AppStorage.Layout storage s,
         uint256 OSHIIssuance,
         uint256 _totalDebtTokenDeposits
-    ) internal returns (uint256) {
+    )
+        internal
+        returns (uint256)
+    {
         /*
         * Calculate the OSHI-per-unit staked.  Division uses a "feedback" error correction, to keep the
         * cumulative error low in the running total G:
@@ -212,7 +226,10 @@ library StabilityPoolLib {
         return releasedToken;
     }
 
-    function _getCompoundedDebtDeposit(AppStorage.Layout storage s, address _depositor)
+    function _getCompoundedDebtDeposit(
+        AppStorage.Layout storage s,
+        address _depositor
+    )
         internal
         view
         returns (uint256)
@@ -233,7 +250,11 @@ library StabilityPoolLib {
         AppStorage.Layout storage s,
         uint256 initialStake,
         Snapshots memory snapshots
-    ) internal view returns (uint256) {
+    )
+        internal
+        view
+        returns (uint256)
+    {
         uint256 snapshot_P = snapshots.P;
         uint128 scaleSnapshot = snapshots.scale;
         uint128 epochSnapshot = snapshots.epoch;
@@ -275,7 +296,11 @@ library StabilityPoolLib {
         return compoundedStake;
     }
 
-    function _getOSHIGainFromSnapshots(AppStorage.Layout storage s, uint256 initialStake, Snapshots memory snapshots)
+    function _getOSHIGainFromSnapshots(
+        AppStorage.Layout storage s,
+        uint256 initialStake,
+        Snapshots memory snapshots
+    )
         internal
         view
         returns (uint256)

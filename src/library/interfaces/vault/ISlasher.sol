@@ -92,7 +92,8 @@ interface ISlasher {
         uint32 updateTimestamp,
         uint32 serveUntilTimestamp,
         uint256 insertAfter
-    ) external;
+    )
+        external;
 
     /**
      * @notice this function is a called by middlewares during an operator's deregistration to make sure the operator's stake at deregistration
@@ -121,7 +122,10 @@ interface ISlasher {
     function canSlash(address toBeSlashed, address slashingContract) external view returns (bool);
 
     /// @notice Returns the timestamp until which `serviceContract` is allowed to slash the `operator`.
-    function contractCanSlashOperatorUntilTimestamp(address operator, address serviceContract)
+    function contractCanSlashOperatorUntilTimestamp(
+        address operator,
+        address serviceContract
+    )
         external
         view
         returns (uint32);
@@ -144,7 +148,11 @@ interface ISlasher {
      * @param middlewareTimesIndex Indicates an index in `operatorToMiddlewareTimes[operator]` to consult as proof of the `operator`'s ability to withdraw
      * @dev The correct `middlewareTimesIndex` input should be computable off-chain.
      */
-    function canWithdraw(address operator, uint32 withdrawalStartTimestamp, uint256 middlewareTimesIndex)
+    function canWithdraw(
+        address operator,
+        uint32 withdrawalStartTimestamp,
+        uint256 middlewareTimesIndex
+    )
         external
         returns (bool);
 
@@ -157,7 +165,10 @@ interface ISlasher {
      *      )
      *  ]
      */
-    function operatorToMiddlewareTimes(address operator, uint256 arrayIndex)
+    function operatorToMiddlewareTimes(
+        address operator,
+        uint256 arrayIndex
+    )
         external
         view
         returns (MiddlewareTimes memory);
@@ -166,13 +177,19 @@ interface ISlasher {
     function middlewareTimesLength(address operator) external view returns (uint256);
 
     /// @notice Getter function for fetching `operatorToMiddlewareTimes[operator][index].stalestUpdateTimestamp`.
-    function getMiddlewareTimesIndexStalestUpdateTimestamp(address operator, uint32 index)
+    function getMiddlewareTimesIndexStalestUpdateTimestamp(
+        address operator,
+        uint32 index
+    )
         external
         view
         returns (uint32);
 
     /// @notice Getter function for fetching `operatorToMiddlewareTimes[operator][index].latestServeUntil`.
-    function getMiddlewareTimesIndexServeUntilTimestamp(address operator, uint32 index)
+    function getMiddlewareTimesIndexServeUntilTimestamp(
+        address operator,
+        uint32 index
+    )
         external
         view
         returns (uint32);
@@ -181,7 +198,10 @@ interface ISlasher {
     function operatorWhitelistedContractsLinkedListSize(address operator) external view returns (uint256);
 
     /// @notice Getter function for fetching a single node in the operator's linked list (`_operatorToWhitelistedContractsByUpdate[operator]`).
-    function operatorWhitelistedContractsLinkedListEntry(address operator, address node)
+    function operatorWhitelistedContractsLinkedListEntry(
+        address operator,
+        address node
+    )
         external
         view
         returns (bool, uint256, uint256);

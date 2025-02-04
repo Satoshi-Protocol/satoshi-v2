@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ITroveManager} from "./ITroveManager.sol";
+import { ITroveManager } from "./ITroveManager.sol";
 
 /// @title ISortedTroves
 /// @notice Interface for managing a sorted list of troves based on their NICR (Nominal Individual Collateral Ratio).
@@ -61,7 +61,11 @@ interface ISortedTroves {
     /// @param _prevId The address of the previous node in the list.
     /// @param _nextId The address of the next node in the list.
     /// @return The addresses of the previous and next nodes for the insert position.
-    function findInsertPosition(uint256 _NICR, address _prevId, address _nextId)
+    function findInsertPosition(
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    )
         external
         view
         returns (address, address);

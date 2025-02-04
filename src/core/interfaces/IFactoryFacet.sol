@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IPriceFeed} from "../../priceFeed/interfaces/IPriceFeed.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
+import { IPriceFeed } from "../../priceFeed/interfaces/IPriceFeed.sol";
+
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
+import { ISortedTroves } from "../interfaces/ISortedTroves.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @notice Parameters for deploying a new instance
 struct DeploymentParams {
@@ -47,7 +48,11 @@ interface IFactoryFacet {
     /// @param priceFeed The price feed to use
     /// @param params The deployment parameters
     /// @return The trove manager and sorted troves instances
-    function deployNewInstance(IERC20 collateralToken, IPriceFeed priceFeed, DeploymentParams memory params)
+    function deployNewInstance(
+        IERC20 collateralToken,
+        IPriceFeed priceFeed,
+        DeploymentParams memory params
+    )
         external
         returns (ITroveManager, ISortedTroves);
 

@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Initializable} from "@solidstate/contracts/security/initializable/Initializable.sol";
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {AppStorage} from "./AppStorage.sol";
-import {Config} from "./Config.sol";
-import {Utils} from "../library/Utils.sol";
+import { Utils } from "../library/Utils.sol";
+import { AppStorage } from "./AppStorage.sol";
+import { Config } from "./Config.sol";
+import { IBeacon } from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
+import { Initializable } from "@solidstate/contracts/security/initializable/Initializable.sol";
 // import {IDebtToken} from "./interfaces/IDebtToken.sol";
-import {DebtToken} from "./DebtToken.sol";
-import {ICommunityIssuance} from "../OSHI/interfaces/ICommunityIssuance.sol";
-import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
+
+import { ICommunityIssuance } from "../OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "../OSHI/interfaces/IRewardManager.sol";
+import { DebtToken } from "./DebtToken.sol";
 
 contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
     using Utils for *;

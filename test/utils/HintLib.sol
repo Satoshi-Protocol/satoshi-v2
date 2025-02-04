@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {ISortedTroves} from "../../src/core/interfaces/ISortedTroves.sol";
-import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
-import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-import {SatoshiMath} from "../../src/library/SatoshiMath.sol";
+import { IMultiCollateralHintHelpers } from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { ISortedTroves } from "../../src/core/interfaces/ISortedTroves.sol";
+import { ITroveManager } from "../../src/core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../../src/library/SatoshiMath.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 
 library HintLib {
     using Math for uint256;
@@ -20,7 +20,11 @@ library HintLib {
         uint256 collateralAmt,
         uint256 netDebtAmt,
         uint256 gasCompensation
-    ) internal view returns (address, address) {
+    )
+        internal
+        view
+        returns (address, address)
+    {
         uint256 borrowingFee = troveManagerBeaconProxy.getBorrowingFeeWithDecay(netDebtAmt);
         uint256 totalDebt = netDebtAmt + borrowingFee + gasCompensation;
         uint256 NICR = collateralAmt.mulDiv(SatoshiMath.NICR_PRECISION, totalDebt);

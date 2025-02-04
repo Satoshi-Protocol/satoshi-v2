@@ -1,53 +1,59 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import { CommunityIssuance } from "../src/OSHI/CommunityIssuance.sol";
+
+import { OSHIToken } from "../src/OSHI/OSHIToken.sol";
+import { RewardManager } from "../src/OSHI/RewardManager.sol";
+import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
+import { IOSHIToken } from "../src/OSHI/interfaces/IOSHIToken.sol";
+import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
+import { DebtToken } from "../src/core/DebtToken.sol";
+import { Initializer } from "../src/core/Initializer.sol";
+import { SatoshiXApp } from "../src/core/SatoshiXApp.sol";
+
+import { SortedTroves } from "../src/core/SortedTroves.sol";
+import { TroveManager } from "../src/core/TroveManager.sol";
+import { BorrowerOperationsFacet } from "../src/core/facets/BorrowerOperationsFacet.sol";
+import { CoreFacet } from "../src/core/facets/CoreFacet.sol";
+import { FactoryFacet } from "../src/core/facets/FactoryFacet.sol";
+import { LiquidationFacet } from "../src/core/facets/LiquidationFacet.sol";
+import { NexusYieldManagerFacet } from "../src/core/facets/NexusYieldManagerFacet.sol";
+import { PriceFeedAggregatorFacet } from "../src/core/facets/PriceFeedAggregatorFacet.sol";
+import { StabilityPoolFacet } from "../src/core/facets/StabilityPoolFacet.sol";
+
+import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
+import { IMultiCollateralHintHelpers } from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { ISatoshiPeriphery, LzSendParam } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { DeploymentParams, IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
+import { INexusYieldManagerFacet } from "../src/core/interfaces/INexusYieldManagerFacet.sol";
+import { IPriceFeedAggregatorFacet } from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
+import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
+
+import { ISortedTroves } from "../src/core/interfaces/ISortedTroves.sol";
+import { IStabilityPoolFacet } from "../src/core/interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager, TroveManagerOperation } from "../src/core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../src/library/SatoshiMath.sol";
+
+import { AggregatorV3Interface } from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "../src/priceFeed/interfaces/IPriceFeed.sol";
 import "./TestConfig.sol";
-import {Vm} from "forge-std/Vm.sol";
-import {console} from "forge-std/console.sol";
-import {stdJson} from "forge-std/StdJson.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {DeployBase, LocalVars} from "./utils/DeployBase.t.sol";
-import {SatoshiMath} from "../src/library/SatoshiMath.sol";
-import {SatoshiXApp} from "../src/core/SatoshiXApp.sol";
-import {ISatoshiXApp} from "../src/core/interfaces/ISatoshiXApp.sol";
-import {BorrowerOperationsFacet} from "../src/core/facets/BorrowerOperationsFacet.sol";
-import {IBorrowerOperationsFacet} from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {CoreFacet} from "../src/core/facets/CoreFacet.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {ITroveManager, TroveManagerOperation} from "../src/core/interfaces/ITroveManager.sol";
-import {FactoryFacet} from "../src/core/facets/FactoryFacet.sol";
-import {IFactoryFacet, DeploymentParams} from "../src/core/interfaces/IFactoryFacet.sol";
-import {LiquidationFacet} from "../src/core/facets/LiquidationFacet.sol";
-import {ILiquidationFacet} from "../src/core/interfaces/ILiquidationFacet.sol";
-import {PriceFeedAggregatorFacet} from "../src/core/facets/PriceFeedAggregatorFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
-import {StabilityPoolFacet} from "../src/core/facets/StabilityPoolFacet.sol";
-import {IStabilityPoolFacet} from "../src/core/interfaces/IStabilityPoolFacet.sol";
-import {INexusYieldManagerFacet} from "../src/core/interfaces/INexusYieldManagerFacet.sol";
-import {NexusYieldManagerFacet} from "../src/core/facets/NexusYieldManagerFacet.sol";
-import {Initializer} from "../src/core/Initializer.sol";
-import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
-import {RewardManager} from "../src/OSHI/RewardManager.sol";
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
-import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
-import {CommunityIssuance} from "../src/OSHI/CommunityIssuance.sol";
-import {SortedTroves} from "../src/core/SortedTroves.sol";
-import {TroveManager} from "../src/core/TroveManager.sol";
-import {ISortedTroves} from "../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../src/priceFeed/interfaces/IPriceFeed.sol";
-import {AggregatorV3Interface} from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
-import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
-import {OSHIToken} from "../src/OSHI/OSHIToken.sol";
-import {ISatoshiPeriphery, LzSendParam} from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
-import {SatoshiPeriphery} from "../src/core/helpers/SatoshiPeriphery.sol";
-import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
-import {HintLib} from "./utils/HintLib.sol";
-import {TroveBase} from "./utils/TroveBase.t.sol";
-import {MessagingFee} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
-import {ERC20Mock} from "./mocks/ERC20Mock.sol";
+
+import { ERC20Mock } from "./mocks/ERC20Mock.sol";
+import { OracleMock, RoundData } from "./mocks/OracleMock.sol";
+import { DeployBase, LocalVars } from "./utils/DeployBase.t.sol";
+import { HintLib } from "./utils/HintLib.sol";
+import { TroveBase } from "./utils/TroveBase.t.sol";
+import { MessagingFee } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { stdJson } from "forge-std/StdJson.sol";
+import { Vm } from "forge-std/Vm.sol";
+import { console } from "forge-std/console.sol";
 
 contract LiquidateTest is DeployBase, TroveBase {
     using Math for uint256;
@@ -103,14 +109,14 @@ contract LiquidateTest is DeployBase, TroveBase {
     function test_LiquidateICRLessThan100InRecoveryMode() public {
         LiquidationVars memory vars;
         // open troves
-        _openTrove(user1, 1e18, 10000e18);
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
+        _openTrove(user1, 1e18, 10_000e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
 
         // reducing TCR below 150%, and all Troves below 100% ICR
         _updateRoundData(
             RoundData({
-                answer: 10000_00_000_000, // 10000
+                answer: 1_000_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -146,15 +152,15 @@ contract LiquidateTest is DeployBase, TroveBase {
     function test_LiquidateSPNotEnoughInNormalMode() public {
         LiquidationVars memory vars;
         // open troves
-        _openTrove(user1, 1000e18, 10000e18);
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
+        _openTrove(user1, 1000e18, 10_000e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
         _provideToSP(user1, 5000e18);
 
         // price drop
         _updateRoundData(
             RoundData({
-                answer: 10000_00_000_000, // 10000
+                answer: 1_000_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -208,16 +214,16 @@ contract LiquidateTest is DeployBase, TroveBase {
     function test_LiquidateICRLargeThanMCRInRecoveryMode() public {
         LiquidationVars memory vars;
         // open troves
-        _openTrove(user1, 1e18, 10020e18);
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
-        _provideToSP(user2, 10000e18);
-        _provideToSP(user3, 10000e18);
+        _openTrove(user1, 1e18, 10_020e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
+        _provideToSP(user2, 10_000e18);
+        _provideToSP(user3, 10_000e18);
 
         // reducing TCR below 150%, and all Troves 120% ICR
         _updateRoundData(
             RoundData({
-                answer: 12000_00_000_000, // 12000
+                answer: 1_200_000_000_000, // 12000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -256,14 +262,14 @@ contract LiquidateTest is DeployBase, TroveBase {
     function test_liquidateTroves_LessThan100InRecoveryMode() public {
         LiquidationVars memory vars;
         // open troves
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
-        _openTrove(user1, 1e18, 10000e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
+        _openTrove(user1, 1e18, 10_000e18);
 
         // reducing TCR below 150%, and all Troves below 100% ICR
         _updateRoundData(
             RoundData({
-                answer: 10000_00_000_000, // 10000
+                answer: 1_000_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -300,17 +306,17 @@ contract LiquidateTest is DeployBase, TroveBase {
     function test_liquidateTroves_2ICRLessThan100InRecoveryMode() public {
         LiquidationVars memory vars;
         // open troves
-        _openTrove(user4, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user1, 1e18, 10000e18);
+        _openTrove(user4, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user1, 1e18, 10_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // reducing TCR below 150%, and all Troves below 100% ICR
         _updateRoundData(
             RoundData({
-                answer: 10000_00_000_000, // 10000
+                answer: 1_000_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -353,15 +359,15 @@ contract LiquidateTest is DeployBase, TroveBase {
     function test_Liquidate2ICRLessThan100InRecoveryMode() public {
         LiquidationVars memory vars;
         // open troves
-        _openTrove(user1, 1e18, 10000e18);
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
-        _openTrove(user4, 1e18, 10000e18);
+        _openTrove(user1, 1e18, 10_000e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
+        _openTrove(user4, 1e18, 10_000e18);
 
         // reducing TCR below 150%, and all Troves below 100% ICR
         _updateRoundData(
             RoundData({
-                answer: 10000_00_000_000, // 10000
+                answer: 1_000_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -412,16 +418,16 @@ contract LiquidateTest is DeployBase, TroveBase {
     function test_liquidateTroves_ICRLargeThanMCRInRecoveryMode() public {
         LiquidationVars memory vars;
         // open troves
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
-        _openTrove(user1, 1e18, 10020e18);
-        _provideToSP(user2, 10000e18);
-        _provideToSP(user3, 10000e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
+        _openTrove(user1, 1e18, 10_020e18);
+        _provideToSP(user2, 10_000e18);
+        _provideToSP(user3, 10_000e18);
 
         // reducing TCR below 150%, and all Troves 120% ICR
         _updateRoundData(
             RoundData({
-                answer: 12000_00_000_000, // 12000
+                answer: 1_200_000_000_000, // 12000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -460,16 +466,16 @@ contract LiquidateTest is DeployBase, TroveBase {
     // MCR <= ICR < 150%, nothing to liquidate
     function test_liquidateTroves_MaxICR() public {
         // open troves
-        _openTrove(user2, 1e18, 10000e18);
-        _openTrove(user3, 1e18, 10000e18);
-        _openTrove(user1, 1e18, 10020e18);
-        _provideToSP(user2, 10000e18);
-        _provideToSP(user3, 10000e18);
+        _openTrove(user2, 1e18, 10_000e18);
+        _openTrove(user3, 1e18, 10_000e18);
+        _openTrove(user1, 1e18, 10_020e18);
+        _provideToSP(user2, 10_000e18);
+        _provideToSP(user3, 10_000e18);
 
         // reducing TCR below 150%, and all Troves 120% ICR
         _updateRoundData(
             RoundData({
-                answer: 12000_00_000_000, // 12000
+                answer: 1_200_000_000_000, // 12000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1

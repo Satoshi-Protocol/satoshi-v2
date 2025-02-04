@@ -6,9 +6,7 @@ optimizer = true
 optimizer_runs = 200
 fs_permissions = [{ access = "read", path = "./"}]
 
-libs = [
-    'lib',
-]
+libs = ['lib']
 
 remappings = [
     "solidity-bytes-utils/=node_modules/solidity-bytes-utils/",
@@ -21,6 +19,16 @@ remappings = [
     "solmate/=lib/solmate/",
     "@api3/contracts=lib/contracts/contracts",
 ]
+
+[fmt] # See https://book.getfoundry.sh/reference/config/formatter
+int_types             = "long"
+line_length           = 120
+bracket_spacing       = true
+multiline_func_header = "all"
+number_underscore     = "thousands"
+quote_style           = "double"
+sort_imports          = true
+ignore                = ['./lib/**/*']
 
 [profile.default.rpc_endpoints]
 holesky = "${RPC_URL_HOLESKY}"

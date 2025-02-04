@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IWETH} from "../../core/helpers/interfaces/IWETH.sol";
-import {IDebtToken} from "../../core/interfaces/IDebtToken.sol";
-import {IOSHIToken} from "./IOSHIToken.sol";
-import {ITroveManager} from "../../core/interfaces/ITroveManager.sol";
+import { IWETH } from "../../core/helpers/interfaces/IWETH.sol";
+import { IDebtToken } from "../../core/interfaces/IDebtToken.sol";
+
+import { ITroveManager } from "../../core/interfaces/ITroveManager.sol";
+import { IOSHIToken } from "./IOSHIToken.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 enum LockDuration {
     THREE, // 3 months
@@ -51,7 +52,13 @@ interface IRewardManager {
         uint32[NUMBER_OF_LOCK_DURATIONS] nextUnlockIndex;
     }
 
-    function initialize(address owner, address _satoshiXApp, address _weth, address _debtToken, address _oshiToken)
+    function initialize(
+        address owner,
+        address _satoshiXApp,
+        address _weth,
+        address _debtToken,
+        address _oshiToken
+    )
         external;
     function stake(uint256 _amount, LockDuration _duration) external;
     function unstake(uint256 _amount) external;
