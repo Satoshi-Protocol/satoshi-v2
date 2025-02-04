@@ -1,35 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IAccessControl} from "@solidstate/contracts/access/access_control/IAccessControl.sol";
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {SatoshiMath} from "../library/SatoshiMath.sol";
-import {ISortedTroves} from "./interfaces/ISortedTroves.sol";
+import { ICommunityIssuance } from "../OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "../OSHI/interfaces/IRewardManager.sol";
+import { SatoshiMath } from "../library/SatoshiMath.sol";
+
+import { Utils } from "../library/Utils.sol";
+import { IVaultManager } from "../vault/interfaces/IVaultManager.sol";
+import { Config } from "./Config.sol";
+import { IBorrowerOperationsFacet } from "./interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "./interfaces/ICoreFacet.sol";
+import { IDebtToken } from "./interfaces/IDebtToken.sol";
+import { IPriceFeedAggregatorFacet } from "./interfaces/IPriceFeedAggregatorFacet.sol";
+import { ISortedTroves } from "./interfaces/ISortedTroves.sol";
 import {
+    FarmingParams,
     ITroveManager,
-    Trove,
-    Status,
-    TroveManagerOperation,
-    VolumeData,
     RedemptionTotals,
-    SingleRedemptionValues,
     RewardSnapshot,
-    FarmingParams
+    SingleRedemptionValues,
+    Status,
+    Trove,
+    TroveManagerOperation,
+    VolumeData
 } from "./interfaces/ITroveManager.sol";
-import {ICommunityIssuance} from "../OSHI/interfaces/ICommunityIssuance.sol";
-import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
-import {IDebtToken} from "./interfaces/IDebtToken.sol";
-import {Config} from "./Config.sol";
-import {IPriceFeedAggregatorFacet} from "./interfaces/IPriceFeedAggregatorFacet.sol";
-import {IBorrowerOperationsFacet} from "./interfaces/IBorrowerOperationsFacet.sol";
-import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
-import {IVaultManager} from "../vault/interfaces/IVaultManager.sol";
-import {Utils} from "../library/Utils.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { IAccessControl } from "@solidstate/contracts/access/access_control/IAccessControl.sol";
 
 contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
@@ -62,8 +64,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
     // Maximum interest rate must be lower than the minimum LST staking yield
     // so that over time the actual TCR becomes greater than the calculated TCR.
-    uint256 public constant MAX_INTEREST_RATE_IN_BPS = 10000; // 100%
-    uint256 public constant SUNSETTING_INTEREST_RATE = (INTEREST_PRECISION * 5000) / (10000 * SECONDS_IN_YEAR); //50%
+    uint256 public constant MAX_INTEREST_RATE_IN_BPS = 10_000; // 100%
+    uint256 public constant SUNSETTING_INTEREST_RATE = (INTEREST_PRECISION * 5000) / (10_000 * SECONDS_IN_YEAR); //50%
 
     /*
      * BETA: 18 digit decimal. Parameter by which to divide the redeemed fraction, in order to calc the new base rate from a redemption.
@@ -162,7 +164,10 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         ICommunityIssuance _communityIssuance,
         address _satoshiXApp,
         uint256 _debtGasCompensation
-    ) external initializer {
+    )
+        external
+        initializer
+    {
         Utils.ensureNonzeroAddress(_owner);
         Utils.ensureNonzeroAddress(_gasPool);
         Utils.ensureNonzeroAddress(address(_debtToken));
@@ -256,15 +261,17 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         uint256 _MCR,
         uint128 _rewardRate,
         uint32 _claimStartTime
-    ) public {
+    )
+        public
+    {
         require(!sunsetting, "Cannot change after sunset");
-        require(_MCR <= Config.CCR && _MCR >= 1100000000000000000, "MCR cannot be > CCR or < 110%");
+        require(_MCR <= Config.CCR && _MCR >= 1_100_000_000_000_000_000, "MCR cannot be > CCR or < 110%");
         if (minuteDecayFactor != 0) {
             require(msg.sender == owner(), "Only owner");
         }
         require(
-            _minuteDecayFactor >= 977159968434245000 // half-life of 30 minutes
-                && _minuteDecayFactor <= 999931237762985000, // half-life of 1 week
+            _minuteDecayFactor >= 977_159_968_434_245_000 // half-life of 30 minutes
+                && _minuteDecayFactor <= 999_931_237_762_985_000, // half-life of 1 week
             "TroveManager: Invalid decay factor"
         );
         require(_redemptionFeeFloor <= _maxRedemptionFee && _maxRedemptionFee <= SatoshiMath.DECIMAL_PRECISION);
@@ -283,7 +290,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         require(_interestRateInBPS <= MAX_INTEREST_RATE_IN_BPS, "Interest > Maximum");
 
-        uint256 newInterestRate = (INTEREST_PRECISION * _interestRateInBPS) / (10000 * SECONDS_IN_YEAR);
+        uint256 newInterestRate = (INTEREST_PRECISION * _interestRateInBPS) / (10_000 * SECONDS_IN_YEAR);
         if (newInterestRate != interestRate) {
             _accrueActiveInterests();
             // accrual function doesn't update timestamp if interest was 0
@@ -454,7 +461,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
      * then,
      * 2) increases the baseRate based on the amount redeemed, as a proportion of total supply
      */
-    function _updateBaseRateFromRedemption(uint256 _collateralDrawn, uint256 _price, uint256 _totalDebtSupply)
+    function _updateBaseRateFromRedemption(
+        uint256 _collateralDrawn,
+        uint256 _price,
+        uint256 _totalDebtSupply
+    )
         internal
         returns (uint256)
     {
@@ -577,7 +588,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
         uint256 _maxFeePercentage
-    ) external {
+    )
+        external
+    {
         ISortedTroves _sortedTrovesCached = sortedTroves;
         RedemptionTotals memory totals;
 
@@ -677,7 +690,10 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         address _upperPartialRedemptionHint,
         address _lowerPartialRedemptionHint,
         uint256 _partialRedemptionHintNICR
-    ) internal returns (SingleRedemptionValues memory singleRedemption) {
+    )
+        internal
+        returns (SingleRedemptionValues memory singleRedemption)
+    {
         Trove storage t = troves[_borrower];
         // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
         singleRedemption.debtLot = SatoshiMath._min(_maxDebtAmount, t.debt - debtGasCompensation);
@@ -757,7 +773,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         address _firstRedemptionHint,
         uint256 _price,
         uint256 _MCR
-    ) internal view returns (bool) {
+    )
+        internal
+        view
+        returns (bool)
+    {
         if (
             _firstRedemptionHint == address(0) || !_sortedTroves.contains(_firstRedemptionHint)
                 || getCurrentICR(_firstRedemptionHint, _price) < _MCR
@@ -793,7 +813,11 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         uint256 NICR,
         address _upperHint,
         address _lowerHint
-    ) external whenNotPaused returns (uint256 stake, uint256 arrayIndex) {
+    )
+        external
+        whenNotPaused
+        returns (uint256 stake, uint256 arrayIndex)
+    {
         _requireCallerIsSatoshiXapp();
         require(!sunsetting, "Cannot open while sunsetting");
         uint256 supply = totalActiveDebt;
@@ -832,7 +856,10 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         address _lowerHint,
         address _borrower,
         address _receiver
-    ) external returns (uint256, uint256, uint256) {
+    )
+        external
+        returns (uint256, uint256, uint256)
+    {
         _requireCallerIsSatoshiXapp();
         if (_isCollIncrease || _isDebtIncrease) {
             require(!paused, "Collateral Paused");
@@ -1076,7 +1103,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         uint256 _collSurplus,
         uint256 _debtGasComp,
         uint256 _collGasComp
-    ) external {
+    )
+        external
+    {
         _requireCallerIsSatoshiXapp();
         // redistribute debt and collateral
         _redistributeDebtAndColl(_debt, _coll);

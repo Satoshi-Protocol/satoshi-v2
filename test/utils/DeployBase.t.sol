@@ -1,61 +1,73 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
-import {ERC20Mock} from "../mocks/ERC20Mock.sol";
-import {IAccessControl} from "@solidstate/contracts/access/access_control/IAccessControl.sol";
-import {IERC2535DiamondCutInternal} from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {UpgradeableBeacon} from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {RoundData, OracleMock} from "../mocks/OracleMock.sol";
+import { ERC20Mock } from "../mocks/ERC20Mock.sol";
 
-import {SatoshiXApp} from "../../src/core/SatoshiXApp.sol";
-import {ISatoshiXApp} from "../../src/core/interfaces/ISatoshiXApp.sol";
-import {BorrowerOperationsFacet} from "../../src/core/facets/BorrowerOperationsFacet.sol";
-import {IBorrowerOperationsFacet} from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {CoreFacet} from "../../src/core/facets/CoreFacet.sol";
-import {ICoreFacet} from "../../src/core/interfaces/ICoreFacet.sol";
-import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
+import { OracleMock, RoundData } from "../mocks/OracleMock.sol";
+import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import { IBeacon } from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import { UpgradeableBeacon } from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IAccessControl } from "@solidstate/contracts/access/access_control/IAccessControl.sol";
+import { IERC2535DiamondCutInternal } from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
+import { Test, console } from "forge-std/Test.sol";
 
-import {FactoryFacet} from "../../src/core/facets/FactoryFacet.sol";
-import {IFactoryFacet, DeploymentParams} from "../../src/core/interfaces/IFactoryFacet.sol";
-import {LiquidationFacet} from "../../src/core/facets/LiquidationFacet.sol";
-import {ILiquidationFacet} from "../../src/core/interfaces/ILiquidationFacet.sol";
-import {PriceFeedAggregatorFacet} from "../../src/core/facets/PriceFeedAggregatorFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
-import {StabilityPoolFacet} from "../../src/core/facets/StabilityPoolFacet.sol";
-import {IStabilityPoolFacet} from "../../src/core/interfaces/IStabilityPoolFacet.sol";
-import {INexusYieldManagerFacet} from "../../src/core/interfaces/INexusYieldManagerFacet.sol";
-import {NexusYieldManagerFacet} from "../../src/core/facets/NexusYieldManagerFacet.sol";
-import {Initializer} from "../../src/core/Initializer.sol";
-import {EndpointV2Mock} from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
+import { SatoshiXApp } from "../../src/core/SatoshiXApp.sol";
 
-import {IRewardManager} from "../../src/OSHI/interfaces/IRewardManager.sol";
-import {RewardManager} from "../../src/OSHI/RewardManager.sol";
-import {IDebtToken} from "../../src/core/interfaces/IDebtToken.sol";
-import {DebtTokenWithLz} from "../../src/core/DebtTokenWithLz.sol";
-import {ICommunityIssuance} from "../../src/OSHI/interfaces/ICommunityIssuance.sol";
-import {CommunityIssuance} from "../../src/OSHI/CommunityIssuance.sol";
-import {SortedTroves} from "../../src/core/SortedTroves.sol";
-import {TroveManager} from "../../src/core/TroveManager.sol";
+import { BorrowerOperationsFacet } from "../../src/core/facets/BorrowerOperationsFacet.sol";
+
+import { CoreFacet } from "../../src/core/facets/CoreFacet.sol";
+import { IBorrowerOperationsFacet } from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../../src/core/interfaces/ICoreFacet.sol";
+import { ISatoshiXApp } from "../../src/core/interfaces/ISatoshiXApp.sol";
+import { ITroveManager } from "../../src/core/interfaces/ITroveManager.sol";
+
+import { Initializer } from "../../src/core/Initializer.sol";
+import { FactoryFacet } from "../../src/core/facets/FactoryFacet.sol";
+import { LiquidationFacet } from "../../src/core/facets/LiquidationFacet.sol";
+import { NexusYieldManagerFacet } from "../../src/core/facets/NexusYieldManagerFacet.sol";
+import { PriceFeedAggregatorFacet } from "../../src/core/facets/PriceFeedAggregatorFacet.sol";
+import { StabilityPoolFacet } from "../../src/core/facets/StabilityPoolFacet.sol";
+import { DeploymentParams, IFactoryFacet } from "../../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../../src/core/interfaces/ILiquidationFacet.sol";
+
+import { INexusYieldManagerFacet } from "../../src/core/interfaces/INexusYieldManagerFacet.sol";
+import { IPriceFeedAggregatorFacet } from "../../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
+import { IStabilityPoolFacet } from "../../src/core/interfaces/IStabilityPoolFacet.sol";
+
+import { EndpointV2Mock } from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
+
+import { CommunityIssuance } from "../../src/OSHI/CommunityIssuance.sol";
+import { RewardManager } from "../../src/OSHI/RewardManager.sol";
+import { ICommunityIssuance } from "../../src/OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "../../src/OSHI/interfaces/IRewardManager.sol";
+import { DebtToken } from "../../src/core/DebtToken.sol";
+
+import { SortedTroves } from "../../src/core/SortedTroves.sol";
+import { TroveManager } from "../../src/core/TroveManager.sol";
+
+import { MultiCollateralHintHelpers } from "../../src/core/helpers/MultiCollateralHintHelpers.sol";
+import { IMultiCollateralHintHelpers } from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { IDebtToken } from "../../src/core/interfaces/IDebtToken.sol";
+import { ISortedTroves } from "../../src/core/interfaces/ISortedTroves.sol";
+import { AggregatorV3Interface } from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "../../src/priceFeed/interfaces/IPriceFeed.sol";
 import "../TestConfig.sol";
-import {ISortedTroves} from "../../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../../src/priceFeed/interfaces/IPriceFeed.sol";
-import {AggregatorV3Interface} from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
-import {MultiCollateralHintHelpers} from "../../src/core/helpers/MultiCollateralHintHelpers.sol";
-import {IMultiCollateralHintHelpers} from "../../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
 
-import {IOSHIToken} from "../../src/OSHI/interfaces/IOSHIToken.sol";
-import {OSHIToken} from "../../src/OSHI/OSHIToken.sol";
-import {ISatoshiPeriphery} from "../../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
-import {SatoshiPeriphery} from "../../src/core/helpers/SatoshiPeriphery.sol";
-import {IWETH} from "../../src/core/helpers/interfaces/IWETH.sol";
-import {WETH9} from "../mocks/WETH9.sol";
-import {GasPool} from "../../src/core/GasPool.sol";
-import {IGasPool} from "../../src/core/interfaces/IGasPool.sol";
-import {Config} from "../../src/core/Config.sol";
+import { OSHIToken } from "../../src/OSHI/OSHIToken.sol";
+import { IOSHIToken } from "../../src/OSHI/interfaces/IOSHIToken.sol";
+
+import { Config } from "../../src/core/Config.sol";
+import { GasPool } from "../../src/core/GasPool.sol";
+import { SatoshiPeriphery } from "../../src/core/helpers/SatoshiPeriphery.sol";
+import { ISatoshiPeriphery } from "../../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+
+import { IWETH } from "../../src/core/helpers/interfaces/IWETH.sol";
+import { IGasPool } from "../../src/core/interfaces/IGasPool.sol";
+
+import { VaultManager } from "../../src/vault/VaultManager.sol";
+import { IVaultManager } from "../../src/vault/interfaces/IVaultManager.sol";
+import { WETH9 } from "../mocks/WETH9.sol";
 
 struct LocalVars {
     // base vars
@@ -118,6 +130,7 @@ abstract contract DeployBase is Test {
     IRewardManager internal rewardManager;
     ICommunityIssuance internal communityIssuance;
     IOSHIToken internal oshiToken;
+    IVaultManager internal vaultManager;
 
     IBeacon internal sortedTrovesBeacon;
     IBeacon internal troveManagerBeacon;
@@ -147,6 +160,7 @@ abstract contract DeployBase is Test {
         _deployPeriphery(DEPLOYER);
         _satoshiXAppInit(DEPLOYER);
         _deployHintHelpers(DEPLOYER);
+        _deployVaultManager(DEPLOYER);
     }
 
     function _deployPeriphery(address deployer) internal {
@@ -422,16 +436,27 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
+    function _deployVaultManager(address deployer) internal {
+        vm.startPrank(deployer);
+        assert(address(vaultManager) == address(0)); // check if contract is not deployed
+        address vaultManagerImpl = address(new VaultManager());
+        bytes memory data = abi.encodeCall(IVaultManager.initialize, (address(debtToken), address(satoshiXApp), OWNER));
+        vaultManager = IVaultManager(address(new ERC1967Proxy(address(vaultManagerImpl), data)));
+        vm.stopPrank();
+    }
+
     function _diamondCut(
         address deployer,
         ISatoshiXApp diamond,
         address target,
         IERC2535DiamondCutInternal.FacetCutAction action,
         bytes4[] memory selectors
-    ) internal {
+    )
+        internal
+    {
         IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](1);
         IERC2535DiamondCutInternal.FacetCut memory facetCut;
-        facetCut = IERC2535DiamondCutInternal.FacetCut({target: target, action: action, selectors: selectors});
+        facetCut = IERC2535DiamondCutInternal.FacetCut({ target: target, action: action, selectors: selectors });
         facetCuts[0] = facetCut;
 
         vm.startPrank(deployer);
@@ -488,7 +513,7 @@ abstract contract DeployBase is Test {
     function _deployMockTroveManager(address deployer) internal returns (ISortedTroves, ITroveManager) {
         collateralMock = new ERC20Mock("Collateral", "COLL");
         initRoundData = RoundData({
-            answer: 4000000000000,
+            answer: 4_000_000_000_000,
             startedAt: block.timestamp,
             updatedAt: block.timestamp,
             answeredInRound: 1
@@ -525,7 +550,10 @@ abstract contract DeployBase is Test {
         IERC20 collateral,
         IPriceFeed priceFeed,
         DeploymentParams memory deploymentParams
-    ) internal returns (ISortedTroves, ITroveManager) {
+    )
+        internal
+        returns (ISortedTroves, ITroveManager)
+    {
         vm.startPrank(owner);
 
         (ITroveManager troveManagerBeaconProxy, ISortedTroves sortedTrovesBeaconProxy) =
@@ -535,7 +563,12 @@ abstract contract DeployBase is Test {
         return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
     }
 
-    function _deployPriceFeed(address deployer, uint8 decimals, uint256 version, RoundData memory roundData)
+    function _deployPriceFeed(
+        address deployer,
+        uint8 decimals,
+        uint256 version,
+        RoundData memory roundData
+    )
         internal
         returns (address)
     {
@@ -581,6 +614,7 @@ abstract contract DeployBase is Test {
         _setClaimStartTime(owner, SP_CLAIM_START_TIME);
         _setSPRewardRate(owner);
         _setTMRewardRate(owner, 1);
+        _setCDPFarming(owner, troveManagerBeaconProxy);
     }
 
     // function _setAddress(
@@ -623,6 +657,14 @@ abstract contract DeployBase is Test {
         IFactoryFacet factoryProxy = IFactoryFacet(address(satoshiXApp));
         factoryProxy.setTMRewardRate(numerator, denominator);
         // assertEq(troveManagerBeaconProxy.rewardRate(), factoryProxy.maxRewardRate());
+        vm.stopPrank();
+    }
+
+    function _setCDPFarming(address owner, ITroveManager troveManagerBeaconProxy) internal {
+        vm.startPrank(owner);
+        troveManagerBeaconProxy.setFarmingParams(3000, 3500);
+        troveManagerBeaconProxy.setVaultManager(address(vaultManager));
+        vaultManager.setTroveManager(address(troveManagerBeaconProxy), true);
         vm.stopPrank();
     }
 

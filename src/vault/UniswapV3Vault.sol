@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC721Receiver} from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IVaultManager} from "./interfaces/IVaultManager.sol";
-import {IDebtToken} from "../core/interfaces/IDebtToken.sol";
-import {INonfungiblePositionManager} from "./interfaces/INonfungiblePositionManager.sol";
-import {VaultCore} from "./VaultCore.sol";
-import {TickHelper} from "../dependencies/uniswapV3/TickHelper.sol";
+import { IDebtToken } from "../core/interfaces/IDebtToken.sol";
+
+import { TickHelper } from "../dependencies/uniswapV3/TickHelper.sol";
+import { VaultCore } from "./VaultCore.sol";
+import { INonfungiblePositionManager } from "./interfaces/INonfungiblePositionManager.sol";
+import { IVaultManager } from "./interfaces/IVaultManager.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 
 contract UniV3DexVault is VaultCore {
     using SafeERC20 for IERC20;
@@ -34,6 +35,7 @@ contract UniV3DexVault is VaultCore {
 
     function initialize(bytes calldata data) external override checkInitAddress initializer {
         __UUPSUpgradeable_init_unchained();
+        __Ownable_init(msg.sender);
         (address vaultManager_, address debtToken_, address nonfungiblePositionManager_) = _decodeInitializeData(data);
 
         vaultManager = vaultManager_;
@@ -126,7 +128,11 @@ contract UniV3DexVault is VaultCore {
         uint256 amount1ToMint,
         uint256 amount0ToMin,
         uint256 amount1ToMin
-    ) external pure returns (bytes memory) {
+    )
+        external
+        pure
+        returns (bytes memory)
+    {
         (token0, token1) = token0 < token1 ? (token0, token1) : (token1, token0);
 
         return abi.encode(
@@ -149,11 +155,20 @@ contract UniV3DexVault is VaultCore {
         uint256 amount1ToMint,
         uint256 amount0Min,
         uint256 amount1Min
-    ) external pure returns (bytes memory) {
+    )
+        external
+        pure
+        returns (bytes memory)
+    {
         return abi.encode(Option.AddLiquidity, tokenId, amount0ToMint, amount1ToMint, amount0Min, amount1Min);
     }
 
-    function constructDecreaseLiquidityData(uint256 tokenId, uint128 liquidity, uint256 amount0Min, uint256 amount1Min)
+    function constructDecreaseLiquidityData(
+        uint256 tokenId,
+        uint128 liquidity,
+        uint256 amount0Min,
+        uint256 amount1Min
+    )
         external
         pure
         returns (bytes memory)
@@ -161,7 +176,11 @@ contract UniV3DexVault is VaultCore {
         return abi.encode(Option.RemoveLiquidity, tokenId, liquidity, amount0Min, amount1Min);
     }
 
-    function constructDecreaseLiquidityFullData(uint256 tokenId, uint256 amount0Min, uint256 amount1Min)
+    function constructDecreaseLiquidityFullData(
+        uint256 tokenId,
+        uint256 amount0Min,
+        uint256 amount1Min
+    )
         external
         pure
         returns (bytes memory)
@@ -324,7 +343,11 @@ contract UniV3DexVault is VaultCore {
         uint256 amount1ToMint,
         uint256 amount0ToMintMin,
         uint256 amount1ToMintMin
-    ) internal virtual returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1) {
+    )
+        internal
+        virtual
+        returns (uint256 tokenId, uint128 liquidity, uint256 amount0, uint256 amount1)
+    {
         INonfungiblePositionManager.MintParams memory liquidityParams = INonfungiblePositionManager.MintParams({
             token0: token0,
             token1: token1,
@@ -388,7 +411,7 @@ contract UniV3DexVault is VaultCore {
     function _createDeposit(uint256 tokenId) internal {
         (,, address token0, address token1,,,, uint128 liquidity,,,,) = nonfungiblePositionManager.positions(tokenId);
 
-        deposits[tokenId] = Deposit({liquidity: liquidity, token0: token0, token1: token1});
+        deposits[tokenId] = Deposit({ liquidity: liquidity, token0: token0, token1: token1 });
 
         _addTokenIdList(tokenId);
         emit CreateDeposit(tokenId);

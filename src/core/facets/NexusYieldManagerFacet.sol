@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.8.19;
 
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {ReentrancyGuard} from "@solidstate/contracts/security/reentrancy_guard/ReentrancyGuard.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {INexusYieldManagerFacet, AssetConfig, ChainConfig} from "../interfaces/INexusYieldManagerFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../interfaces/IPriceFeedAggregatorFacet.sol";
-import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {Config} from "../Config.sol";
+import { IRewardManager } from "../../OSHI/interfaces/IRewardManager.sol";
+import { AppStorage } from "../AppStorage.sol";
+import { Config } from "../Config.sol";
+import { AssetConfig, ChainConfig, INexusYieldManagerFacet } from "../interfaces/INexusYieldManagerFacet.sol";
+import { IPriceFeedAggregatorFacet } from "../interfaces/IPriceFeedAggregatorFacet.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import { ReentrancyGuard } from "@solidstate/contracts/security/reentrancy_guard/ReentrancyGuard.sol";
 
 /**
  * @title Nexus Yield Manager Contract.
@@ -77,7 +77,11 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param vault The address of the privileged vault.
      * @param amount The amount of token to transfer.
      */
-    function transferTokenToPrivilegedVault(address token, address vault, uint256 amount)
+    function transferTokenToPrivilegedVault(
+        address token,
+        address vault,
+        uint256 amount
+    )
         external
         onlyRole(Config.OWNER_ROLE)
     {
@@ -101,7 +105,11 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @return Amount of debtToken minted to the sender.
      */
     // @custom:event Emits AssetForDebtTokenSwapped event.
-    function swapIn(address asset, address receiver, uint256 assetAmount)
+    function swapIn(
+        address asset,
+        address receiver,
+        uint256 assetAmount
+    )
         external
         isActive
         nonReentrant
@@ -246,7 +254,11 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @return The amount of stable tokens to swap.
      */
     // @custom:event Emits DebtTokenForAssetSwapped event.
-    function swapOutPrivileged(address asset, address receiver, uint256 amount)
+    function swapOutPrivileged(
+        address asset,
+        address receiver,
+        uint256 amount
+    )
         external
         isActive
         onlyPrivileged
@@ -291,7 +303,11 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @return Amount of debtToken minted to the sender.
      */
     // @custom:event Emits AssetForDebtTokenSwapped event.
-    function swapInPrivileged(address asset, address receiver, uint256 assetAmount)
+    function swapInPrivileged(
+        address asset,
+        address receiver,
+        uint256 assetAmount
+    )
         external
         isActive
         onlyPrivileged
@@ -466,7 +482,11 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param asset The address of the asset.
      * @param amount The amount of debt tokens.
      */
-    function _previewAssetAmountFromDebtToken(address asset, uint256 amount, FeeDirection direction)
+    function _previewAssetAmountFromDebtToken(
+        address asset,
+        uint256 amount,
+        FeeDirection direction
+    )
         internal
         returns (uint256)
     {
@@ -624,7 +644,10 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     }
 
     // @notice Get the pending withdrawals for the given assets and account.
-    function pendingWithdrawals(address[] memory assets, address account)
+    function pendingWithdrawals(
+        address[] memory assets,
+        address account
+    )
         external
         view
         returns (uint256[] memory, uint32[] memory)

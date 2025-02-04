@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.0;
 
-import {IPoolAddressesProvider} from "./IPoolAddressesProvider.sol";
-import {DataTypes} from "./DataTypes.sol";
+import { DataTypes } from "./DataTypes.sol";
+import { IPoolAddressesProvider } from "./IPoolAddressesProvider.sol";
 
 /**
  * @title IPool
@@ -252,7 +252,8 @@ interface IPool {
         uint8 permitV,
         bytes32 permitR,
         bytes32 permitS
-    ) external;
+    )
+        external;
 
     /**
      * @notice Withdraws an `amount` of underlying asset from the reserve, burning the equivalent aTokens owned
@@ -282,7 +283,13 @@ interface IPool {
      * calling the function if he wants to borrow against his own collateral, or the address of the credit delegator
      * if he has been given credit delegation allowance
      */
-    function borrow(address asset, uint256 amount, uint256 interestRateMode, uint16 referralCode, address onBehalfOf)
+    function borrow(
+        address asset,
+        uint256 amount,
+        uint256 interestRateMode,
+        uint16 referralCode,
+        address onBehalfOf
+    )
         external;
 
     /**
@@ -297,7 +304,12 @@ interface IPool {
      * other borrower whose debt should be removed
      * @return The final amount repaid
      */
-    function repay(address asset, uint256 amount, uint256 interestRateMode, address onBehalfOf)
+    function repay(
+        address asset,
+        uint256 amount,
+        uint256 interestRateMode,
+        address onBehalfOf
+    )
         external
         returns (uint256);
 
@@ -326,7 +338,9 @@ interface IPool {
         uint8 permitV,
         bytes32 permitR,
         bytes32 permitS
-    ) external returns (uint256);
+    )
+        external
+        returns (uint256);
 
     /**
      * @notice Repays a borrowed `amount` on a specific reserve using the reserve aTokens, burning the
@@ -384,7 +398,8 @@ interface IPool {
         address user,
         uint256 debtToCover,
         bool receiveAToken
-    ) external;
+    )
+        external;
 
     /**
      * @notice Allows smartcontracts to access the liquidity of the pool within one transaction,
@@ -411,7 +426,8 @@ interface IPool {
         address onBehalfOf,
         bytes calldata params,
         uint16 referralCode
-    ) external;
+    )
+        external;
 
     /**
      * @notice Allows smartcontracts to access the liquidity of the pool within one transaction,
@@ -431,7 +447,8 @@ interface IPool {
         uint256 amount,
         bytes calldata params,
         uint16 referralCode
-    ) external;
+    )
+        external;
 
     /**
      * @notice Returns the user account data across all the reserves
@@ -471,7 +488,8 @@ interface IPool {
         address stableDebtAddress,
         address variableDebtAddress,
         address interestRateStrategyAddress
-    ) external;
+    )
+        external;
 
     /**
      * @notice Drop a reserve
@@ -555,7 +573,8 @@ interface IPool {
         uint256 amount,
         uint256 balanceFromBefore,
         uint256 balanceToBefore
-    ) external;
+    )
+        external;
 
     /**
      * @notice Returns the list of the underlying assets of all the initialized reserves

@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-import {SatoshiMath} from "../library/SatoshiMath.sol";
-import {IVault} from "./interfaces/IVault.sol";
-import {IVaultManager} from "./interfaces/IVaultManager.sol";
-import {ITroveManager} from "../../src/core/interfaces/ITroveManager.sol";
-import {IDebtToken} from "../../src/core/interfaces/IDebtToken.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IDebtToken } from "../../src/core/interfaces/IDebtToken.sol";
+import { ITroveManager } from "../../src/core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../library/SatoshiMath.sol";
+import { IVault } from "./interfaces/IVault.sol";
+import { IVaultManager } from "./interfaces/IVaultManager.sol";
+
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /* 
     * @title VaultManager
@@ -39,8 +40,9 @@ contract VaultManager is IVaultManager, OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(address _debtToken, address _nexusYieldManager) external override initializer {
+    function initialize(address _debtToken, address _nexusYieldManager, address _owner) external override initializer {
         __UUPSUpgradeable_init_unchained();
+        __Ownable_init(_owner);
 
         debtToken = IDebtToken(_debtToken);
         nexusYieldManager = _nexusYieldManager;
@@ -122,7 +124,7 @@ contract VaultManager is IVaultManager, OwnableUpgradeable, UUPSUpgradeable {
         emit NexusYieldManagerSet(nexusYieldManager_);
     }
 
-    function setTrovesManager(address troveManager_, bool status) external onlyOwner {
+    function setTroveManager(address troveManager_, bool status) external onlyOwner {
         troveManagers[troveManager_] = status;
 
         emit TroveManagerSet(troveManager_, status);

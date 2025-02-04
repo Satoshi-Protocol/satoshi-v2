@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /* Deploy setup */
 address constant DEPLOYER = 0x6510b482312e528fbb892b7C3A0d29e07E12DEc3;
@@ -18,13 +18,13 @@ uint256 constant TM_ALLOCATION = 20 * _1_MILLION;
 uint256 constant SP_ALLOCATION = 10 * _1_MILLION;
 uint128 constant REWARD_RATE = 0; // 126839167935058336 (20_000_000e18 / (5 * 31536000))
 
-uint256 constant MINUTE_DECAY_FACTOR = 999037758833783500; //  (half life of 12 hours)
+uint256 constant MINUTE_DECAY_FACTOR = 999_037_758_833_783_500; //  (half life of 12 hours)
 uint256 constant REDEMPTION_FEE_FLOOR = 1e18 / 1000 * 5; //  (0.5%)
 uint256 constant MAX_REDEMPTION_FEE = 1e18 / 100 * 5; //  (5%)
 uint256 constant BORROWING_FEE_FLOOR = 1e18 / 1000 * 5; //  (0.5%)
 uint256 constant MAX_BORROWING_FEE = 1e18 / 100 * 5; //  (5%)
 uint256 constant INTEREST_RATE_IN_BPS = 0; //  (4.5%)
-uint256 constant MAX_DEBT = 1e18 * 1000000000; //  (1 billion)
+uint256 constant MAX_DEBT = 1e18 * 1_000_000_000; //  (1 billion)
 uint256 constant MCR = 11 * 1e17; //  (110%)
 
 uint8 constant ORACLE_MOCK_DECIMALS = 8;
@@ -33,6 +33,6 @@ uint256 constant ORACLE_MOCK_VERSION = 1;
 uint256 constant MIN_NET_DEBT = 10e18;
 uint256 constant DEBT_GAS_COMPENSATION = 2e18;
 
-uint128 constant SP_MAX_REWARD_RATE = 63419583967529168;
+uint128 constant SP_MAX_REWARD_RATE = 63_419_583_967_529_168;
 uint256 constant LIQUIDATION_FEE = 200; //  (0.2%)
-uint256 constant CCR = 1500000000000000000; // 150%
+uint256 constant CCR = 1_500_000_000_000_000_000; // 150%

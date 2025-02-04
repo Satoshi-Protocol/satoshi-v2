@@ -151,7 +151,10 @@ interface IDelegationManager {
      * @dev This function will revert if the caller attempts to set their `earningsReceiver` to address(0).
      * @dev Note that the `metadataURI` is *never stored * and is only emitted in the `OperatorMetadataURIUpdated` event
      */
-    function registerAsOperator(OperatorDetails calldata registeringOperatorDetails, string calldata metadataURI)
+    function registerAsOperator(
+        OperatorDetails calldata registeringOperatorDetails,
+        string calldata metadataURI
+    )
         external;
 
     /**
@@ -212,7 +215,8 @@ interface IDelegationManager {
         IERC20[] calldata tokens,
         uint256 middlewareTimesIndex,
         bool receiveAsTokens
-    ) external;
+    )
+        external;
 
     /**
      * @notice Array-ified version of `completeQueuedWithdrawal`.
@@ -228,7 +232,8 @@ interface IDelegationManager {
         IERC20[][] calldata tokens,
         uint256[] calldata middlewareTimesIndexes,
         bool[] calldata receiveAsTokens
-    ) external;
+    )
+        external;
 
     /**
      * @notice Increases a staker's delegated share balance in a strategy.
@@ -282,7 +287,10 @@ interface IDelegationManager {
     /**
      * @notice Given array of strategies, returns array of shares for the operator
      */
-    function getOperatorShares(address operator, IStrategy[] memory strategies)
+    function getOperatorShares(
+        address operator,
+        IStrategy[] memory strategies
+    )
         external
         view
         returns (uint256[] memory);
@@ -343,7 +351,11 @@ interface IDelegationManager {
      * @param operator The operator who is being delegated to
      * @param expiry The desired expiry time of the staker's signature
      */
-    function calculateCurrentStakerDelegationDigestHash(address staker, address operator, uint256 expiry)
+    function calculateCurrentStakerDelegationDigestHash(
+        address staker,
+        address operator,
+        uint256 expiry
+    )
         external
         view
         returns (bytes32);
@@ -355,7 +367,12 @@ interface IDelegationManager {
      * @param operator The operator who is being delegated to
      * @param expiry The desired expiry time of the staker's signature
      */
-    function calculateStakerDelegationDigestHash(address staker, uint256 _stakerNonce, address operator, uint256 expiry)
+    function calculateStakerDelegationDigestHash(
+        address staker,
+        uint256 _stakerNonce,
+        address operator,
+        uint256 expiry
+    )
         external
         view
         returns (bytes32);
@@ -374,7 +391,10 @@ interface IDelegationManager {
         address _delegationApprover,
         bytes32 approverSalt,
         uint256 expiry
-    ) external view returns (bytes32);
+    )
+        external
+        view
+        returns (bytes32);
 
     /// @notice The EIP-712 typehash for the contract's domain
     function DOMAIN_TYPEHASH() external view returns (bytes32);

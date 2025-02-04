@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { IERC3156FlashBorrower } from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 // import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 
-import {ITroveManager} from "./ITroveManager.sol";
+import { ITroveManager } from "./ITroveManager.sol";
 
 interface IDebtToken is IERC20, IERC20Metadata {
     /**
@@ -38,7 +38,12 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @param data Additional data to pass to the receiver.
      * @return A boolean indicating if the operation was successful.
      */
-    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
+    function flashLoan(
+        IERC3156FlashBorrower receiver,
+        address token,
+        uint256 amount,
+        bytes calldata data
+    )
         external
         returns (bool);
 
@@ -145,7 +150,8 @@ interface IDebtToken is IERC20, IERC20Metadata {
         address _satoshiXApp,
         address _owner,
         uint256 _debtGasCompensation
-    ) external;
+    )
+        external;
 
     /**
      * @notice Checks if an address is authorized as a ward.

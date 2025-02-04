@@ -1,52 +1,59 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import { CommunityIssuance } from "../src/OSHI/CommunityIssuance.sol";
+
+import { OSHIToken } from "../src/OSHI/OSHIToken.sol";
+import { RewardManager } from "../src/OSHI/RewardManager.sol";
+import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
+import { IOSHIToken } from "../src/OSHI/interfaces/IOSHIToken.sol";
+import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
+import { DebtToken } from "../src/core/DebtToken.sol";
+import { Initializer } from "../src/core/Initializer.sol";
+import { SatoshiXApp } from "../src/core/SatoshiXApp.sol";
+
+import { SortedTroves } from "../src/core/SortedTroves.sol";
+import { TroveManager } from "../src/core/TroveManager.sol";
+import { BorrowerOperationsFacet } from "../src/core/facets/BorrowerOperationsFacet.sol";
+import { CoreFacet } from "../src/core/facets/CoreFacet.sol";
+import { FactoryFacet } from "../src/core/facets/FactoryFacet.sol";
+import { LiquidationFacet } from "../src/core/facets/LiquidationFacet.sol";
+import { NexusYieldManagerFacet } from "../src/core/facets/NexusYieldManagerFacet.sol";
+import { PriceFeedAggregatorFacet } from "../src/core/facets/PriceFeedAggregatorFacet.sol";
+import { StabilityPoolFacet } from "../src/core/facets/StabilityPoolFacet.sol";
+
+import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
+
+import { IMultiCollateralHintHelpers } from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { ISatoshiPeriphery } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import { IWETH } from "../src/core/helpers/interfaces/IWETH.sol";
+import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { DeploymentParams, IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
+import { INexusYieldManagerFacet } from "../src/core/interfaces/INexusYieldManagerFacet.sol";
+import { IPriceFeedAggregatorFacet } from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
+import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
+
+import { ISortedTroves } from "../src/core/interfaces/ISortedTroves.sol";
+import { IStabilityPoolFacet } from "../src/core/interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../src/library/SatoshiMath.sol";
+
+import { AggregatorV3Interface } from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "../src/priceFeed/interfaces/IPriceFeed.sol";
 import "./TestConfig.sol";
-import {Vm} from "forge-std/Vm.sol";
-import {console} from "forge-std/console.sol";
-import {stdJson} from "forge-std/StdJson.sol";
-import {IERC20Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {DeployBase} from "./utils/DeployBase.t.sol";
-import {SatoshiMath} from "../src/library/SatoshiMath.sol";
-import {SatoshiXApp} from "../src/core/SatoshiXApp.sol";
-import {ISatoshiXApp} from "../src/core/interfaces/ISatoshiXApp.sol";
-import {BorrowerOperationsFacet} from "../src/core/facets/BorrowerOperationsFacet.sol";
-import {IBorrowerOperationsFacet} from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {CoreFacet} from "../src/core/facets/CoreFacet.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
-import {FactoryFacet} from "../src/core/facets/FactoryFacet.sol";
-import {IFactoryFacet, DeploymentParams} from "../src/core/interfaces/IFactoryFacet.sol";
-import {LiquidationFacet} from "../src/core/facets/LiquidationFacet.sol";
-import {ILiquidationFacet} from "../src/core/interfaces/ILiquidationFacet.sol";
-import {PriceFeedAggregatorFacet} from "../src/core/facets/PriceFeedAggregatorFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
-import {StabilityPoolFacet} from "../src/core/facets/StabilityPoolFacet.sol";
-import {IStabilityPoolFacet} from "../src/core/interfaces/IStabilityPoolFacet.sol";
-import {INexusYieldManagerFacet} from "../src/core/interfaces/INexusYieldManagerFacet.sol";
-import {NexusYieldManagerFacet} from "../src/core/facets/NexusYieldManagerFacet.sol";
-import {Initializer} from "../src/core/Initializer.sol";
-import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
-import {RewardManager} from "../src/OSHI/RewardManager.sol";
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {DebtTokenWithLz} from "../src/core/DebtTokenWithLz.sol";
-import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
-import {CommunityIssuance} from "../src/OSHI/CommunityIssuance.sol";
-import {SortedTroves} from "../src/core/SortedTroves.sol";
-import {TroveManager} from "../src/core/TroveManager.sol";
-import {ISortedTroves} from "../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../src/priceFeed/interfaces/IPriceFeed.sol";
-import {AggregatorV3Interface} from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
-import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
-import {OSHIToken} from "../src/OSHI/OSHIToken.sol";
-import {ISatoshiPeriphery} from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
-import {SatoshiPeriphery} from "../src/core/helpers/SatoshiPeriphery.sol";
-import {IWETH} from "../src/core/helpers/interfaces/IWETH.sol";
-import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
-import {HintLib} from "./utils/HintLib.sol";
-import {TroveBase} from "./utils/TroveBase.t.sol";
+
+import { OracleMock, RoundData } from "./mocks/OracleMock.sol";
+import { DeployBase } from "./utils/DeployBase.t.sol";
+import { HintLib } from "./utils/HintLib.sol";
+import { TroveBase } from "./utils/TroveBase.t.sol";
+import { IERC20Errors } from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { stdJson } from "forge-std/StdJson.sol";
+import { Vm } from "forge-std/Vm.sol";
+import { console } from "forge-std/console.sol";
 
 contract StabilityPoolTest is DeployBase, TroveBase {
     uint256 maxFeePercentage = 0.05e18; // 5%
@@ -98,7 +105,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function testProvideToSP() public {
         StabilityPoolVars memory vars;
         // open trove
-        _openTrove(user1, 1e18, 10000e18);
+        _openTrove(user1, 1e18, 10_000e18);
         vars.stabilityPoolDebtBefore = stabilityPoolProxy().getTotalDebtTokenDeposits();
         assertEq(vars.stabilityPoolDebtBefore, 0);
 
@@ -112,7 +119,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function testWithdrawFromSPFull() public {
         StabilityPoolVars memory vars;
         // open trove
-        _openTrove(user1, 1e18, 10000e18);
+        _openTrove(user1, 1e18, 10_000e18);
 
         vars.stabilityPoolDebtBefore = stabilityPoolProxy().getTotalDebtTokenDeposits();
         assertEq(vars.stabilityPoolDebtBefore, 0);
@@ -131,18 +138,18 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function testLiquidateInNormalModeICRLessThanMCR() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 100e18, 185000e18);
-        _provideToSP(user1, 100000e18);
+        _openTrove(user1, 100e18, 185_000e18);
+        _provideToSP(user1, 100_000e18);
         // 2 toves opened
-        _openTrove(user2, 1e18, 20000e18);
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't
         _updateRoundData(
             RoundData({
-                answer: 20500_00_000_000, // 20500
+                answer: 2_050_000_000_000, // 20500
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2
@@ -174,18 +181,18 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function testLiquidateInNormalModeICRLessThan100() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 100e18, 185000e18);
-        _provideToSP(user1, 100000e18);
+        _openTrove(user1, 100e18, 185_000e18);
+        _provideToSP(user1, 100_000e18);
         // 2 toves opened
-        _openTrove(user2, 1e18, 20000e18);
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't
         _updateRoundData(
             RoundData({
-                answer: 10000_00_000_000, // 10000
+                answer: 1_000_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2
@@ -212,18 +219,18 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function testCorrectUpdateSnapshot() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 100e18, 185000e18);
-        _provideToSP(user1, 100000e18);
+        _openTrove(user1, 100e18, 185_000e18);
+        _provideToSP(user1, 100_000e18);
         // 2 toves opened
-        _openTrove(user2, 1e18, 20000e18);
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         _openTrove(user4, 1e18, 100e18);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't
         _updateRoundData(
             RoundData({
-                answer: 20500_00_000_000, // 20500
+                answer: 2_050_000_000_000, // 20500
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2
@@ -275,21 +282,21 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function testClaimCollGain() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 10000e18, 185000e18);
+        _openTrove(user1, 10_000e18, 185_000e18);
         // 1 tove opened
-        _openTrove(user2, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
         // user3 opens trove
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
-        _provideToSP(user1, 70000e18);
-        _provideToSP(user2, 20000e18);
+        _provideToSP(user1, 70_000e18);
+        _provideToSP(user2, 20_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't
         _updateRoundData(
             RoundData({
-                answer: 20000_00_000_000, // 20000
+                answer: 2_000_000_000_000, // 20000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2
@@ -304,7 +311,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
         vars.collGainBefore = stabilityPoolProxy().getDepositorCollateralGain(user2)[0];
         assert(vars.collGainBefore > 0);
         uint256 expectedGain = vars.userCollBefore[1] * 995 * 2 / 1000 / 9;
-        assertApproxEqAbs(vars.collGainBefore, expectedGain, 100000);
+        assertApproxEqAbs(vars.collGainBefore, expectedGain, 100_000);
 
         // user2 claim collateral gain
         _claimCollateralGains(user2);
@@ -322,7 +329,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
         assertFalse(sortedTrovesBeaconProxy.contains(user3));
 
         vars.collGainAfter = stabilityPoolProxy().getDepositorCollateralGain(user2)[0];
-        assertApproxEqAbs(vars.collGainBefore, vars.collGainAfter, 10000);
+        assertApproxEqAbs(vars.collGainBefore, vars.collGainAfter, 10_000);
 
         _recordUserStateAfterToVar(vars);
         // check user1 trove reamins the same
@@ -340,20 +347,20 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function testCompoundedDebt() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 10000e18, 185000e18);
-        _provideToSP(user1, 20000e18);
+        _openTrove(user1, 10_000e18, 185_000e18);
+        _provideToSP(user1, 20_000e18);
         // 1 tove opened
-        _openTrove(user2, 1e18, 20000e18);
-        _provideToSP(user2, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
+        _provideToSP(user2, 20_000e18);
         // user3 opens trove
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't (normal mode)
         _updateRoundData(
             RoundData({
-                answer: 20500_00_000_000, // 10000
+                answer: 2_050_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2
@@ -362,7 +369,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
 
         // user1 get the compounded debt after
         vars.stakeBefore = stabilityPoolProxy().getCompoundedDebtDeposit(user1);
-        assertEq(vars.stakeBefore, 20000e18);
+        assertEq(vars.stakeBefore, 20_000e18);
 
         vars.stabilityPoolDebtBefore = stabilityPoolProxy().getTotalDebtTokenDeposits();
         // liquidate user2
@@ -374,7 +381,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
         vars.stakeAfter = stabilityPoolProxy().getCompoundedDebtDeposit(user1);
         assert(vars.stakeAfter < vars.stakeBefore);
         assertTrue(
-            SatoshiMath._approximatelyEqual(vars.stakeAfter, vars.stakeBefore - vars.userDebtBefore[1] / 2, 100000)
+            SatoshiMath._approximatelyEqual(vars.stakeAfter, vars.stakeBefore - vars.userDebtBefore[1] / 2, 100_000)
         );
 
         vars.stabilityPoolDebtAfter = stabilityPoolProxy().getTotalDebtTokenDeposits();
@@ -397,22 +404,22 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function test_2lquidateAndProvide() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 10000e18, 185000e18);
+        _openTrove(user1, 10_000e18, 185_000e18);
         // 1 tove opened
-        _openTrove(user2, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
         // user3 opens trove
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         // provide to SP
-        _provideToSP(user1, 50000e18);
-        _provideToSP(user2, 10000e18);
+        _provideToSP(user1, 50_000e18);
+        _provideToSP(user2, 10_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't (normal mode)
         _updateRoundData(
             RoundData({
-                answer: 20500_00_000_000, // 10000
+                answer: 2_050_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2
@@ -430,27 +437,27 @@ contract StabilityPoolTest is DeployBase, TroveBase {
         _claimCollateralGains(user2);
 
         // provide to SP
-        uint256 provideAmt = 10000e18;
+        uint256 provideAmt = 10_000e18;
         _provideToSP(user2, provideAmt);
 
         // check the stake amount in SP
         vars.stakeAfter = stabilityPoolProxy().getCompoundedDebtDeposit(user2);
         uint256 expectedStake = 2 * provideAmt - (vars.userDebtBefore[1] + vars.userDebtBefore[2]) / 6;
-        assertTrue(SatoshiMath._approximatelyEqual(vars.stakeAfter, expectedStake, 10000));
+        assertTrue(SatoshiMath._approximatelyEqual(vars.stakeAfter, expectedStake, 10_000));
     }
 
     // deposit to SP and check the stake amount in SP
     function testOSHIEmissionWhenEmissionEnd() public {
         StabilityPoolVars memory vars;
         // open trove
-        _openTrove(user1, 10000e18, 20000000e18);
+        _openTrove(user1, 10_000e18, 20_000_000e18);
         vars.stabilityPoolDebtBefore = stabilityPoolProxy().getTotalDebtTokenDeposits();
         assertEq(vars.stabilityPoolDebtBefore, 0);
 
         // deposit to SP
-        _provideToSP(user1, 20000000e18);
+        _provideToSP(user1, 20_000_000e18);
         vars.stabilityPoolDebtAfter = stabilityPoolProxy().getTotalDebtTokenDeposits();
-        assertEq(vars.stabilityPoolDebtAfter, 20000000e18);
+        assertEq(vars.stabilityPoolDebtAfter, 20_000_000e18);
         // 5 years later
         vm.warp(block.timestamp + 365 days * 6);
         uint256 oshiReward = stabilityPoolProxy().claimableReward(user1);
@@ -468,7 +475,7 @@ contract StabilityPoolTest is DeployBase, TroveBase {
         _provideToSP(user1, 1000e18);
         // check no oshi reward in SP
         assertEq(stabilityPoolProxy().claimableReward(user1), 0);
-        vm.warp(block.timestamp + 10000);
+        vm.warp(block.timestamp + 10_000);
         assertEq(stabilityPoolProxy().claimableReward(user1), 0);
 
         vm.startPrank(OWNER);
@@ -477,45 +484,45 @@ contract StabilityPoolTest is DeployBase, TroveBase {
         vm.stopPrank();
         assertEq(stabilityPoolProxy().rewardRate(), MAX_REWARD_RATE);
 
-        vm.warp(block.timestamp + 10000);
+        vm.warp(block.timestamp + 10_000);
         // check oshi reward in SP
         uint256 rewardRate = stabilityPoolProxy().rewardRate();
-        assertEq(stabilityPoolProxy().claimableReward(user1), 10000 * rewardRate);
+        assertEq(stabilityPoolProxy().claimableReward(user1), 10_000 * rewardRate);
     }
 
     function test_normalAfteremptySP() public {
         // StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 10000e18, 185000e18);
+        _openTrove(user1, 10_000e18, 185_000e18);
         // 1 tove opened
-        _openTrove(user2, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
         // user3 opens trove
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         // provide to SP
-        _provideToSP(user1, 50000e18);
-        _provideToSP(user2, 10000e18);
+        _provideToSP(user1, 50_000e18);
+        _provideToSP(user2, 10_000e18);
     }
 
     function test_liquidateAndWithdrawFromSP() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 10000e18, 185000e18);
+        _openTrove(user1, 10_000e18, 185_000e18);
         // 1 tove opened
-        _openTrove(user2, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
         // user3 opens trove
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         // provide to SP
-        _provideToSP(user1, 50000e18);
-        _provideToSP(user2, 10000e18);
+        _provideToSP(user1, 50_000e18);
+        _provideToSP(user2, 10_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't (normal mode)
         _updateRoundData(
             RoundData({
-                answer: 20500_00_000_000, // 10000
+                answer: 2_050_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2
@@ -543,22 +550,22 @@ contract StabilityPoolTest is DeployBase, TroveBase {
     function test_liquidateAndWithdrawFromSPAll() public {
         StabilityPoolVars memory vars;
         // whale opens trove
-        _openTrove(user1, 10000e18, 185000e18);
+        _openTrove(user1, 10_000e18, 185_000e18);
         // 1 tove opened
-        _openTrove(user2, 1e18, 20000e18);
+        _openTrove(user2, 1e18, 20_000e18);
         // user3 opens trove
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user3, 1e18, 20_000e18);
 
         // provide to SP
-        _provideToSP(user1, 50000e18);
-        _provideToSP(user2, 10000e18);
+        _provideToSP(user1, 50_000e18);
+        _provideToSP(user2, 10_000e18);
 
         _recordUserStateBeforeToVar(vars);
 
         // price drops: user2's and user3's Troves fall below MCR, whale doesn't (normal mode)
         _updateRoundData(
             RoundData({
-                answer: 20500_00_000_000, // 10000
+                answer: 2_050_000_000_000, // 10000
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 2

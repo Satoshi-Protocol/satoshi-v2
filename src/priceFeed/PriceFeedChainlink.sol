@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {AggregatorV3Interface} from "./interfaces/AggregatorV3Interface.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { AggregatorV3Interface } from "./interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title PriceFeed Contract to integrate with Chainlink
@@ -15,8 +15,8 @@ contract PriceFeedChainlink is IPriceFeed, Ownable {
 
     constructor(AggregatorV3Interface source_) Ownable(msg.sender) {
         _source = source_;
-        maxTimeThreshold = 86400;
-        emit MaxTimeThresholdUpdated(86400);
+        maxTimeThreshold = 86_400;
+        emit MaxTimeThresholdUpdated(86_400);
     }
 
     function fetchPrice() external view returns (uint256) {

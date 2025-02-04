@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {IPriceFeed} from "./interfaces/IPriceFeed.sol";
-import {IDIAOracleV2} from "./interfaces/IDIAOracleV2.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { IDIAOracleV2 } from "./interfaces/IDIAOracleV2.sol";
+import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title Partial interface of wstBTC
@@ -34,7 +34,9 @@ contract PriceFeedWstBTCWithDIAOracle is IPriceFeed, Ownable {
         string memory key_,
         uint256 _maxTimeThreshold,
         IWstBTCPartial wstBTC_
-    ) Ownable(msg.sender) {
+    )
+        Ownable(msg.sender)
+    {
         _source = source_;
         _decimals = decimals_;
         _key = key_;

@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {TroveManagerData} from "../interfaces/IBorrowerOperationsFacet.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {Balances} from "../interfaces/IBorrowerOperationsFacet.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {Config} from "../Config.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+import { AppStorage } from "../AppStorage.sol";
+
+import { Config } from "../Config.sol";
+import { TroveManagerData } from "../interfaces/IBorrowerOperationsFacet.sol";
+import { Balances } from "../interfaces/IBorrowerOperationsFacet.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 library BorrowerOperationsLib {
     /**
@@ -46,7 +47,10 @@ library BorrowerOperationsLib {
         (, totalPricedCollateral, totalDebt) = _getTCRData(balances);
     }
 
-    function _getCollateralAndTCRData(AppStorage.Layout storage s, ITroveManager troveManager)
+    function _getCollateralAndTCRData(
+        AppStorage.Layout storage s,
+        ITroveManager troveManager
+    )
         internal
         returns (
             IERC20 collateralToken,
@@ -74,7 +78,10 @@ library BorrowerOperationsLib {
         return msg.sender == _account || s.isApprovedDelegate[_account][msg.sender];
     }
 
-    function _getCollChange(uint256 _collReceived, uint256 _requestedCollWithdrawal)
+    function _getCollChange(
+        uint256 _collReceived,
+        uint256 _requestedCollWithdrawal
+    )
         internal
         pure
         returns (uint256 collChange, bool isCollIncrease)
@@ -97,7 +104,11 @@ library BorrowerOperationsLib {
         bool _isDebtIncrease,
         uint256 _price,
         uint8 decimals
-    ) internal pure returns (uint256) {
+    )
+        internal
+        pure
+        returns (uint256)
+    {
         (uint256 newColl, uint256 newDebt) =
             _getNewTroveAmounts(_coll, _debt, _collChange, _isCollIncrease, _debtChange, _isDebtIncrease);
 
@@ -113,7 +124,11 @@ library BorrowerOperationsLib {
         bool _isCollIncrease,
         uint256 _debtChange,
         bool _isDebtIncrease
-    ) internal pure returns (uint256, uint256) {
+    )
+        internal
+        pure
+        returns (uint256, uint256)
+    {
         uint256 newColl = _coll;
         uint256 newDebt = _debt;
 
@@ -131,7 +146,11 @@ library BorrowerOperationsLib {
         uint256 _debtChange,
         bool _isDebtIncrease,
         uint8 decimals
-    ) internal pure returns (uint256) {
+    )
+        internal
+        pure
+        returns (uint256)
+    {
         totalDebt = _isDebtIncrease ? totalDebt + _debtChange : totalDebt - _debtChange;
         totalColl = _isCollIncrease ? totalColl + _collChange : totalColl - _collChange;
 

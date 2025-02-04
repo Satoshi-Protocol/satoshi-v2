@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {MessagingFee} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
+import { MessagingFee } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 
-import {DebtTokenWithLz} from "../../DebtTokenWithLz.sol";
+import { IDebtToken } from "../../interfaces/IDebtToken.sol";
 
-import {IBorrowerOperationsFacet} from "../../interfaces/IBorrowerOperationsFacet.sol";
-import {ITroveManager} from "../../interfaces/ITroveManager.sol";
+import { IBorrowerOperationsFacet } from "../../interfaces/IBorrowerOperationsFacet.sol";
+import { ITroveManager } from "../../interfaces/ITroveManager.sol";
 // import {ILiquidationManager} from "../../interfaces/core/ILiquidationManager.sol";
 
 struct LzSendParam {
@@ -24,11 +24,11 @@ interface ISatoshiPeriphery {
     error RefundFailed();
     error InsufficientMsgValue(uint256 msgValue, uint256 requiredValue);
 
-    function debtToken() external view returns (DebtTokenWithLz);
+    function debtToken() external view returns (IDebtToken);
 
     function xApp() external view returns (address);
 
-    function initialize(DebtTokenWithLz _debtToken, address _xApp, address _owner) external;
+    function initialize(IDebtToken _debtToken, address _xApp, address _owner) external;
 
     function openTrove(
         ITroveManager troveManager,
@@ -38,12 +38,24 @@ interface ISatoshiPeriphery {
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external payable;
+    )
+        external
+        payable;
 
-    function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
+    function addColl(
+        ITroveManager troveManager,
+        uint256 _collAmount,
+        address _upperHint,
+        address _lowerHint
+    )
         external;
 
-    function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
+    function withdrawColl(
+        ITroveManager troveManager,
+        uint256 _collWithdrawal,
+        address _upperHint,
+        address _lowerHint
+    )
         external;
 
     function withdrawDebt(
@@ -53,9 +65,16 @@ interface ISatoshiPeriphery {
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external payable;
+    )
+        external
+        payable;
 
-    function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
+    function repayDebt(
+        ITroveManager troveManager,
+        uint256 _debtAmount,
+        address _upperHint,
+        address _lowerHint
+    )
         external;
 
     function adjustTrove(
@@ -68,7 +87,9 @@ interface ISatoshiPeriphery {
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external payable;
+    )
+        external
+        payable;
 
     function closeTrove(ITroveManager troveManager) external;
 
@@ -77,5 +98,7 @@ interface ISatoshiPeriphery {
         uint256 maxTrovesToLiquidate,
         uint256 maxICR,
         LzSendParam calldata _lzSendParam
-    ) external payable;
+    )
+        external
+        payable;
 }

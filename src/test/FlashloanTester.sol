@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
-import {IDebtToken} from "../core/interfaces/IDebtToken.sol";
+import { IDebtToken } from "../core/interfaces/IDebtToken.sol";
+import { IERC3156FlashBorrower } from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 
 contract FlashloanTester is IERC3156FlashBorrower {
     IDebtToken lender;
@@ -12,7 +12,13 @@ contract FlashloanTester is IERC3156FlashBorrower {
     }
 
     // ERC-3156 Flash loan callback
-    function onFlashLoan(address initiator, address token, uint256 amount, uint256 fee, bytes calldata)
+    function onFlashLoan(
+        address initiator,
+        address token,
+        uint256 amount,
+        uint256 fee,
+        bytes calldata
+    )
         public
         override
         returns (bytes32)

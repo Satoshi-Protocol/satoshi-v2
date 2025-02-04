@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
-import {PriceFeedAPI3Oracle} from "../../src/priceFeed/PriceFeedAPI3Oracle.sol";
-import {IProxy} from "@api3/contracts/api3-server-v1/proxies/interfaces/IProxy.sol";
+import { PriceFeedAPI3Oracle } from "../../src/priceFeed/PriceFeedAPI3Oracle.sol";
+
 import {
     API3_MAX_TIME_THRESHOLD,
     API3_ORACLE_PRICE_FEED_DECIMAL,
     API3_ORACLE_PRICE_FEED_SOURCE_ADDRESS
 } from "./DeployPriceFeedConfig.sol";
+import { IProxy } from "@api3/contracts/api3-server-v1/proxies/interfaces/IProxy.sol";
+import { Script, console } from "forge-std/Script.sol";
 
 contract DeployPriceFeedAPI3Script is Script {
     PriceFeedAPI3Oracle internal priceFeedAPI3Oracle;

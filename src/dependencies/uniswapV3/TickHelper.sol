@@ -1,12 +1,12 @@
 pragma solidity ^0.8.19;
 
-import {TickMath} from "./TickMath.sol";
-import {Tick} from "./Tick.sol";
+import { Tick } from "./Tick.sol";
+import { TickMath } from "./TickMath.sol";
 
 library TickHelper {
     uint24 constant FEE_LOW = 500;
     uint24 constant FEE_MEDIUM = 3000;
-    uint24 constant FEE_HIGH = 10000;
+    uint24 constant FEE_HIGH = 10_000;
 
     int24 constant TICK_LOW = 10;
     int24 constant TICK_MEDIUM = 60;

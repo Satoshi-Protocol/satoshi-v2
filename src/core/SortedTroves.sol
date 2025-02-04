@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {ITroveManager} from "./interfaces/ITroveManager.sol";
-import {ISortedTroves, Node, Data} from "./interfaces/ISortedTroves.sol";
-import {Utils} from "../library/Utils.sol";
+import { Utils } from "../library/Utils.sol";
+import { Data, ISortedTroves, Node } from "./interfaces/ISortedTroves.sol";
+import { ITroveManager } from "./interfaces/ITroveManager.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
     ITroveManager public troveManager;
@@ -57,7 +57,9 @@ contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
         uint256 _NICR,
         address _prevId,
         address _nextId
-    ) internal {
+    )
+        internal
+    {
         // NICR must be non-zero
         require(_NICR > 0, "SortedTroves: NICR must be positive");
 
@@ -231,7 +233,12 @@ contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
         return _validInsertPosition(troveManager, _NICR, _prevId, _nextId);
     }
 
-    function _validInsertPosition(ITroveManager _troveManager, uint256 _NICR, address _prevId, address _nextId)
+    function _validInsertPosition(
+        ITroveManager _troveManager,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    )
         internal
         view
         returns (bool)
@@ -258,7 +265,11 @@ contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
      * @param _NICR Node's NICR
      * @param _startId Id of node to start descending the list from
      */
-    function _descendList(ITroveManager _troveManager, uint256 _NICR, address _startId)
+    function _descendList(
+        ITroveManager _troveManager,
+        uint256 _NICR,
+        address _startId
+    )
         internal
         view
         returns (address, address)
@@ -286,7 +297,11 @@ contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
      * @param _NICR Node's NICR
      * @param _startId Id of node to start ascending the list from
      */
-    function _ascendList(ITroveManager _troveManager, uint256 _NICR, address _startId)
+    function _ascendList(
+        ITroveManager _troveManager,
+        uint256 _NICR,
+        address _startId
+    )
         internal
         view
         returns (address, address)
@@ -314,7 +329,11 @@ contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
      * @param _prevId Id of previous node for the insert position
      * @param _nextId Id of next node for the insert position
      */
-    function findInsertPosition(uint256 _NICR, address _prevId, address _nextId)
+    function findInsertPosition(
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    )
         external
         view
         returns (address, address)
@@ -322,7 +341,12 @@ contract SortedTroves is ISortedTroves, Initializable, OwnableUpgradeable {
         return _findInsertPosition(troveManager, _NICR, _prevId, _nextId);
     }
 
-    function _findInsertPosition(ITroveManager _troveManager, uint256 _NICR, address _prevId, address _nextId)
+    function _findInsertPosition(
+        ITroveManager _troveManager,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    )
         internal
         view
         returns (address, address)

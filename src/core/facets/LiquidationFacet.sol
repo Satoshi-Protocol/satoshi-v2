@@ -1,24 +1,26 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
-import {ISolidStateERC20} from "@solidstate/contracts/token/ERC20/ISolidStateERC20.sol";
-import {IERC20Metadata} from "@solidstate/contracts/token/ERC20/metadata/IERC20Metadata.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {IStabilityPoolFacet} from "../interfaces/IStabilityPoolFacet.sol";
-import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+
+import { AppStorage } from "../AppStorage.sol";
+import { Config } from "../Config.sol";
 import {
     ILiquidationFacet,
-    TroveManagerValues,
+    LiquidationTotals,
     LiquidationValues,
-    LiquidationTotals
+    TroveManagerValues
 } from "../interfaces/ILiquidationFacet.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {Config} from "../Config.sol";
-import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
-import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
+import { ISortedTroves } from "../interfaces/ISortedTroves.sol";
+import { IStabilityPoolFacet } from "../interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+
+import { BorrowerOperationsLib } from "../libs/BorrowerOperationsLib.sol";
+import { StabilityPoolLib } from "../libs/StabilityPoolLib.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
+import { ISolidStateERC20 } from "@solidstate/contracts/token/ERC20/ISolidStateERC20.sol";
+import { IERC20Metadata } from "@solidstate/contracts/token/ERC20/metadata/IERC20Metadata.sol";
 
 contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableInternal {
     using StabilityPoolLib for AppStorage.Layout;
@@ -272,7 +274,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
         address _borrower,
         uint256 _debtInStabPool,
         bool sunsetting
-    ) internal returns (LiquidationValues memory singleLiquidation) {
+    )
+        internal
+        returns (LiquidationValues memory singleLiquidation)
+    {
         uint256 pendingDebtReward;
         uint256 pendingCollReward;
 
@@ -312,7 +317,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
         uint256 _debtInStabPool,
         uint256 _MCR,
         uint256 _price
-    ) internal returns (LiquidationValues memory singleLiquidation) {
+    )
+        internal
+        returns (LiquidationValues memory singleLiquidation)
+    {
         uint256 entireTroveDebt;
         uint256 entireTroveColl;
         uint256 pendingDebtReward;
@@ -355,7 +363,11 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
      * @dev Liquidate a trove without using the stability pool. All debt and collateral
      *          are distributed porportionally between the remaining active troves.
      */
-    function _liquidateWithoutSP(AppStorage.Layout storage s, ITroveManager troveManager, address _borrower)
+    function _liquidateWithoutSP(
+        AppStorage.Layout storage s,
+        ITroveManager troveManager,
+        address _borrower
+    )
         internal
         returns (LiquidationValues memory singleLiquidation)
     {
@@ -382,7 +394,12 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
     /* In a full liquidation, returns the values for a trove's coll and debt to be offset, and coll and debt to be
      * redistributed to active troves.
      */
-    function _getOffsetAndRedistributionVals(uint256 _debt, uint256 _coll, uint256 _debtInStabPool, bool sunsetting)
+    function _getOffsetAndRedistributionVals(
+        uint256 _debt,
+        uint256 _coll,
+        uint256 _debtInStabPool,
+        bool sunsetting
+    )
         internal
         pure
         returns (uint256 debtToOffset, uint256 collToSendToSP, uint256 debtToRedistribute, uint256 collToRedistribute)
@@ -418,7 +435,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
     function _applyLiquidationValuesToTotals(
         LiquidationTotals memory totals,
         LiquidationValues memory singleLiquidation
-    ) internal pure {
+    )
+        internal
+        pure
+    {
         // Tally all the values with their respective running totals
         totals.totalCollGasCompensation = totals.totalCollGasCompensation + singleLiquidation.collGasCompensation;
         totals.totalDebtGasCompensation = totals.totalDebtGasCompensation + singleLiquidation.debtGasCompensation;

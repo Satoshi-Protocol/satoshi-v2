@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
-import {ICommunityIssuance} from "./interfaces/ICommunityIssuance.sol";
-import {Utils} from "../library/Utils.sol";
+import { Utils } from "../library/Utils.sol";
+import { ICommunityIssuance } from "./interfaces/ICommunityIssuance.sol";
+import { IOSHIToken } from "./interfaces/IOSHIToken.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract CommunityIssuance is ICommunityIssuance, UUPSUpgradeable, OwnableUpgradeable {
     address public satoshiXApp;

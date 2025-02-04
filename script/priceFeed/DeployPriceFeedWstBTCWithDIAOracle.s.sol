@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
-import {PriceFeedWstBTCWithDIAOracle, IWstBTCPartial} from "../../src/priceFeed/PriceFeedWstBTCWithDIAOracle.sol";
-import {IDIAOracleV2} from "../../src/priceFeed/interfaces/IDIAOracleV2.sol";
+import { IWstBTCPartial, PriceFeedWstBTCWithDIAOracle } from "../../src/priceFeed/PriceFeedWstBTCWithDIAOracle.sol";
+import { IDIAOracleV2 } from "../../src/priceFeed/interfaces/IDIAOracleV2.sol";
 import {
-    DIA_ORACLE_PRICE_FEED_SOURCE_ADDRESS,
+    DIA_MAX_TIME_THRESHOLD,
     DIA_ORACLE_PRICE_FEED_DECIMALS,
     DIA_ORACLE_PRICE_FEED_KEY,
-    DIA_MAX_TIME_THRESHOLD,
+    DIA_ORACLE_PRICE_FEED_SOURCE_ADDRESS,
     WSTBTC_ADDRESS
 } from "./DeployPriceFeedConfig.sol";
+import { Script, console } from "forge-std/Script.sol";
 
 contract DeployPriceFeedWSTBTCScript is Script {
     uint256 internal DEPLOYMENT_PRIVATE_KEY;

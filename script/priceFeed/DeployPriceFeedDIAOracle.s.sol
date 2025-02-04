@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Script, console} from "forge-std/Script.sol";
+import { Script, console } from "forge-std/Script.sol";
 
-import {PriceFeedDIAOracle} from "../../src/priceFeed/PriceFeedDIAOracle.sol";
-import {IDIAOracleV2} from "../../src/priceFeed/interfaces/IDIAOracleV2.sol";
+import { PriceFeedDIAOracle } from "../../src/priceFeed/PriceFeedDIAOracle.sol";
+import { IDIAOracleV2 } from "../../src/priceFeed/interfaces/IDIAOracleV2.sol";
 import {
-    DIA_ORACLE_PRICE_FEED_SOURCE_ADDRESS,
+    DIA_MAX_TIME_THRESHOLD,
     DIA_ORACLE_PRICE_FEED_DECIMALS,
     DIA_ORACLE_PRICE_FEED_KEY,
-    DIA_MAX_TIME_THRESHOLD
+    DIA_ORACLE_PRICE_FEED_SOURCE_ADDRESS
 } from "./DeployPriceFeedConfig.sol";
 
 contract DeployPriceFeedChainlinkScript is Script {

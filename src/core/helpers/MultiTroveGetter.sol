@@ -1,14 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
-import {IMultiTroveGetter, CombinedTroveData} from "./interfaces/IMultiTroveGetter.sol";
+import { ISortedTroves } from "../interfaces/ISortedTroves.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+import { CombinedTroveData, IMultiTroveGetter } from "./interfaces/IMultiTroveGetter.sol";
 
 contract MultiTroveGetter is IMultiTroveGetter {
-    constructor() {}
+    constructor() { }
 
-    function getMultipleSortedTroves(ITroveManager troveManager, int256 _startIdx, uint256 _count, uint256 price)
+    function getMultipleSortedTroves(
+        ITroveManager troveManager,
+        int256 _startIdx,
+        uint256 _count,
+        uint256 price
+    )
         external
         view
         returns (CombinedTroveData[] memory _troves)
@@ -50,7 +55,11 @@ contract MultiTroveGetter is IMultiTroveGetter {
         uint256 _startIdx,
         uint256 _count,
         uint256 price
-    ) internal view returns (CombinedTroveData[] memory _troves) {
+    )
+        internal
+        view
+        returns (CombinedTroveData[] memory _troves)
+    {
         address currentTroveowner = sortedTroves.getFirst();
 
         for (uint256 idx = 0; idx < _startIdx; ++idx) {
@@ -95,7 +104,11 @@ contract MultiTroveGetter is IMultiTroveGetter {
         uint256 _startIdx,
         uint256 _count,
         uint256 price
-    ) internal view returns (CombinedTroveData[] memory _troves) {
+    )
+        internal
+        view
+        returns (CombinedTroveData[] memory _troves)
+    {
         address currentTroveowner = sortedTroves.getLast();
 
         for (uint256 idx = 0; idx < _startIdx; ++idx) {

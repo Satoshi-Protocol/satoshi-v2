@@ -29,7 +29,11 @@ interface ISupraSValueFeed {
 
     // Function to convert and derive new data pairs using two pair IDs and a mathematical operator multiplication(*) or division(/).
     //** Curreently only available in testnets
-    function getDerivedSvalue(uint256 pair_id_1, uint256 pair_id_2, uint256 operation)
+    function getDerivedSvalue(
+        uint256 pair_id_1,
+        uint256 pair_id_2,
+        uint256 operation
+    )
         external
         view
         returns (derivedData memory);

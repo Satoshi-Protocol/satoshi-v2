@@ -1,24 +1,26 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
+import { IRewardManager } from "../../OSHI/interfaces/IRewardManager.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+import { AppStorage } from "../AppStorage.sol";
+
+import { Config } from "../Config.sol";
 import {
-    IBorrowerOperationsFacet,
+    Balances,
     BorrowerOperation,
-    TroveManagerData,
-    Balances
+    IBorrowerOperationsFacet,
+    TroveManagerData
 } from "../interfaces/IBorrowerOperationsFacet.sol";
-import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
-import {Config} from "../Config.sol";
-import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+
+import { BorrowerOperationsLib } from "../libs/BorrowerOperationsLib.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 
 contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal {
     using SafeERC20 for IERC20;
@@ -130,7 +132,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Deposits are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -196,7 +200,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _collateralAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Trove adjustments are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -216,7 +222,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _collWithdrawal,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s._isCallerOrDelegated(account), "Caller not approved");
         _adjustTrove(s, troveManager, account, 0, 0, _collWithdrawal, 0, false, _upperHint, _lowerHint);
@@ -235,7 +243,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Withdrawals are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -254,7 +264,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s._isCallerOrDelegated(account), "Caller not approved");
         _adjustTrove(s, troveManager, account, 0, 0, 0, _debtAmount, false, _upperHint, _lowerHint);
@@ -275,7 +287,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require((_collDeposit == 0 && !_isDebtIncrease) || !s.paused, "Trove adjustments are paused");
         require(_collDeposit == 0 || _collWithdrawal == 0, "BorrowerOperations: Cannot withdraw and add coll");
@@ -310,7 +324,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint
-    ) internal {
+    )
+        internal
+    {
         require(
             _collDeposit != 0 || _collWithdrawal != 0 || _debtChange != 0,
             "BorrowerOps: There must be either a collateral change or a debt change"
@@ -419,7 +435,10 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         address _caller,
         uint256 _maxFeePercentage,
         uint256 _debtAmount
-    ) internal returns (uint256) {
+    )
+        internal
+        returns (uint256)
+    {
         uint256 debtFee = _troveManager.decayBaseRateAndGetBorrowingFee(_debtAmount);
 
         SatoshiMath._requireUserAcceptsFee(debtFee, _debtAmount, _maxFeePercentage);
@@ -442,7 +461,10 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         bool _isDebtIncrease,
         LocalVariables_adjustTrove memory _vars,
         uint8 decimals
-    ) internal pure {
+    )
+        internal
+        pure
+    {
         /*
          *In Recovery Mode, only allow:
          *

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {ISatoshiXApp} from "../../core/interfaces/ISatoshiXApp.sol";
-import {IVault} from "./IVault.sol";
-import {IDebtToken} from "../../core/interfaces/IDebtToken.sol";
+import { IDebtToken } from "../../core/interfaces/IDebtToken.sol";
+import { ISatoshiXApp } from "../../core/interfaces/ISatoshiXApp.sol";
+import { IVault } from "./IVault.sol";
 
 interface IVaultManager {
     event WhiteListVaultSet(address vault, bool isWhitelisted);
@@ -20,7 +20,7 @@ interface IVaultManager {
     error CallerIsNotTroveManager();
 
     function executeStrategy(address, bytes calldata) external;
-    function initialize(address, address) external;
+    function initialize(address, address, address) external;
     function exitStrategyByTroveManager(uint256 amount) external;
     function setPriority(address token, IVault[] memory _priority) external;
     function transferCollToTroveManager(address troveManager, uint256 amount) external;
@@ -28,4 +28,6 @@ interface IVaultManager {
     function mintDebtToken(uint256 amount) external;
     function burnDebtToken(uint256 amount) external;
     function debtToken() external view returns (IDebtToken);
+    function setNexusYieldManager(address nexusYieldManager) external;
+    function setTroveManager(address troveManager, bool status) external;
 }

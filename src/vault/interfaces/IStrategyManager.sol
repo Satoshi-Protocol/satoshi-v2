@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LGPL-3.0
 pragma solidity ^0.8.19;
 
-import "./IStrategy.sol";
 import "./ISlasher.sol";
+import "./IStrategy.sol";
 
 /**
  * @title Interface for the primary entrypoint for funds into Pell.
@@ -72,7 +72,9 @@ interface IStrategyManager {
         address staker,
         uint256 expiry,
         bytes memory signature
-    ) external returns (uint256 shares);
+    )
+        external
+        returns (uint256 shares);
 
     /// @notice Used by the DelegationManager to remove a Staker's shares from a particular strategy when entering the withdrawal queue
     function removeShares(address staker, IStrategy strategy, uint256 shares) external;
@@ -103,7 +105,8 @@ interface IStrategyManager {
     function addStrategiesToDepositWhitelist(
         IStrategy[] calldata strategiesToWhitelist,
         bool[] calldata thirdPartyTransfersForbiddenValues
-    ) external;
+    )
+        external;
 
     /**
      * @notice Owner-only function that removes the provided Strategies from the 'whitelist' of strategies that stakers can deposit into

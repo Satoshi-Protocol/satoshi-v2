@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
 pragma solidity ^0.8.19;
 
-import {SafeCast} from "./SafeCast.sol";
+import { SafeCast } from "./SafeCast.sol";
 
-import {TickMath} from "./TickMath.sol";
+import { TickMath } from "./TickMath.sol";
 
 /// @title Tick
 /// @notice Contains functions for managing tick processes and relevant calculations
@@ -65,7 +65,11 @@ library Tick {
         int24 tickCurrent,
         uint256 feeGrowthGlobal0X128,
         uint256 feeGrowthGlobal1X128
-    ) internal view returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128) {
+    )
+        internal
+        view
+        returns (uint256 feeGrowthInside0X128, uint256 feeGrowthInside1X128)
+    {
         unchecked {
             Info storage lower = self[tickLower];
             Info storage upper = self[tickUpper];
@@ -122,7 +126,10 @@ library Tick {
         uint32 time,
         bool upper,
         uint128 maxLiquidity
-    ) internal returns (bool flipped) {
+    )
+        internal
+        returns (bool flipped)
+    {
         Tick.Info storage info = self[tick];
 
         uint128 liquidityGrossBefore = info.liquidityGross;
@@ -176,7 +183,10 @@ library Tick {
         uint160 secondsPerLiquidityCumulativeX128,
         int56 tickCumulative,
         uint32 time
-    ) internal returns (int128 liquidityNet) {
+    )
+        internal
+        returns (int128 liquidityNet)
+    {
         unchecked {
             Tick.Info storage info = self[tick];
             info.feeGrowthOutside0X128 = feeGrowthGlobal0X128 - info.feeGrowthOutside0X128;
