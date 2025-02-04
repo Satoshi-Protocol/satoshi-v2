@@ -20,7 +20,7 @@ import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.s
 import {ILiquidationFacet} from "../interfaces/ILiquidationFacet.sol";
 import {ITroveManager} from "../interfaces/ITroveManager.sol";
 import {ICoreFacet} from "../interfaces/ICoreFacet.sol";
-import {DebtToken} from "../DebtToken.sol";
+import {DebtTokenWithLz} from "../DebtTokenWithLz.sol";
 import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
 import {IPriceFeed} from "../../priceFeed/interfaces/IPriceFeed.sol";
 import {Config} from "../Config.sol";
@@ -31,12 +31,12 @@ import {Config} from "../Config.sol";
  */
 contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
-    using SafeERC20 for DebtToken;
+    using SafeERC20 for DebtTokenWithLz;
 
-    DebtToken public debtToken;
+    DebtTokenWithLz public debtToken;
     address public xApp;
 
-    function initialize(DebtToken _debtToken, address _xApp, address _owner) external initializer {
+    function initialize(DebtTokenWithLz _debtToken, address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
         if (_xApp == address(0)) revert InvalidZeroAddress();
 

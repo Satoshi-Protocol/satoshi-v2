@@ -8,7 +8,7 @@ import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
 import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
 import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
 import {FlashloanTester} from "../src/test/FlashloanTester.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
+import {DebtTokenWithLz} from "../src/core/DebtTokenWithLz.sol";
 import {Config} from "../src/core/Config.sol";
 import {DEBT_GAS_COMPENSATION} from "./TestConfig.sol";
 
@@ -42,14 +42,14 @@ contract LzDebtTokenTest is TestHelperOz5 {
         super.setUp();
         setUpEndpoints(2, LibraryType.UltraLightNode);
 
-        address debtTokenImplA = address(new DebtToken(endpoints[aEid]));
+        address debtTokenImplA = address(new DebtTokenWithLz(endpoints[aEid]));
         bytes memory dataA = abi.encodeCall(
             IDebtToken.initialize,
             (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner, DEBT_GAS_COMPENSATION)
         );
         debtTokenA = IDebtToken(address(new ERC1967Proxy(debtTokenImplA, dataA)));
 
-        address debtTokenImplB = address(new DebtToken(endpoints[bEid]));
+        address debtTokenImplB = address(new DebtTokenWithLz(endpoints[bEid]));
         bytes memory dataB = abi.encodeCall(
             IDebtToken.initialize,
             (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner, DEBT_GAS_COMPENSATION)

@@ -35,7 +35,7 @@ import {EndpointV2Mock} from "@layerzerolabs/test-devtools-evm-foundry/contracts
 import {IRewardManager} from "../../src/OSHI/interfaces/IRewardManager.sol";
 import {RewardManager} from "../../src/OSHI/RewardManager.sol";
 import {IDebtToken} from "../../src/core/interfaces/IDebtToken.sol";
-import {DebtToken} from "../../src/core/DebtToken.sol";
+import {DebtTokenWithLz} from "../../src/core/DebtTokenWithLz.sol";
 import {ICommunityIssuance} from "../../src/OSHI/interfaces/ICommunityIssuance.sol";
 import {CommunityIssuance} from "../../src/OSHI/CommunityIssuance.sol";
 import {SortedTroves} from "../../src/core/SortedTroves.sol";
@@ -154,8 +154,9 @@ abstract contract DeployBase is Test {
         assert(address(satoshiPeriphery) == address(0)); // check if contract is not deployed
         assert(address(debtToken) != address(0)); // check if debtToken is deployed
         assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
-        bytes memory data =
-            abi.encodeCall(ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), OWNER));
+        bytes memory data = abi.encodeCall(
+            ISatoshiPeriphery.initialize, (DebtTokenWithLz(address(debtToken)), address(satoshiXApp), OWNER)
+        );
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
         vm.stopPrank();
@@ -376,7 +377,7 @@ abstract contract DeployBase is Test {
         assert(address(debtToken) == address(0)); // check if contract is not deployed
         assert(address(gasPool) != address(0)); // check if gasPool is deployed
         assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
-        address debtTokenImpl = address(new DebtToken(address(endpointMock)));
+        address debtTokenImpl = address(new DebtTokenWithLz(address(endpointMock)));
         bytes memory data = abi.encodeCall(
             IDebtToken.initialize,
             (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(gasPool), address(satoshiXApp), OWNER, DEBT_GAS_COMPENSATION)

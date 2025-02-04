@@ -19,7 +19,7 @@
     "lint:fix": "eslint --fix '**/*.{js,ts,json}' && prettier --write . && solhint 'contracts/**/*.sol' --fix --noPrompt",
     "lint:js": "eslint '**/*.{js,ts,json}' && prettier --check .",
     "lint:sol": "solhint 'contracts/**/*.sol'",
-    "lz:deploy:debt-token": "hardhat compile && hardhat lz:deploy --tags DebtToken",
+    "lz:deploy:debt-token": "hardhat compile && hardhat lz:deploy --tags DebtTokenWithLz",
     "lz:set": "hardhat lz:oapp:wire --oapp-config layerzero.config.ts",
     "test": "$npm_execpath run test:forge && $npm_execpath run test:hardhat",
     "test:compile": "hardhat compile",

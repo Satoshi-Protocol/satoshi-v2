@@ -4,41 +4,41 @@ import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/tool
 
 // const sepoliaContract: OmniPointHardhat = {
 //     eid: EndpointId.SEPOLIA_V2_TESTNET,
-//     contractName: 'DebtToken',
+//     contractName: 'DebtTokenWithLz',
 //     address: '0x45186cf2F66f43cf0a777a753b4ABBcD812204E6',
 // }
 
 // export const holeskyContract: OmniPointHardhat = {
 //     eid: EndpointId.HOLESKY_V2_TESTNET,
-//     contractName: 'DebtToken',
+//     contractName: 'DebtTokenWithLz',
 //     address: '0x4716c7b4fb7d8eD75B4D8904209b213308de837f',
 // }
 
 export const arbitrumSepoliaContract: OmniPointHardhat = {
     eid: EndpointId.ARBSEP_V2_TESTNET,
-    contractName: 'DebtToken',
+    contractName: 'DebtTokenWithLz',
     address: '0x85576DEa799eC912AAf05566922EaC75fC97Bd79',
 }
 
 // export const optimismSepoliaContract: OmniPointHardhat = {
 //     eid: EndpointId.OPTSEP_V2_TESTNET,
-//     contractName: 'DebtToken',
+//     contractName: 'DebtTokenWithLz',
 //     address: '0x512F0966853cE4f7F64094E42426a0deB16085Fb',
 // }
 
 // const baseSepoliaContract: OmniPointHardhat = {
 //     eid: EndpointId.BASE_V2_TESTNET,
-//     contractName: 'DebtToken',
+//     contractName: 'DebtTokenWithLz',
 // }
 
 export const base_sepoliaContract = {
     eid: EndpointId.BASESEP_V2_TESTNET,
-    contractName: 'DebtToken',
+    contractName: 'DebtTokenWithLz',
     address: '0xBeD1808E6Dec5aDee59B1671Da8CFa81a9A1F2D3',
 }
 // export const coredao_testnetContract = {
 //     eid: EndpointId.COREDAO_V2_TESTNET,
-//     contractName: 'DebtToken',
+//     contractName: 'DebtTokenWithLz',
 // }
 
 // send & received library related to the DVN on lz
@@ -116,7 +116,7 @@ const config: OAppOmniGraphHardhat = {
                 },
             },
         },
-        
+
         // {
         //     from: coredao_testnetContract,
         //     to: base_sepoliaContract,

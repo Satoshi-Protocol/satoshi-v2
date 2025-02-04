@@ -32,7 +32,7 @@ import {Initializer} from "../src/core/Initializer.sol";
 import {IRewardManager, LockDuration} from "../src/OSHI/interfaces/IRewardManager.sol";
 import {RewardManager} from "../src/OSHI/RewardManager.sol";
 import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
+import {DebtTokenWithLz} from "../src/core/DebtTokenWithLz.sol";
 import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
 import {CommunityIssuance} from "../src/OSHI/CommunityIssuance.sol";
 import {SortedTroves} from "../src/core/SortedTroves.sol";

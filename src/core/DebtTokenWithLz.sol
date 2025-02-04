@@ -11,17 +11,17 @@ import {IDebtToken} from "./interfaces/IDebtToken.sol";
 import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
 import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
 import {Utils} from "../library/Utils.sol";
-import {ERC20PermitUpgradeable} from
-    "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {OFTPermitUpgradeable} from "./libs/OFTPermitUpgradeable.sol";
 
 /**
- * @title DebtToken
- * @dev A standalone DebtToken contract for chains that have not yet integrated with LayerZero.
- *      Once LayerZero integration is available, the OFT Adapter can be used to enable cross-chain functionality.
- * @notice DebtToken with ERC20 permit and ERC3156 Flash Loan support
+ * @title DebtTokenWithLz
+ * @dev Only deploy when LayerZero has already integrated the chain. The constructor must specify lzEndpoint.
+ *      If LayerZero has not yet integrated the chain, the `./DebtToken.sol` contract must be used,
+ *      and integration should be completed later using the OFT Adapter.
+ * @notice DebtToken with LayerZero OFT implementation, ERC20 permit and ERC3156 Flash Loan support
+ *      used for cross-chain circulation of debt tokens
  */
-contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, OwnableUpgradeable {
+contract DebtTokenWithLz is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     // --- ERC 3156 Data ---
     bytes32 private constant _RETURN_VALUE = keccak256("ERC3156FlashBorrower.onFlashLoan");
     uint256 public constant FLASH_LOAN_FEE = 9; // 1 = 0.0001%
@@ -46,11 +46,11 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
     }
 
     modifier auth() {
-        require(wards[msg.sender], "DebtToken: not-authorized");
+        require(wards[msg.sender], "DebtTokenWithLz: not-authorized");
         _;
     }
 
-    constructor() {
+    constructor(address _lzEndpoint) OFTPermitUpgradeable(_lzEndpoint) {
         _disableInitializers();
     }
 
@@ -74,8 +74,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
         Utils.ensureNonZero(debtGasCompensation_);
 
         __UUPSUpgradeable_init_unchained();
-        __ERC20Permit_init(_name);
-        __ERC20_init(_name, _symbol);
+        __OFT_init(_name, _symbol, _owner);
         __Ownable_init(_owner);
         gasPool = _gasPool;
         satoshiXApp = _satoshiXApp;
@@ -83,14 +82,14 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
     }
 
     function enableTroveManager(ITroveManager _troveManager) external {
-        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "DebtTokenWithLz: Caller not SatoshiXapp");
         troveManager[_troveManager] = true;
     }
 
     // --- Functions for intra-Satoshi calls ---
 
     function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
-        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "DebtTokenWithLz: Caller not SatoshiXapp");
         _mint(_account, _amount);
         _mint(gasPool, _debtGasCompensation);
 
@@ -98,7 +97,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
     }
 
     function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
-        require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
+        require(msg.sender == satoshiXApp, "DebtTokenWithLz: Caller not SatoshiXapp");
         _burn(_account, _amount);
         _burn(gasPool, _debtGasCompensation);
 

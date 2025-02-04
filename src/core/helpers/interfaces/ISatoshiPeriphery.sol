@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import {MessagingFee} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 
-import {DebtToken} from "../../DebtToken.sol";
+import {DebtTokenWithLz} from "../../DebtTokenWithLz.sol";
 
 import {IBorrowerOperationsFacet} from "../../interfaces/IBorrowerOperationsFacet.sol";
 import {ITroveManager} from "../../interfaces/ITroveManager.sol";
@@ -24,11 +24,11 @@ interface ISatoshiPeriphery {
     error RefundFailed();
     error InsufficientMsgValue(uint256 msgValue, uint256 requiredValue);
 
-    function debtToken() external view returns (DebtToken);
+    function debtToken() external view returns (DebtTokenWithLz);
 
     function xApp() external view returns (address);
 
-    function initialize(DebtToken _debtToken, address _xApp, address _owner) external;
+    function initialize(DebtTokenWithLz _debtToken, address _xApp, address _owner) external;
 
     function openTrove(
         ITroveManager troveManager,

@@ -32,7 +32,7 @@
 // import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
 // import {RewardManager} from "../src/OSHI/RewardManager.sol";
 // import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-// import {DebtToken} from "../src/core/DebtToken.sol";
+// import {DebtTokenWithLz} from "../src/core/DebtTokenWithLz.sol";
 // import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
 // import {CommunityIssuance} from "../src/OSHI/CommunityIssuance.sol";
 // import {SortedTroves} from "../src/core/SortedTroves.sol";
@@ -117,7 +117,7 @@
 //     function _deployPeriphery(address deployer) internal {
 //         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 //         bytes memory data = abi.encodeCall(
-//             ISatoshiPeriphery.initialize, (DebtToken(address(debtToken)), address(satoshiXApp), deployer)
+//             ISatoshiPeriphery.initialize, (DebtTokenWithLz(address(debtToken)), address(satoshiXApp), deployer)
 //         );
 //         address peripheryImpl = address(new SatoshiPeriphery());
 //         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
@@ -339,7 +339,7 @@
 //     ) internal {
 //         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 //         assert(address(debtToken) == address(0)); // check if contract is not deployed
-//         address debtTokenImpl = address(new DebtToken(endpoint));
+//         address debtTokenImpl = address(new DebtTokenWithLz(endpoint));
 //         bytes memory data = abi.encodeCall(
 //             IDebtToken.initialize, (debtTokenName, debtTokenSymbol, address(gasPool), address(satoshiXApp), deployer)
 //         );
