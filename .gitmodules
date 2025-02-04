@@ -7,12 +7,12 @@
 [submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/pyth-sdk-solidity"]
 	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/pyth-sdk-solidity
 	url = https://github.com/pyth-network/pyth-sdk-solidity
-[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solmate"]
-	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solmate
-	url = https://github.com/transmissions11/solmate
 [submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git"]
 	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git
 	url = https://github.com/JorgeAtPaladin/LayerZero-v2.git
 [submodule "lib/contracts"]
 	path = lib/contracts
 	url = https://github.com/api3dao/contracts
+[submodule "lib/solmate"]
+	path = lib/solmate
+	url = https://github.com/transmissions11/solmate
