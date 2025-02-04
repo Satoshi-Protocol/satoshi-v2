@@ -1,15 +1,9 @@
-[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity"]
-	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/solidstate-solidity
-	url = https://github.com/solidstate-network/solidstate-solidity
-[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/contracts"]
-	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/contracts
-	url = https://github.com/api3dao/contracts
-[submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/pyth-sdk-solidity"]
-	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/pyth-sdk-solidity
-	url = https://github.com/pyth-network/pyth-sdk-solidity
 [submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git"]
 	path = node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git
 	url = https://github.com/JorgeAtPaladin/LayerZero-v2.git
+[submodule "lib/forge-std"]
+	path = lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
 [submodule "lib/contracts"]
 	path = lib/contracts
 	url = https://github.com/api3dao/contracts
@@ -19,3 +13,6 @@
 [submodule "lib/solidstate-solidity"]
 	path = lib/solidstate-solidity
 	url = https://github.com/solidstate-network/solidstate-solidity
+[submodule "lib/pyth-sdk-solidity"]
+	path = lib/pyth-sdk-solidity
+	url = https://github.com/pyth-network/pyth-sdk-solidity
