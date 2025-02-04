@@ -26,6 +26,7 @@ import { RewardManager } from "../src/OSHI/RewardManager.sol";
 import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
 import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
 import { DebtToken } from "../src/core/DebtToken.sol";
+import { DebtTokenWithLz } from "../src/core/DebtTokenWithLz.sol";
 import { Initializer } from "../src/core/Initializer.sol";
 
 import { SortedTroves } from "../src/core/SortedTroves.sol";
@@ -143,9 +144,8 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         assert(address(satoshiPeriphery) == address(0)); // check if contract is not deployed
         assert(address(debtToken) != address(0)); // check if debtToken is deployed
         assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
-        bytes memory data = abi.encodeCall(
-            ISatoshiPeriphery.initialize, (DebtTokenWithLz(address(debtToken)), address(satoshiXApp), owner)
-        );
+        bytes memory data =
+            abi.encodeCall(ISatoshiPeriphery.initialize, (IDebtToken(address(debtToken)), address(satoshiXApp), owner));
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
         vm.stopBroadcast();

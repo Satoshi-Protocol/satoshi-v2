@@ -3,11 +3,10 @@ pragma solidity ^0.8.20;
 
 import { MessagingFee } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 
+import { DebtTokenWithLz } from "../../DebtTokenWithLz.sol";
 import { IDebtToken } from "../../interfaces/IDebtToken.sol";
 
-import { IBorrowerOperationsFacet } from "../../interfaces/IBorrowerOperationsFacet.sol";
 import { ITroveManager } from "../../interfaces/ITroveManager.sol";
-// import {ILiquidationManager} from "../../interfaces/core/ILiquidationManager.sol";
 
 struct LzSendParam {
     uint32 dstEid;
@@ -24,7 +23,7 @@ interface ISatoshiPeriphery {
     error RefundFailed();
     error InsufficientMsgValue(uint256 msgValue, uint256 requiredValue);
 
-    function debtToken() external view returns (IDebtToken);
+    function debtToken() external view returns (DebtTokenWithLz);
 
     function xApp() external view returns (address);
 

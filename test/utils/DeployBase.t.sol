@@ -42,6 +42,7 @@ import { RewardManager } from "../../src/OSHI/RewardManager.sol";
 import { ICommunityIssuance } from "../../src/OSHI/interfaces/ICommunityIssuance.sol";
 import { IRewardManager } from "../../src/OSHI/interfaces/IRewardManager.sol";
 import { DebtToken } from "../../src/core/DebtToken.sol";
+import { DebtTokenWithLz } from "../../src/core/DebtTokenWithLz.sol";
 
 import { SortedTroves } from "../../src/core/SortedTroves.sol";
 import { TroveManager } from "../../src/core/TroveManager.sol";
@@ -168,9 +169,8 @@ abstract contract DeployBase is Test {
         assert(address(satoshiPeriphery) == address(0)); // check if contract is not deployed
         assert(address(debtToken) != address(0)); // check if debtToken is deployed
         assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
-        bytes memory data = abi.encodeCall(
-            ISatoshiPeriphery.initialize, (DebtTokenWithLz(address(debtToken)), address(satoshiXApp), OWNER)
-        );
+        bytes memory data =
+            abi.encodeCall(ISatoshiPeriphery.initialize, (IDebtToken(address(debtToken)), address(satoshiXApp), OWNER));
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
         vm.stopPrank();
@@ -391,7 +391,14 @@ abstract contract DeployBase is Test {
         assert(address(debtToken) == address(0)); // check if contract is not deployed
         assert(address(gasPool) != address(0)); // check if gasPool is deployed
         assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
-        address debtTokenImpl = address(new DebtTokenWithLz(address(endpointMock)));
+
+        address debtTokenImpl;
+        address(endpointMock) == address(0)
+            // if LZ_ENDPOINT is not set, deploy DebtToken
+            ? debtTokenImpl = address(new DebtToken())
+            // if LZ_ENDPOINT is set, deploy DebtTokenWithLz
+            : debtTokenImpl = address(new DebtTokenWithLz(address(endpointMock)));
+
         bytes memory data = abi.encodeCall(
             IDebtToken.initialize,
             (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(gasPool), address(satoshiXApp), OWNER, DEBT_GAS_COMPENSATION)

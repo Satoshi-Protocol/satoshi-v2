@@ -5,12 +5,13 @@ import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.s
 
 import { IPriceFeed } from "../../priceFeed/interfaces/IPriceFeed.sol";
 import { Config } from "../Config.sol";
-import { DebtToken } from "../DebtToken.sol";
+import { DebtTokenWithLz } from "../DebtTokenWithLz.sol";
 import { IBorrowerOperationsFacet } from "../interfaces/IBorrowerOperationsFacet.sol";
 import { ICoreFacet } from "../interfaces/ICoreFacet.sol";
 import { ILiquidationFacet } from "../interfaces/ILiquidationFacet.sol";
 import { ITroveManager } from "../interfaces/ITroveManager.sol";
 
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
 import { ISatoshiPeriphery, LzSendParam } from "./interfaces/ISatoshiPeriphery.sol";
 import { IWETH } from "./interfaces/IWETH.sol";
 import {
@@ -37,11 +38,11 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     DebtTokenWithLz public debtToken;
     address public xApp;
 
-    function initialize(DebtTokenWithLz _debtToken, address _xApp, address _owner) external initializer {
+    function initialize(IDebtToken _debtToken, address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
         if (_xApp == address(0)) revert InvalidZeroAddress();
 
-        debtToken = _debtToken;
+        debtToken = DebtTokenWithLz(address(_debtToken));
         xApp = _xApp;
 
         __Ownable_init(_owner);

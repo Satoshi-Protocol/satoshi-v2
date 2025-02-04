@@ -6,7 +6,7 @@ import "forge-std/console.sol";
 // DevTools imports
 
 import { Config } from "../src/core/Config.sol";
-import { DebtToken } from "../src/core/DebtToken.sol";
+import { DebtTokenWithLz } from "../src/core/DebtTokenWithLz.sol";
 import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
 import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
 import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";

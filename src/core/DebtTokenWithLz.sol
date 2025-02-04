@@ -1,17 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import { IERC3156FlashBorrower } from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import {ITroveManager} from "./interfaces/ITroveManager.sol";
-import {IDebtToken} from "./interfaces/IDebtToken.sol";
-import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
-import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
-import {Utils} from "../library/Utils.sol";
-import {OFTPermitUpgradeable} from "./libs/OFTPermitUpgradeable.sol";
+import { IRewardManager } from "../OSHI/interfaces/IRewardManager.sol";
+
+import { Utils } from "../library/Utils.sol";
+import { ICoreFacet } from "./interfaces/ICoreFacet.sol";
+import { IDebtToken } from "./interfaces/IDebtToken.sol";
+import { ITroveManager } from "./interfaces/ITroveManager.sol";
+
+import { OFTPermitUpgradeable } from "./libs/OFTPermitUpgradeable.sol";
 
 /**
  * @title DebtTokenWithLz
@@ -67,7 +69,10 @@ contract DebtTokenWithLz is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         address _satoshiXApp,
         address _owner,
         uint256 debtGasCompensation_
-    ) external initializer {
+    )
+        external
+        initializer
+    {
         Utils.ensureNonzeroAddress(_satoshiXApp);
         Utils.ensureNonzeroAddress(_owner);
         Utils.ensureNonzeroAddress(_gasPool);
@@ -134,7 +139,11 @@ contract DebtTokenWithLz is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         return super.transfer(recipient, amount);
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount)
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    )
         public
         override(IDebtToken, ERC20Upgradeable)
         returns (bool)
@@ -178,7 +187,7 @@ contract DebtTokenWithLz is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
      * @return The fees applied to the corresponding flash loan.
      */
     function _flashFee(uint256 amount) internal pure returns (uint256) {
-        return (amount * FLASH_LOAN_FEE) / 10000;
+        return (amount * FLASH_LOAN_FEE) / 10_000;
     }
 
     /**
@@ -198,7 +207,12 @@ contract DebtTokenWithLz is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     // This function can reenter, but it doesn't pose a risk because it always preserves the property that the amount
     // minted at the beginning is always recovered and burned at the end, or else the entire function will revert.
     // slither-disable-next-line reentrancy-no-eth
-    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
+    function flashLoan(
+        IERC3156FlashBorrower receiver,
+        address token,
+        uint256 amount,
+        bytes calldata data
+    )
         external
         returns (bool)
     {
