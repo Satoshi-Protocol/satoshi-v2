@@ -13,8 +13,7 @@ libs = [
     # - forge-std
     # - ds-test
     # - solidity-bytes-utils
-    'node_modules/@layerzerolabs/toolbox-foundry/lib',
-    'node_modules',
+    'lib',
 ]
 
 remappings = [
