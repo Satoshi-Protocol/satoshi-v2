@@ -3,7 +3,9 @@ pragma solidity ^0.8.13;
 
 import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
 import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
+
 import { DeploymentParams, IFactoryFacet } from "../src/core/facets/FactoryFacet.sol";
+import { IVaultManager } from "../src/vault/interfaces/IVaultManager.sol";
 
 import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
 import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
@@ -23,11 +25,14 @@ import {
     MINUTE_DECAY_FACTOR,
     PRICE_FEED_ADDRESS,
     REDEMPTION_FEE_FLOOR,
+    REFILL_PERCENTAGE,
+    RETAIN_PERCENTAGE,
     REWARD_MANAGER_ADDRESS,
     REWARD_RATE,
     SATOSHI_X_APP_ADDRESS,
     TM_ALLOCATION,
-    TM_CLAIM_START_TIME
+    TM_CLAIM_START_TIME,
+    VAULT_MANAGER_ADDRESS
 } from "./DeployInstanceConfig.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console } from "forge-std/Script.sol";
@@ -38,6 +43,7 @@ contract DeployInstanceScript is Script {
     IERC20 internal collateral;
     IPriceFeed internal priceFeed;
     IRewardManager internal rewardManager;
+    IVaultManager internal vaultManager;
     ICommunityIssuance internal communityIssuance;
     IDebtToken internal debtToken;
     DeploymentParams internal deploymentParams;
@@ -53,6 +59,8 @@ contract DeployInstanceScript is Script {
         assert(address(debtToken) != address(0));
         rewardManager = IRewardManager(REWARD_MANAGER_ADDRESS);
         assert(address(rewardManager) != address(0));
+        vaultManager = IVaultManager(VAULT_MANAGER_ADDRESS);
+        assert(address(vaultManager) != address(0));
         deploymentParams = DeploymentParams({
             minuteDecayFactor: MINUTE_DECAY_FACTOR,
             redemptionFeeFloor: REDEMPTION_FEE_FLOOR,
@@ -77,11 +85,14 @@ contract DeployInstanceScript is Script {
             IFactoryFacet(satoshiXApp).deployNewInstance(collateral, priceFeed, params);
 
         // set reward manager settings
-        rewardManager.registerTroveManager(troveManagerBeaconProxy);
+        _registerTroveManager(troveManagerBeaconProxy);
 
         // set community issuance allocation & addresses
-        _setCommunityIssuanceAllocation(address(troveManagerBeaconProxy), params.OSHIAllocation);
+        _setCommunityIssuanceAllocation(troveManagerBeaconProxy, params.OSHIAllocation);
         require(communityIssuance.allocated(address(troveManagerBeaconProxy)) == params.OSHIAllocation);
+
+        // set farming params
+        _setFarmingParam(troveManagerBeaconProxy);
 
         console.log("SortedTrovesBeaconProxy: address:", address(sortedTrovesBeaconProxy));
         console.log("TroveManagerBeaconProxy: address:", address(troveManagerBeaconProxy));
@@ -89,11 +100,21 @@ contract DeployInstanceScript is Script {
         vm.stopBroadcast();
     }
 
-    function _setCommunityIssuanceAllocation(address troveManagerBeaconProxy, uint256 allocation) internal {
+    function _registerTroveManager(ITroveManager troveManagerBeaconProxy) internal {
+        rewardManager.registerTroveManager(troveManagerBeaconProxy);
+    }
+
+    function _setCommunityIssuanceAllocation(ITroveManager troveManagerBeaconProxy, uint256 allocation) internal {
         address[] memory _recipients = new address[](1);
-        _recipients[0] = troveManagerBeaconProxy;
+        _recipients[0] = address(troveManagerBeaconProxy);
         uint256[] memory _amount = new uint256[](1);
         _amount[0] = allocation;
         communityIssuance.setAllocated(_recipients, _amount);
+    }
+
+    function _setFarmingParam(ITroveManager troveManagerBeaconProxy) internal {
+        troveManagerBeaconProxy.setFarmingParams(RETAIN_PERCENTAGE, REFILL_PERCENTAGE);
+        troveManagerBeaconProxy.setVaultManager(address(vaultManager));
+        vaultManager.setTroveManager(address(troveManagerBeaconProxy), true);
     }
 }

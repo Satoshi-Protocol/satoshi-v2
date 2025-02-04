@@ -20,14 +20,17 @@ import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperat
 import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
 import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
 import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+import { VaultManager } from "../src/vault/VaultManager.sol";
 
 import { CommunityIssuance } from "../src/OSHI/CommunityIssuance.sol";
 import { RewardManager } from "../src/OSHI/RewardManager.sol";
 import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
 import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
+
 import { DebtToken } from "../src/core/DebtToken.sol";
 import { DebtTokenWithLz } from "../src/core/DebtTokenWithLz.sol";
 import { Initializer } from "../src/core/Initializer.sol";
+import { IVaultManager } from "../src/vault/interfaces/IVaultManager.sol";
 
 import { SortedTroves } from "../src/core/SortedTroves.sol";
 import { TroveManager } from "../src/core/TroveManager.sol";
@@ -96,6 +99,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
 
     IDebtToken internal debtToken;
     IRewardManager internal rewardManager;
+    IVaultManager internal vaultManager;
     ICommunityIssuance internal communityIssuance;
     IOSHIToken internal oshiToken;
     IGasPool internal gasPool;
@@ -128,6 +132,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         _deployDebtToken(LZ_ENDPOINT, DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL);
         _deployCommunityIssuance();
         _deployRewardManager();
+        _deployVaultManager();
         _deployPeriphery();
         _satoshiXAppInit();
         _deployHintHelpers();
@@ -348,12 +353,26 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     function _deployRewardManager() internal {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(rewardManager) == address(0)); // check if contract is not deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
+        assert(address(debtToken) != address(0)); // check if debtToken is deployed
+        assert(address(oshiToken) != address(0)); // check if oshiToken is deployed
         address rewardManagerImpl = address(new RewardManager());
         bytes memory data = abi.encodeCall(
             IRewardManager.initialize,
             (owner, address(satoshiXApp), WETH_ADDRESS, address(debtToken), address(oshiToken))
         );
         rewardManager = IRewardManager(address(new ERC1967Proxy(address(rewardManagerImpl), data)));
+        vm.stopBroadcast();
+    }
+
+    function _deployVaultManager() internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        assert(address(vaultManager) == address(0)); // check if contract is not deployed
+        assert(address(debtToken) != address(0)); // check if debtToken is deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
+        address vaultManagerImpl = address(new VaultManager());
+        bytes memory data = abi.encodeCall(IVaultManager.initialize, (address(debtToken), address(satoshiXApp), OWNER));
+        vaultManager = IVaultManager(address(new ERC1967Proxy(address(vaultManagerImpl), data)));
         vm.stopBroadcast();
     }
 
@@ -483,6 +502,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         _setRewardManager(address(rewardManager));
         _setSPCommunityIssuanceAllocation();
         _setClaimStartTime(SP_CLAIM_START_TIME);
+        _setSPRewardRate(SP_REWARD_RATE);
     }
 
     function _setRewardManager(address _rewardManager) internal {
@@ -505,6 +525,13 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.startBroadcast(OWNER_PRIVATE_KEY);
         IStabilityPoolFacet stabilityPoolProxy = IStabilityPoolFacet(address(satoshiXApp));
         stabilityPoolProxy.setClaimStartTime(_claimStartTime);
+        vm.stopBroadcast();
+    }
+
+    function _setSPRewardRate(uint128 _rewardRate) internal {
+        vm.startBroadcast(OWNER_PRIVATE_KEY);
+        IStabilityPoolFacet stabilityPool = IStabilityPoolFacet(address(satoshiXApp));
+        stabilityPool.setSPRewardRate(_rewardRate);
         vm.stopBroadcast();
     }
 
@@ -535,6 +562,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         console.log("sortedTrovesBeacon", address(sortedTrovesBeacon));
         console.log("troveManagerBeacon", address(troveManagerBeacon));
         console.log("rewardManager", address(rewardManager));
+        console.log("vaultManager", address(vaultManager));
         console.log("oshiToken", address(oshiToken));
         console.log("communityIssuance", address(communityIssuance));
         console.log("hintHelpers", address(hintHelpers));

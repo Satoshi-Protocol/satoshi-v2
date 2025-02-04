@@ -16,7 +16,7 @@ uint32 constant TM_CLAIM_START_TIME = 0;
 uint256 constant _1_MILLION = 1e24; // 1e6 * 1e18 = 1e24
 uint256 constant TM_ALLOCATION = 20 * _1_MILLION;
 uint256 constant SP_ALLOCATION = 10 * _1_MILLION;
-uint128 constant REWARD_RATE = 0; // 126839167935058336 (20_000_000e18 / (5 * 31536000))
+uint128 constant TM_REWARD_RATE = 0; // 126839167935058336 (20_000_000e18 / (5 * 31536000))
 
 uint256 constant MINUTE_DECAY_FACTOR = 999_037_758_833_783_500; //  (half life of 12 hours)
 uint256 constant REDEMPTION_FEE_FLOOR = 1e18 / 1000 * 5; //  (0.5%)

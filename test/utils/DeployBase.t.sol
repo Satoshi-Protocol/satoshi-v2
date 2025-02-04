@@ -162,6 +162,8 @@ abstract contract DeployBase is Test {
         _satoshiXAppInit(DEPLOYER);
         _deployHintHelpers(DEPLOYER);
         _deployVaultManager(DEPLOYER);
+
+        _setConfigByOwner(OWNER);
     }
 
     function _deployPeriphery(address deployer) internal {
@@ -446,6 +448,8 @@ abstract contract DeployBase is Test {
     function _deployVaultManager(address deployer) internal {
         vm.startPrank(deployer);
         assert(address(vaultManager) == address(0)); // check if contract is not deployed
+        assert(address(debtToken) != address(0)); // check if debtToken is deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
         address vaultManagerImpl = address(new VaultManager());
         bytes memory data = abi.encodeCall(IVaultManager.initialize, (address(debtToken), address(satoshiXApp), OWNER));
         vaultManager = IVaultManager(address(new ERC1967Proxy(address(vaultManagerImpl), data)));
@@ -534,7 +538,7 @@ abstract contract DeployBase is Test {
             interestRateInBps: INTEREST_RATE_IN_BPS,
             maxDebt: MAX_DEBT,
             MCR: MCR,
-            rewardRate: REWARD_RATE,
+            rewardRate: TM_REWARD_RATE,
             OSHIAllocation: TM_ALLOCATION,
             claimStartTime: TM_CLAIM_START_TIME
         });
@@ -545,7 +549,7 @@ abstract contract DeployBase is Test {
         (ISortedTroves sortedTrovesBeaconProxy, ITroveManager troveManagerBeaconProxy) =
             _deployNewInstance(OWNER, collateralMock, IPriceFeed(priceFeedAddr), deploymentParams);
 
-        _setConfigByOwner(OWNER, troveManagerBeaconProxy);
+        _setTMConfig(OWNER, troveManagerBeaconProxy);
 
         return (sortedTrovesBeaconProxy, troveManagerBeaconProxy);
         // vm.startPrank(deployer);
@@ -607,21 +611,17 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
-    function _setConfigByOwner(address owner, ITroveManager troveManagerBeaconProxy) internal {
-        // set allocation for the stability pool
-        address[] memory _recipients = new address[](1);
-        _recipients[0] = address(satoshiXApp);
-        uint256[] memory _amount = new uint256[](1);
-        _amount[0] = SP_ALLOCATION;
-        // _setRewardManager(owner, address(rewardManagerProxy));
+    function _setTMConfig(address owner, ITroveManager troveManagerBeaconProxy) internal {
         _setTMCommunityIssuanceAllocation(owner, troveManagerBeaconProxy);
-        _setSPCommunityIssuanceAllocation(owner);
-        // _setAddress(owner, address(satoshiXApp), weth, address(debtToken), address(oshiToken));
         _registerTroveManager(owner, troveManagerBeaconProxy);
+        _setFarmingParam(owner, troveManagerBeaconProxy);
+    }
+
+    function _setConfigByOwner(address owner) internal {
+        _setRewardManager(owner, address(rewardManager));
+        _setSPCommunityIssuanceAllocation(owner);
         _setClaimStartTime(owner, SP_CLAIM_START_TIME);
         _setSPRewardRate(owner);
-        _setTMRewardRate(owner, 1);
-        _setCDPFarming(owner, troveManagerBeaconProxy);
     }
 
     // function _setAddress(
@@ -635,6 +635,12 @@ abstract contract DeployBase is Test {
     //     rewardManager.setAddresses(_borrowerOperations, _weth, _debtToken, _oshiToken);
     //     vm.stopPrank();
     // }
+
+    function _setRewardManager(address owner, address _rewardManager) internal {
+        vm.startPrank(owner);
+        ICoreFacet(address(satoshiXApp)).setRewardManager(_rewardManager);
+        vm.stopPrank();
+    }
 
     function _setTMCommunityIssuanceAllocation(address owner, ITroveManager troveManagerBeaconProxy) internal {
         address[] memory _recipients = new address[](1);
@@ -656,18 +662,7 @@ abstract contract DeployBase is Test {
         vm.stopPrank();
     }
 
-    function _setTMRewardRate(address owner, uint128 denominator) internal {
-        vm.startPrank(owner);
-        uint128[] memory numerator = new uint128[](2);
-        numerator[0] = 0;
-        numerator[1] = 0;
-        IFactoryFacet factoryProxy = IFactoryFacet(address(satoshiXApp));
-        factoryProxy.setTMRewardRate(numerator, denominator);
-        // assertEq(troveManagerBeaconProxy.rewardRate(), factoryProxy.maxRewardRate());
-        vm.stopPrank();
-    }
-
-    function _setCDPFarming(address owner, ITroveManager troveManagerBeaconProxy) internal {
+    function _setFarmingParam(address owner, ITroveManager troveManagerBeaconProxy) internal {
         vm.startPrank(owner);
         troveManagerBeaconProxy.setFarmingParams(3000, 3500);
         troveManagerBeaconProxy.setVaultManager(address(vaultManager));

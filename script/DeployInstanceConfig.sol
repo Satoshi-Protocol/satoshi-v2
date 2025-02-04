@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 address constant SATOSHI_X_APP_ADDRESS = 0x07BbC5A83B83a5C440D1CAedBF1081426d0AA4Ec;
 address constant REWARD_MANAGER_ADDRESS = 0xA11c3CAC45606C5b341B729332c2FA31bE896eb2;
+address constant VAULT_MANAGER_ADDRESS = 0x0AE3B2F4f7E5F4f3f1FBf5fbf5fBF5FbF5Fbf5Fb;
 
 //NOTE: custom `PriceFeed.sol` contract for the collateral should be deploy first
 address constant PRICE_FEED_ADDRESS = 0x00072C48501f53Cb2Bb9EFCdD7A0Ee569cF9428f;
@@ -23,3 +24,7 @@ uint128 constant REWARD_RATE = 0; // 126839167935058336 (20_000_000e18 / (5 * 31
 
 //TODO: Replace with the actual timestamp
 uint32 constant TM_CLAIM_START_TIME = 4_294_967_295; // max uint32
+
+// farming parameters
+uint256 constant RETAIN_PERCENTAGE = 10_000; // 100%
+uint256 constant REFILL_PERCENTAGE = 0; // 0%
