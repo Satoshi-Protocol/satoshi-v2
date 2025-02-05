@@ -167,23 +167,27 @@ contract OSHITokenTest is DeployBase, TroveBase {
         oshiToken.transferFrom(user1, user3, 50);
     }
 
-    function testFailApproveToZeroAddress() public {
+    function testRevertApproveToZeroAddress() public {
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256(bytes("ERC20InvalidSpender(address)"))), address(0)));
         oshiToken.approve(address(0), 1e18);
     }
 
-    function testFailTransferToZeroAddress() public {
+    function testRevertTransferToZeroAddress() public {
         vm.prank(user1);
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256(bytes("ERC20InvalidReceiver(address)"))), address(0)));
         oshiToken.transfer(address(0), 10);
     }
 
-    function testFailTransferInsufficientBalance() public {
+    function testRevertTransferInsufficientBalance() public {
         vm.prank(user1);
+        vm.expectRevert();
         oshiToken.transfer(user2, 3e18);
     }
 
-    function testFailTransferFromInsufficientApprove() public {
+    function testRevertTransferFromInsufficientApprove() public {
         vm.prank(user1);
         oshiToken.approve(address(this), 10);
+        vm.expectRevert();
         oshiToken.transferFrom(user1, user2, 20);
     }
 

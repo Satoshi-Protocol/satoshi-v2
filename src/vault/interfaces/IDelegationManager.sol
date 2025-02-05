@@ -1,28 +1,20 @@
 // SPDX-License-Identifier: LGPL-3.0
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
+import "./ISignatureUtils.sol";
 import "./IStrategy.sol";
 import "./IStrategyManager.sol";
 
-interface IDelegationManager {
-    /**
-     * @title DelegationManager
-     * @notice  This is the contract for delegation in Pell. The main functionalities of this contract are
-     * - enabling anyone to register as an operator in Pell
-     * - allowing operators to specify parameters related to stakers who delegate to them
-     * - enabling any staker to delegate its stake to the operator of its choice (a given staker can only delegate to a single operator at a time)
-     * - enabling a staker to undelegate its assets from the operator it is delegated to (performed as part of the withdrawal process, initiated through the StrategyManager)
-     */
-    struct QueuedWithdrawalParams {
-        // Array of strategies that the QueuedWithdrawal contains
-        IStrategy[] strategies;
-        // Array containing the amount of shares in each Strategy in the `strategies` array
-        uint256[] shares;
-        // The address of the withdrawer
-        address withdrawer;
-    }
+/**
+ * @title DelegationManager
+ * @notice  This is the contract for delegation in Pell. The main functionalities of this contract are
+ * - enabling anyone to register as an operator in Pell
+ * - allowing operators to specify parameters related to stakers who delegate to them
+ * - enabling any staker to delegate its stake to the operator of its choice (a given staker can only delegate to a single operator at a time)
+ * - enabling a staker to undelegate its assets from the operator it is delegated to (performed as part of the withdrawal process, initiated through the StrategyManager)
+ */
+interface IDelegationManager is ISignatureUtils {
     // @notice Struct used for storing information about a single operator who has registered with Pell
-
     struct OperatorDetails {
         // @notice address to receive the rewards that the operator earns via serving applications built on Pell.
         address earningsReceiver;
@@ -95,6 +87,15 @@ interface IDelegationManager {
         IStrategy[] strategies;
         // Array containing the amount of shares in each Strategy in the `strategies` array
         uint256[] shares;
+    }
+
+    struct QueuedWithdrawalParams {
+        // Array of strategies that the QueuedWithdrawal contains
+        IStrategy[] strategies;
+        // Array containing the amount of shares in each Strategy in the `strategies` array
+        uint256[] shares;
+        // The address of the withdrawer
+        address withdrawer;
     }
 
     // @notice Emitted when a new operator registers in Pell and provides their OperatorDetails.
@@ -172,6 +173,52 @@ interface IDelegationManager {
      * @dev Note that the `metadataURI` is *never stored * and is only emitted in the `OperatorMetadataURIUpdated` event
      */
     function updateOperatorMetadataURI(string calldata metadataURI) external;
+
+    /**
+     * @notice Caller delegates their stake to an operator.
+     * @param operator The account (`msg.sender`) is delegating its assets to for use in serving applications built on Pell.
+     * @param approverSignatureAndExpiry Verifies the operator approves of this delegation
+     * @param approverSalt A unique single use value tied to an individual signature.
+     * @dev The approverSignatureAndExpiry is used in the event that:
+     *          1) the operator's `delegationApprover` address is set to a non-zero value.
+     *                  AND
+     *          2) neither the operator nor their `delegationApprover` is the `msg.sender`, since in the event that the operator
+     *             or their delegationApprover is the `msg.sender`, then approval is assumed.
+     * @dev In the event that `approverSignatureAndExpiry` is not checked, its content is ignored entirely; it's recommended to use an empty input
+     * in this case to save on complexity + gas costs
+     */
+    function delegateTo(
+        address operator,
+        SignatureWithExpiry memory approverSignatureAndExpiry,
+        bytes32 approverSalt
+    )
+        external;
+
+    /**
+     * @notice Caller delegates a staker's stake to an operator with valid signatures from both parties.
+     * @param staker The account delegating stake to an `operator` account
+     * @param operator The account (`staker`) is delegating its assets to for use in serving applications built on Pell.
+     * @param stakerSignatureAndExpiry Signed data from the staker authorizing delegating stake to an operator
+     * @param approverSignatureAndExpiry is a parameter that will be used for verifying that the operator approves of this delegation action in the event that:
+     * @param approverSalt Is a salt used to help guarantee signature uniqueness. Each salt can only be used once by a given approver.
+     *
+     * @dev If `staker` is an EOA, then `stakerSignature` is verified to be a valid ECDSA stakerSignature from `staker`, indicating their intention for this action.
+     * @dev If `staker` is a contract, then `stakerSignature` will be checked according to EIP-1271.
+     * @dev the operator's `delegationApprover` address is set to a non-zero value.
+     * @dev neither the operator nor their `delegationApprover` is the `msg.sender`, since in the event that the operator or their delegationApprover
+     * is the `msg.sender`, then approval is assumed.
+     * @dev This function will revert if the current `block.timestamp` is equal to or exceeds the expiry
+     * @dev In the case that `approverSignatureAndExpiry` is not checked, its content is ignored entirely; it's recommended to use an empty input
+     * in this case to save on complexity + gas costs
+     */
+    function delegateToBySignature(
+        address staker,
+        address operator,
+        SignatureWithExpiry memory stakerSignatureAndExpiry,
+        SignatureWithExpiry memory approverSignatureAndExpiry,
+        bytes32 approverSalt
+    )
+        external;
 
     /**
      * @notice Undelegates the staker from the operator who they are delegated to. Puts the staker into the "undelegation limbo" mode of DelegationManager
