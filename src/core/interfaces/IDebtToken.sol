@@ -20,9 +20,8 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @notice Burns a specific amount of tokens from the specified account with gas compensation.
      * @param _account The address from which the tokens will be burned.
      * @param _amount The amount of tokens to burn.
-     * @return A boolean indicating if the operation was successful.
      */
-    function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool);
+    function burnWithGasCompensation(address _account, uint256 _amount) external;
 
     /**
      * @notice Enables a Trove Manager for the debt token.
@@ -58,9 +57,8 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @notice Mints a specific amount of tokens to the specified account with gas compensation.
      * @param _account The address to which the tokens will be minted.
      * @param _amount The amount of tokens to mint.
-     * @return A boolean indicating if the operation was successful.
      */
-    function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool);
+    function mintWithGasCompensation(address _account, uint256 _amount) external;
 
     /**
      * @notice Returns a specific amount of tokens from a pool to a receiver.

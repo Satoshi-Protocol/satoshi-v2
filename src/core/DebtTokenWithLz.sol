@@ -93,20 +93,16 @@ contract DebtTokenWithLz is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
 
     // --- Functions for intra-Satoshi calls ---
 
-    function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
+    function mintWithGasCompensation(address _account, uint256 _amount) external {
         require(msg.sender == satoshiXApp, "DebtTokenWithLz: Caller not SatoshiXapp");
         _mint(_account, _amount);
         _mint(gasPool, _debtGasCompensation);
-
-        return true;
     }
 
-    function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
+    function burnWithGasCompensation(address _account, uint256 _amount) external {
         require(msg.sender == satoshiXApp, "DebtTokenWithLz: Caller not SatoshiXapp");
         _burn(_account, _amount);
         _burn(gasPool, _debtGasCompensation);
-
-        return true;
     }
 
     function mint(address _account, uint256 _amount) external {
