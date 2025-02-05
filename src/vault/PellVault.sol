@@ -107,6 +107,17 @@ contract PellVault is VaultCore {
         emit DelegationManagerSet(delegationManager_);
     }
 
+    function delegateTo(
+        address operator,
+        IDelegationManager.SignatureWithExpiry memory approverSignatureAndExpiry,
+        bytes32 approverSalt
+    )
+        external
+        onlyOwner
+    {
+        IDelegationManager(delegationManager).delegateTo(operator, approverSignatureAndExpiry, approverSalt);
+    }
+
     // --- View functions ---
 
     function constructDepositData(address token, uint256 amount) external pure returns (bytes memory) {

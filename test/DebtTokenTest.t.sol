@@ -107,41 +107,52 @@ contract DebtTokenTest is DeployBase {
         assertEq(debtToken.balanceOf(user1), 200);
     }
 
-    function testFailMintToZero() public {
+    function test_RevertWhenMintToZero() public {
         vm.prank(address(satoshiXApp));
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256(bytes("ERC20InvalidReceiver(address)"))), address(0)));
         debtToken.mint(address(0), 1e18);
     }
 
-    function testFailBurnFromZero() public {
+    function testRevertBurnFromZero() public {
         vm.prank(address(satoshiXApp));
+        vm.expectRevert();
         debtToken.burn(address(0), 1e18);
     }
 
-    function testFailBurnInsufficientBalance() public {
+    function testRevertBurnInsufficientBalance() public {
         vm.prank(user1);
+        vm.expectRevert();
         debtToken.burn(user1, 3e18);
     }
 
-    function testFailApproveToZeroAddress() public {
+    function testRevertApproveToZeroAddress() public {
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256(bytes("ERC20InvalidSpender(address)"))), address(0)));
         debtToken.approve(address(0), 1e18);
     }
 
-    function testFailTransferToZeroAddress() public {
+    function testRevertTransferToZeroAddress() public {
         testMint();
         vm.prank(user1);
+        vm.expectRevert("Debt: Cannot transfer tokens directly to the Debt token contract or the zero address");
         debtToken.transfer(address(0), 10);
     }
 
-    function testFailTransferInsufficientBalance() public {
+    function testRevertTransferInsufficientBalance() public {
         testMint();
         vm.prank(user1);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                bytes4(keccak256(bytes("ERC20InsufficientBalance(address,uint256,uint256)"))), user1, 200, 3e18
+            )
+        );
         debtToken.transfer(user2, 3e18);
     }
 
-    function testFailTransferFromInsufficientApprove() public {
+    function testRevertTransferFromInsufficientApprove() public {
         testMint();
         vm.prank(user1);
         debtToken.approve(address(this), 10);
+        vm.expectRevert();
         debtToken.transferFrom(user1, user2, 20);
     }
 

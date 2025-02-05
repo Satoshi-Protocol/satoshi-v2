@@ -250,8 +250,8 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     /**
      * @notice Swaps debtToken for a asset.
      * @param receiver The address where the stablecoin will be sent.
-     * @param amount The amount of stable tokens to receive.
-     * @return The amount of stable tokens to swap.
+     * @param amount The amount of stable tokens to swap.
+     * @return The amount of asset received.
      */
     // @custom:event Emits DebtTokenForAssetSwapped event.
     function swapOutPrivileged(
