@@ -1,20 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IAccessControl} from "@solidstate/contracts/access/access_control/IAccessControl.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {SatoshiMath} from "../library/SatoshiMath.sol";
-import {IRewardManager, LockDuration, NUMBER_OF_LOCK_DURATIONS} from "./interfaces/IRewardManager.sol";
-import {IDebtToken} from "../core/interfaces/IDebtToken.sol";
-import {IOSHIToken} from "./interfaces/IOSHIToken.sol";
-import {ITroveManager} from "../core/interfaces/ITroveManager.sol";
-import {IWETH} from "../core/helpers/interfaces/IWETH.sol";
-import {ICoreFacet} from "../core/interfaces/ICoreFacet.sol";
-import {Config} from "../core/Config.sol";
-import {Utils} from "../library/Utils.sol";
+import { Config } from "../core/Config.sol";
+import { IWETH } from "../core/helpers/interfaces/IWETH.sol";
+import { ICoreFacet } from "../core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../core/interfaces/IDebtToken.sol";
+import { ITroveManager } from "../core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../library/SatoshiMath.sol";
+
+import { Utils } from "../library/Utils.sol";
+import { IOSHIToken } from "./interfaces/IOSHIToken.sol";
+import { IRewardManager, LockDuration, NUMBER_OF_LOCK_DURATIONS } from "./interfaces/IRewardManager.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { IAccessControl } from "@solidstate/contracts/access/access_control/IAccessControl.sol";
 
 /**
  * @title Reward Manager Contract
@@ -69,11 +70,26 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         // No additional authorization logic is needed for this contract
     }
 
-    function initialize(address owner) external initializer {
-        Utils.ensureNonzeroAddress(owner);
+    function initialize(
+        address _owner,
+        address _satoshiXApp,
+        address _weth,
+        address _debtToken,
+        address _oshiToken
+    )
+        external
+        initializer
+    {
+        Utils.ensureNonzeroAddress(_owner);
+        Utils.ensureNonzeroAddress(_satoshiXApp);
+        Utils.ensureNonzeroAddress(_weth);
+        Utils.ensureNonzeroAddress(_debtToken);
+        Utils.ensureNonzeroAddress(_oshiToken);
+
+        _setAddresses(_satoshiXApp, _weth, _debtToken, _oshiToken);
 
         __UUPSUpgradeable_init_unchained();
-        __Ownable_init_unchained(owner);
+        __Ownable_init_unchained(_owner);
     }
 
     // --- External Functions ---
@@ -194,7 +210,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function increaseCollPerUintStaked(uint256 _amount) external {
-        _isVaildCaller();
+        _isValidCaller();
 
         address collateralToken = address(ITroveManager(msg.sender).collateralToken());
         uint256 index = collTokenIndex[collateralToken];
@@ -217,7 +233,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function increaseSATPerUintStaked(uint256 _amount) external {
-        _isVaildCaller();
+        _isValidCaller();
 
         debtToken.transferFrom(msg.sender, address(this), _amount);
 
@@ -305,17 +321,16 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         emit TroveManagerRemoved(_troveManager);
     }
 
-    function setAddresses(address _satoshiXPP, IWETH _weth, IDebtToken _debtToken, IOSHIToken _oshiToken)
+    function setAddresses(
+        address _satoshiXApp,
+        address _weth,
+        address _debtToken,
+        address _oshiToken
+    )
         external
         onlyOwner
     {
-        satoshiXApp = _satoshiXPP;
-        weth = _weth;
-        debtToken = _debtToken;
-        oshiToken = _oshiToken;
-        emit SatoshiXappSet(_satoshiXPP);
-        emit DebtTokenSet(_debtToken);
-        emit WETHSet(_weth);
+        _setAddresses(_satoshiXApp, _weth, _debtToken, _oshiToken);
     }
 
     function claimFee() external onlyOwner {
@@ -361,7 +376,7 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
 
         if (address(collateralToken) == address(weth)) {
             IWETH(weth).withdraw(collAmount);
-            (bool success,) = payable(msg.sender).call{value: collAmount}("");
+            (bool success,) = payable(msg.sender).call{ value: collAmount }("");
             if (!success) revert NativeTokenTransferFailed();
         } else {
             collateralToken.safeTransfer(msg.sender, collAmount);
@@ -374,9 +389,25 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         debtToken.transfer(msg.sender, debtAmount);
     }
 
+    function _setAddresses(address _satoshiXApp, address _weth, address _debtToken, address _oshiToken) internal {
+        Utils.ensureNonzeroAddress(_satoshiXApp);
+        Utils.ensureNonzeroAddress(_weth);
+        Utils.ensureNonzeroAddress(_debtToken);
+        Utils.ensureNonzeroAddress(_oshiToken);
+
+        satoshiXApp = _satoshiXApp;
+        weth = IWETH(_weth);
+        debtToken = IDebtToken(_debtToken);
+        oshiToken = IOSHIToken(_oshiToken);
+        emit SatoshiXappSet(_satoshiXApp);
+        emit DebtTokenSet(_debtToken);
+        emit OSHITokenSet(_oshiToken);
+        emit WETHSet(_weth);
+    }
+
     // --- Require ---
 
-    function _isVaildCaller() internal view {
+    function _isValidCaller() internal view {
         bool isRegistered;
         if (
             msg.sender == satoshiXApp || IAccessControl(satoshiXApp).hasRole(Config.OWNER_ROLE, msg.sender)

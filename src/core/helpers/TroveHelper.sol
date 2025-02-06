@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {ITroveHelper} from "./interfaces/ITroveHelper.sol";
-import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+import { ISortedTroves } from "../interfaces/ISortedTroves.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+import { ITroveHelper } from "./interfaces/ITroveHelper.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract TroveHelper is ITroveHelper {
     uint256 constant INTEREST_PRECISION = 1e27;
 
-    constructor() {}
+    constructor() { }
 
     function getNicrByTime(ITroveManager troveManager, address _borrower, uint256 time) public view returns (uint256) {
         require(time >= block.timestamp, "TroveHelper: invalid time");
@@ -21,7 +21,11 @@ contract TroveHelper is ITroveHelper {
         return NICR;
     }
 
-    function getNicrListByTime(ITroveManager troveManager, address[] memory _borrower, uint256 time)
+    function getNicrListByTime(
+        ITroveManager troveManager,
+        address[] memory _borrower,
+        uint256 time
+    )
         external
         view
         returns (uint256[] memory)
@@ -35,7 +39,10 @@ contract TroveHelper is ITroveHelper {
         return nicrList;
     }
 
-    function calculateInterestIndexByTime(ITroveManager troveManager, uint256 time)
+    function calculateInterestIndexByTime(
+        ITroveManager troveManager,
+        uint256 time
+    )
         external
         view
         returns (uint256 currentInterestIndex, uint256 interestFactor)
@@ -45,7 +52,10 @@ contract TroveHelper is ITroveHelper {
     }
 
     // SortedTroves
-    function getNode(address sortedTrovesAddress, address _borrower)
+    function getNode(
+        address sortedTrovesAddress,
+        address _borrower
+    )
         external
         view
         returns (bool exist, address nextId, address prevId)
@@ -59,7 +69,11 @@ contract TroveHelper is ITroveHelper {
         }
     }
 
-    function getTroveCollAndDebtByTime(ITroveManager troveManager, address _borrower, uint256 time)
+    function getTroveCollAndDebtByTime(
+        ITroveManager troveManager,
+        address _borrower,
+        uint256 time
+    )
         public
         view
         returns (uint256, uint256)
@@ -84,7 +98,10 @@ contract TroveHelper is ITroveHelper {
 
     // --- internal functions ---
 
-    function _calculateInterestIndex(ITroveManager troveManager, uint256 time)
+    function _calculateInterestIndex(
+        ITroveManager troveManager,
+        uint256 time
+    )
         internal
         view
         returns (uint256 currentInterestIndex, uint256 interestFactor)

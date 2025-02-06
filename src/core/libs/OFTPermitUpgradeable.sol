@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.20;
 
-import {ERC20PermitUpgradeable} from
+import { IOFT, OFTCoreUpgradeable } from "@layerzerolabs/oft-evm-upgradeable/contracts/oft/OFTCoreUpgradeable.sol";
+import { ERC20PermitUpgradeable } from
     "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-import {IOFT, OFTCoreUpgradeable} from "@layerzerolabs-oapp-upgradeable/contracts/oft/OFTCoreUpgradeable.sol";
 
 /**
  * @title OFT Contract
@@ -15,7 +15,7 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
      * @dev Constructor for the OFT contract.
      * @param _lzEndpoint The LayerZero endpoint address.
      */
-    constructor(address _lzEndpoint) OFTCoreUpgradeable(decimals(), _lzEndpoint) {}
+    constructor(address _lzEndpoint) OFTCoreUpgradeable(decimals(), _lzEndpoint) { }
 
     /**
      * @dev Initializes the OFT with the provided name, symbol, and delegate.
@@ -33,21 +33,7 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
         __OFTCore_init(_delegate);
     }
 
-    function __OFT_init_unchained() internal onlyInitializing {}
-
-    /**
-     * @notice Retrieves interfaceID and the version of the OFT.
-     * @return interfaceId The interface ID.
-     * @return version The version.
-     *
-     * @dev interfaceId: This specific interface ID is '0x02e49c2c'.
-     * @dev version: Indicates a cross-chain compatible msg encoding with other OFTs.
-     * @dev If a new feature is added to the OFT cross-chain msg encoding, the version will be incremented.
-     * ie. localOFT version(x,1) CAN send messages to remoteOFT version(x,1)
-     */
-    function oftVersion() external pure virtual returns (bytes4 interfaceId, uint64 version) {
-        return (type(IOFT).interfaceId, 1);
-    }
+    function __OFT_init_unchained() internal onlyInitializing { }
 
     /**
      * @dev Retrieves the address of the underlying ERC20 implementation.
@@ -55,7 +41,7 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
      *
      * @dev In the case of OFT, address(this) and erc20 are the same contract.
      */
-    function token() external view returns (address) {
+    function token() public view returns (address) {
         return address(this);
     }
 
@@ -71,13 +57,19 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
 
     /**
      * @dev Burns tokens from the sender's specified balance.
+     * @param _from The address to debit the tokens from.
      * @param _amountLD The amount of tokens to send in local decimals.
      * @param _minAmountLD The minimum amount to send in local decimals.
      * @param _dstEid The destination chain ID.
      * @return amountSentLD The amount sent in local decimals.
      * @return amountReceivedLD The amount received in local decimals on the remote.
      */
-    function _debit(uint256 _amountLD, uint256 _minAmountLD, uint32 _dstEid)
+    function _debit(
+        address _from,
+        uint256 _amountLD,
+        uint256 _minAmountLD,
+        uint32 _dstEid
+    )
         internal
         virtual
         override
@@ -89,7 +81,7 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
         // therefore amountSentLD CAN differ from amountReceivedLD.
 
         // @dev Default OFT burns on src.
-        _burn(msg.sender, amountSentLD);
+        _burn(_from, amountSentLD);
     }
 
     /**
@@ -99,12 +91,17 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
      * @dev _srcEid The source chain ID.
      * @return amountReceivedLD The amount of tokens ACTUALLY received in local decimals.
      */
-    function _credit(address _to, uint256 _amountLD, uint32 /*_srcEid*/ )
+    function _credit(
+        address _to,
+        uint256 _amountLD,
+        uint32 /*_srcEid*/
+    )
         internal
         virtual
         override
         returns (uint256 amountReceivedLD)
     {
+        if (_to == address(0x0)) _to = address(0xdead); // _mint(...) does not support address(0x0)
         // @dev Default OFT mints on dst.
         _mint(_to, _amountLD);
         // @dev In the case of NON-default OFT, the _amountLD MIGHT not be == amountReceivedLD.

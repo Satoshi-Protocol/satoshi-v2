@@ -1,59 +1,63 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./TestConfig.sol";
-import {Config} from "../src/core/Config.sol";
-import {Vm} from "forge-std/Vm.sol";
-import {console} from "forge-std/console.sol";
-import {stdJson} from "forge-std/StdJson.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {ERC20Mock} from "./mocks/ERC20Mock.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {DeployBase, LocalVars} from "./utils/DeployBase.t.sol";
-import {SatoshiMath} from "../src/library/SatoshiMath.sol";
-import {SatoshiXApp} from "../src/core/SatoshiXApp.sol";
-import {ISatoshiXApp} from "../src/core/interfaces/ISatoshiXApp.sol";
-import {BorrowerOperationsFacet} from "../src/core/facets/BorrowerOperationsFacet.sol";
-import {IBorrowerOperationsFacet} from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {CoreFacet} from "../src/core/facets/CoreFacet.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {ITroveManager, TroveManagerOperation} from "../src/core/interfaces/ITroveManager.sol";
-import {FactoryFacet} from "../src/core/facets/FactoryFacet.sol";
-import {IFactoryFacet, DeploymentParams} from "../src/core/interfaces/IFactoryFacet.sol";
-import {LiquidationFacet} from "../src/core/facets/LiquidationFacet.sol";
-import {ILiquidationFacet} from "../src/core/interfaces/ILiquidationFacet.sol";
-import {PriceFeedAggregatorFacet} from "../src/core/facets/PriceFeedAggregatorFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
-import {StabilityPoolFacet} from "../src/core/facets/StabilityPoolFacet.sol";
-import {IStabilityPoolFacet} from "../src/core/interfaces/IStabilityPoolFacet.sol";
-import {INexusYieldManagerFacet, AssetConfig} from "../src/core/interfaces/INexusYieldManagerFacet.sol";
-import {NexusYieldManagerFacet} from "../src/core/facets/NexusYieldManagerFacet.sol";
-import {Initializer} from "../src/core/Initializer.sol";
-import {IRewardManager, LockDuration} from "../src/OSHI/interfaces/IRewardManager.sol";
-import {RewardManager} from "../src/OSHI/RewardManager.sol";
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
-import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
-import {CommunityIssuance} from "../src/OSHI/CommunityIssuance.sol";
-import {SortedTroves} from "../src/core/SortedTroves.sol";
-import {TroveManager} from "../src/core/TroveManager.sol";
-import {ISortedTroves} from "../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../src/priceFeed/IPriceFeed.sol";
-import {AggregatorV3Interface} from "../src/priceFeed/AggregatorV3Interface.sol";
-import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
-import {OSHIToken} from "../src/OSHI/OSHIToken.sol";
-import {ISatoshiPeriphery, LzSendParam} from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
-import {SatoshiPeriphery} from "../src/core/helpers/SatoshiPeriphery.sol";
-import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
-import {HintLib} from "./utils/HintLib.sol";
-import {TroveBase} from "./utils/TroveBase.t.sol";
-import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
-import {ERC20Mock} from "./mocks/ERC20Mock.sol";
+import { CommunityIssuance } from "../src/OSHI/CommunityIssuance.sol";
 
+import { OSHIToken } from "../src/OSHI/OSHIToken.sol";
+import { RewardManager } from "../src/OSHI/RewardManager.sol";
+import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
+import { IOSHIToken } from "../src/OSHI/interfaces/IOSHIToken.sol";
+import { IRewardManager, LockDuration } from "../src/OSHI/interfaces/IRewardManager.sol";
+import { Config } from "../src/core/Config.sol";
+
+import { DebtToken } from "../src/core/DebtToken.sol";
+import { Initializer } from "../src/core/Initializer.sol";
+import { SatoshiXApp } from "../src/core/SatoshiXApp.sol";
+
+import { SortedTroves } from "../src/core/SortedTroves.sol";
+import { TroveManager } from "../src/core/TroveManager.sol";
+import { BorrowerOperationsFacet } from "../src/core/facets/BorrowerOperationsFacet.sol";
+import { CoreFacet } from "../src/core/facets/CoreFacet.sol";
+import { FactoryFacet } from "../src/core/facets/FactoryFacet.sol";
+import { LiquidationFacet } from "../src/core/facets/LiquidationFacet.sol";
+import { NexusYieldManagerFacet } from "../src/core/facets/NexusYieldManagerFacet.sol";
+import { PriceFeedAggregatorFacet } from "../src/core/facets/PriceFeedAggregatorFacet.sol";
+import { StabilityPoolFacet } from "../src/core/facets/StabilityPoolFacet.sol";
+
+import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
+import { IMultiCollateralHintHelpers } from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { ISatoshiPeriphery, LzSendParam } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { DeploymentParams, IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
+import { AssetConfig, INexusYieldManagerFacet } from "../src/core/interfaces/INexusYieldManagerFacet.sol";
+import { IPriceFeedAggregatorFacet } from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
+import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
+
+import { ISortedTroves } from "../src/core/interfaces/ISortedTroves.sol";
+import { IStabilityPoolFacet } from "../src/core/interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager, TroveManagerOperation } from "../src/core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../src/library/SatoshiMath.sol";
+
+import { AggregatorV3Interface } from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "../src/priceFeed/interfaces/IPriceFeed.sol";
+import "./TestConfig.sol";
+import { ERC20Mock } from "./mocks/ERC20Mock.sol";
+import { OracleMock, RoundData } from "./mocks/OracleMock.sol";
+import { DeployBase, LocalVars } from "./utils/DeployBase.t.sol";
+import { HintLib } from "./utils/HintLib.sol";
+import { TroveBase } from "./utils/TroveBase.t.sol";
+import { MessagingFee } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { stdJson } from "forge-std/StdJson.sol";
+import { Vm } from "forge-std/Vm.sol";
+import { console } from "forge-std/console.sol";
 
 contract mock6 is ERC20Mock {
-    constructor() ERC20Mock("MOCK", "MOCK") {}
+    constructor() ERC20Mock("MOCK", "MOCK") { }
 
     function decimals() public pure override returns (uint8) {
         return 6;
@@ -61,7 +65,7 @@ contract mock6 is ERC20Mock {
 }
 
 contract mock27 is ERC20Mock {
-    constructor() ERC20Mock("MOCK", "MOCK") {}
+    constructor() ERC20Mock("MOCK", "MOCK") { }
 
     function decimals() public pure override returns (uint8) {
         return 27;
@@ -74,7 +78,6 @@ contract NexusYieldTest is DeployBase, TroveBase {
     uint256 maxFeePercentage = 0.05e18; // 5%
     ISortedTroves sortedTrovesBeaconProxy;
     ITroveManager troveManagerBeaconProxy;
-    IMultiCollateralHintHelpers hintHelpers;
     address user;
     address user1;
     address user2;
@@ -107,11 +110,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
         user5 = vm.addr(6);
 
         // setup contracts and deploy one instance
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
-        hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         collateral = ERC20Mock(address(collateralMock));
         nexusYieldProxy = getNexusYieldProxy();
 
@@ -122,7 +121,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
                 priceFeedAggregatorProxy(),
                 10,
                 10,
-                10000e18,
+                10_000e18,
                 1000e18,
                 0,
                 false,
@@ -196,7 +195,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
     }
 
     function test_swapIn() public {
-        deal(address(collateralMock), user1, 10001e18);
+        deal(address(collateralMock), user1, 10_001e18);
         vm.startPrank(user1);
         collateralMock.approve(address(nexusYieldProxy), 1001e18);
         uint256 dailyMintCount = nexusYieldProxy.dailyMintCount(address(collateralMock));
@@ -234,7 +233,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
                 priceFeedAggregatorProxy(),
                 0,
                 0,
-                10000e18,
+                10_000e18,
                 1000e18,
                 0,
                 false,
@@ -324,7 +323,9 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
         (, uint32 withdrawalTime) = nexusYieldProxy.pendingWithdrawal(address(collateralMock), user1);
 
-        vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.WithdrawalAlreadyScheduled.selector, withdrawalTime));
+        vm.expectRevert(
+            abi.encodeWithSelector(INexusYieldManagerFacet.WithdrawalAlreadyScheduled.selector, withdrawalTime)
+        );
         nexusYieldProxy.scheduleSwapOut(address(collateralMock), amount);
     }
 
@@ -364,24 +365,30 @@ contract NexusYieldTest is DeployBase, TroveBase {
     function test_mintCapReached() public {
         vm.startPrank(OWNER);
         nexusYieldProxy.setPrivileged(user1, true);
-        deal(address(collateralMock), user1, 1000000e18);
+        deal(address(collateralMock), user1, 1_000_000e18);
         vm.startPrank(user1);
-        collateralMock.approve(address(nexusYieldProxy), 1000000e18);
+        collateralMock.approve(address(nexusYieldProxy), 1_000_000e18);
         uint256 debtTokenMinted = nexusYieldProxy.debtTokenMinted(address(collateralMock));
-        uint256 amountToMint = 1000000e18;
+        uint256 amountToMint = 1_000_000e18;
         uint256 debtTokenMintCap = nexusYieldProxy.debtTokenMintCap(address(collateralMock));
         vm.expectRevert(
             abi.encodeWithSelector(
-                INexusYieldManagerFacet.DebtTokenMintCapReached.selector, debtTokenMinted, amountToMint, debtTokenMintCap
+                INexusYieldManagerFacet.DebtTokenMintCapReached.selector,
+                debtTokenMinted,
+                amountToMint,
+                debtTokenMintCap
             )
         );
-        nexusYieldProxy.swapIn(address(collateralMock), user1, 1000000e18);
+        nexusYieldProxy.swapIn(address(collateralMock), user1, 1_000_000e18);
         vm.expectRevert(
             abi.encodeWithSelector(
-                INexusYieldManagerFacet.DebtTokenMintCapReached.selector, debtTokenMinted, amountToMint, debtTokenMintCap
+                INexusYieldManagerFacet.DebtTokenMintCapReached.selector,
+                debtTokenMinted,
+                amountToMint,
+                debtTokenMintCap
             )
         );
-        nexusYieldProxy.swapInPrivileged(address(collateralMock), user1, 1000000e18);
+        nexusYieldProxy.swapInPrivileged(address(collateralMock), user1, 1_000_000e18);
         vm.stopPrank();
     }
 
@@ -416,32 +423,30 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
     function test_setAssetConfig() public {
         vm.startPrank(OWNER);
-        uint256 feeIn = 100000;
+        uint256 feeIn = 100_000;
         uint256 feeOut = 10;
         AssetConfig memory config = AssetConfig(
-                priceFeedAggregatorProxy(),
-                feeIn,
-                feeOut,
-                10000e18,
-                1000e18,
-                0,
-                false,
-                3 days,
-                1.1e18,
-                0.9e18,
-                uint256(collateral.decimals())
-            );
-        vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.InvalidFee.selector, feeIn, feeOut));
-        nexusYieldProxy.setAssetConfig(
-            address(collateral), config
+            priceFeedAggregatorProxy(),
+            feeIn,
+            feeOut,
+            10_000e18,
+            1000e18,
+            0,
+            false,
+            3 days,
+            1.1e18,
+            0.9e18,
+            uint256(collateral.decimals())
         );
+        vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.InvalidFee.selector, feeIn, feeOut));
+        nexusYieldProxy.setAssetConfig(address(collateral), config);
         nexusYieldProxy.setAssetConfig(
             address(collateral),
             AssetConfig(
                 priceFeedAggregatorProxy(),
                 10,
                 10,
-                10000e18,
+                10_000e18,
                 1000e18,
                 0,
                 false,
@@ -453,7 +458,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
         );
         assertEq(nexusYieldProxy.feeIn(address(collateralMock)), 10);
         assertEq(nexusYieldProxy.feeOut(address(collateralMock)), 10);
-        assertEq(nexusYieldProxy.debtTokenMintCap(address(collateralMock)), 10000e18);
+        assertEq(nexusYieldProxy.debtTokenMintCap(address(collateralMock)), 10_000e18);
         assertEq(nexusYieldProxy.dailyDebtTokenMintCap(address(collateralMock)), 1000e18);
         assertEq(address(nexusYieldProxy.oracle(address(collateralMock))), address(priceFeedAggregatorProxy()));
         assertFalse(nexusYieldProxy.isUsingOracle(address(collateralMock)));
@@ -503,7 +508,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
     function test_oraclePriceLessThan1() public {
         _updateRoundData(
-            RoundData({answer: 0.9e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1})
+            RoundData({ answer: 0.9e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1 })
         );
         assertEq(priceFeedAggregatorProxy().fetchPrice(collateralMock), 0.9e18);
 
@@ -514,7 +519,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
                 priceFeedAggregatorProxy(),
                 10,
                 10,
-                10000e18,
+                10_000e18,
                 1000e18,
                 0,
                 true,
@@ -531,15 +536,14 @@ contract NexusYieldTest is DeployBase, TroveBase {
         collateralMock.approve(address(nexusYieldProxy), amount);
         nexusYieldProxy.swapIn(address(collateralMock), user1, amount);
         (, uint256 previewFee) = nexusYieldProxy.previewSwapIn(address(collateralMock), amount);
-        uint256 fee =
-            amount * 9 / 10 * nexusYieldProxy.feeIn(address(collateralMock)) / Config.BASIS_POINTS_DIVISOR;
+        uint256 fee = amount * 9 / 10 * nexusYieldProxy.feeIn(address(collateralMock)) / Config.BASIS_POINTS_DIVISOR;
         assertEq(previewFee, fee);
         assertEq(debtTokenProxy().balanceOf(user1), 90e18 - fee);
     }
 
     function test_priceOutOfRange() public {
         _updateRoundData(
-            RoundData({answer: 0.8e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1})
+            RoundData({ answer: 0.8e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1 })
         );
         assertEq(priceFeedAggregatorProxy().fetchPrice(collateralMock), 0.8e18);
 
@@ -550,7 +554,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
                 priceFeedAggregatorProxy(),
                 10,
                 10,
-                10000e18,
+                10_000e18,
                 1000e18,
                 0,
                 true,
@@ -570,7 +574,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
         // price > 1.1
         _updateRoundData(
-            RoundData({answer: 1.2e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1})
+            RoundData({ answer: 1.2e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1 })
         );
         assertEq(priceFeedAggregatorProxy().fetchPrice(collateralMock), 1.2e18);
 
@@ -581,21 +585,48 @@ contract NexusYieldTest is DeployBase, TroveBase {
         nexusYieldProxy.swapIn(address(collateralMock), user1, amount);
     }
 
-    /** utils */
+    function test_permission() public {
+        address someone = makeAddr("someone");
+        vm.startPrank(someone);
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.pause();
+
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.resume();
+
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.sunsetAsset(address(collateralMock));
+
+        vm.expectRevert(
+            "AccessControl: account 0x69979820b003b34127eadba93bd51caac2f768db is missing role 0xb19546dff01e856fb3f010c267a7b1c60363cf8a4664e21cc89c26224620214e"
+        );
+        nexusYieldProxy.setPrivileged(user1, true);
+        vm.stopPrank();
+    }
+
+    /**
+     * utils
+     */
     function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
-    TroveBase.openTrove(
-        borrowerOperationsProxy(),
-        sortedTrovesBeaconProxy,
-        troveManagerBeaconProxy,
-        hintHelpers,
-        DEBT_GAS_COMPENSATION,
-        caller,
-        caller,
-        collateralMock,
-        collateralAmt,
-        debtAmt,
-        0.05e18
-    );
+        TroveBase.openTrove(
+            borrowerOperationsProxy(),
+            sortedTrovesBeaconProxy,
+            troveManagerBeaconProxy,
+            hintHelpers,
+            DEBT_GAS_COMPENSATION,
+            caller,
+            caller,
+            collateralMock,
+            collateralAmt,
+            debtAmt,
+            0.05e18
+        );
     }
 
     function _provideToSP(address caller, uint256 amount) internal {
@@ -617,7 +648,6 @@ contract NexusYieldTest is DeployBase, TroveBase {
         stabilityPoolProxy().claimCollateralGains(caller, collateralIndexes);
         vm.stopPrank();
     }
-
 
     function _troveClaimOSHIReward(address caller) internal returns (uint256 amount) {
         vm.startPrank(caller);
@@ -700,5 +730,4 @@ contract NexusYieldTest is DeployBase, TroveBase {
         vars.claimableTroveReward[3] = troveManagerBeaconProxy.claimableReward(user4);
         vars.claimableTroveReward[4] = troveManagerBeaconProxy.claimableReward(user5);
     }
-
 }

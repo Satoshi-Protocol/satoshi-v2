@@ -1,24 +1,21 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ITroveManager} from "./interfaces/ITroveManager.sol";
-import {TroveManagerData} from "./interfaces/IBorrowerOperationsFacet.sol";
-import {IDebtToken} from "./interfaces/IDebtToken.sol";
-import {Queue, SunsetIndex, AccountDeposit, Snapshots} from "./interfaces/IStabilityPoolFacet.sol";
-import {OracleRecord} from "./interfaces/IPriceFeedAggregatorFacet.sol";
-import {ICommunityIssuance} from "./../OSHI/interfaces/ICommunityIssuance.sol";
-import {IRewardManager} from "./../OSHI/interfaces/IRewardManager.sol";
-import {IXAppRouter} from "./interfaces/IXAppRouter.sol";
-import {AssetConfig, ChainConfig} from "./interfaces/INexusYieldManagerFacet.sol";
+import { ICommunityIssuance } from "./../OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "./../OSHI/interfaces/IRewardManager.sol";
+import { TroveManagerData } from "./interfaces/IBorrowerOperationsFacet.sol";
+import { IDebtToken } from "./interfaces/IDebtToken.sol";
+import { AssetConfig, ChainConfig } from "./interfaces/INexusYieldManagerFacet.sol";
+import { OracleRecord } from "./interfaces/IPriceFeedAggregatorFacet.sol";
+import { AccountDeposit, Queue, Snapshots, SunsetIndex } from "./interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager } from "./interfaces/ITroveManager.sol";
+import { IBeacon } from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 library AppStorage {
     bytes32 internal constant STORAGE_SLOT = bytes32(uint256(keccak256("satoshi.app.storage")) - 1);
 
     struct Layout {
-        IXAppRouter xAppRouter;
         address feeReceiver;
         address gasPool;
         IRewardManager rewardManager;
@@ -29,6 +26,7 @@ library AppStorage {
         uint256 startTime;
         IDebtToken debtToken;
         uint256 minNetDebt;
+        uint256 gasCompensation;
         // owner => caller => isApproved
         mapping(address => mapping(address => bool)) isApprovedDelegate;
         /* Factory */

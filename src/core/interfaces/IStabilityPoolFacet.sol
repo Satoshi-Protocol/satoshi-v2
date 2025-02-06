@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // import {ISatoshiOwnable} from "../dependencies/ISatoshiOwnable.sol";
 // import {IDebtToken} from "./IDebtToken.sol";
 // import {IFactory} from "./IFactory.sol";
@@ -29,7 +29,6 @@ struct Queue {
     uint16 firstSunsetIndexKey;
     uint16 nextSunsetIndexKey;
 }
-
 
 /// @title Stability Pool Facet Interface
 /// @notice Interface for interacting with the Stability Pool Facet
@@ -116,7 +115,10 @@ interface IStabilityPoolFacet {
     /// @return G The G value
     /// @return scale The scale value
     /// @return epoch The epoch value
-    function depositSnapshots(address account) external view returns (uint256 P, uint256 G, uint128 scale, uint128 epoch);
+    function depositSnapshots(address account)
+        external
+        view
+        returns (uint256 P, uint256 G, uint128 scale, uint128 epoch);
 
     /// @notice Returns the deposit sums for an account and index
     /// @param account The address of the account

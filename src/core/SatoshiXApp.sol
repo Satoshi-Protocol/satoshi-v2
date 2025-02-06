@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SolidStateDiamond} from "@solidstate/contracts/proxy/diamond/SolidStateDiamond.sol";
-import {AccessControl} from "@solidstate/contracts/access/access_control/AccessControl.sol";
+import { AccessControl } from "@solidstate/contracts/access/access_control/AccessControl.sol";
+
+// SatoshiXApp use SolidStateDiamond from SolidState's implementation
+// but add `msg.data.length` check in `_getImplementation` function, which could lead to
+// undesired behavior or vulnerabilities in the protocol's logic.
+import { SolidStateDiamond } from "../library/proxy/SolidStateDiamond.sol";
 
 /**
  * @title SatoshiXAPP Diamond Proxy
@@ -12,5 +16,5 @@ import {AccessControl} from "@solidstate/contracts/access/access_control/AccessC
  */
 // solhint-disable-next-line no-empty-blocks
 contract SatoshiXApp is SolidStateDiamond, AccessControl {
-    constructor() {}
+// No extra logic
 }

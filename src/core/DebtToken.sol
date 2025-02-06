@@ -1,46 +1,40 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {ECDSA} from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { ERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
+import { IERC3156FlashBorrower } from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
+import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import {
-    IOFT,
-    SendParam,
-    OFTLimit,
-    OFTReceipt,
-    OFTFeeDetail,
-    MessagingReceipt,
-    MessagingFee
-} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
+import { IRewardManager } from "../OSHI/interfaces/IRewardManager.sol";
 
-import {ITroveManager} from "./interfaces/ITroveManager.sol";
-import {IDebtToken} from "./interfaces/IDebtToken.sol";
-import {IRewardManager} from "../OSHI/interfaces/IRewardManager.sol";
-import {ICoreFacet} from "./interfaces/ICoreFacet.sol";
-import {Config} from "./Config.sol";
-import {Utils} from "../library/Utils.sol";
-import {OFTPermitUpgradeable} from "./libs/OFTPermitUpgradeable.sol";
+import { Utils } from "../library/Utils.sol";
+import { ICoreFacet } from "./interfaces/ICoreFacet.sol";
+import { IDebtToken } from "./interfaces/IDebtToken.sol";
+import { ITroveManager } from "./interfaces/ITroveManager.sol";
 
-contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
-    string public constant version = "1";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { ERC20PermitUpgradeable } from
+    "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 
+/**
+ * @title DebtToken
+ * @dev A standalone DebtToken contract for chains that have not yet integrated with LayerZero.
+ *      Once LayerZero integration is available, the OFT Adapter can be used to enable cross-chain functionality.
+ * @notice DebtToken with ERC20 permit and ERC3156 Flash Loan support
+ */
+contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, OwnableUpgradeable {
     // --- ERC 3156 Data ---
     bytes32 private constant _RETURN_VALUE = keccak256("ERC3156FlashBorrower.onFlashLoan");
     uint256 public constant FLASH_LOAN_FEE = 9; // 1 = 0.0001%
 
-    // // --- Addresses ---
+    // --- Addresses ---
     address public gasPool;
     address public satoshiXApp;
 
-    mapping(ITroveManager => bool) public troveManager;
+    uint256 internal _debtGasCompensation;
 
-    // // Amount of debt to be locked in gas pool on opening troves
-    // uint256 public DEBT_GAS_COMPENSATION;
+    mapping(ITroveManager => bool) public troveManager;
 
     // --- Auth ---
     mapping(address => bool) public wards;
@@ -58,7 +52,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         _;
     }
 
-    constructor(address _lzEndpoint) OFTPermitUpgradeable(_lzEndpoint) {
+    constructor() {
         _disableInitializers();
     }
 
@@ -73,16 +67,24 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         string memory _symbol,
         address _gasPool,
         address _satoshiXApp,
-        address _owner
-    ) external initializer {
+        address _owner,
+        uint256 debtGasCompensation_
+    )
+        external
+        initializer
+    {
         Utils.ensureNonzeroAddress(_satoshiXApp);
         Utils.ensureNonzeroAddress(_owner);
+        Utils.ensureNonzeroAddress(_gasPool);
+        Utils.ensureNonZero(debtGasCompensation_);
 
         __UUPSUpgradeable_init_unchained();
-        __OFT_init(_name, _symbol, _owner);
+        __ERC20Permit_init(_name);
+        __ERC20_init(_name, _symbol);
         __Ownable_init(_owner);
         gasPool = _gasPool;
         satoshiXApp = _satoshiXApp;
+        _debtGasCompensation = debtGasCompensation_;
     }
 
     function enableTroveManager(ITroveManager _troveManager) external {
@@ -92,20 +94,16 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
 
     // --- Functions for intra-Satoshi calls ---
 
-    function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
+    function mintWithGasCompensation(address _account, uint256 _amount) external {
         require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _mint(_account, _amount);
-        _mint(gasPool, Config.DEBT_GAS_COMPENSATION);
-
-        return true;
+        _mint(gasPool, _debtGasCompensation);
     }
 
-    function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool) {
+    function burnWithGasCompensation(address _account, uint256 _amount) external {
         require(msg.sender == satoshiXApp, "DebtToken: Caller not SatoshiXapp");
         _burn(_account, _amount);
-        _burn(gasPool, Config.DEBT_GAS_COMPENSATION);
-
-        return true;
+        _burn(gasPool, _debtGasCompensation);
     }
 
     function mint(address _account, uint256 _amount) external {
@@ -121,7 +119,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         _burn(_account, _amount);
     }
 
-    function sendToSP(address _sender, uint256 _amount) external {
+    function sendToXApp(address _sender, uint256 _amount) external {
         require(msg.sender == satoshiXApp, "Debt: Caller not SatoshiXapp");
         _transfer(_sender, msg.sender, _amount);
     }
@@ -138,7 +136,11 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         return super.transfer(recipient, amount);
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount)
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    )
         public
         override(IDebtToken, ERC20Upgradeable)
         returns (bool)
@@ -147,8 +149,8 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
         return super.transferFrom(sender, recipient, amount);
     }
 
-    function DEBT_GAS_COMPENSATION() external pure returns (uint256) {
-        return Config.DEBT_GAS_COMPENSATION;
+    function DEBT_GAS_COMPENSATION() external view returns (uint256) {
+        return _debtGasCompensation;
     }
 
     // --- ERC 3156 Functions ---
@@ -182,7 +184,7 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
      * @return The fees applied to the corresponding flash loan.
      */
     function _flashFee(uint256 amount) internal pure returns (uint256) {
-        return (amount * FLASH_LOAN_FEE) / 10000;
+        return (amount * FLASH_LOAN_FEE) / 10_000;
     }
 
     /**
@@ -202,7 +204,12 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
     // This function can reenter, but it doesn't pose a risk because it always preserves the property that the amount
     // minted at the beginning is always recovered and burned at the end, or else the entire function will revert.
     // slither-disable-next-line reentrancy-no-eth
-    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
+    function flashLoan(
+        IERC3156FlashBorrower receiver,
+        address token,
+        uint256 amount,
+        bytes calldata data
+    )
         external
         returns (bool)
     {
@@ -231,9 +238,10 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, OFTPermitUpgradeable {
             _recipient != address(0) && _recipient != address(this),
             "Debt: Cannot transfer tokens directly to the Debt token contract or the zero address"
         );
+        // NOTE: it is not allowing transfers to the SatoshiXApp or TroveManager contracts, if needed, only use sendToXApp or returnFromPool functions
         require(
-            !troveManager[ITroveManager(_recipient)],
-            "Debt: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps"
+            _recipient != satoshiXApp && !troveManager[ITroveManager(_recipient)],
+            "Debt: Cannot transfer tokens directly to the SatoshiXApp or TroveManager"
         );
     }
 }

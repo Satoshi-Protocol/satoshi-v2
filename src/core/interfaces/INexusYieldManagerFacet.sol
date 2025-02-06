@@ -1,7 +1,7 @@
 pragma solidity ^0.8.19;
 
-import {IDebtToken} from "./IDebtToken.sol";
-import {IPriceFeedAggregatorFacet} from "./IPriceFeedAggregatorFacet.sol";
+import { IDebtToken } from "./IDebtToken.sol";
+import { IPriceFeedAggregatorFacet } from "./IPriceFeedAggregatorFacet.sol";
 
 struct AssetConfig {
     /// The address of ResilientOracle contract wrapped in its interface.
@@ -326,7 +326,10 @@ interface INexusYieldManagerFacet {
      * @param account The address of the account.
      * @return The array of pending withdrawal amounts and times.
      */
-    function pendingWithdrawals(address[] memory assets, address account)
+    function pendingWithdrawals(
+        address[] memory assets,
+        address account
+    )
         external
         view
         returns (uint256[] memory, uint32[] memory);
@@ -336,7 +339,7 @@ interface INexusYieldManagerFacet {
      * @return True if the contract is paused, false otherwise.
      */
     function isNymPaused() external view returns (bool);
-    
+
     /**
      * @notice Returns the daily mint count for a specific asset.
      * @param asset The address of the asset.

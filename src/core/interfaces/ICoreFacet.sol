@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
-import {IDebtToken} from "./IDebtToken.sol";
-import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
+import { ICommunityIssuance } from "../../OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "../../OSHI/interfaces/IRewardManager.sol";
+import { IDebtToken } from "./IDebtToken.sol";
+import { IBeacon } from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 
 interface ICoreFacet {
     /// @notice Emitted when the reward manager is set

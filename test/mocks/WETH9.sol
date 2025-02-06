@@ -1,7 +1,7 @@
 // solhint-disable-next-line
 pragma solidity ^0.8.19;
 
-import {IWETH} from "../../src/core/helpers/interfaces/IWETH.sol";
+import { IWETH } from "../../src/core/helpers/interfaces/IWETH.sol";
 
 ///NOTE: Mutated v0.8.13 WETH9 contract to be used for testing
 contract WETH9 {

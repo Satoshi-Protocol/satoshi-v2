@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IDebtToken} from "./IDebtToken.sol";
-import {ISortedTroves} from "./ISortedTroves.sol";
-import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
+import { ICommunityIssuance } from "../../OSHI/interfaces/ICommunityIssuance.sol";
+import { IDebtToken } from "./IDebtToken.sol";
+import { ISortedTroves } from "./ISortedTroves.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /// @title ITroveManager
 /// @notice Interface for the Trove Manager contract
@@ -125,13 +125,16 @@ interface ITroveManager {
     /// @param _debtToken The address of the debt token
     /// @param _communityIssuance The address of the community issuance contract
     /// @param _satoshiXApp The address of the SatoshiX app
+    /// @param _debtGasCompensation The debt gas compensation
     function initialize(
         address _owner,
         address _gasPool,
         IDebtToken _debtToken,
         ICommunityIssuance _communityIssuance,
-        address _satoshiXApp
-    ) external;
+        address _satoshiXApp,
+        uint256 _debtGasCompensation
+    )
+        external;
 
     /// @notice Adds collateral surplus for a borrower
     /// @param borrower The address of the borrower
@@ -191,7 +194,8 @@ interface ITroveManager {
         uint256 _collSurplus,
         uint256 _debtGasComp,
         uint256 _collGasComp
-    ) external;
+    )
+        external;
 
     /// @notice Gets the entire system balances
     /// @return The total debt, total collateral, and total stakes
@@ -218,7 +222,9 @@ interface ITroveManager {
         uint256 NICR,
         address _upperHint,
         address _lowerHint
-    ) external returns (uint256 stake, uint256 arrayIndex);
+    )
+        external
+        returns (uint256 stake, uint256 arrayIndex);
 
     /// @notice Redeems collateral
     /// @param _debtAmount The amount of debt
@@ -236,7 +242,8 @@ interface ITroveManager {
         uint256 _partialRedemptionHintNICR,
         uint256 _maxIterations,
         uint256 _maxFeePercentage
-    ) external;
+    )
+        external;
 
     /// @notice Sets the configuration
     /// @param _sortedTroves The address of the sorted troves contract
@@ -265,7 +272,8 @@ interface ITroveManager {
         uint256 _MCR,
         uint128 _rewardRate,
         uint32 _claimStartTime
-    ) external;
+    )
+        external;
 
     /// @notice Sets the trove manager reward rate
     /// @param _newRewardRate The new reward rate
@@ -302,7 +310,9 @@ interface ITroveManager {
         address _lowerHint,
         address _borrower,
         address _receiver
-    ) external returns (uint256, uint256, uint256);
+    )
+        external
+        returns (uint256, uint256, uint256);
 
     /// @notice Gets the bootstrap period
     /// @return The bootstrap period
@@ -599,9 +609,8 @@ interface ITroveManager {
     function claimStartTime() external view returns (uint32);
 
     /// @notice Transfers collateral to a privileged vault
-    /// @param vault The address of the vault
     /// @param amount The amount of collateral
-    function transferCollToPrivilegedVault(address vault, uint256 amount) external;
+    function transferCollToPrivilegedVault(uint256 amount) external;
 
     /// @notice Receives collateral from a privileged vault
     /// @param amount The amount of collateral

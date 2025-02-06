@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {Vm} from "forge-std/Vm.sol";
-import {Test, console} from "forge-std/Test.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { Test, console } from "forge-std/Test.sol";
+import { Vm } from "forge-std/Vm.sol";
 
-import {stdJson} from "forge-std/StdJson.sol";
-import {DeployBase} from "./utils/DeployBase.t.sol";
-import {DEPLOYER, OWNER, DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL} from "./TestConfig.sol";
-import {ERC20PermitUpgradeable} from
+import { FlashloanTester } from "../src/test/FlashloanTester.sol";
+import { DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, DEPLOYER, OWNER } from "./TestConfig.sol";
+import { DeployBase } from "./utils/DeployBase.t.sol";
+
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { ERC20PermitUpgradeable } from
     "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {FlashloanTester} from "../src/test/FlashloanTester.sol";
+import { IERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
+import { stdJson } from "forge-std/StdJson.sol";
 
 contract DebtTokenTest is DeployBase {
     using Math for uint256;
@@ -106,46 +107,55 @@ contract DebtTokenTest is DeployBase {
         assertEq(debtToken.balanceOf(user1), 200);
     }
 
-
-    function testFailMintToZero() public {
+    function test_RevertWhenMintToZero() public {
         vm.prank(address(satoshiXApp));
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256(bytes("ERC20InvalidReceiver(address)"))), address(0)));
         debtToken.mint(address(0), 1e18);
     }
 
-    function testFailBurnFromZero() public {
+    function testRevertBurnFromZero() public {
         vm.prank(address(satoshiXApp));
+        vm.expectRevert();
         debtToken.burn(address(0), 1e18);
     }
 
-    function testFailBurnInsufficientBalance() public {
+    function testRevertBurnInsufficientBalance() public {
         vm.prank(user1);
+        vm.expectRevert();
         debtToken.burn(user1, 3e18);
     }
 
-    function testFailApproveToZeroAddress() public {
+    function testRevertApproveToZeroAddress() public {
+        vm.expectRevert(abi.encodeWithSelector(bytes4(keccak256(bytes("ERC20InvalidSpender(address)"))), address(0)));
         debtToken.approve(address(0), 1e18);
     }
 
-    function testFailTransferToZeroAddress() public {
+    function testRevertTransferToZeroAddress() public {
         testMint();
         vm.prank(user1);
+        vm.expectRevert("Debt: Cannot transfer tokens directly to the Debt token contract or the zero address");
         debtToken.transfer(address(0), 10);
     }
 
-    function testFailTransferInsufficientBalance() public {
+    function testRevertTransferInsufficientBalance() public {
         testMint();
         vm.prank(user1);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                bytes4(keccak256(bytes("ERC20InsufficientBalance(address,uint256,uint256)"))), user1, 200, 3e18
+            )
+        );
         debtToken.transfer(user2, 3e18);
     }
 
-    function testFailTransferFromInsufficientApprove() public {
+    function testRevertTransferFromInsufficientApprove() public {
         testMint();
         vm.prank(user1);
         debtToken.approve(address(this), 10);
+        vm.expectRevert();
         debtToken.transferFrom(user1, user2, 20);
     }
 
-    
     function testPermit() public {
         IERC20Permit debtTokenPermit = IERC20Permit(address(debtToken));
         uint256 ownerPrivateKey = 0xA11CE;
@@ -167,7 +177,7 @@ contract DebtTokenTest is DeployBase {
 
     function testFlashloan() public {
         uint256 totalSupplyBefore = debtToken.totalSupply();
-        uint256 amount = 10000e18;
+        uint256 amount = 10_000e18;
         FlashloanTester flashloanTester = new FlashloanTester(debtToken);
         // mint fee to tester
         vm.prank(address(satoshiXApp));
@@ -195,11 +205,16 @@ contract DebtTokenTest is DeployBase {
 
     function testFlashFee() public {
         assertEq(debtToken.flashFee(address(0), 1000e18), 0);
-        assertEq(debtToken.flashFee(address(debtToken), 1000e18), 1000e18 * 9 / 10000);
+        assertEq(debtToken.flashFee(address(debtToken), 1000e18), 1000e18 * 9 / 10_000);
     }
-    
 
-    function getDigest(address owner, address spender, uint256 amount, uint256 nonce, uint256 deadline)
+    function getDigest(
+        address owner,
+        address spender,
+        uint256 amount,
+        uint256 nonce,
+        uint256 deadline
+    )
         public
         view
         returns (bytes32)
@@ -212,5 +227,4 @@ contract DebtTokenTest is DeployBase {
             )
         );
     }
-
 }

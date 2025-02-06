@@ -2,18 +2,17 @@
 
 pragma solidity ^0.8.20;
 
-import {console} from "forge-std/console.sol";
-import {Test} from "forge-std/Test.sol";
-import {DeployBase} from "./utils/DeployBase.t.sol";
-import {EndpointV2Mock} from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
+import { DeployBase } from "./utils/DeployBase.t.sol";
+import { EndpointV2Mock } from "@layerzerolabs/test-devtools-evm-foundry/contracts/mocks/EndpointV2Mock.sol";
+import { Test } from "forge-std/Test.sol";
+import { console } from "forge-std/console.sol";
 
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {InitialConfig} from "../src/core/InitialConfig.sol";
-import {Config} from "../src/core/Config.sol";
-import {DEPLOYER, OWNER} from "./TestConfig.sol";
+import { Config } from "../src/core/Config.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { DEBT_GAS_COMPENSATION, DEPLOYER, FEE_RECEIVER, OWNER } from "./TestConfig.sol";
 
 contract CoreFacetTest is DeployBase {
-    address owner = InitialConfig.OWNER;
+    address owner = OWNER;
 
     function setUp() public virtual override {
         super.setUp();
@@ -22,7 +21,7 @@ contract CoreFacetTest is DeployBase {
 
     function test_feeReceiver() public {
         address feeReceiver = ICoreFacet(address(satoshiXApp)).feeReceiver();
-        assertEq(feeReceiver, InitialConfig.FEE_RECEIVER);
+        assertEq(feeReceiver, FEE_RECEIVER);
     }
 
     function test_setFeeReceiver() public {
@@ -78,6 +77,6 @@ contract CoreFacetTest is DeployBase {
 
     function test_gasCompensation() public {
         uint256 gasCompensation = ICoreFacet(address(satoshiXApp)).gasCompensation();
-        assertEq(gasCompensation, Config.DEBT_GAS_COMPENSATION);
+        assertEq(gasCompensation, DEBT_GAS_COMPENSATION);
     }
 }

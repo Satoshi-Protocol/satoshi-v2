@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {IFactoryFacet} from "../interfaces/IFactoryFacet.sol";
+import { IFactoryFacet } from "../interfaces/IFactoryFacet.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 struct Collateral {
     address collateral;

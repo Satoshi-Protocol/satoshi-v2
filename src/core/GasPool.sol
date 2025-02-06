@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IGasPool} from "./interfaces/IGasPool.sol";
+import { IGasPool } from "./interfaces/IGasPool.sol";
 
 /**
  * @title Gas Pool Contract (Non-upgradeable)

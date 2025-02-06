@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IBeacon} from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
-import {ICoreFacet} from "../interfaces/ICoreFacet.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
-import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
-import {ICommunityIssuance} from "../../OSHI/interfaces/ICommunityIssuance.sol";
-import {Config} from "../Config.sol";
+import { ICommunityIssuance } from "../../OSHI/interfaces/ICommunityIssuance.sol";
+import { IRewardManager } from "../../OSHI/interfaces/IRewardManager.sol";
+import { AppStorage } from "../AppStorage.sol";
+
+import { Config } from "../Config.sol";
+import { ICoreFacet } from "../interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
+import { IBeacon } from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 
 contract CoreFacet is ICoreFacet, AccessControlInternal {
     /**
@@ -87,7 +88,7 @@ contract CoreFacet is ICoreFacet, AccessControlInternal {
         return AppStorage.layout().communityIssuance;
     }
 
-    function gasCompensation() external pure returns (uint256) {
-        return Config.DEBT_GAS_COMPENSATION;
+    function gasCompensation() external view returns (uint256) {
+        return AppStorage.layout().gasCompensation;
     }
 }

@@ -1,38 +1,31 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.20;
 
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {OwnableInternal} from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
+import { IRewardManager } from "../../OSHI/interfaces/IRewardManager.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+import { AppStorage } from "../AppStorage.sol";
+
+import { Config } from "../Config.sol";
 import {
-    IBorrowerOperationsFacet,
+    Balances,
     BorrowerOperation,
-    TroveManagerData,
-    Balances
+    IBorrowerOperationsFacet,
+    TroveManagerData
 } from "../interfaces/IBorrowerOperationsFacet.sol";
-import {IRewardManager} from "../../OSHI/interfaces/IRewardManager.sol";
-import {Config} from "../Config.sol";
-import {BorrowerOperationsLib} from "../libs/BorrowerOperationsLib.sol";
-/**
- * @title Borrower Operations Contract (Upgradable)
- *        Mutated from:
- *        https://github.com/prisma-fi/prisma-contracts/blob/main/contracts/core/BorrowerOperations.sol
- *        https://github.com/liquity/dev/blob/main/packages/contracts/contracts/BorrowerOperations.sol
- *
- */
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+
+import { BorrowerOperationsLib } from "../libs/BorrowerOperationsLib.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
+import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
 
 contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInternal {
     using SafeERC20 for IERC20;
     using SafeERC20 for IDebtToken;
     using BorrowerOperationsLib for *;
-
-    // IFactory public factory;
 
     struct LocalVariables_adjustTrove {
         uint256 price;
@@ -49,6 +42,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 debtChange;
         address account;
         uint256 MCR;
+        uint256 debtGasCompensation;
     }
 
     struct LocalVariables_openTrove {
@@ -62,31 +56,6 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 stake;
         uint256 arrayIndex;
     }
-
-    // constructor() {
-    //     _disableInitializers();
-    // }
-
-    // /// @notice Override the _authorizeUpgrade function inherited from UUPSUpgradeable contract
-    // // solhint-disable-next-line no-empty-blocks
-    // function _authorizeUpgrade(address newImplementation) internal view override onlyRole(Config.OWNER_ROLE) {
-    //     // No additional authorization logic is needed for this contract
-    // }
-
-    // function initialize(
-    //     ISatoshiCore _satoshiCore,
-    //     IDebtToken _debtToken,
-    //     IFactory _factory,
-    //     uint256 _minNetDebt,
-    //     uint256 _gasCompensation
-    // ) external initializer {
-    //     __UUPSUpgradeable_init_unchained();
-    //     __SatoshiOwnable_init(_satoshiCore);
-    //     __SatoshiBase_init(_gasCompensation);
-    //     debtToken = _debtToken;
-    //     factory = _factory;
-    //     _setMinNetDebt(_minNetDebt);
-    // }
 
     function isApprovedDelegate(address _account, address _delegate) external view returns (bool) {
         return AppStorage.layout().isApprovedDelegate[_account][_delegate];
@@ -149,8 +118,8 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         return BorrowerOperationsLib._checkRecoveryMode(TCR);
     }
 
-    function getCompositeDebt(uint256 _debt) external pure returns (uint256) {
-        return SatoshiMath._getCompositeDebt(_debt);
+    function getCompositeDebt(uint256 _debt) external view returns (uint256) {
+        return SatoshiMath._getCompositeDebt(_debt, AppStorage.layout().gasCompensation);
     }
 
     // --- Borrower Trove Operations ---
@@ -163,7 +132,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Deposits are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -186,7 +157,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 scaledCollateralAmount = SatoshiMath._getScaledCollateralAmount(_collateralAmount, decimals);
 
         // ICR is based on the composite debt, i.e. the requested Debt amount + Debt borrowing fee + Debt gas comp.
-        vars.compositeDebt = SatoshiMath._getCompositeDebt(vars.netDebt);
+        vars.compositeDebt = SatoshiMath._getCompositeDebt(vars.netDebt, s.gasCompensation);
         vars.ICR = SatoshiMath._computeCR(scaledCollateralAmount, vars.compositeDebt, vars.price);
         vars.NICR = SatoshiMath._computeNominalCR(_collateralAmount, vars.compositeDebt);
 
@@ -229,7 +200,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _collateralAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Trove adjustments are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -249,7 +222,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _collWithdrawal,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s._isCallerOrDelegated(account), "Caller not approved");
         _adjustTrove(s, troveManager, account, 0, 0, _collWithdrawal, 0, false, _upperHint, _lowerHint);
@@ -268,7 +243,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(!s.paused, "Withdrawals are paused");
         require(s._isCallerOrDelegated(account), "Caller not approved");
@@ -287,7 +264,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s._isCallerOrDelegated(account), "Caller not approved");
         _adjustTrove(s, troveManager, account, 0, 0, 0, _debtAmount, false, _upperHint, _lowerHint);
@@ -308,7 +287,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint
-    ) external {
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require((_collDeposit == 0 && !_isDebtIncrease) || !s.paused, "Trove adjustments are paused");
         require(_collDeposit == 0 || _collWithdrawal == 0, "BorrowerOperations: Cannot withdraw and add coll");
@@ -343,7 +324,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint
-    ) internal {
+    )
+        internal
+    {
         require(
             _collDeposit != 0 || _collWithdrawal != 0 || _debtChange != 0,
             "BorrowerOps: There must be either a collateral change or a debt change"
@@ -363,13 +346,14 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         vars.debtChange = _debtChange;
         vars.account = account;
         vars.MCR = troveManager.MCR();
+        vars.debtGasCompensation = s.gasCompensation;
 
         if (_isDebtIncrease) {
             require(_debtChange != 0, "BorrowerOps: Debt increase requires non-zero debtChange");
             BorrowerOperationsLib._requireValidMaxFeePercentage(_maxFeePercentage);
 
             vars.netDebtChange +=
-                _triggerBorrowingFee(s, troveManager, collateralToken, msg.sender, _maxFeePercentage, _debtChange);
+                _triggerBorrowingFee(s, troveManager, collateralToken, account, _maxFeePercentage, _debtChange);
         }
 
         // Calculate old and new ICRs and check if adjustment satisfies all conditions for the current system mode
@@ -380,7 +364,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
 
         // When the adjustment is a debt repayment, check it's a valid amount and that the caller has enough Debt
         if (!_isDebtIncrease && _debtChange != 0) {
-            BorrowerOperationsLib._requireAtLeastMinNetDebt(s, SatoshiMath._getNetDebt(vars.debt) - vars.netDebtChange);
+            BorrowerOperationsLib._requireAtLeastMinNetDebt(
+                s, SatoshiMath._getNetDebt(vars.debt, vars.debtGasCompensation) - vars.netDebtChange
+            );
         }
 
         // If we are incrasing collateral, send tokens to the trove manager prior to adjusting the trove
@@ -423,7 +409,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         troveManager.closeTrove(account, msg.sender, coll, debt);
 
         // Burn the repaid Debt from the user's balance and the gas compensation from the Gas Pool
-        s.debtToken.burnWithGasCompensation(msg.sender, debt - Config.DEBT_GAS_COMPENSATION);
+        s.debtToken.burnWithGasCompensation(msg.sender, debt - s.gasCompensation);
 
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
@@ -449,7 +435,10 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         address _caller,
         uint256 _maxFeePercentage,
         uint256 _debtAmount
-    ) internal returns (uint256) {
+    )
+        internal
+        returns (uint256)
+    {
         uint256 debtFee = _troveManager.decayBaseRateAndGetBorrowingFee(_debtAmount);
 
         SatoshiMath._requireUserAcceptsFee(debtFee, _debtAmount, _maxFeePercentage);
@@ -472,7 +461,10 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         bool _isDebtIncrease,
         LocalVariables_adjustTrove memory _vars,
         uint8 decimals
-    ) internal pure {
+    )
+        internal
+        pure
+    {
         /*
          *In Recovery Mode, only allow:
          *

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { IERC3156FlashBorrower } from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 // import {IERC20Permit} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 
-import {ITroveManager} from "./ITroveManager.sol";
+import { ITroveManager } from "./ITroveManager.sol";
 
 interface IDebtToken is IERC20, IERC20Metadata {
     /**
@@ -20,9 +20,8 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @notice Burns a specific amount of tokens from the specified account with gas compensation.
      * @param _account The address from which the tokens will be burned.
      * @param _amount The amount of tokens to burn.
-     * @return A boolean indicating if the operation was successful.
      */
-    function burnWithGasCompensation(address _account, uint256 _amount) external returns (bool);
+    function burnWithGasCompensation(address _account, uint256 _amount) external;
 
     /**
      * @notice Enables a Trove Manager for the debt token.
@@ -38,7 +37,12 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @param data Additional data to pass to the receiver.
      * @return A boolean indicating if the operation was successful.
      */
-    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
+    function flashLoan(
+        IERC3156FlashBorrower receiver,
+        address token,
+        uint256 amount,
+        bytes calldata data
+    )
         external
         returns (bool);
 
@@ -53,9 +57,8 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @notice Mints a specific amount of tokens to the specified account with gas compensation.
      * @param _account The address to which the tokens will be minted.
      * @param _amount The amount of tokens to mint.
-     * @return A boolean indicating if the operation was successful.
      */
-    function mintWithGasCompensation(address _account, uint256 _amount) external returns (bool);
+    function mintWithGasCompensation(address _account, uint256 _amount) external;
 
     /**
      * @notice Returns a specific amount of tokens from a pool to a receiver.
@@ -70,7 +73,7 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @param _sender The address sending the tokens.
      * @param _amount The amount of tokens to send.
      */
-    function sendToSP(address _sender, uint256 _amount) external;
+    function sendToXApp(address _sender, uint256 _amount) external;
 
     /**
      * @notice Transfers a specific amount of tokens to a recipient.
@@ -136,14 +139,17 @@ interface IDebtToken is IERC20, IERC20Metadata {
      * @param _gasPool The address of the gas pool.
      * @param _satoshiXApp The address of the SatoshiX application.
      * @param _owner The address of the owner.
+     * @param _debtGasCompensation The gas compensation amount for debt operations.
      */
     function initialize(
         string memory _name,
         string memory _symbol,
         address _gasPool,
         address _satoshiXApp,
-        address _owner
-    ) external;
+        address _owner,
+        uint256 _debtGasCompensation
+    )
+        external;
 
     /**
      * @notice Checks if an address is authorized as a ward.

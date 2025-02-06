@@ -1,18 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {AccessControlInternal} from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {IDebtToken} from "../interfaces/IDebtToken.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+
+import { AppStorage } from "../AppStorage.sol";
+import { Config } from "../Config.sol";
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
 import {
-    IStabilityPoolFacet, AccountDeposit, Snapshots, SunsetIndex, Queue
+    AccountDeposit, IStabilityPoolFacet, Queue, Snapshots, SunsetIndex
 } from "../interfaces/IStabilityPoolFacet.sol";
-import {Config} from "../Config.sol";
-import {AppStorage} from "../AppStorage.sol";
-import {StabilityPoolLib} from "../libs/StabilityPoolLib.sol";
+
+import { StabilityPoolLib } from "../libs/StabilityPoolLib.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 
 contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
     using SafeERC20 for IERC20;
@@ -70,14 +72,14 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
 
         _accrueRewards(s, msg.sender);
 
-        s.debtToken.sendToSP(msg.sender, _amount);
+        s.debtToken.sendToXApp(msg.sender, _amount);
         uint256 newTotalDebtTokenDeposits = s.totalDebtTokenDeposits + _amount;
         s.totalDebtTokenDeposits = newTotalDebtTokenDeposits;
         emit StabilityPoolLib.StabilityPoolDebtBalanceUpdated(newTotalDebtTokenDeposits);
 
         uint256 newDeposit = compoundedDebtDeposit + _amount;
         s.accountDeposits[msg.sender] =
-            AccountDeposit({amount: uint128(newDeposit), timestamp: uint128(block.timestamp)});
+            AccountDeposit({ amount: uint128(newDeposit), timestamp: uint128(block.timestamp) });
 
         _updateSnapshots(s, msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
@@ -116,7 +118,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
 
         // Update deposit
         uint256 newDeposit = compoundedDebtDeposit - debtToWithdraw;
-        s.accountDeposits[msg.sender] = AccountDeposit({amount: uint128(newDeposit), timestamp: depositTimestamp});
+        s.accountDeposits[msg.sender] = AccountDeposit({ amount: uint128(newDeposit), timestamp: depositTimestamp });
 
         _updateSnapshots(s, msg.sender, newDeposit);
         emit UserDepositChanged(msg.sender, newDeposit);
@@ -160,7 +162,10 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
         return collateralGains;
     }
 
-    function _accrueDepositorCollateralGain(AppStorage.Layout storage s, address _depositor)
+    function _accrueDepositorCollateralGain(
+        AppStorage.Layout storage s,
+        address _depositor
+    )
         private
         returns (bool hasGains)
     {
@@ -279,7 +284,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
             }
         }
         s.accountDeposits[msg.sender] =
-            AccountDeposit({amount: uint128(compoundedDebtDeposit), timestamp: depositTimestamp});
+            AccountDeposit({ amount: uint128(compoundedDebtDeposit), timestamp: depositTimestamp });
         _updateSnapshots(s, msg.sender, compoundedDebtDeposit);
         emit CollateralGainWithdrawn(msg.sender, collateralGains);
     }
@@ -354,7 +359,7 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
             if (debtLoss > 0 || hasGains || amount > 0) {
                 // Update deposit
                 s.accountDeposits[account] =
-                    AccountDeposit({amount: uint128(compoundedDebtDeposit), timestamp: depositTimestamp});
+                    AccountDeposit({ amount: uint128(compoundedDebtDeposit), timestamp: depositTimestamp });
                 _updateSnapshots(s, account, compoundedDebtDeposit);
             }
         }
@@ -408,12 +413,12 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
     function depositSnapshots(address depositor)
         external
         view
-        returns (uint256 P, uint256 G, uint128 scale, uint128 epoch)
+        returns (uint256 _P, uint256 _G, uint128 scale, uint128 epoch)
     {
         AppStorage.Layout storage s = AppStorage.layout();
         Snapshots memory snapshots = s.depositSnapshots[depositor];
-        P = snapshots.P;
-        G = snapshots.G;
+        _P = snapshots.P;
+        _G = snapshots.G;
         scale = snapshots.scale;
         epoch = snapshots.epoch;
     }

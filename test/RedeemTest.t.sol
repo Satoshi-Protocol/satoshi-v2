@@ -1,54 +1,59 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "./TestConfig.sol";
-import {Vm} from "forge-std/Vm.sol";
-import {console} from "forge-std/console.sol";
-import {stdJson} from "forge-std/StdJson.sol";
-import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {DeployBase, LocalVars} from "./utils/DeployBase.t.sol";
-import {SatoshiMath} from "../src/library/SatoshiMath.sol";
-import {SatoshiXApp} from "../src/core/SatoshiXApp.sol";
-import {ISatoshiXApp} from "../src/core/interfaces/ISatoshiXApp.sol";
-import {BorrowerOperationsFacet} from "../src/core/facets/BorrowerOperationsFacet.sol";
-import {IBorrowerOperationsFacet} from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {CoreFacet} from "../src/core/facets/CoreFacet.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {ITroveManager, TroveManagerOperation} from "../src/core/interfaces/ITroveManager.sol";
-import {FactoryFacet} from "../src/core/facets/FactoryFacet.sol";
-import {IFactoryFacet, DeploymentParams} from "../src/core/interfaces/IFactoryFacet.sol";
-import {LiquidationFacet} from "../src/core/facets/LiquidationFacet.sol";
-import {ILiquidationFacet} from "../src/core/interfaces/ILiquidationFacet.sol";
-import {PriceFeedAggregatorFacet} from "../src/core/facets/PriceFeedAggregatorFacet.sol";
-import {IPriceFeedAggregatorFacet} from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
-import {StabilityPoolFacet} from "../src/core/facets/StabilityPoolFacet.sol";
-import {IStabilityPoolFacet} from "../src/core/interfaces/IStabilityPoolFacet.sol";
-import {INexusYieldManagerFacet} from "../src/core/interfaces/INexusYieldManagerFacet.sol";
-import {NexusYieldManagerFacet} from "../src/core/facets/NexusYieldManagerFacet.sol";
-import {Initializer} from "../src/core/Initializer.sol";
-import {IRewardManager} from "../src/OSHI/interfaces/IRewardManager.sol";
-import {RewardManager} from "../src/OSHI/RewardManager.sol";
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
-import {ICommunityIssuance} from "../src/OSHI/interfaces/ICommunityIssuance.sol";
-import {CommunityIssuance} from "../src/OSHI/CommunityIssuance.sol";
-import {SortedTroves} from "../src/core/SortedTroves.sol";
-import {TroveManager} from "../src/core/TroveManager.sol";
-import {ISortedTroves} from "../src/core/interfaces/ISortedTroves.sol";
-import {IPriceFeed} from "../src/priceFeed/IPriceFeed.sol";
-import {AggregatorV3Interface} from "../src/priceFeed/AggregatorV3Interface.sol";
-import {IOSHIToken} from "../src/OSHI/interfaces/IOSHIToken.sol";
-import {OSHIToken} from "../src/OSHI/OSHIToken.sol";
-import {ISatoshiPeriphery, LzSendParam} from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
-import {SatoshiPeriphery} from "../src/core/helpers/SatoshiPeriphery.sol";
-import {IMultiCollateralHintHelpers} from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
-import {RoundData, OracleMock} from "./mocks/OracleMock.sol";
-import {HintLib} from "./utils/HintLib.sol";
-import {TroveBase} from "./utils/TroveBase.t.sol";
-import {MessagingFee} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
-import {ERC20Mock} from "./mocks/ERC20Mock.sol";
+import { CommunityIssuance } from "../src/OSHI/CommunityIssuance.sol";
 
+import { OSHIToken } from "../src/OSHI/OSHIToken.sol";
+import { RewardManager } from "../src/OSHI/RewardManager.sol";
+import { ICommunityIssuance } from "../src/OSHI/interfaces/ICommunityIssuance.sol";
+import { IOSHIToken } from "../src/OSHI/interfaces/IOSHIToken.sol";
+import { IRewardManager } from "../src/OSHI/interfaces/IRewardManager.sol";
+import { DebtToken } from "../src/core/DebtToken.sol";
+import { Initializer } from "../src/core/Initializer.sol";
+import { SatoshiXApp } from "../src/core/SatoshiXApp.sol";
+
+import { SortedTroves } from "../src/core/SortedTroves.sol";
+import { TroveManager } from "../src/core/TroveManager.sol";
+import { BorrowerOperationsFacet } from "../src/core/facets/BorrowerOperationsFacet.sol";
+import { CoreFacet } from "../src/core/facets/CoreFacet.sol";
+import { FactoryFacet } from "../src/core/facets/FactoryFacet.sol";
+import { LiquidationFacet } from "../src/core/facets/LiquidationFacet.sol";
+import { NexusYieldManagerFacet } from "../src/core/facets/NexusYieldManagerFacet.sol";
+import { PriceFeedAggregatorFacet } from "../src/core/facets/PriceFeedAggregatorFacet.sol";
+import { StabilityPoolFacet } from "../src/core/facets/StabilityPoolFacet.sol";
+
+import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
+import { IMultiCollateralHintHelpers } from "../src/core/helpers/interfaces/IMultiCollateralHintHelpers.sol";
+import { ISatoshiPeriphery, LzSendParam } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { DeploymentParams, IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
+import { INexusYieldManagerFacet } from "../src/core/interfaces/INexusYieldManagerFacet.sol";
+import { IPriceFeedAggregatorFacet } from "../src/core/interfaces/IPriceFeedAggregatorFacet.sol";
+import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
+
+import { ISortedTroves } from "../src/core/interfaces/ISortedTroves.sol";
+import { IStabilityPoolFacet } from "../src/core/interfaces/IStabilityPoolFacet.sol";
+import { ITroveManager, TroveManagerOperation } from "../src/core/interfaces/ITroveManager.sol";
+import { SatoshiMath } from "../src/library/SatoshiMath.sol";
+
+import { AggregatorV3Interface } from "../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "../src/priceFeed/interfaces/IPriceFeed.sol";
+import "./TestConfig.sol";
+
+import { ERC20Mock } from "./mocks/ERC20Mock.sol";
+import { OracleMock, RoundData } from "./mocks/OracleMock.sol";
+import { DeployBase, LocalVars } from "./utils/DeployBase.t.sol";
+import { HintLib } from "./utils/HintLib.sol";
+import { TroveBase } from "./utils/TroveBase.t.sol";
+import { MessagingFee } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
+import { stdJson } from "forge-std/StdJson.sol";
+import { Vm } from "forge-std/Vm.sol";
+import { console } from "forge-std/console.sol";
 
 contract RedeemTest is DeployBase, TroveBase {
     using Math for uint256;
@@ -56,7 +61,6 @@ contract RedeemTest is DeployBase, TroveBase {
     uint256 maxFeePercentage = 0.05e18; // 5%
     ISortedTroves sortedTrovesBeaconProxy;
     ITroveManager troveManagerBeaconProxy;
-    IMultiCollateralHintHelpers hintHelpers;
     address user1;
     address user2;
     address user3;
@@ -89,27 +93,22 @@ contract RedeemTest is DeployBase, TroveBase {
         user4 = vm.addr(4);
 
         // setup contracts and deploy one instance
-        (
-            sortedTrovesBeaconProxy,
-            troveManagerBeaconProxy
-        ) = _deployMockTroveManager(DEPLOYER);
-        hintHelpers = IMultiCollateralHintHelpers(_deployHintHelpers(DEPLOYER));
+        (sortedTrovesBeaconProxy, troveManagerBeaconProxy) = _deployMockTroveManager(DEPLOYER);
         collateral = ERC20Mock(address(collateralMock));
     }
 
-
     function test_getRedemptionHints() public {
-        _openTrove(user1, 1e18, 13333e18);
-        _openTrove(user2, 1e18, 13793e18);
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user1, 1e18, 13_333e18);
+        _openTrove(user2, 1e18, 13_793e18);
+        _openTrove(user3, 1e18, 20_000e18);
         // user4 should be untouched by redemption after the price drop (ICR < 110%)
         // user4 should be liquidated
-        _openTrove(user4, 1e18, 30000e18);
+        _openTrove(user4, 1e18, 30_000e18);
 
         // price drop
         _updateRoundData(
             RoundData({
-                answer: 30500_00_000_000,
+                answer: 3_050_000_000_000,
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -137,25 +136,25 @@ contract RedeemTest is DeployBase, TroveBase {
         // price drop
         _updateRoundData(
             RoundData({
-                answer: 40000_00_000_000,
+                answer: 4_000_000_000_000,
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
             })
         );
 
-        _openTrove(user1, 1000000e18, 133330e18);
-        _openTrove(user2, 1e18, 13793e18);
-        _openTrove(user3, 1e18, 20000e18);
-        _openTrove(user4, 1e18, 30000e18);
+        _openTrove(user1, 1_000_000e18, 133_330e18);
+        _openTrove(user2, 1e18, 13_793e18);
+        _openTrove(user3, 1e18, 20_000e18);
+        _openTrove(user4, 1e18, 30_000e18);
 
-        uint256 redemptionAmount = 35000e18;
+        uint256 redemptionAmount = 35_000e18;
 
         _redeemCollateral(user1, redemptionAmount);
         (, uint256 debt4) = troveManagerBeaconProxy.getTroveCollAndDebt(user4);
         (, uint256 debt3) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
         assertEq(debt4, 0);
-        assert(debt3 < 20000e18);
+        assert(debt3 < 20_000e18);
     }
 
     function test_RedeemOnlyOneTrove() public {
@@ -164,14 +163,14 @@ contract RedeemTest is DeployBase, TroveBase {
         // price drop
         _updateRoundData(
             RoundData({
-                answer: 40000_00_000_000,
+                answer: 4_000_000_000_000,
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
             })
         );
 
-        _openTrove(user1, 1000000e18, 1000e18);
+        _openTrove(user1, 1_000_000e18, 1000e18);
         _openTrove(user2, 1e18, 50e18);
         _openTrove(user3, 1e18, 80e18);
 
@@ -180,23 +179,23 @@ contract RedeemTest is DeployBase, TroveBase {
 
         _redeemCollateral(user1, redemptionAmount);
         (, uint256 debt3) = troveManagerBeaconProxy.getTroveCollAndDebt(user3);
-        assertEq(debt3,  beforeDebt3 - redemptionAmount);
+        assertEq(debt3, beforeDebt3 - redemptionAmount);
     }
 
     function test_redeem() public {
         LocalVars memory vars;
-        _openTrove(user1, 1e18, 13333e18);
-        _openTrove(user2, 1e18, 13793e18);
-        _openTrove(user3, 1e18, 20000e18);
+        _openTrove(user1, 1e18, 13_333e18);
+        _openTrove(user2, 1e18, 13_793e18);
+        _openTrove(user3, 1e18, 20_000e18);
         // open with a high ICR
-        _openTrove(user4, 100e18, 30000e18);
+        _openTrove(user4, 100e18, 30_000e18);
 
         // skip bootstrapping time
         vm.warp(block.timestamp + 14 days);
 
         _updateRoundData(
             RoundData({
-                answer: 40000_00_000_000,
+                answer: 4_000_000_000_000,
                 startedAt: block.timestamp,
                 updatedAt: block.timestamp,
                 answeredInRound: 1
@@ -244,7 +243,9 @@ contract RedeemTest is DeployBase, TroveBase {
         assertEq(collateralMock.balanceOf(user3), expectedColl);
     }
 
-    /** utils */
+    /**
+     * utils
+     */
     function _openTrove(address caller, uint256 collateralAmt, uint256 debtAmt) internal {
         TroveBase.openTrove(
             borrowerOperationsProxy(),

@@ -10,7 +10,7 @@ interface Transaction {
     arguments: string[]
 }
 
-const contractName = 'DebtToken'
+const contractName = 'DebtTokenWithLz'
 
 // get the contract address from broadcast(forge) recordings
 const getContractAddress = (deployFile: string, contract: string, chainId: number, timestamp?: number) => {
@@ -51,9 +51,9 @@ const deploy: DeployFunction = async (hre) => {
     console.log(`Network: ${hre.network.name}`)
     console.log(`Deployer: ${deployer}`)
 
-    const artifact = await deployments.getExtendedArtifact('DebtToken')
-    const debtImpl = getContractAddress('Deploy', 'DebtToken', hre.network.config.chainId!)
-    console.log(`DebtToken implementation address: ${debtImpl}`)
+    const artifact = await deployments.getExtendedArtifact('DebtTokenWithLz')
+    const debtImpl = getContractAddress('Deploy', 'DebtTokenWithLz', hre.network.config.chainId!)
+    console.log(`DebtTokenWithLz implementation address: ${debtImpl}`)
     const debtTokenAddr = getProxyAddress('Deploy', 'ERC1967Proxy', debtImpl, hre.network.config.chainId!)
 
     const proxyDeployments = {
@@ -62,7 +62,7 @@ const deploy: DeployFunction = async (hre) => {
     }
 
     // save the contract data to the deployments folder
-    await save('DebtToken', proxyDeployments)
+    await save('DebtTokenWithLz', proxyDeployments)
 }
 
 deploy.tags = [contractName]

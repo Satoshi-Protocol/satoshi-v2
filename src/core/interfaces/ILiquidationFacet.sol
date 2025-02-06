@@ -1,41 +1,62 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ICoreFacet} from "./ICoreFacet.sol";
-import {ITroveManager} from "./ITroveManager.sol";
+import { ICoreFacet } from "./ICoreFacet.sol";
+import { ITroveManager } from "./ITroveManager.sol";
 
 /// @notice Represents values related to a Trove Manager
 struct TroveManagerValues {
-    uint256 price; ///< The price of the collateral
-    uint256 MCR; ///< Minimum Collateral Ratio
-    bool sunsetting; ///< Indicates if the Trove Manager is being phased out
+    uint256 price;
+    ///< The price of the collateral
+    uint256 MCR;
+    ///< Minimum Collateral Ratio
+    bool sunsetting;
 }
+///< Indicates if the Trove Manager is being phased out
 
 /// @notice Represents values involved in a liquidation process
 struct LiquidationValues {
-    uint256 entireTroveDebt; ///< Total debt of the trove
-    uint256 entireTroveColl; ///< Total collateral of the trove
-    uint256 collGasCompensation; ///< Collateral compensation for gas
-    uint256 debtGasCompensation; ///< Debt compensation for gas
-    uint256 debtToOffset; ///< Debt to be offset
-    uint256 collToSendToSP; ///< Collateral to send to Stability Pool
-    uint256 debtToRedistribute; ///< Debt to redistribute
-    uint256 collToRedistribute; ///< Collateral to redistribute
-    uint256 collSurplus; ///< Surplus collateral
+    uint256 entireTroveDebt;
+    ///< Total debt of the trove
+    uint256 entireTroveColl;
+    ///< Total collateral of the trove
+    uint256 collGasCompensation;
+    ///< Collateral compensation for gas
+    uint256 debtGasCompensation;
+    ///< Debt compensation for gas
+    uint256 debtToOffset;
+    ///< Debt to be offset
+    uint256 collToSendToSP;
+    ///< Collateral to send to Stability Pool
+    uint256 debtToRedistribute;
+    ///< Debt to redistribute
+    uint256 collToRedistribute;
+    ///< Collateral to redistribute
+    uint256 collSurplus;
 }
+///< Surplus collateral
 
 /// @notice Represents total values involved in a sequence of liquidations
 struct LiquidationTotals {
-    uint256 totalCollInSequence; ///< Total collateral in the sequence
-    uint256 totalDebtInSequence; ///< Total debt in the sequence
-    uint256 totalCollGasCompensation; ///< Total collateral gas compensation
-    uint256 totalDebtGasCompensation; ///< Total debt gas compensation
-    uint256 totalDebtToOffset; ///< Total debt to offset
-    uint256 totalCollToSendToSP; ///< Total collateral to send to Stability Pool
-    uint256 totalDebtToRedistribute; ///< Total debt to redistribute
-    uint256 totalCollToRedistribute; ///< Total collateral to redistribute
-    uint256 totalCollSurplus; ///< Total collateral surplus
+    uint256 totalCollInSequence;
+    ///< Total collateral in the sequence
+    uint256 totalDebtInSequence;
+    ///< Total debt in the sequence
+    uint256 totalCollGasCompensation;
+    ///< Total collateral gas compensation
+    uint256 totalDebtGasCompensation;
+    ///< Total debt gas compensation
+    uint256 totalDebtToOffset;
+    ///< Total debt to offset
+    uint256 totalCollToSendToSP;
+    ///< Total collateral to send to Stability Pool
+    uint256 totalDebtToRedistribute;
+    ///< Total debt to redistribute
+    uint256 totalCollToRedistribute;
+    ///< Total collateral to redistribute
+    uint256 totalCollSurplus;
 }
+///< Total collateral surplus
 
 /// @title ILiquidationFacet
 /// @notice Interface for liquidation-related functions and events

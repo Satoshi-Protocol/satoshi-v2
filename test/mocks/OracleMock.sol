@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {AggregatorV3Interface} from "../../src/priceFeed/AggregatorV3Interface.sol";
-import {IPriceFeed} from "../../src/priceFeed/IPriceFeed.sol";
+import { AggregatorV3Interface } from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
+import { IPriceFeed } from "../../src/priceFeed/interfaces/IPriceFeed.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 struct RoundData {
     int256 answer;
@@ -26,8 +26,8 @@ contract OracleMock is AggregatorV3Interface, IPriceFeed, Ownable {
     constructor(uint8 decimals_, uint256 version_) Ownable(msg.sender) {
         _decimals = decimals_;
         _version = version_;
-        maxTimeThreshold = 86400;
-        emit MaxTimeThresholdUpdated(86400);
+        maxTimeThreshold = 86_400;
+        emit MaxTimeThresholdUpdated(86_400);
     }
 
     function description() external pure override returns (string memory) {

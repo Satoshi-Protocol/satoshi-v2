@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20Metadata} from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
-import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {ISortedTroves} from "../interfaces/ISortedTroves.sol";
-import {IMultiCollateralHintHelpers} from "./interfaces/IMultiCollateralHintHelpers.sol";
-import {SatoshiMath} from "../../library/SatoshiMath.sol";
-import {Config} from "../Config.sol";
+import { SatoshiMath } from "../../library/SatoshiMath.sol";
+import { Config } from "../Config.sol";
+import { IBorrowerOperationsFacet } from "../interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../interfaces/ICoreFacet.sol";
+import { ISortedTroves } from "../interfaces/ISortedTroves.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+import { IMultiCollateralHintHelpers } from "./interfaces/IMultiCollateralHintHelpers.sol";
+import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 
 /**
  * @title Multiple Collateral Hint Helpers Contract
@@ -41,7 +42,12 @@ contract MultiCollateralHintHelpers is IMultiCollateralHintHelpers {
      * will leave it uncapped.
      */
 
-    function getRedemptionHints(ITroveManager troveManager, uint256 _debtAmount, uint256 _price, uint256 _maxIterations)
+    function getRedemptionHints(
+        ITroveManager troveManager,
+        uint256 _debtAmount,
+        uint256 _price,
+        uint256 _maxIterations
+    )
         external
         view
         returns (address firstRedemptionHint, uint256 partialRedemptionHintNICR, uint256 truncatedDebtAmount)
@@ -67,7 +73,7 @@ contract MultiCollateralHintHelpers is IMultiCollateralHintHelpers {
         uint256 minNetDebt = IBorrowerOperationsFacet(satoshiXApp).minNetDebt();
         while (currentTroveuser != address(0) && remainingDebt > 0 && _maxIterations-- > 0) {
             (uint256 debt, uint256 coll,,) = troveManager.getEntireDebtAndColl(currentTroveuser);
-            uint256 netDebt = SatoshiMath._getNetDebt(debt);
+            uint256 netDebt = SatoshiMath._getNetDebt(debt, ICoreFacet(satoshiXApp).gasCompensation());
 
             if (netDebt > remainingDebt) {
                 if (netDebt > minNetDebt) {
@@ -79,7 +85,8 @@ contract MultiCollateralHintHelpers is IMultiCollateralHintHelpers {
                         );
                     uint256 newDebt = netDebt - maxRedeemableDebt;
 
-                    uint256 compositeDebt = SatoshiMath._getCompositeDebt(newDebt);
+                    uint256 compositeDebt =
+                        SatoshiMath._getCompositeDebt(newDebt, ICoreFacet(satoshiXApp).gasCompensation());
                     partialRedemptionHintNICR = SatoshiMath._computeNominalCR(newColl, compositeDebt);
 
                     remainingDebt = remainingDebt - maxRedeemableDebt;
@@ -104,7 +111,12 @@ contract MultiCollateralHintHelpers is IMultiCollateralHintHelpers {
     Submitting numTrials = k * sqrt(length), with k = 15 makes it very, very likely that the ouput address will
     be <= sqrt(length) positions away from the correct insert position.
     */
-    function getApproxHint(ITroveManager troveManager, uint256 _CR, uint256 _numTrials, uint256 _inputRandomSeed)
+    function getApproxHint(
+        ITroveManager troveManager,
+        uint256 _CR,
+        uint256 _numTrials,
+        uint256 _inputRandomSeed
+    )
         external
         view
         returns (address hintAddress, uint256 diff, uint256 latestRandomSeed)

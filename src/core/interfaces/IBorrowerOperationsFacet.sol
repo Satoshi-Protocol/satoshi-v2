@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ITroveManager} from "./ITroveManager.sol";
+import { ITroveManager } from "./ITroveManager.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 enum BorrowerOperation {
     openTrove,
@@ -39,7 +39,8 @@ interface IBorrowerOperationsFacet {
         uint256 _collateralAmount,
         address _upperHint,
         address _lowerHint
-    ) external;
+    )
+        external;
 
     function adjustTrove(
         ITroveManager _troveManager,
@@ -51,7 +52,8 @@ interface IBorrowerOperationsFacet {
         bool _isDebtIncrease,
         address _upperHint,
         address _lowerHint
-    ) external;
+    )
+        external;
 
     function closeTrove(ITroveManager _troveManager, address _account) external;
 
@@ -69,7 +71,8 @@ interface IBorrowerOperationsFacet {
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external;
+    )
+        external;
 
     function removeTroveManager(ITroveManager _troveManager) external;
 
@@ -79,7 +82,8 @@ interface IBorrowerOperationsFacet {
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external;
+    )
+        external;
 
     function setMinNetDebt(uint256 _minNetDebt) external;
 
@@ -89,7 +93,8 @@ interface IBorrowerOperationsFacet {
         uint256 _collWithdrawal,
         address _upperHint,
         address _lowerHint
-    ) external;
+    )
+        external;
 
     function withdrawDebt(
         ITroveManager _troveManager,
@@ -98,7 +103,8 @@ interface IBorrowerOperationsFacet {
         uint256 _debtAmount,
         address _upperHint,
         address _lowerHint
-    ) external;
+    )
+        external;
 
     function checkRecoveryMode(uint256 TCR) external pure returns (bool);
 

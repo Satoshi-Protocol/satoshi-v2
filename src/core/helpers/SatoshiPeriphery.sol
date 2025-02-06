@@ -1,28 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { IPriceFeed } from "../../priceFeed/interfaces/IPriceFeed.sol";
+import { Config } from "../Config.sol";
+import { DebtTokenWithLz } from "../DebtTokenWithLz.sol";
+import { IBorrowerOperationsFacet } from "../interfaces/IBorrowerOperationsFacet.sol";
+import { ICoreFacet } from "../interfaces/ICoreFacet.sol";
+import { ILiquidationFacet } from "../interfaces/ILiquidationFacet.sol";
+import { ITroveManager } from "../interfaces/ITroveManager.sol";
+
+import { IDebtToken } from "../interfaces/IDebtToken.sol";
+import { ISatoshiPeriphery, LzSendParam } from "./interfaces/ISatoshiPeriphery.sol";
+import { IWETH } from "./interfaces/IWETH.sol";
 import {
     IOFT,
-    SendParam,
+    MessagingFee,
+    MessagingReceipt,
+    OFTFeeDetail,
     OFTLimit,
     OFTReceipt,
-    OFTFeeDetail,
-    MessagingReceipt,
-    MessagingFee
-} from "@layerzerolabs-oapp-upgradeable/contracts/oft/interfaces/IOFT.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {IWETH} from "./interfaces/IWETH.sol";
-import {IBorrowerOperationsFacet} from "../interfaces/IBorrowerOperationsFacet.sol";
-import {ILiquidationFacet} from "../interfaces/ILiquidationFacet.sol";
-import {ITroveManager} from "../interfaces/ITroveManager.sol";
-import {DebtToken} from "../DebtToken.sol";
-import {ISatoshiPeriphery, LzSendParam} from "./interfaces/ISatoshiPeriphery.sol";
-import {IPriceFeed} from "../../priceFeed/IPriceFeed.sol";
-import {Config} from "../Config.sol";
+    SendParam
+} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title Satoshi Borrower Operations Router
@@ -30,16 +33,16 @@ import {Config} from "../Config.sol";
  */
 contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable {
     using SafeERC20 for IERC20;
-    using SafeERC20 for DebtToken;
+    using SafeERC20 for DebtTokenWithLz;
 
-    DebtToken public debtToken;
+    DebtTokenWithLz public debtToken;
     address public xApp;
 
-    function initialize(DebtToken _debtToken, address _xApp, address _owner) external initializer {
+    function initialize(IDebtToken _debtToken, address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
         if (_xApp == address(0)) revert InvalidZeroAddress();
 
-        debtToken = _debtToken;
+        debtToken = DebtTokenWithLz(address(_debtToken));
         xApp = _xApp;
 
         __Ownable_init(_owner);
@@ -69,7 +72,10 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external payable {
+    )
+        external
+        payable
+    {
         IERC20 collateralToken = troveManager.collateralToken();
 
         _beforeAddColl(collateralToken, _collAmount);
@@ -92,7 +98,12 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @param _collAmount The amount of additional collateral
     /// @param _upperHint The upper hint (for querying the position of the sorted trove)
     /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
-    function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint)
+    function addColl(
+        ITroveManager troveManager,
+        uint256 _collAmount,
+        address _upperHint,
+        address _lowerHint
+    )
         external
     {
         IERC20 collateralToken = troveManager.collateralToken();
@@ -109,7 +120,12 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @param _collWithdrawal The amount of collateral to withdraw
     /// @param _upperHint The upper hint (for querying the position of the sorted trove)
     /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
-    function withdrawColl(ITroveManager troveManager, uint256 _collWithdrawal, address _upperHint, address _lowerHint)
+    function withdrawColl(
+        ITroveManager troveManager,
+        uint256 _collWithdrawal,
+        address _upperHint,
+        address _lowerHint
+    )
         external
     {
         IERC20 collateralToken = troveManager.collateralToken();
@@ -137,7 +153,10 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external payable {
+    )
+        external
+        payable
+    {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
         IBorrowerOperationsFacet(xApp).withdrawDebt(
             troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
@@ -154,7 +173,12 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @param _debtAmount The amount of debt to repay
     /// @param _upperHint The upper hint (for querying the position of the sorted trove)
     /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
-    function repayDebt(ITroveManager troveManager, uint256 _debtAmount, address _upperHint, address _lowerHint)
+    function repayDebt(
+        ITroveManager troveManager,
+        uint256 _debtAmount,
+        address _upperHint,
+        address _lowerHint
+    )
         external
     {
         _beforeRepayDebt(_debtAmount);
@@ -173,7 +197,10 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         address _upperHint,
         address _lowerHint,
         LzSendParam calldata _lzSendParam
-    ) external payable {
+    )
+        external
+        payable
+    {
         if (_collDeposit != 0 && _collWithdrawal != 0) revert CannotWithdrawAndAddColl();
 
         IERC20 collateralToken = troveManager.collateralToken();
@@ -216,7 +243,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @param troveManager The TroveManager contract
     function closeTrove(ITroveManager troveManager) external {
         (uint256 collAmount, uint256 debtAmount) = troveManager.getTroveCollAndDebt(msg.sender);
-        uint256 netDebtAmount = debtAmount - Config.DEBT_GAS_COMPENSATION;
+        uint256 netDebtAmount = debtAmount - ICoreFacet(xApp).gasCompensation();
         _beforeRepayDebt(netDebtAmount);
 
         IERC20 collateralToken = troveManager.collateralToken();
@@ -230,44 +257,15 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         _afterWithdrawColl(collateralToken, userCollAmount);
     }
 
-    function redeemCollateral(
-        ITroveManager troveManager,
-        uint256 _debtAmount,
-        address _firstRedemptionHint,
-        address _upperPartialRedemptionHint,
-        address _lowerPartialRedemptionHint,
-        uint256 _partialRedemptionHintNICR,
-        uint256 _maxIterations,
-        uint256 _maxFeePercentage
-    ) external {
-        IERC20 collateralToken = troveManager.collateralToken();
-
-        _beforeRepayDebt(_debtAmount);
-
-        uint256 collTokenBalanceBefore = collateralToken.balanceOf(address(this));
-
-        troveManager.redeemCollateral(
-            _debtAmount,
-            _firstRedemptionHint,
-            _upperPartialRedemptionHint,
-            _lowerPartialRedemptionHint,
-            _partialRedemptionHintNICR,
-            _maxIterations,
-            _maxFeePercentage
-        );
-
-        uint256 collTokenBalanceAfter = collateralToken.balanceOf(address(this));
-        uint256 userCollAmount = collTokenBalanceAfter - collTokenBalanceBefore;
-
-        _afterWithdrawColl(collateralToken, userCollAmount);
-    }
-
     function liquidateTroves(
         ITroveManager troveManager,
         uint256 maxTrovesToLiquidate,
         uint256 maxICR,
         LzSendParam calldata _lzSendParam
-    ) external payable {
+    )
+        external
+        payable
+    {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
         uint256 collTokenBalanceBefore = troveManager.collateralToken().balanceOf(address(this));
 
@@ -307,8 +305,11 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         if (debtAmount == 0) return;
         address account = msg.sender;
 
-        // In current chain
         if (lzSendParam.dstEid == 0) {
+            // In current chain
+            debtToken.safeTransfer(account, debtAmount);
+        } else if (debtToken.peers(lzSendParam.dstEid) == 0) {
+            // If the dstEid is not supported, just transfer the debt token to the msg sender
             debtToken.safeTransfer(account, debtAmount);
         } else {
             // Step 1: Prepare the SendParam
@@ -331,7 +332,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
             require(expectFee.lzTokenFee == lzSendParam.fee.lzTokenFee, "SatoshiPeriphery: lzTokenFee incorrect");
 
             // Step 3: Send the Debt tokens to the other chain
-            debtToken.send{value: msg.value}(_sendParam, lzSendParam.fee, account);
+            debtToken.send{ value: msg.value }(_sendParam, lzSendParam.fee, account);
         }
     }
 

@@ -17,7 +17,10 @@ contract OFTComposerMock is IOAppComposer {
         bytes calldata _message,
         address _executor,
         bytes calldata /*_extraData*/
-    ) external payable {
+    )
+        external
+        payable
+    {
         from = _from;
         guid = _guid;
         message = _message;

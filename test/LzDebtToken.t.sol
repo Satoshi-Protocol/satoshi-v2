@@ -1,19 +1,25 @@
-// Forge imports
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
 import "forge-std/console.sol";
 
 // DevTools imports
-import {IDebtToken} from "../src/core/interfaces/IDebtToken.sol";
-import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
-import {ICoreFacet} from "../src/core/interfaces/ICoreFacet.sol";
-import {FlashloanTester} from "../src/test/FlashloanTester.sol";
-import {DebtToken} from "../src/core/DebtToken.sol";
-import {Config} from "../src/core/Config.sol";
 
-import {OptionsBuilder} from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
-import {IOFT, SendParam, OFTReceipt} from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
-import {MessagingFee, MessagingReceipt} from "@layerzerolabs/oft-evm/contracts/OFTCore.sol";
-import {TestHelperOz5} from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
-import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
+import { Config } from "../src/core/Config.sol";
+import { DebtTokenWithLz } from "../src/core/DebtTokenWithLz.sol";
+import { ICoreFacet } from "../src/core/interfaces/ICoreFacet.sol";
+import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
+import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+import { FlashloanTester } from "../src/test/FlashloanTester.sol";
+
+import { DEBT_GAS_COMPENSATION } from "./TestConfig.sol";
+
+import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
+
+import { MessagingFee, MessagingReceipt } from "@layerzerolabs/oft-evm/contracts/OFTCore.sol";
+import { IOFT, OFTReceipt, SendParam } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
+import { TestHelperOz5 } from "@layerzerolabs/test-devtools-evm-foundry/contracts/TestHelperOz5.sol";
+import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract LzDebtTokenTest is TestHelperOz5 {
     using OptionsBuilder for bytes;
@@ -39,14 +45,18 @@ contract LzDebtTokenTest is TestHelperOz5 {
         super.setUp();
         setUpEndpoints(2, LibraryType.UltraLightNode);
 
-        address debtTokenImplA = address(new DebtToken(endpoints[aEid]));
-        bytes memory dataA =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner));
+        address debtTokenImplA = address(new DebtTokenWithLz(endpoints[aEid]));
+        bytes memory dataA = abi.encodeCall(
+            IDebtToken.initialize,
+            (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner, DEBT_GAS_COMPENSATION)
+        );
         debtTokenA = IDebtToken(address(new ERC1967Proxy(debtTokenImplA, dataA)));
 
-        address debtTokenImplB = address(new DebtToken(endpoints[bEid]));
-        bytes memory dataB =
-            abi.encodeCall(IDebtToken.initialize, (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner));
+        address debtTokenImplB = address(new DebtTokenWithLz(endpoints[bEid]));
+        bytes memory dataB = abi.encodeCall(
+            IDebtToken.initialize,
+            (DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, address(satoshiXApp), satoshiXApp, owner, DEBT_GAS_COMPENSATION)
+        );
         debtTokenB = IDebtToken(address(new ERC1967Proxy(debtTokenImplB, dataB)));
 
         address[] memory ofts = new address[](2);
@@ -68,7 +78,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 beforeUserBDebtB = debtTokenB.balanceOf(userB);
 
         // Quote send to get fee
-        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200000, 0);
+        bytes memory options = OptionsBuilder.newOptions().addExecutorLzReceiveOption(200_000, 0);
         SendParam memory sendParam =
             SendParam(bEid, addressToBytes32(userB), tokensToSend, tokensToSend, options, "", "");
         MessagingFee memory fee = _debtTokenA.quoteSend(sendParam, false);
@@ -76,8 +86,8 @@ contract LzDebtTokenTest is TestHelperOz5 {
         vm.expectEmit(false, true, false, false);
         emit IOFT.OFTSent(bytes32(0), 0, userA, tokensToSend, tokensToSend);
         vm.prank(userA);
-        (MessagingReceipt memory msgReceipt, OFTReceipt memory oftReceipt) =
-            _debtTokenA.send{value: fee.nativeFee}(sendParam, fee, payable(address(this)));
+        (, OFTReceipt memory oftReceipt) =
+            _debtTokenA.send{ value: fee.nativeFee }(sendParam, fee, payable(address(this)));
         verifyPackets(bEid, addressToBytes32(address(debtTokenB))); // Manually trigger `lzReceive`
 
         uint256 afterUserADebtA = debtTokenA.balanceOf(userA);
@@ -106,13 +116,13 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 afterUserAmount = debtTokenA.balanceOf(userA);
         uint256 afterAppAmount = debtTokenA.balanceOf(satoshiXApp);
         assertEq(amount, afterUserAmount - beforeUserAmount);
-        assertEq(Config.DEBT_GAS_COMPENSATION, afterAppAmount - beforeAppAmount);
+        assertEq(DEBT_GAS_COMPENSATION, afterAppAmount - beforeAppAmount);
     }
 
     function test_burnWithGasCompensation() external {
         uint256 amount = 10 ether;
         deal(address(debtTokenA), userA, amount);
-        deal(address(debtTokenA), satoshiXApp, Config.DEBT_GAS_COMPENSATION);
+        deal(address(debtTokenA), satoshiXApp, DEBT_GAS_COMPENSATION);
         uint256 beforeUserAmount = debtTokenA.balanceOf(userA);
         uint256 beforeAppAmount = debtTokenA.balanceOf(satoshiXApp);
 
@@ -122,7 +132,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 afterUserAmount = debtTokenA.balanceOf(userA);
         uint256 afterAppAmount = debtTokenA.balanceOf(satoshiXApp);
         assertEq(amount, beforeUserAmount - afterUserAmount);
-        assertEq(Config.DEBT_GAS_COMPENSATION, beforeAppAmount - afterAppAmount);
+        assertEq(DEBT_GAS_COMPENSATION, beforeAppAmount - afterAppAmount);
     }
 
     function test_burn() external {
@@ -139,12 +149,12 @@ contract LzDebtTokenTest is TestHelperOz5 {
         assertEq(amount, beforeUserAmount - afterUserAmount);
     }
 
-    function test_sendToSP() external {
+    function test_sendToXApp() external {
         uint256 amount = 10 ether;
         uint256 beforeUserAmount = debtTokenA.balanceOf(userA);
 
         vm.prank(satoshiXApp);
-        debtTokenA.sendToSP(userA, amount);
+        debtTokenA.sendToXApp(userA, amount);
 
         uint256 afterUserAmount = debtTokenA.balanceOf(userA);
         assertEq(amount, beforeUserAmount - afterUserAmount);
@@ -220,7 +230,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
     // Test the `DEBT_GAS_COMPENSATION` function
     function test_DEBT_GAS_COMPENSATION() external {
         uint256 compensation = debtTokenA.DEBT_GAS_COMPENSATION();
-        assertEq(compensation, Config.DEBT_GAS_COMPENSATION, "Gas compensation should match config");
+        assertEq(compensation, DEBT_GAS_COMPENSATION, "Gas compensation should match config");
     }
 
     function test_maxFlashLoan() external {
@@ -241,7 +251,7 @@ contract LzDebtTokenTest is TestHelperOz5 {
         uint256 debtFlashFee = debtTokenA.flashFee(address(debtTokenA), amount);
 
         assertEq(tokenFlashFee, 0, "Flash fee should match config");
-        assertEq(debtFlashFee, (amount * debtTokenA.FLASH_LOAN_FEE()) / 10000, "Flash fee should match config");
+        assertEq(debtFlashFee, (amount * debtTokenA.FLASH_LOAN_FEE()) / 10_000, "Flash fee should match config");
     }
 
     /// ---- FAIL TESTS ---- ///
