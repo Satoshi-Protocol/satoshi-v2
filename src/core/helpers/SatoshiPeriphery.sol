@@ -305,8 +305,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         if (debtAmount == 0) return;
         address account = msg.sender;
 
-        // In current chain
         if (lzSendParam.dstEid == 0) {
+            // In current chain
             debtToken.safeTransfer(account, debtAmount);
         } else if (debtToken.peers(lzSendParam.dstEid) == 0) {
             // If the dstEid is not supported, just transfer the debt token to the msg sender
