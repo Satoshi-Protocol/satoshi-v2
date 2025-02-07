@@ -45,16 +45,14 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
             revert INexusYieldManagerFacet.InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
         }
         AssetConfig storage assetConfig = s.assetConfigs[asset];
-        assetConfig.decimals = assetConfig_.decimals;
         assetConfig.feeIn = assetConfig_.feeIn;
         assetConfig.feeOut = assetConfig_.feeOut;
         assetConfig.debtTokenMintCap = assetConfig_.debtTokenMintCap;
         assetConfig.dailyDebtTokenMintCap = assetConfig_.dailyDebtTokenMintCap;
-        assetConfig.oracle = assetConfig_.oracle;
-        assetConfig.isUsingOracle = assetConfig_.isUsingOracle;
         assetConfig.swapWaitingPeriod = assetConfig_.swapWaitingPeriod;
         assetConfig.maxPrice = assetConfig_.maxPrice;
         assetConfig.minPrice = assetConfig_.minPrice;
+        assetConfig.isUsingOracle = assetConfig_.isUsingOracle;
         s.isAssetSupported[asset] = true;
 
         emit AssetConfigSetting(asset, assetConfig_);
@@ -506,7 +504,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         }
 
         // get price with decimals 18
-        uint256 price = s.assetConfigs[asset].oracle.fetchPrice(IERC20(asset));
+        uint256 price = IPriceFeedAggregatorFacet(address(this)).fetchPrice(IERC20(asset));
 
         if (price > assetConfig.maxPrice || price < assetConfig.minPrice) {
             revert InvalidPrice(price);
@@ -577,12 +575,6 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     }
 
     /* Getters */
-
-    // @notice Get the oracle for the given asset.
-    function oracle(address asset) public view returns (IPriceFeedAggregatorFacet) {
-        AppStorage.Layout storage s = AppStorage.layout();
-        return s.assetConfigs[asset].oracle;
-    }
 
     // @notice Get the feeIn for the given asset.
     function feeIn(address asset) public view returns (uint256) {

@@ -331,7 +331,7 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(nexusYieldManagerFacet) == address(0)); // check if contract is not deployed
         nexusYieldManagerFacet = INexusYieldManagerFacet(address(new NexusYieldManagerFacet()));
-        bytes4[] memory selectors = new bytes4[](29);
+        bytes4[] memory selectors = new bytes4[](28);
         selectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
         selectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
         selectors[2] = INexusYieldManagerFacet.swapIn.selector;
@@ -347,20 +347,19 @@ abstract contract DeployBase is Test {
         selectors[12] = INexusYieldManagerFacet.withdraw.selector;
         selectors[13] = INexusYieldManagerFacet.convertDebtTokenToAssetAmount.selector;
         selectors[14] = INexusYieldManagerFacet.convertAssetToDebtTokenAmount.selector;
-        selectors[15] = INexusYieldManagerFacet.oracle.selector;
-        selectors[16] = INexusYieldManagerFacet.feeIn.selector;
-        selectors[17] = INexusYieldManagerFacet.feeOut.selector;
-        selectors[18] = INexusYieldManagerFacet.debtTokenMintCap.selector;
-        selectors[19] = INexusYieldManagerFacet.dailyDebtTokenMintCap.selector;
-        selectors[20] = INexusYieldManagerFacet.debtTokenMinted.selector;
-        selectors[21] = INexusYieldManagerFacet.isUsingOracle.selector;
-        selectors[22] = INexusYieldManagerFacet.swapWaitingPeriod.selector;
-        selectors[23] = INexusYieldManagerFacet.debtTokenDailyMintCapRemain.selector;
-        selectors[24] = INexusYieldManagerFacet.pendingWithdrawal.selector;
-        selectors[25] = INexusYieldManagerFacet.pendingWithdrawals.selector;
-        selectors[26] = INexusYieldManagerFacet.isNymPaused.selector;
-        selectors[27] = INexusYieldManagerFacet.dailyMintCount.selector;
-        selectors[28] = INexusYieldManagerFacet.isAssetSupported.selector;
+        selectors[15] = INexusYieldManagerFacet.feeIn.selector;
+        selectors[16] = INexusYieldManagerFacet.feeOut.selector;
+        selectors[17] = INexusYieldManagerFacet.debtTokenMintCap.selector;
+        selectors[18] = INexusYieldManagerFacet.dailyDebtTokenMintCap.selector;
+        selectors[19] = INexusYieldManagerFacet.debtTokenMinted.selector;
+        selectors[20] = INexusYieldManagerFacet.isUsingOracle.selector;
+        selectors[21] = INexusYieldManagerFacet.swapWaitingPeriod.selector;
+        selectors[22] = INexusYieldManagerFacet.debtTokenDailyMintCapRemain.selector;
+        selectors[23] = INexusYieldManagerFacet.pendingWithdrawal.selector;
+        selectors[24] = INexusYieldManagerFacet.pendingWithdrawals.selector;
+        selectors[25] = INexusYieldManagerFacet.isNymPaused.selector;
+        selectors[26] = INexusYieldManagerFacet.dailyMintCount.selector;
+        selectors[27] = INexusYieldManagerFacet.isAssetSupported.selector;
         vm.stopPrank();
         return (address(nexusYieldManagerFacet), selectors);
     }

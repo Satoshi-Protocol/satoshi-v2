@@ -116,20 +116,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
         vm.startPrank(OWNER);
         nexusYieldProxy.setAssetConfig(
-            address(collateral),
-            AssetConfig(
-                priceFeedAggregatorProxy(),
-                10,
-                10,
-                10_000e18,
-                1000e18,
-                0,
-                false,
-                3 days,
-                1.1e18,
-                0.9e18,
-                uint256(collateral.decimals())
-            )
+            address(collateral), AssetConfig(10, 10, 10_000e18, 1000e18, 0, 3 days, 1.1e18, 0.9e18, false)
         );
         debtTokenProxy().rely(address(nexusYieldProxy));
         rewardManagerProxy().setWhitelistCaller(address(nexusYieldProxy), true);
@@ -228,20 +215,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
     function test_swapInZeroFee() public {
         vm.startPrank(OWNER);
         nexusYieldProxy.setAssetConfig(
-            address(collateral),
-            AssetConfig(
-                priceFeedAggregatorProxy(),
-                0,
-                0,
-                10_000e18,
-                1000e18,
-                0,
-                false,
-                3 days,
-                1.1e18,
-                0.9e18,
-                uint256(collateral.decimals())
-            )
+            address(collateral), AssetConfig(0, 0, 10_000e18, 1000e18, 0, 3 days, 1.1e18, 0.9e18, false)
         );
 
         deal(address(collateralMock), user1, 1000e18);
@@ -425,42 +399,16 @@ contract NexusYieldTest is DeployBase, TroveBase {
         vm.startPrank(OWNER);
         uint256 feeIn = 100_000;
         uint256 feeOut = 10;
-        AssetConfig memory config = AssetConfig(
-            priceFeedAggregatorProxy(),
-            feeIn,
-            feeOut,
-            10_000e18,
-            1000e18,
-            0,
-            false,
-            3 days,
-            1.1e18,
-            0.9e18,
-            uint256(collateral.decimals())
-        );
+        AssetConfig memory config = AssetConfig(feeIn, feeOut, 10_000e18, 1000e18, 0, 3 days, 1.1e18, 0.9e18, false);
         vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.InvalidFee.selector, feeIn, feeOut));
         nexusYieldProxy.setAssetConfig(address(collateral), config);
         nexusYieldProxy.setAssetConfig(
-            address(collateral),
-            AssetConfig(
-                priceFeedAggregatorProxy(),
-                10,
-                10,
-                10_000e18,
-                1000e18,
-                0,
-                false,
-                3 days,
-                1.1e18,
-                0.9e18,
-                uint256(collateral.decimals())
-            )
+            address(collateral), AssetConfig(10, 10, 10_000e18, 1000e18, 0, 3 days, 1.1e18, 0.9e18, false)
         );
         assertEq(nexusYieldProxy.feeIn(address(collateralMock)), 10);
         assertEq(nexusYieldProxy.feeOut(address(collateralMock)), 10);
         assertEq(nexusYieldProxy.debtTokenMintCap(address(collateralMock)), 10_000e18);
         assertEq(nexusYieldProxy.dailyDebtTokenMintCap(address(collateralMock)), 1000e18);
-        assertEq(address(nexusYieldProxy.oracle(address(collateralMock))), address(priceFeedAggregatorProxy()));
         assertFalse(nexusYieldProxy.isUsingOracle(address(collateralMock)));
         assertEq(nexusYieldProxy.swapWaitingPeriod(address(collateralMock)), 3 days);
         vm.stopPrank();
@@ -514,20 +462,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
         vm.startPrank(OWNER);
         nexusYieldProxy.setAssetConfig(
-            address(collateral),
-            AssetConfig(
-                priceFeedAggregatorProxy(),
-                10,
-                10,
-                10_000e18,
-                1000e18,
-                0,
-                true,
-                3 days,
-                1.1e18,
-                0.9e18,
-                uint256(collateral.decimals())
-            )
+            address(collateral), AssetConfig(10, 10, 10_000e18, 1000e18, 0, 3 days, 1.1e18, 0.9e18, true)
         );
 
         uint256 amount = 100e18;
@@ -549,20 +484,7 @@ contract NexusYieldTest is DeployBase, TroveBase {
 
         vm.startPrank(OWNER);
         nexusYieldProxy.setAssetConfig(
-            address(collateral),
-            AssetConfig(
-                priceFeedAggregatorProxy(),
-                10,
-                10,
-                10_000e18,
-                1000e18,
-                0,
-                true,
-                3 days,
-                1.1e18,
-                0.9e18,
-                uint256(collateral.decimals())
-            )
+            address(collateral), AssetConfig(10, 10, 10_000e18, 1000e18, 0, 3 days, 1.1e18, 0.9e18, true)
         );
 
         uint256 amount = 100e18;

@@ -265,7 +265,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         public
     {
         require(!sunsetting, "Cannot change after sunset");
-        require(_MCR <= Config.CCR && _MCR >= 1_100_000_000_000_000_000, "MCR cannot be > CCR or < 110%");
+        require(_MCR >= 1_100_000_000_000_000_000, "MCR cannot be < 110%");
         if (minuteDecayFactor != 0) {
             require(msg.sender == owner(), "Only owner");
         }

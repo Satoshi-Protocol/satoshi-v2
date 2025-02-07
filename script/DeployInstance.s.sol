@@ -94,6 +94,8 @@ contract DeployInstanceScript is Script {
         // set farming params
         _setFarmingParam(troveManagerBeaconProxy);
 
+        console.log("Collateral: address:", address(collateral));
+        console.log("PriceFeed: address:", address(priceFeed));
         console.log("SortedTrovesBeaconProxy: address:", address(sortedTrovesBeaconProxy));
         console.log("TroveManagerBeaconProxy: address:", address(troveManagerBeaconProxy));
 

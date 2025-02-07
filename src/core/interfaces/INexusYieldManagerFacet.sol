@@ -4,8 +4,6 @@ import { IDebtToken } from "./IDebtToken.sol";
 import { IPriceFeedAggregatorFacet } from "./IPriceFeedAggregatorFacet.sol";
 
 struct AssetConfig {
-    /// The address of ResilientOracle contract wrapped in its interface.
-    IPriceFeedAggregatorFacet oracle;
     /// The incoming stableCoin fee. (Fee for swapIn).
     uint256 feeIn;
     /// The outgoing stableCoin fee. (Fee for swapOut).
@@ -16,16 +14,14 @@ struct AssetConfig {
     uint256 dailyDebtTokenMintCap;
     /// The total amount of debtToken minted through this asset.
     uint256 debtTokenMinted;
-    /// A flag indicating whether the contract is using an oracle or not.
-    bool isUsingOracle;
     /// The time used to wait after schedule the withdrawal.
     uint256 swapWaitingPeriod;
     /// The maximum price of the asset. If the price of the asset exceeds this value, the operation will revert.
     uint256 maxPrice;
     /// The minimum price of the asset. If the price of the asset is less than this value, the operation will revert.
     uint256 minPrice;
-    /// decimals of the asset
-    uint256 decimals;
+    /// A flag indicating whether the contract is using an oracle or not.
+    bool isUsingOracle;
 }
 
 struct ChainConfig {
@@ -248,13 +244,6 @@ interface INexusYieldManagerFacet {
      * @return The equivalent amount of debt tokens.
      */
     function convertAssetToDebtTokenAmount(address asset, uint256 amount) external view returns (uint256);
-
-    /**
-     * @notice Returns the oracle for a specific asset.
-     * @param asset The address of the asset.
-     * @return The oracle interface.
-     */
-    function oracle(address asset) external view returns (IPriceFeedAggregatorFacet);
 
     /**
      * @notice Returns the incoming fee for a specific asset.
