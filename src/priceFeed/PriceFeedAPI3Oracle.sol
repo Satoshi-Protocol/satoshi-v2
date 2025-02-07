@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
 import { IProxy } from "@api3/contracts/api3-server-v1/proxies/interfaces/IProxy.sol";

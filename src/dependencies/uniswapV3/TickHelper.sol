@@ -1,4 +1,4 @@
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import { Tick } from "./Tick.sol";
 import { TickMath } from "./TickMath.sol";

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import "./IStrategy.sol";
 import "./IStrategyManager.sol";

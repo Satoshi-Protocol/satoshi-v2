@@ -5,9 +5,9 @@ address constant OWNER = 0xd3e87B4B76E6F8bFf454AAFc2AD3271C5b317d47;
 address constant GUARDIAN = 0x8B483EBb3abfc25AEC2e88222Bf79D6d0fc44B0B;
 address constant FEE_RECEIVER = 0x4D8a2eae0e8a3e0fDeb1f9270eD5F850BFd4EcBC;
 
-address constant WETH_ADDRESS = 0xfF204e2681A6fA0e2C3FaDe68a1B28fb90E4Fc5F;
+address constant WETH_ADDRESS = 0xB5136FEba197f5fF4B765E5b50c74db717796dcD;
 
-address constant LZ_ENDPOINT = 0x6F475642a6e85809B1c36Fa62763669b1b48DD5B;
+address constant LZ_ENDPOINT = 0xcb566e3B6934Fa77258d68ea18E931fa75e1aaAa;
 
 string constant DEBT_TOKEN_NAME = "Satoshi Stablecoin V2";
 string constant DEBT_TOKEN_SYMBOL = "satUSD";

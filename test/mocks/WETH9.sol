@@ -1,5 +1,5 @@
 // solhint-disable-next-line
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import { IWETH } from "../../src/core/helpers/interfaces/IWETH.sol";
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import { IDIAOracleV2 } from "./interfaces/IDIAOracleV2.sol";
 import { IPriceFeed } from "./interfaces/IPriceFeed.sol";
