@@ -66,57 +66,48 @@ const config: HardhatUserConfig = {
     // @dev: Must add chainId on each network
     // @dev: chainId read by DebtToken deployment script
     networks: {
-        // holesky: {
-        //     eid: EndpointId.HOLESKY_V2_TESTNET,
-        //     url: process.env.RPC_URL_HOLESKY || 'https://ethereum-holesky-rpc.publicnode.com',
-        //     chainId: 17000,
-        //     accounts,
-        // },
-        // 'sepolia-testnet': {
-        //     eid: EndpointId.SEPOLIA_V2_TESTNET,
-        //     url: process.env.RPC_URL_SEPOLIA || 'https://rpc.sepolia.org/',
-        //     chainId: 11155111,
-        //     accounts,
-        // },
+        bevm: {
+            eid: EndpointId.BEVM_V2_MAINNET,
+            url: process.env.RPC_URL_BEVM || 'https://rpc-mainnet-1.bevm.io',
+            chainId: 11501,
+            accounts,
+        },
+        bob: {
+            eid: EndpointId.BOB_V2_MAINNET,
+            url: process.env.RPC_URL_BOB || 'https://bob-mainnet.public.blastapi.io',
+            chainId: 60808,
+            accounts,
+        },
+        bitlayer: {
+            eid: EndpointId.BITLAYER_V2_MAINNET,
+            url: process.env.RPC_URL_BITLAYER || 'https://rpc.bitlayer.org',
+            chainId: 200901,
+            accounts,
+        },
+        'sepolia-testnet': {
+            eid: EndpointId.SEPOLIA_V2_TESTNET,
+            url: process.env.RPC_URL_SEPOLIA || 'https://rpc.sepolia.org/',
+            chainId: 11155111,
+            accounts,
+        },
         'arbitrum-sepolia': {
             eid: EndpointId.ARBSEP_V2_TESTNET, // from @layerzerolabs/lz-definitions
             url: process.env.RPC_URL_ARBITRUM_SEPOLIA || 'https://arbitrum-sepolia.gateway.tenderly.co',
             chainId: 421614,
             accounts,
         },
-        // 'optimism-sepolia': {
-        //     eid: EndpointId.OPTSEP_V2_TESTNET, // from @layerzerolabs/lz-definitions
-        //     url: process.env.RPC_URL_OPTIMISM_SEPOLIA || 'https://optimism-sepolia.gateway.tenderly.co',
-        //     chainId: 11155420,
-        //     accounts,
-        // },
+        'optimism-sepolia': {
+            eid: EndpointId.OPTSEP_V2_TESTNET, // from @layerzerolabs/lz-definitions
+            url: process.env.RPC_URL_OPTIMISM_SEPOLIA || 'https://optimism-sepolia.gateway.tenderly.co',
+            chainId: 11155420,
+            accounts,
+        },
         'base-sepolia': {
             eid: EndpointId.BASESEP_V2_TESTNET, // Ensure this EndpointId exists in @layerzerolabs/lz-definitions
             url: process.env.RPC_URL_BASE || 'https://base-sepolia.infura.io/v3/fcc10c614bc248b8adc9939205d2fd36', // Infura endpoint with API key
             accounts,
         },
 
-        // CoreDAO Testnet Configuration
-        // 'coredao-testnet': {
-        //     eid: EndpointId.COREDAO_V2_TESTNET,
-        //     url: process.env.RPC_URL_COREDAO_V2_TESTNET || 'https://rpc.test.btcs.network',
-        //     accounts,
-        // },
-        // 'base-sepolia': {
-        //     eid: EndpointId.BASE_V2_TESTNET, // from @layerzerolabs/lz-definitions
-        //     url: process.env.RPC_URL_BASE_SEPOLIA || 'https://base-sepolia.gateway.tenderly.co',
-        //     accounts,
-        // },
-        // 'avalanche-testnet': {
-        //     eid: EndpointId.AVALANCHE_V2_TESTNET,
-        //     url: process.env.RPC_URL_FUJI || 'https://rpc.ankr.com/avalanche_fuji',
-        //     accounts,
-        // },
-        // 'amoy-testnet': {
-        //     eid: EndpointId.AMOY_V2_TESTNET,
-        //     url: process.env.RPC_URL_AMOY || 'https://polygon-amoy-bor-rpc.publicnode.com',
-        //     accounts,
-        // },
     },
     namedAccounts: {
         deployer: {

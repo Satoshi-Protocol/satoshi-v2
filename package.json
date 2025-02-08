@@ -35,7 +35,7 @@
     "@babel/core": "^7.23.9",
     "@layerzerolabs/devtools-evm-hardhat": "^1.2.0",
     "@layerzerolabs/eslint-config-next": "~2.3.39",
-    "@layerzerolabs/lz-definitions": "^2.3.39",
+    "@layerzerolabs/lz-definitions": "^3.0.67",
     "@layerzerolabs/lz-evm-messagelib-v2": "^2.3.39",
     "@layerzerolabs/lz-evm-protocol-v2": "^2.3.39",
     "@layerzerolabs/lz-evm-v1-0.7": "^2.3.39",

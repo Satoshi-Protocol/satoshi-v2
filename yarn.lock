@@ -1171,6 +1171,13 @@
   dependencies:
     tiny-invariant "^1.3.1"
 
+"@layerzerolabs/lz-definitions@^3.0.67":
+  version "3.0.67"
+  resolved "https://registry.yarnpkg.com/@layerzerolabs/lz-definitions/-/lz-definitions-3.0.67.tgz#19d7ca607caeb6600b3b88e5344eb721b8426996"
+  integrity sha512-uJGycsZAYGtZa0Ikt+IoOHHTYsb51N1fDXA70pR/FCNd+VCPCdLLEvwYedtfMxmX8FCMbjGPiW1iurMmAKKcwg==
+  dependencies:
+    tiny-invariant "^1.3.1"
+
 "@layerzerolabs/lz-evm-messagelib-v2@^2.3.39":
   version "2.3.44"
   resolved "https://registry.npmmirror.com/@layerzerolabs/lz-evm-messagelib-v2/-/lz-evm-messagelib-v2-2.3.44.tgz#3684bf9de5cf19e417626970ca09528496d70fc1"
