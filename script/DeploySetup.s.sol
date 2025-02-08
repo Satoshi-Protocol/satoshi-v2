@@ -339,7 +339,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         selectors[26] = INexusYieldManagerFacet.dailyMintCount.selector;
         selectors[27] = INexusYieldManagerFacet.isAssetSupported.selector;
         vm.stopBroadcast();
-        return (address(stabilityPoolFacet), selectors);
+        return (address(nexusYieldManagerFacet), selectors);
     }
 
     function _deployInitializer() internal {

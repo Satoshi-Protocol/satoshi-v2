@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-address constant SATOSHI_X_APP_ADDRESS = 0x07BbC5A83B83a5C440D1CAedBF1081426d0AA4Ec;
-address constant REWARD_MANAGER_ADDRESS = 0xA11c3CAC45606C5b341B729332c2FA31bE896eb2;
-address constant VAULT_MANAGER_ADDRESS = 0xc473754a6e35cC4F45316F9faaeF0a3a86D90E4e;
+address constant SATOSHI_X_APP_ADDRESS = 0x2863E3D0f29E2EEC6adEFC0dF0d3171DaD542c02;
+address constant REWARD_MANAGER_ADDRESS = 0xba50dDac6B2F5482cA064EFAc621E0C7c0f6A783;
+address constant VAULT_MANAGER_ADDRESS = 0x03d9C4E4BC5D3678A9076caC50dB0251D8676872;
 
 //NOTE: custom `PriceFeed.sol` contract for the collateral should be deploy first
-address constant PRICE_FEED_ADDRESS = 0x40918B4649a618eEE47f62Be7Fb6ce5b9906da9A;
-address constant COLLATERAL_ADDRESS = 0xf6718b2701D4a6498eF77D7c152b2137Ab28b8A3;
+address constant PRICE_FEED_ADDRESS = 0x2dF10F991BFA70eeb3f68E1A7c7953943157A56b;
+address constant COLLATERAL_ADDRESS = 0x93919784C523f39CACaa98Ee0a9d96c3F32b593e;
 uint256 constant MCR = 160 * 1e16; //  110 * 1e16 -> 110%
 
 uint256 constant MINUTE_DECAY_FACTOR = 999_037_758_833_783_500; //  (half life of 12 hours)
@@ -16,7 +16,7 @@ uint256 constant MAX_REDEMPTION_FEE = 1e18 / 100 * 5; //  (5%)
 uint256 constant BORROWING_FEE_FLOOR = 1e18 / 1000 * 5; //  (0.5%)
 uint256 constant MAX_BORROWING_FEE = 1e18 / 100 * 5; //  (5%)
 uint256 constant INTEREST_RATE_IN_BPS = 0; //  (0%)
-uint256 constant MAX_DEBT = 1e18 * 1_000_000_000; //  (1 billion)
+uint256 constant MAX_DEBT = 1e18 * 100_000; //  (1 billion)
 
 // OSHI token configuration
 uint256 constant TM_ALLOCATION = 0; //  10,000,000 OSHI (10% of total supply)

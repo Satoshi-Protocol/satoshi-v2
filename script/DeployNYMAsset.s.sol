@@ -9,7 +9,6 @@ import { IPriceFeed } from "../src/priceFeed/interfaces/IPriceFeed.sol";
 import {
     ASSET_ADDRESS,
     DAILY_MINT_CAP,
-    DEBT_TOKEN_ADDRESS,
     DEBT_TOKEN_MINT_CAP,
     FEE_IN,
     FEE_OUT,
@@ -50,6 +49,10 @@ contract DeployNYMAssetScript is Script {
 
         IPriceFeedAggregatorFacet(satoshiXApp).setPriceFeed(IERC20(ASSET_ADDRESS), IPriceFeed(PRICE_FEED_ADDRESS));
         INexusYieldManagerFacet(satoshiXApp).setAssetConfig(ASSET_ADDRESS, assetConfig);
+
+        console.log("NYM asset deployed");
+        console.log("Asset address:", ASSET_ADDRESS);
+        console.log("Price feed address:", PRICE_FEED_ADDRESS);
 
         vm.stopBroadcast();
     }

@@ -308,7 +308,7 @@
 //         selectors[27] = INexusYieldManagerFacet.dailyMintCount.selector;
 //         selectors[28] = INexusYieldManagerFacet.isAssetSupported.selector;
 //         vm.stopBroadcast();
-//         return (address(stabilityPoolFacet), selectors);
+//         return (address(nexusYieldManagerFacet), selectors);
 //     }
 
 //     function _deployInitializer(address deployer) internal {
