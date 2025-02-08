@@ -2,168 +2,123 @@ import { EndpointId } from '@layerzerolabs/lz-definitions'
 
 import type { OAppOmniGraphHardhat, OmniPointHardhat } from '@layerzerolabs/toolbox-hardhat'
 
-// const sepoliaContract: OmniPointHardhat = {
-//     eid: EndpointId.SEPOLIA_V2_TESTNET,
-//     contractName: 'DebtTokenWithLz',
-//     address: '0x45186cf2F66f43cf0a777a753b4ABBcD812204E6',
-// }
-
-// export const holeskyContract: OmniPointHardhat = {
-//     eid: EndpointId.HOLESKY_V2_TESTNET,
-//     contractName: 'DebtTokenWithLz',
-//     address: '0x4716c7b4fb7d8eD75B4D8904209b213308de837f',
-// }
-
-export const arbitrumSepoliaContract: OmniPointHardhat = {
-    eid: EndpointId.ARBSEP_V2_TESTNET,
+const bevmContract: OmniPointHardhat = {
+    eid: EndpointId.BEVM_V2_MAINNET,
     contractName: 'DebtTokenWithLz',
-    address: '0x85576DEa799eC912AAf05566922EaC75fC97Bd79',
+    address: '0x2031c8848775a5EFB7cfF2A4EdBE3F04c50A1478',
 }
 
-// export const optimismSepoliaContract: OmniPointHardhat = {
-//     eid: EndpointId.OPTSEP_V2_TESTNET,
-//     contractName: 'DebtTokenWithLz',
-//     address: '0x512F0966853cE4f7F64094E42426a0deB16085Fb',
-// }
-
-// const baseSepoliaContract: OmniPointHardhat = {
-//     eid: EndpointId.BASE_V2_TESTNET,
-//     contractName: 'DebtTokenWithLz',
-// }
-
-export const base_sepoliaContract = {
-    eid: EndpointId.BASESEP_V2_TESTNET,
+const bobContract: OmniPointHardhat = {
+    eid: EndpointId.BOB_V2_MAINNET,
     contractName: 'DebtTokenWithLz',
-    address: '0xBeD1808E6Dec5aDee59B1671Da8CFa81a9A1F2D3',
+    address: '0xecf21b335B41f9d5A89f6186A99c19a3c467871f',
 }
-// export const coredao_testnetContract = {
-//     eid: EndpointId.COREDAO_V2_TESTNET,
-//     contractName: 'DebtTokenWithLz',
-// }
 
-// send & received library related to the DVN on lz
-// link: https://docs.layerzero.network/v2/developers/evm/protocol-gas-settings/default-config#setting-send-and-receive-libraries
+const bitlayerContract: OmniPointHardhat = {
+    eid: EndpointId.BITLAYER_V2_MAINNET,
+    contractName: 'DebtTokenWithLz',
+    address: '0xba50dDac6B2F5482cA064EFAc621E0C7c0f6A783',
+}
+
+const bevmConfig = {
+    sendLibrary: '0xe1844c5D63a9543023008D332Bd3d2e6f1FE1043',
+    receiveLibraryConfig: { receiveLibrary: '0x2367325334447C5E1E0f1b3a6fB947b262F58312', gracePeriod: 0n },
+    sendConfig: {
+        executorConfig: { maxMessageSize: 10000, executor: '0x4208D6E27538189bB48E603D6123A94b8Abe0A0b' },
+        ulnConfig: {
+            confirmations: 10n,
+            requiredDVNs: ['0x9c061c9a4782294eef65ef28cb88233a987f4bdd'],
+            optionalDVNs: [],
+            optionalDVNThreshold: 0,
+        },
+    },
+    receiveConfig: {
+        ulnConfig: {
+            confirmations: 5n,
+            requiredDVNs: ['0x9c061c9a4782294eef65ef28cb88233a987f4bdd'],
+            optionalDVNs: [],
+            optionalDVNThreshold: 0,
+        },
+    },
+}
+
+const bobConfig = {
+    sendLibrary: '0xC39161c743D0307EB9BCc9FEF03eeb9Dc4802de7',
+    receiveLibraryConfig: { receiveLibrary: '0xe1844c5D63a9543023008D332Bd3d2e6f1FE1043', gracePeriod: 0n },
+    sendConfig: {
+        executorConfig: { maxMessageSize: 10000, executor: '0xc097ab8CD7b053326DFe9fB3E3a31a0CCe3B526f' },
+        ulnConfig: {
+            confirmations: 10n,
+            requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+            optionalDVNs: [],
+            optionalDVNThreshold: 0,
+        },
+    },
+    receiveConfig: {
+        ulnConfig: {
+            confirmations: 5n,
+            requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+            optionalDVNs: [],
+            optionalDVNThreshold: 0,
+        },
+    },
+}
+
+const bitlayerConfig = {
+    sendLibrary: '0xC39161c743D0307EB9BCc9FEF03eeb9Dc4802de7',
+    receiveLibraryConfig: { receiveLibrary: '0xe1844c5D63a9543023008D332Bd3d2e6f1FE1043', gracePeriod: 0n },
+    sendConfig: {
+        executorConfig: { maxMessageSize: 10000, executor: '0xcCE466a522984415bC91338c232d98869193D46e' },
+        ulnConfig: {
+            confirmations: 10n,
+            requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+            optionalDVNs: [],
+            optionalDVNThreshold: 0,
+        },
+    },
+    receiveConfig: {
+        ulnConfig: {
+            confirmations: 5n,
+            requiredDVNs: ['0x6788f52439aca6bff597d3eec2dc9a44b8fee842'],
+            optionalDVNs: [],
+            optionalDVNThreshold: 0,
+        },
+    },
+}
+
 
 const config: OAppOmniGraphHardhat = {
     contracts: [
-        { contract: base_sepoliaContract },
-        { contract: arbitrumSepoliaContract },
-        // {
-        //     contract: arbitrumSepoliaContract,
-        // },
-        // {
-        //     contract: holeskyContract,
-        // },
-        // {
-        //     contract: optimismSepoliaContract,
-        // },
-        // {
-        //     contract: baseSepoliaContract,
-        // },
-        // {
-        //     contract: holeskyContract,
-        // },
+        { contract: bevmContract },
+        { contract: bobContract },
+        { contract: bitlayerContract },
     ],
-    // TODO: generate by script
-    connections: [
-        {
-            from: base_sepoliaContract,
-            to: arbitrumSepoliaContract,
-            config: {
-                sendLibrary: '0xC1868e054425D378095A003EcbA3823a5D0135C9',
-                receiveLibraryConfig: { receiveLibrary: '0x12523de19dc41c91F7d2093E0CFbB76b17012C8d', gracePeriod: 0n },
-                sendConfig: {
-                    executorConfig: { maxMessageSize: 10000, executor: '0x8A3D588D9f6AC041476b094f97FF94ec30169d3D' },
-                    ulnConfig: {
-                        confirmations: 2n,
-                        requiredDVNs: ['0xe1a12515f9ab2764b887bf60b923ca494ebbb2d6'],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
-                },
-                receiveConfig: {
-                    ulnConfig: {
-                        confirmations: 1n,
-                        requiredDVNs: ['0xe1a12515f9ab2764b887bf60b923ca494ebbb2d6'],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
-                },
-            },
-        },
-        {
-            from: arbitrumSepoliaContract,
-            to: base_sepoliaContract,
-            config: {
-                sendLibrary: '0x4f7cd4DA19ABB31b0eC98b9066B9e857B1bf9C0E',
-                receiveLibraryConfig: { receiveLibrary: '0x75Db67CDab2824970131D5aa9CECfC9F69c69636', gracePeriod: 0n },
-                sendConfig: {
-                    executorConfig: { maxMessageSize: 10000, executor: '0x5Df3a1cEbBD9c8BA7F8dF51Fd632A9aef8308897' },
-                    ulnConfig: {
-                        confirmations: 2n,
-                        requiredDVNs: ['0x53f488E93b4f1b60E8E83aa374dBe1780A1EE8a8'],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
-                },
-                receiveConfig: {
-                    ulnConfig: {
-                        confirmations: 1n,
-                        requiredDVNs: ['0x53f488E93b4f1b60E8E83aa374dBe1780A1EE8a8'],
-                        optionalDVNs: [],
-                        optionalDVNThreshold: 0,
-                    },
-                },
-            },
-        },
-
-        // {
-        //     from: coredao_testnetContract,
-        //     to: base_sepoliaContract,
-        //     config: {
-        //         sendLibrary: '0xc8361Fac616435eB86B9F6e2faaff38F38B0d68C',
-        //         receiveLibraryConfig: { receiveLibrary: '0xD1bbdB62826eDdE4934Ff3A4920eB053ac9D5569', gracePeriod: 0n },
-        //         sendConfig: {
-        //             executorConfig: { maxMessageSize: 10000, executor: '0x3Bdb89Df44e50748fAed8cf851eB25bf95f37d19' },
-        //             ulnConfig: {
-        //                 confirmations: 1n,
-        //                 requiredDVNs: ['0xAe9BBF877BF1BD41EdD5dfc3473D263171cF3B9e'],
-        //                 optionalDVNs: [],
-        //                 optionalDVNThreshold: 0,
-        //             },
-        //         },
-        //         receiveConfig: {
-        //             ulnConfig: {
-        //                 confirmations: 1n,
-        //                 requiredDVNs: ['0xAe9BBF877BF1BD41EdD5dfc3473D263171cF3B9e'],
-        //                 optionalDVNs: [],
-        //                 optionalDVNThreshold: 0,
-        //             },
-        //         },
-        //     },
-        // },
-
-        // {
-        //     from: arbitrumSepoliaContract,
-        //     to: optimismSepoliaContract,
-        // },
-        // {
-        //     from: holeskyContract,
-        //     to: arbitrumSepoliaContract,
-        // },
-        // {
-        //     from: holeskyContract,
-        //     to: optimismSepoliaContract,
-        // },
-        // {
-        //     from: optimismSepoliaContract,
-        //     to: arbitrumSepoliaContract,
-        // },
-        // {
-        //     from: optimismSepoliaContract,
-        //     to: holeskyContract,
-        // },
-    ],
+    connections: permutationConnections([
+        { contract: bevmContract, config: bevmConfig },
+        { contract: bobContract, config: bobConfig },
+        { contract: bitlayerContract, config: bitlayerConfig },
+    ]),
 }
 
+
+function permutationConnections(chains: {
+    contract: OmniPointHardhat;
+    config: any;
+  }[]) {
+    const connections: any = [];
+    for (let i = 0; i < chains.length; i++) {
+      for (let j = 0; j < chains.length; j++) {
+        if (i !== j) {
+          connections.push({
+            from: chains[i].contract,
+            to: chains[j].contract,
+            config: chains[i].config,
+          });
+        }
+      }
+    }
+    return connections;
+  }
+
+  
 export default config
