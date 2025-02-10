@@ -28,12 +28,17 @@ interface ITroveManager {
     event LastFeeOpTimeUpdated(uint256 _lastFeeOpTime);
 
     /// @notice Emitted during a redemption operation
+    /// @param _user The address of the user to operate redeem
     /// @param _attemptedDebtAmount The attempted debt amount to redeem
     /// @param _actualDebtAmount The actual debt amount redeemed
     /// @param _collateralSent The amount of collateral sent
     /// @param _collateralFee The collateral fee
     event Redemption(
-        uint256 _attemptedDebtAmount, uint256 _actualDebtAmount, uint256 _collateralSent, uint256 _collateralFee
+        address _user,
+        uint256 _attemptedDebtAmount,
+        uint256 _actualDebtAmount,
+        uint256 _collateralSent,
+        uint256 _collateralFee
     );
 
     /// @notice Emitted when system snapshots are updated
