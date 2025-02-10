@@ -59,9 +59,16 @@ import { IOSHIToken } from "../src/OSHI/interfaces/IOSHIToken.sol";
 
 import { Config } from "../src/core/Config.sol";
 import { GasPool } from "../src/core/GasPool.sol";
-import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
-import { ISatoshiPeriphery } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
 
+import { MultiTroveGetter } from "../src/core/helpers/MultiTroveGetter.sol";
+import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
+import { TroveHelper } from "../src/core/helpers/TroveHelper.sol";
+
+import { TroveManagerGetter } from "../src/core/helpers/TroveManagerGetter.sol";
+import { IMultiTroveGetter } from "../src/core/helpers/interfaces/IMultiTroveGetter.sol";
+import { ISatoshiPeriphery } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import { ITroveHelper } from "../src/core/helpers/interfaces/ITroveHelper.sol";
+import { ITroveManagerGetter } from "../src/core/helpers/interfaces/ITroveManagerGetter.sol";
 import { IGasPool } from "../src/core/interfaces/IGasPool.sol";
 import {
     DEBT_GAS_COMPENSATION,
@@ -110,6 +117,9 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     ISatoshiPeriphery internal satoshiPeriphery;
 
     IMultiCollateralHintHelpers internal hintHelpers;
+    IMultiTroveGetter internal multiTroveGetter;
+    ITroveHelper internal troveHelper;
+    ITroveManagerGetter internal troveManagerGetter;
 
     function setUp() external {
         DEPLOYMENT_PRIVATE_KEY = uint256(vm.envBytes32("DEPLOYMENT_PRIVATE_KEY"));
@@ -135,7 +145,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         _deployVaultManager();
         _deployPeriphery();
         _satoshiXAppInit();
-        _deployHintHelpers();
+        _deployHelpers();
 
         // set config
         _setConfigByOwner();
@@ -534,10 +544,17 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
     }
 
-    function _deployHintHelpers() internal {
+    function _deployHelpers() internal {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        assert(address(hintHelpers) == address(0)); // check if contract is not deployed
+        assert(address(multiTroveGetter) == address(0)); // check if contract is not deployed
+        assert(address(troveHelper) == address(0)); // check if contract is not deployed
+        assert(address(troveManagerGetter) == address(0)); // check if contract is not deployed
 
         hintHelpers = IMultiCollateralHintHelpers(address(new MultiCollateralHintHelpers(address(satoshiXApp))));
+        multiTroveGetter = IMultiTroveGetter(address(new MultiTroveGetter()));
+        troveHelper = ITroveHelper(address(new TroveHelper()));
+        troveManagerGetter = ITroveManagerGetter(address(new TroveManagerGetter(address(satoshiXApp))));
         vm.stopBroadcast();
     }
 
@@ -564,5 +581,8 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         console.log("oshiToken", address(oshiToken));
         console.log("communityIssuance", address(communityIssuance));
         console.log("hintHelpers", address(hintHelpers));
+        console.log("multiTroveGetter", address(multiTroveGetter));
+        console.log("troveHelper", address(troveHelper));
+        console.log("troveManagerGetter", address(troveManagerGetter));
     }
 }

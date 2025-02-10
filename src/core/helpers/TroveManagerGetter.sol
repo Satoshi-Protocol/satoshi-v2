@@ -3,14 +3,11 @@ pragma solidity ^0.8.20;
 
 import { IFactoryFacet } from "../interfaces/IFactoryFacet.sol";
 import { ITroveManager } from "../interfaces/ITroveManager.sol";
+
+import { Collateral, ITroveManagerGetter } from "./interfaces/ITroveManagerGetter.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-struct Collateral {
-    address collateral;
-    address[] troveManagers;
-}
-
-contract TroveManagerGetters {
+contract TroveManagerGetter is ITroveManagerGetter {
     address public immutable satoshiXApp;
 
     constructor(address _satoshiXApp) {
