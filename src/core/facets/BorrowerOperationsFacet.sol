@@ -78,6 +78,21 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         emit MinNetDebtUpdated(_minNetDebt);
     }
 
+    // 
+    function forceResetTM(ITroveManager[] calldata _troveManagers) external onlyRole(Config.OWNER_ROLE) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        delete s.troveManagers;
+
+        for (uint256 i; i < _troveManagers.length; i++) {
+            ITroveManager troveManager = _troveManagers[i];
+            IERC20 collateralToken = s.troveManagersData[troveManager].collateralToken;
+            assert(address(collateralToken) != address(0));
+
+            s.troveManagersData[troveManager] = TroveManagerData(collateralToken, uint16(s.troveManagers.length));
+            s.troveManagers.push(troveManager);
+        }
+    }
+
     function removeTroveManager(ITroveManager troveManager) external {
         AppStorage.Layout storage s = AppStorage.layout();
         TroveManagerData memory tmData = s.troveManagersData[troveManager];

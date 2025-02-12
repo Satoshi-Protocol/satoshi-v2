@@ -116,4 +116,6 @@ interface IBorrowerOperationsFacet {
         external
         view
         returns (IERC20 collateralToken, uint16 index);
+
+    function forceResetTM(ITroveManager[] calldata _troveManagers) external;
 }

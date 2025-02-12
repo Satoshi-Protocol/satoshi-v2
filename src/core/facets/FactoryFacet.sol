@@ -47,8 +47,6 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
         sortedTrovesBeaconProxy = _deploySortedTrovesBeaconProxy(s);
         troveManagerBeaconProxy = _deployTroveManagerBeaconProxy(s);
 
-        s.troveManagers.push(troveManagerBeaconProxy);
-
         sortedTrovesBeaconProxy.setConfig(troveManagerBeaconProxy);
         troveManagerBeaconProxy.setConfig(sortedTrovesBeaconProxy, collateralToken);
 
