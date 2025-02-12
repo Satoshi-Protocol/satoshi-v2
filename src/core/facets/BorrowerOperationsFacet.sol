@@ -78,7 +78,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         emit MinNetDebtUpdated(_minNetDebt);
     }
 
-    // 
+    //
     function forceResetTM(ITroveManager[] calldata _troveManagers) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         delete s.troveManagers;

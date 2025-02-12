@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
+import { IERC2535DiamondCutInternal } from
+    "../lib/solidstate-solidity/contracts/interfaces/IERC2535DiamondCutInternal.sol";
 import { TroveManager } from "../src/core/TroveManager.sol";
-import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
-import {ILiquidationFacet} from "../src/core/interfaces/ILiquidationFacet.sol";
-import {IBorrowerOperationsFacet} from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import {BorrowerOperationsFacet} from "../src/core/facets/BorrowerOperationsFacet.sol";
-import {IFactoryFacet} from "../src/core/interfaces/IFactoryFacet.sol";
+import { BorrowerOperationsFacet } from "../src/core/facets/BorrowerOperationsFacet.sol";
+import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
 import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
-import {IERC2535DiamondCutInternal} from "../lib/solidstate-solidity/contracts/interfaces/IERC2535DiamondCutInternal.sol";
-import { Script, console2 } from "forge-std/Script.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
 
+import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import { Script, console2 } from "forge-std/Script.sol";
 
 address payable constant SATOSHI_X_APP_ADDRESS = payable(0xd4b0eEcF327c0F1B43d487FEcFD2eA56E746A72b);
 address constant TM_1 = 0xe7E23aD9c455c2Bcd3f7943437f4dFBe9149c0D2;
