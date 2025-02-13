@@ -576,6 +576,12 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
 
     /* Getters */
 
+    // @notice Get the asset configuration for the given asset.
+    function getAssetConfig(address asset) external view returns (AssetConfig memory) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        return s.assetConfigs[asset];
+    }
+
     // @notice Get the feeIn for the given asset.
     function feeIn(address asset) public view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();

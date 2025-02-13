@@ -148,6 +148,13 @@ interface INexusYieldManagerFacet {
     function sunsetAsset(address asset) external;
 
     /**
+     * @notice Returns the configuration for a specific asset.
+     * @param asset The address of the asset.
+     * @return The configuration parameters for the asset.
+     */
+    function getAssetConfig(address asset) external view returns (AssetConfig memory);
+
+    /**
      * @notice Swaps a specified amount of an asset for debt tokens.
      * @param asset The address of the asset to swap.
      * @param receiver The address to receive the debt tokens.
