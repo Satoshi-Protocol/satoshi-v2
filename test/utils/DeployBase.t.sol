@@ -210,7 +210,7 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(borrowerOperationsFacet) == address(0)); // check if contract is not deployed
         borrowerOperationsFacet = IBorrowerOperationsFacet(address(new BorrowerOperationsFacet()));
-        bytes4[] memory selectors = new bytes4[](18);
+        bytes4[] memory selectors = new bytes4[](19);
         selectors[0] = IBorrowerOperationsFacet.addColl.selector;
         selectors[1] = IBorrowerOperationsFacet.adjustTrove.selector;
         selectors[2] = IBorrowerOperationsFacet.checkRecoveryMode.selector;
@@ -229,6 +229,7 @@ abstract contract DeployBase is Test {
         selectors[15] = IBorrowerOperationsFacet.troveManagersData.selector;
         selectors[16] = IBorrowerOperationsFacet.withdrawColl.selector;
         selectors[17] = IBorrowerOperationsFacet.withdrawDebt.selector;
+        selectors[18] = IBorrowerOperationsFacet.forceResetTM.selector;
         vm.stopPrank();
         return (address(borrowerOperationsFacet), selectors);
     }
