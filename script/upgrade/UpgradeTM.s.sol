@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import { TroveManager } from "../src/core/TroveManager.sol";
+import { TroveManager } from "../../src/core/TroveManager.sol";
 
-import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import { IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
-import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
-import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+import { IBorrowerOperationsFacet } from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { IFactoryFacet } from "../../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../../src/core/interfaces/ILiquidationFacet.sol";
+import { ITroveManager } from "../../src/core/interfaces/ITroveManager.sol";
 
 import { Script, console } from "forge-std/Script.sol";
 

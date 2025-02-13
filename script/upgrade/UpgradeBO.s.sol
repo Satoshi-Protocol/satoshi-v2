@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import { IERC2535DiamondCutInternal } from
-    "../lib/solidstate-solidity/contracts/interfaces/IERC2535DiamondCutInternal.sol";
-import { TroveManager } from "../src/core/TroveManager.sol";
-import { BorrowerOperationsFacet } from "../src/core/facets/BorrowerOperationsFacet.sol";
-import { IBorrowerOperationsFacet } from "../src/core/interfaces/IBorrowerOperationsFacet.sol";
-import { IFactoryFacet } from "../src/core/interfaces/IFactoryFacet.sol";
-import { ILiquidationFacet } from "../src/core/interfaces/ILiquidationFacet.sol";
-import { ISatoshiXApp } from "../src/core/interfaces/ISatoshiXApp.sol";
-import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
+import { TroveManager } from "../../src/core/TroveManager.sol";
+import { BorrowerOperationsFacet } from "../../src/core/facets/BorrowerOperationsFacet.sol";
+import { IBorrowerOperationsFacet } from "../../src/core/interfaces/IBorrowerOperationsFacet.sol";
+import { IFactoryFacet } from "../../src/core/interfaces/IFactoryFacet.sol";
+import { ILiquidationFacet } from "../../src/core/interfaces/ILiquidationFacet.sol";
+import { ISatoshiXApp } from "../../src/core/interfaces/ISatoshiXApp.sol";
+import { ITroveManager } from "../../src/core/interfaces/ITroveManager.sol";
+import { IERC2535DiamondCutInternal } from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
 
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
