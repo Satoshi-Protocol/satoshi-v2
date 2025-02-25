@@ -13,10 +13,10 @@ contract PriceFeedChainlink is IPriceFeed, Ownable {
     AggregatorV3Interface internal immutable _source;
     uint256 public maxTimeThreshold;
 
-    constructor(AggregatorV3Interface source_) Ownable(msg.sender) {
+    constructor(AggregatorV3Interface source_, uint256 _maxTimeThreshold) Ownable(msg.sender) {
         _source = source_;
-        maxTimeThreshold = 86_400;
-        emit MaxTimeThresholdUpdated(86_400);
+        maxTimeThreshold = _maxTimeThreshold;
+        emit MaxTimeThresholdUpdated(_maxTimeThreshold);
     }
 
     function fetchPrice() external view returns (uint256) {

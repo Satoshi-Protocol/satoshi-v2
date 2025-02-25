@@ -3,8 +3,11 @@ pragma solidity ^0.8.13;
 
 import { PriceFeedChainlink } from "../../src/priceFeed/PriceFeedChainlink.sol";
 import { AggregatorV3Interface } from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
-import { CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0 } from "./DeployPriceFeedConfig.sol";
-import { Script, console } from "forge-std/Script.sol";
+import { Script, console2 } from "forge-std/Script.sol";
+
+//! Change when deploying
+address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS = 0xC3740C3c49EdA37298F8e6C5970D53b9C2498F2b;
+uint256 constant CHAINLINK_MAX_TIME_THRESHOLD = 86_400 + 300;
 
 contract DeployPriceFeedChainlinkScript is Script {
     PriceFeedChainlink internal priceFeedChainlink;
@@ -19,10 +22,14 @@ contract DeployPriceFeedChainlinkScript is Script {
     function run() public {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
-        AggregatorV3Interface source = AggregatorV3Interface(CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0);
-        priceFeedChainlink = new PriceFeedChainlink(source);
-        assert(priceFeedChainlink.fetchPrice() > 0);
-        console.log("PriceFeedChainlink deployed at:", address(priceFeedChainlink));
+        AggregatorV3Interface source = AggregatorV3Interface(CHAINLINK_PRICE_FEED_SOURCE_ADDRESS);
+        priceFeedChainlink = new PriceFeedChainlink(source, CHAINLINK_MAX_TIME_THRESHOLD);
+        uint256 price = priceFeedChainlink.fetchPrice();
+        assert(price > 0);
+        console2.log("PriceFeedChainlink deployed at:", address(priceFeedChainlink));
+        console2.log("PriceFeedChainlink source address:", CHAINLINK_PRICE_FEED_SOURCE_ADDRESS);
+        console2.log("PriceFeedChainlink max time threshold:", CHAINLINK_MAX_TIME_THRESHOLD);
+        console2.log("PriceFeedChainlink price:", price);
 
         vm.stopBroadcast();
     }
