@@ -47,4 +47,8 @@ library Config {
      * Farming
      */
     uint256 constant FARMING_PRECISION = 1e4;
+
+    /* Recovery mode grace period */
+    uint128 constant UNSET_TIMESTAMP = type(uint128).max;
+    uint128 constant MINIMUM_GRACE_PERIOD = 15 minutes;
 }

@@ -273,10 +273,12 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(liquidationFacet) == address(0)); // check if contract is not deployed
         liquidationFacet = ILiquidationFacet(address(new LiquidationFacet()));
-        bytes4[] memory selectors = new bytes4[](3);
+        bytes4[] memory selectors = new bytes4[](5);
         selectors[0] = ILiquidationFacet.batchLiquidateTroves.selector;
         selectors[1] = ILiquidationFacet.liquidate.selector;
         selectors[2] = ILiquidationFacet.liquidateTroves.selector;
+        selectors[3] = ILiquidationFacet.setGracePeriod.selector;
+        selectors[4] = ILiquidationFacet.syncGracePeriod.selector;
         vm.stopPrank();
         return (address(liquidationFacet), selectors);
     }

@@ -247,6 +247,10 @@ contract LiquidateTest is DeployBase, TroveBase {
         uint256 collUser1Remaining = coll1 - vars.collToSendToSP;
 
         vm.startPrank(user4);
+        liquidationManagerProxy().syncGracePeriod();
+        vm.expectRevert(ILiquidationFacet.InGracePeriod.selector);
+        liquidationManagerProxy().liquidate(troveManagerBeaconProxy, user1);
+        vm.warp(block.timestamp + 20 minutes);
         // the user1 coll will capped at 1.1 * debt, no redistribution
         liquidationManagerProxy().liquidate(troveManagerBeaconProxy, user1);
 
@@ -451,6 +455,8 @@ contract LiquidateTest is DeployBase, TroveBase {
         uint256 collUser1Remaining = coll1 - vars.collToSendToSP;
 
         vm.startPrank(user4);
+        liquidationManagerProxy().syncGracePeriod();
+        vm.warp(block.timestamp + 20 minutes);
         // the user1 coll will capped at 1.1 * debt, no redistribution
         liquidationManagerProxy().liquidateTroves(troveManagerBeaconProxy, 10, CCR);
 

@@ -108,5 +108,11 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
          */
         // debtToken
         // rewardManager
+
+        /**
+         * LiquidationFacet
+         */
+        s.lastGracePeriodStartTimestamp = Config.UNSET_TIMESTAMP;
+        s.recoveryModeGracePeriodDuration = Config.MINIMUM_GRACE_PERIOD;
     }
 }
