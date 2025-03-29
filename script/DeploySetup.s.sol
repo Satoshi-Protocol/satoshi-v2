@@ -510,10 +510,17 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     }
 
     function _setConfigByOwner() internal {
+        _setAuth();
         _setRewardManager(address(rewardManager));
         _setSPCommunityIssuanceAllocation();
         _setClaimStartTime(SP_CLAIM_START_TIME);
         _setSPRewardRate(SP_REWARD_RATE);
+    }
+
+    function _setAuth() internal {
+        vm.startBroadcast(OWNER_PRIVATE_KEY);
+        debtToken.rely(address(satoshiXApp));
+        vm.stopBroadcast();
     }
 
     function _setRewardManager(address _rewardManager) internal {
