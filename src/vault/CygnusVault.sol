@@ -90,8 +90,8 @@ contract CygnusVault is VaultCore {
         return abi.encode(Option.RequestWithdraw, token, amount);
     }
 
-    function constructClaimData(address token) external pure returns (bytes memory) {
-        return abi.encode(Option.Claim, token);
+    function constructClaimData(address token, uint256 index) external pure returns (bytes memory) {
+        return abi.encode(Option.Claim, token, index);
     }
 
     function constructExitByTroveManagerData(address, uint256) external pure override returns (bytes memory) {
