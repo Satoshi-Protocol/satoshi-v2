@@ -19,10 +19,14 @@ interface IVault {
     event DelegationManagerSet(address delegationManager);
     event VaultManagerSet(address vaultManager);
     event TokenStrategySet(address token, address strategy);
+    event STTokenSet(address token, address strategy);
     event DepositToPellStrategy(address token, address strategy, uint256 amount);
     event WithdrawQueuedOnPell(IDelegationManager.Withdrawal);
     event CompleteQueueWithdrawOnPell(IDelegationManager.Withdrawal);
     event NonfungiblePositionManagerSet(address nonfungiblePositionManager);
+    event ClaimOnCygnus(address token, uint256 index);
+    event DepositToCygnusStrategy(address token, address strategy, uint256 amount);
+    event RequestWithdrawFromCygnusStrategy(address token, address strategy, uint256 amount);
 
     error DebtTokenBalanceUnexpectedChange(uint256 expect, uint256 actual);
     error InvalidOption(uint256 option);
