@@ -437,6 +437,8 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         // Burn the repaid Debt from the user's balance and the gas compensation from the Gas Pool
         s.debtToken.burnWithGasCompensation(msg.sender, debt - s.gasCompensation);
 
+        syncGracePeriod();
+
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
             troveManager.collectInterests();
@@ -557,5 +559,10 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         AppStorage.Layout storage s = AppStorage.layout();
         Balances memory balances = s._fetchBalances();
         (, totalPricedCollateral, totalDebt) = BorrowerOperationsLib._getTCRData(balances);
+    }
+
+    function syncGracePeriod() public {
+        AppStorage.Layout storage s = AppStorage.layout();
+        s._syncGracePeriod(s._inRecoveryMode());
     }
 }

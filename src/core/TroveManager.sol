@@ -667,6 +667,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         totals.collateralToSendToRedeemer = totals.totalCollateralDrawn - totals.collateralFee;
 
+        IBorrowerOperationsFacet(satoshiXApp).syncGracePeriod();
+
         emit Redemption(
             msg.sender, _debtAmount, totals.totalDebtToRedeem, totals.totalCollateralDrawn, totals.collateralFee
         );
@@ -1109,6 +1111,9 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         external
     {
         _requireCallerIsSatoshiXapp();
+
+        IBorrowerOperationsFacet(satoshiXApp).syncGracePeriod();
+
         // redistribute debt and collateral
         _redistributeDebtAndColl(_debt, _coll);
 

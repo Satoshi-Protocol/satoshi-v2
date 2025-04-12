@@ -87,7 +87,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
             } else if (ICR < troveManagerValues.MCR) {
                 singleLiquidation = _tryLiquidateWithCap(
-                    troveManager, account, debtInStabPool, troveManagerValues.MCR, troveManagerValues.price
+                    troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                 );
                 debtInStabPool -= singleLiquidation.debtToOffset;
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
@@ -119,7 +119,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 _checkRecoveryModeGracePeriod();
 
                 singleLiquidation = _tryLiquidateWithCap(
-                    _troveManager, account, debtInStabPool, troveManagerValues.MCR, troveManagerValues.price
+                    _troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                 );
                 if (singleLiquidation.debtToOffset == 0) continue;
                 debtInStabPool -= singleLiquidation.debtToOffset;
@@ -141,6 +141,9 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 address(this), totals.totalDebtToOffset, totals.totalCollToSendToSP
             );
         }
+
+        syncGracePeriod();
+
         troveManager.finalizeLiquidation(
             msg.sender,
             totals.totalDebtToRedistribute,
@@ -199,7 +202,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 debtInStabPool -= singleLiquidation.debtToOffset;
             } else if (ICR < troveManagerValues.MCR) {
                 singleLiquidation = _tryLiquidateWithCap(
-                    troveManager, account, debtInStabPool, troveManagerValues.MCR, troveManagerValues.price
+                    troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                 );
                 debtInStabPool -= singleLiquidation.debtToOffset;
             } else {
@@ -231,7 +234,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                         _liquidateNormalMode(s, troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
                 } else if (ICR < troveManagerValues.MCR) {
                     singleLiquidation = _tryLiquidateWithCap(
-                        troveManager, account, debtInStabPool, troveManagerValues.MCR, troveManagerValues.price
+                        troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                     );
                 } else {
                     if (troveManagerValues.sunsetting) continue;
@@ -240,7 +243,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                     // check the recovery mode grace period
                     _checkRecoveryModeGracePeriod();
                     singleLiquidation = _tryLiquidateWithCap(
-                        troveManager, account, debtInStabPool, troveManagerValues.MCR, troveManagerValues.price
+                        troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                     );
                     if (singleLiquidation.debtToOffset == 0) continue;
                 }
@@ -499,7 +502,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
         emit GracePeriodDurationSet(_gracePeriod);
     }
 
-    function syncGracePeriod() external {
+    function syncGracePeriod() public {
         AppStorage.Layout storage s = AppStorage.layout();
         s._syncGracePeriod(_inRecoveryMode());
     }
