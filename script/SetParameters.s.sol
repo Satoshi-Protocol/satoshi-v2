@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ITroveManager} from "../src/core/interfaces/ITroveManager.sol";
+import { ITroveManager } from "../src/core/interfaces/ITroveManager.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
@@ -14,7 +14,7 @@ uint256 constant MAX_BORROWING_FEE = 1e18 / 100 * 5; //  (5%)
 uint256 constant INTEREST_RATE_IN_BPS = 0; //  (0%)
 uint256 constant MAX_DEBT = 1e18 * 1_000_000_000;
 uint256 constant MCR = 170 * 1e16; //  110 * 1e16 -> 110%
-uint128 constant REWARD_RATE = 0; 
+uint128 constant REWARD_RATE = 0;
 uint32 constant TM_CLAIM_START_TIME = 4_294_967_295; // max uint32
 
 contract SetParametersScript is Script {
