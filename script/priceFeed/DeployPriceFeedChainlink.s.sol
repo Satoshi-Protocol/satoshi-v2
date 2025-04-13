@@ -7,7 +7,7 @@ import { Script, console2 } from "forge-std/Script.sol";
 
 //! Change when deploying
 address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS = 0x31a36CdF4465ba61ce78F5CDbA26FDF8ec361803;
-uint256 constant CHAINLINK_MAX_TIME_THRESHOLD = 21600 + 300;
+uint256 constant CHAINLINK_MAX_TIME_THRESHOLD = 21_600 + 300;
 
 contract DeployPriceFeedChainlinkScript is Script {
     PriceFeedChainlink internal priceFeedChainlink;
