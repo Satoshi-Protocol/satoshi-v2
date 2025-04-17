@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import { INexusYieldManagerFacet } from "../src/core/interfaces/INexusYieldManagerFacet.sol";
 import { Script, console } from "forge-std/Script.sol";
 
-address constant SATOSHI_XAPP_ADDRESS = 0x07BbC5A83B83a5C440D1CAedBF1081426d0AA4Ec;
+address constant SATOSHI_XAPP_ADDRESS = 0xEC272aF6e65C4D7857091225fa8ED300Df787CCF;
 address constant ACCOUNT = 0x2acfb3F0255793c29A9aab335E5D77d0261B886B;
 bool constant IS_PRIVILEGED = true;
 
