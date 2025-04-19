@@ -50,7 +50,7 @@ contract DeployNYMAssetScript is Script {
         if (IS_USING_ORACLE) {
             IPriceFeedAggregatorFacet(satoshiXApp).setPriceFeed(IERC20(ASSET_ADDRESS), IPriceFeed(PRICE_FEED_ADDRESS));
         }
-        
+
         INexusYieldManagerFacet(satoshiXApp).setAssetConfig(ASSET_ADDRESS, assetConfig);
 
         console.log("NYM asset deployed");

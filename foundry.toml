@@ -19,6 +19,7 @@ remappings = [
     "@pythnetwork/pyth-sdk-solidity/=lib/pyth-sdk-solidity",
     "solmate/=lib/solmate/",
     "@api3/contracts=lib/contracts/contracts",
+    "@chainsight-management-oracle/contracts/=lib/chainsight-management-oracle/contracts/",
 ]
 
 [fmt] # See https://book.getfoundry.sh/reference/config/formatter

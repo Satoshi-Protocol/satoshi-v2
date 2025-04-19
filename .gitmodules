@@ -23,3 +23,6 @@
 [submodule "node_modules/.pnpm/@layerzerolabs+toolbox-foundry@0.1.9/node_modules/@layerzerolabs/toolbox-foundry/lib/LayerZero-v2.git"]
 	path = node_modules/@layerzerolabs/toolbox-foundry/lib/contracts
 	url = https://github.com/JorgeAtPaladin/LayerZero-v2.git
+[submodule "lib/chainsight-management-oracle"]
+	path = lib/chainsight-management-oracle
+	url = https://github.com/horizonx-tech/chainsight-management-oracle
