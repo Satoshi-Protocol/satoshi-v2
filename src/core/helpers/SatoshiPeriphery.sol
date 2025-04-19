@@ -280,7 +280,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         address _upperHint,
         address _lowerHint
     )
-        external
+        public
     {
         _beforeRepayDebt(_debtAmount);
 
@@ -297,9 +297,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         external
     {
         _updateSupraPriceFeed(troveManager, _bytesProof);
-        _beforeRepayDebt(_debtAmount);
-
-        IBorrowerOperationsFacet(xApp).repayDebt(troveManager, msg.sender, _debtAmount, _upperHint, _lowerHint);
+        repayDebt(troveManager, _debtAmount, _upperHint, _lowerHint);
     }
 
     /// @notice Enables a borrower to simultaneously change (decrease/increase) both their collateral and debt,
