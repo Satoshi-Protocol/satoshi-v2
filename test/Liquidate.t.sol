@@ -248,7 +248,7 @@ contract LiquidateTest is DeployBase, TroveBase {
 
         vm.startPrank(user4);
         liquidationManagerProxy().syncGracePeriod();
-        vm.expectRevert(ILiquidationFacet.InGracePeriod.selector);
+        vm.expectRevert("TroveManager: nothing to liquidate");
         liquidationManagerProxy().liquidate(troveManagerBeaconProxy, user1);
         vm.warp(block.timestamp + 20 minutes);
         // the user1 coll will capped at 1.1 * debt, no redistribution

@@ -112,8 +112,7 @@ contract Initializer is Initializable, AccessControlInternal, OwnableInternal {
         /**
          * LiquidationFacet
          */
-        s.lastGracePeriodStartTimestamp = Config.UNSET_TIMESTAMP;
-        s.recoveryModeGracePeriodDuration = Config.MINIMUM_GRACE_PERIOD;
+        initV2();
     }
 
     function initV2() public reinitializer(2) {

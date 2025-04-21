@@ -116,7 +116,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
 
                 uint256 TCR = SatoshiMath._computeCR(entireSystemColl, entireSystemDebt);
                 if (TCR >= Config.CCR || ICR >= TCR) break;
-                _checkRecoveryModeGracePeriod();
+                if (_checkRecoveryModeGracePeriod()) break;
 
                 singleLiquidation = _tryLiquidateWithCap(
                     _troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
@@ -241,7 +241,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                     uint256 TCR = SatoshiMath._computeCR(entireSystemColl, entireSystemDebt);
                     if (TCR >= Config.CCR || ICR >= TCR) continue;
                     // check the recovery mode grace period
-                    _checkRecoveryModeGracePeriod();
+                    if (_checkRecoveryModeGracePeriod()) break;
                     singleLiquidation = _tryLiquidateWithCap(
                         troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                     );
@@ -481,15 +481,19 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
         return BorrowerOperationsLib._checkRecoveryMode(TCR);
     }
 
-    function _checkRecoveryModeGracePeriod() internal {
+    function _checkRecoveryModeGracePeriod() internal view returns (bool) {
         AppStorage.Layout storage s = AppStorage.layout();
         uint128 cachedLastGracePeriodStartTimestamp = s.lastGracePeriodStartTimestamp;
         if (cachedLastGracePeriodStartTimestamp == Config.UNSET_TIMESTAMP) {
-            revert NotInGracePeriod();
+            // grace period has never been triggered
+            return true;
         }
         if (uint128(block.timestamp) < cachedLastGracePeriodStartTimestamp + s.recoveryModeGracePeriodDuration) {
-            revert InGracePeriod();
+            // it is still in grace period
+            return true;
         }
+
+        return false;
     }
 
     // --- Grace Period ---
