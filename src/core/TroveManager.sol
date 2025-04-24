@@ -1403,6 +1403,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
                 <= getEntireSystemColl() * (FARMING_PRECISION - farmingParams.retainPercentage) / FARMING_PRECISION,
             "TroveManager: Exceed the collateral transfer limit"
         );
+        require(address(vaultManager) != address(0), "TroveManager: VaultManager not set");
 
         // record the collateral output
         collateralOutput += amount;
