@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-address constant SATOSHI_XAPP_ADDRESS = 0x2863E3D0f29E2EEC6adEFC0dF0d3171DaD542c02;
+address constant SATOSHI_XAPP_ADDRESS = 0x07BbC5A83B83a5C440D1CAedBF1081426d0AA4Ec;
 
-address constant ASSET_ADDRESS = 0x62b4B8F5a03e40b9dAAf95c7A6214969406e28c3;
-address constant PRICE_FEED_ADDRESS = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
+address constant ASSET_ADDRESS = 0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3;
+address constant PRICE_FEED_ADDRESS = 0x23e727E4919eB9f11200197014ab96d03008Ccff;
 
 uint256 constant FEE_IN = 5; // 5/10000
 uint256 constant FEE_OUT = 100; // 100/10000
