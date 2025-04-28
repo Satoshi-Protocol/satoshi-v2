@@ -156,9 +156,10 @@ contract PellVault is VaultCore {
         return (IStrategy(strategy[token]).userUnderlyingView(address(this)));
     }
 
-    function getPendingWithdrawalAmount(uint256 wIndex, uint256 index) external view returns (uint256) {
+    function getPendingWithdrawalAmount(uint256 wIndex, uint256 index) external view returns (address, uint256) {
         uint256 share = withdrawalQueue[wIndex].shares[index];
-        return withdrawalQueue[wIndex].strategies[index].sharesToUnderlyingView(share);
+        IERC20 underlyingToken = IStrategy(withdrawalQueue[wIndex].strategies[index]).underlyingToken();
+        return (address(underlyingToken), withdrawalQueue[wIndex].strategies[index].sharesToUnderlyingView(share));
     }
 
     function getWithdrawalQueueLength() external view returns (uint256) {
