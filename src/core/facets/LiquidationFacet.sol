@@ -142,8 +142,6 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
             );
         }
 
-        syncGracePeriod();
-
         troveManager.finalizeLiquidation(
             msg.sender,
             totals.totalDebtToRedistribute,

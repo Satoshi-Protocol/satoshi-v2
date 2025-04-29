@@ -667,8 +667,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
 
         totals.collateralToSendToRedeemer = totals.totalCollateralDrawn - totals.collateralFee;
 
-        IBorrowerOperationsFacet(satoshiXApp).syncGracePeriod();
-
         emit Redemption(
             msg.sender, _debtAmount, totals.totalDebtToRedeem, totals.totalCollateralDrawn, totals.collateralFee
         );
@@ -679,6 +677,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         totalActiveDebt = totalActiveDebt - totals.totalDebtToRedeem;
         _sendCollateral(msg.sender, totals.collateralToSendToRedeemer);
         _resetState();
+
+        IBorrowerOperationsFacet(satoshiXApp).syncGracePeriod();
 
         if (interestPayable > 0) {
             collectInterests();
@@ -1112,8 +1112,6 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     {
         _requireCallerIsSatoshiXapp();
 
-        IBorrowerOperationsFacet(satoshiXApp).syncGracePeriod();
-
         // redistribute debt and collateral
         _redistributeDebtAndColl(_debt, _coll);
 
@@ -1139,6 +1137,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
             collateralToken.safeIncreaseAllowance(rewardManager, collGasCompToFeeReceiver);
         }
         IRewardManager(rewardManager).increaseCollPerUintStaked(collGasCompToFeeReceiver);
+
+        IBorrowerOperationsFacet(satoshiXApp).syncGracePeriod();
     }
 
     function _redistributeDebtAndColl(uint256 _debt, uint256 _coll) internal {
