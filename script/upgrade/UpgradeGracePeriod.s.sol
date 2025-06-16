@@ -15,62 +15,63 @@ import { IERC2535DiamondCutInternal } from "@solidstate/contracts/interfaces/IER
 import { Script, console } from "forge-std/Script.sol";
 
 address payable constant SATOSHI_X_APP_ADDRESS = payable(0x07BbC5A83B83a5C440D1CAedBF1081426d0AA4Ec);
+address payable constant TM_BEACON_ADDRESS = payable(0x00);
 
 interface IBeacon {
     function upgradeTo(address newImplementation) external;
     function implementation() external view returns (address);
 }
 
-contract UpgradeGracePeriodScript is Script {
-    uint256 internal OWNER_PRIVATE_KEY;
+library UpgradeGracePeriodLib {
+    function upgradeGracePeriod(address payable satoshiXApp) internal {
+        IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](6);
 
-    function setUp() public {
-        OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
-    }
-
-    function run() public {
-        vm.startBroadcast(OWNER_PRIVATE_KEY);
-
-        _upgradeBOFaucet();
-        _upgradeLiquidationFacet();
-        _upgradeInitializer();
-
-        // initV2
-        Initializer initializer = Initializer(SATOSHI_X_APP_ADDRESS);
-        initializer.initV2();
-
-        vm.stopBroadcast();
-    }
-
-    function _diamondCut(
-        address target,
-        bytes4[] memory selectors,
-        bytes4[] memory newSelectors,
-        bytes memory data
-    )
-        internal
-    {
-        IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](2);
-
-        facetCuts[0] = IERC2535DiamondCutInternal.FacetCut({
-            target: target,
-            action: IERC2535DiamondCutInternal.FacetCutAction.REPLACE,
-            selectors: selectors
-        });
-
-        facetCuts[1] = IERC2535DiamondCutInternal.FacetCut({
-            target: target,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: newSelectors
-        });
-
-        ISatoshiXApp XAPP = ISatoshiXApp(SATOSHI_X_APP_ADDRESS);
-        XAPP.diamondCut(facetCuts, address(0), data);
-    }
-
-    function _upgradeBOFaucet() internal {
+        // BorrowerOperationsFacet
         address newBorrowerOperationsImpl = address(new BorrowerOperationsFacet());
+        facetCuts[0] = IERC2535DiamondCutInternal.FacetCut({
+            target: newBorrowerOperationsImpl,
+            action: IERC2535DiamondCutInternal.FacetCutAction.REPLACE,
+            selectors: getBOSelectors()
+        });
+        facetCuts[1] = IERC2535DiamondCutInternal.FacetCut({
+            target: newBorrowerOperationsImpl,
+            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
+            selectors: getBONewSelectors()
+        });
 
+        // LiquidationFacet
+        address newLiquidationFacetImpl = address(new LiquidationFacet());
+        facetCuts[2] = IERC2535DiamondCutInternal.FacetCut({
+            target: newLiquidationFacetImpl,
+            action: IERC2535DiamondCutInternal.FacetCutAction.REPLACE,
+            selectors: getLiquidationSelectors()
+        });
+        facetCuts[3] = IERC2535DiamondCutInternal.FacetCut({
+            target: newLiquidationFacetImpl,
+            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
+            selectors: getLiquidationNewSelectors()
+        });
+
+        // Initializer
+        address newInitializerImpl = address(new Initializer());
+        facetCuts[4] = IERC2535DiamondCutInternal.FacetCut({
+            target: newInitializerImpl,
+            action: IERC2535DiamondCutInternal.FacetCutAction.REPLACE,
+            selectors: getInitializerSelectors()
+        });
+        facetCuts[5] = IERC2535DiamondCutInternal.FacetCut({
+            target: newInitializerImpl,
+            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
+            selectors: getInitializerNewSelectors()
+        });
+
+        // Upgrade and run initV2
+        ISatoshiXApp XAPP = ISatoshiXApp(satoshiXApp);
+        bytes memory data = abi.encodeWithSelector(Initializer.initV2.selector);
+        XAPP.diamondCut(facetCuts, satoshiXApp, data);
+    }
+
+    function getBOSelectors() internal pure returns (bytes4[] memory) {
         bytes4[] memory selectors = new bytes4[](19);
         selectors[0] = IBorrowerOperationsFacet.addColl.selector;
         selectors[1] = IBorrowerOperationsFacet.adjustTrove.selector;
@@ -91,34 +92,57 @@ contract UpgradeGracePeriodScript is Script {
         selectors[16] = IBorrowerOperationsFacet.withdrawColl.selector;
         selectors[17] = IBorrowerOperationsFacet.withdrawDebt.selector;
         selectors[18] = IBorrowerOperationsFacet.forceResetTM.selector;
-
-        bytes4[] memory newSelectors = new bytes4[](1);
-        newSelectors[0] = IBorrowerOperationsFacet.syncGracePeriod.selector;
-
-        _diamondCut(newBorrowerOperationsImpl, selectors, newSelectors, "");
+        return selectors;
     }
 
-    function _upgradeLiquidationFacet() internal {
-        address newLiquidationFacetImpl = address(new LiquidationFacet());
+    function getBONewSelectors() internal pure returns (bytes4[] memory) {
+        bytes4[] memory newSelectors = new bytes4[](1);
+        newSelectors[0] = IBorrowerOperationsFacet.syncGracePeriod.selector;
+        return newSelectors;
+    }
+
+    function getLiquidationSelectors() internal pure returns (bytes4[] memory) {
         bytes4[] memory selectors = new bytes4[](3);
         selectors[0] = ILiquidationFacet.batchLiquidateTroves.selector;
         selectors[1] = ILiquidationFacet.liquidate.selector;
         selectors[2] = ILiquidationFacet.liquidateTroves.selector;
-
-        bytes4[] memory newSelectors = new bytes4[](2);
-        newSelectors[0] = ILiquidationFacet.setGracePeriod.selector;
-        newSelectors[1] = ILiquidationFacet.syncGracePeriod.selector;
-
-        _diamondCut(newLiquidationFacetImpl, selectors, newSelectors, "");
+        return selectors;
     }
 
-    function _upgradeInitializer() internal {
-        Initializer initializer = new Initializer();
+    function getLiquidationNewSelectors() internal pure returns (bytes4[] memory) {
+        bytes4[] memory newSelectors = new bytes4[](1);
+        newSelectors[0] = ILiquidationFacet.setGracePeriod.selector;
+        return newSelectors;
+    }
+
+    function getInitializerSelectors() internal pure returns (bytes4[] memory) {
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = Initializer.init.selector;
+        return selectors;
+    }
+
+    function getInitializerNewSelectors() internal pure returns (bytes4[] memory) {
         bytes4[] memory newSelectors = new bytes4[](1);
         newSelectors[0] = Initializer.initV2.selector;
-        bytes memory data = abi.encodeWithSelector(Initializer.initV2.selector);
-        _diamondCut(address(initializer), selectors, newSelectors, data);
+        return newSelectors;
+    }
+}
+
+contract UpgradeGracePeriodScript is Script {
+    uint256 internal OWNER_PRIVATE_KEY;
+
+    function setUp() public {
+        OWNER_PRIVATE_KEY = uint256(vm.envBytes32("OWNER_PRIVATE_KEY"));
+    }
+
+    function run() public {
+        vm.startBroadcast(OWNER_PRIVATE_KEY);
+
+        UpgradeGracePeriodLib.upgradeGracePeriod(SATOSHI_X_APP_ADDRESS);
+        IBeacon troveManagerBeacon = IBeacon(TM_BEACON_ADDRESS);
+        address newTroveManagerImpl = address(new TroveManager());
+        troveManagerBeacon.upgradeTo(address(newTroveManagerImpl));
+
+        vm.stopBroadcast();
     }
 }
