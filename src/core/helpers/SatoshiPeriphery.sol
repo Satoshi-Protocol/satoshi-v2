@@ -284,8 +284,13 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
     function swapIn(address asset, uint256 assetAmount, LzSendParam calldata _lzSendParam) external payable {
         _beforeAddColl(IERC20(asset), assetAmount);
+        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
         uint256 debtAmount = INexusYieldManagerFacet(xApp).swapIn(asset, address(this), assetAmount);
+
+        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
+        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
+        require(userDebtAmount == debtAmount, "SatoshiPeriphery: Debt amount mismatch");
 
         _afterWithdrawDebt(debtAmount, _lzSendParam);
     }
