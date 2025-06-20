@@ -62,11 +62,14 @@ import { GasPool } from "../src/core/GasPool.sol";
 
 import { MultiTroveGetter } from "../src/core/helpers/MultiTroveGetter.sol";
 import { SatoshiPeriphery } from "../src/core/helpers/SatoshiPeriphery.sol";
+
+import { SwapRouter } from "../src/core/helpers/SwapRouter.sol";
 import { TroveHelper } from "../src/core/helpers/TroveHelper.sol";
 
 import { TroveManagerGetter } from "../src/core/helpers/TroveManagerGetter.sol";
 import { IMultiTroveGetter } from "../src/core/helpers/interfaces/IMultiTroveGetter.sol";
 import { ISatoshiPeriphery } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import { ISwapRouter } from "../src/core/helpers/interfaces/ISwapRouter.sol";
 import { ITroveHelper } from "../src/core/helpers/interfaces/ITroveHelper.sol";
 import { ITroveManagerGetter } from "../src/core/helpers/interfaces/ITroveManagerGetter.sol";
 import { IGasPool } from "../src/core/interfaces/IGasPool.sol";
@@ -115,6 +118,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
     IBeacon internal troveManagerBeacon;
 
     ISatoshiPeriphery internal satoshiPeriphery;
+    ISwapRouter internal swapRouter;
 
     IMultiCollateralHintHelpers internal hintHelpers;
     IMultiTroveGetter internal multiTroveGetter;
@@ -144,6 +148,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         _deployRewardManager();
         _deployVaultManager();
         _deployPeriphery();
+        _deploySwapRouter();
         _satoshiXAppInit();
         _deployHelpers();
 
@@ -163,6 +168,18 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
             abi.encodeCall(ISatoshiPeriphery.initialize, (IDebtToken(address(debtToken)), address(satoshiXApp), owner));
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
+        vm.stopBroadcast();
+    }
+
+    function _deploySwapRouter() internal {
+        vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
+        assert(address(swapRouter) == address(0)); // check if contract is not deployed
+        assert(address(debtToken) != address(0)); // check if debtToken is deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
+        bytes memory data =
+            abi.encodeCall(ISwapRouter.initialize, (IDebtToken(address(debtToken)), address(satoshiXApp), owner));
+        address swapRouterImpl = address(new SwapRouter());
+        swapRouter = ISwapRouter(address(new ERC1967Proxy(swapRouterImpl, data)));
         vm.stopBroadcast();
     }
 
