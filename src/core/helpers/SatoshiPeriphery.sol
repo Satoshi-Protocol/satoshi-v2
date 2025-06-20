@@ -9,7 +9,6 @@ import { DebtTokenWithLz } from "../DebtTokenWithLz.sol";
 import { IBorrowerOperationsFacet } from "../interfaces/IBorrowerOperationsFacet.sol";
 import { ICoreFacet } from "../interfaces/ICoreFacet.sol";
 import { ILiquidationFacet } from "../interfaces/ILiquidationFacet.sol";
-import { INexusYieldManagerFacet } from "../interfaces/INexusYieldManagerFacet.sol";
 import { ITroveManager } from "../interfaces/ITroveManager.sol";
 
 import { IDebtToken } from "../interfaces/IDebtToken.sol";
@@ -280,19 +279,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         _afterWithdrawDebt(userDebtAmount, _lzSendParam);
         _afterWithdrawColl(troveManager.collateralToken(), userCollAmount);
-    }
-
-    function swapIn(address asset, uint256 assetAmount, LzSendParam calldata _lzSendParam) external payable {
-        _beforeAddColl(IERC20(asset), assetAmount);
-        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-
-        uint256 debtAmount = INexusYieldManagerFacet(xApp).swapIn(asset, address(this), assetAmount);
-
-        uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
-        uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
-        require(userDebtAmount == debtAmount, "SatoshiPeriphery: Debt amount mismatch");
-
-        _afterWithdrawDebt(debtAmount, _lzSendParam);
     }
 
     // INTERNAL FUNCTIONS //
