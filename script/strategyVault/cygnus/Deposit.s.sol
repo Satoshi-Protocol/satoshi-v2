@@ -10,7 +10,7 @@ import { Script, console2 } from "forge-std/Script.sol";
 address constant VAULT_MANAGER_ADDRESS = 0x9Dda31F8a07B216AB5E153456DE251E0ed2e6372;
 address constant CYGNUS_VAULT_ADDRESS = 0xE8c5b4517610006C1fb0eD5467E01e4bAd43558D;
 address constant TOKEN_ADDRESS = 0x8d2757EA27AaBf172DA4CCa4e5474c76016e3dC5;
-uint256 constant AMOUNT = 150 * 1e18;
+uint256 constant AMOUNT = 250 * 1e18;
 
 contract DepositScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;

@@ -4,9 +4,9 @@ pragma solidity ^0.8.20;
 import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
-address constant DEBT_TOKEN_ADDRESS = 0x8dD8b12d55C73c08294664a5915475eD1c8b1F6f;
-address constant MINTER_ADDRESS = 0xFbDdd16303a7bC37b19448e738b21ECdAC0fA8d0;
-uint256 constant MINT_AMOUNT = 4500 * 1e18;
+address constant DEBT_TOKEN_ADDRESS = 0xb4818BB69478730EF4e33Cc068dD94278e2766cB;
+address constant MINTER_ADDRESS = 0x2acfb3F0255793c29A9aab335E5D77d0261B886B;
+uint256 constant MINT_AMOUNT = 20_000 * 1e18;
 
 contract MintDebtTokenScript is Script {
     uint256 internal MINTER_PRIVATE_KEY;
