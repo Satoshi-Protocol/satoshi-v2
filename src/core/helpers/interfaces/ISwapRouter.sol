@@ -15,7 +15,11 @@ struct LzSendParam {
 interface ISwapRouter {
     error InvalidZeroAddress();
 
+    event SwapInCrossChain(
+        address indexed user, address indexed asset, uint256 assetAmount, uint256 debtAmount, LzSendParam lzSendParam
+    );
+
     function initialize(IDebtToken _debtToken, address _xApp, address _owner) external;
 
-    function swapIn(address asset, uint256 assetAmount, LzSendParam calldata _lzSendParam) external payable;
+    function swapInCrossChain(address asset, uint256 assetAmount, LzSendParam calldata _lzSendParam) external payable;
 }

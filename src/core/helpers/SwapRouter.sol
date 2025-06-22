@@ -49,7 +49,7 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
 
     // EXTERNAL FUNCTIONS //
 
-    function swapIn(address asset, uint256 assetAmount, LzSendParam calldata _lzSendParam) external payable {
+    function swapInCrossChain(address asset, uint256 assetAmount, LzSendParam calldata _lzSendParam) external payable {
         _beforeAddAsset(IERC20(asset), assetAmount);
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
@@ -60,6 +60,8 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
         require(userDebtAmount == debtAmount, "SwapRouter: Debt amount mismatch");
 
         _sendDebt(debtAmount, _lzSendParam);
+
+        emit SwapInCrossChain(msg.sender, asset, assetAmount, debtAmount, _lzSendParam);
     }
 
     // INTERNAL FUNCTIONS //
