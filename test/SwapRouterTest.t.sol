@@ -130,7 +130,7 @@ contract SwapRouterTest is DeployBase, TroveBase {
         deal(address(collateralMock), user2, 100e18);
         vm.startPrank(user1);
         collateralMock.approve(address(swapRouter), 100e18);
-        swapRouter.swapInCrossChain(address(collateralMock), 100e18, LzSendParam(0, "", MessagingFee(0, 0)));
+        swapRouter.swapInCrossChain(address(collateralMock), 100e18, user1, LzSendParam(0, "", MessagingFee(0, 0)));
         vm.stopPrank();
         uint256 fee = 100e18 * nexusYieldProxy.feeIn(address(collateralMock)) / Config.BASIS_POINTS_DIVISOR;
         assertEq(debtTokenProxy().balanceOf(user1), 100e18 - fee);

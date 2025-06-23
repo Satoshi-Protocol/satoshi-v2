@@ -49,7 +49,15 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
 
     // EXTERNAL FUNCTIONS //
 
-    function swapInCrossChain(address asset, uint256 assetAmount, LzSendParam calldata _lzSendParam) external payable {
+    function swapInCrossChain(
+        address asset,
+        uint256 assetAmount,
+        address receiver,
+        LzSendParam calldata _lzSendParam
+    )
+        external
+        payable
+    {
         _beforeAddAsset(IERC20(asset), assetAmount);
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
@@ -59,9 +67,9 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
         require(userDebtAmount == debtAmount, "SwapRouter: Debt amount mismatch");
 
-        _sendDebt(debtAmount, _lzSendParam);
+        _sendDebt(debtAmount, receiver, _lzSendParam);
 
-        emit SwapInCrossChain(msg.sender, asset, assetAmount, debtAmount, _lzSendParam);
+        emit SwapInCrossChain(msg.sender, receiver, asset, assetAmount, debtAmount, _lzSendParam);
     }
 
     // INTERNAL FUNCTIONS //
@@ -74,27 +82,26 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
         token.approve(xApp, amount);
     }
 
-    /// @notice Withdraw the debt token to the msg sender
+    /// @notice Withdraw the debt token to the receiver
     /// @dev Need used in the payable functions
     /// @dev Transfer the debt token in current chain if dstEid is 0
     /// @dev Only debt token need to provide lzSendParam, and support native token as lz fee
-    function _sendDebt(uint256 debtAmount, LzSendParam calldata lzSendParam) private {
+    function _sendDebt(uint256 debtAmount, address receiver, LzSendParam calldata lzSendParam) private {
         if (debtAmount == 0) return;
-        address account = msg.sender;
 
         if (lzSendParam.dstEid == 0) {
             // In current chain
-            debtToken.safeTransfer(account, debtAmount);
+            debtToken.safeTransfer(receiver, debtAmount);
         } else if (debtToken.peers(lzSendParam.dstEid) == 0) {
             // If the dstEid is not supported, just transfer the debt token to the msg sender
-            debtToken.safeTransfer(account, debtAmount);
+            debtToken.safeTransfer(receiver, debtAmount);
         } else {
             // Step 1: Prepare the SendParam
             SendParam memory _sendParam = SendParam(
                 lzSendParam.dstEid,
-                bytes32(uint256(uint160(account))),
+                bytes32(uint256(uint160(receiver))),
                 debtAmount,
-                debtAmount,
+                0, /* minAmountLD */
                 lzSendParam.extraOptions,
                 "",
                 ""
@@ -109,7 +116,7 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
             require(expectFee.lzTokenFee == lzSendParam.fee.lzTokenFee, "SwapRouter: lzTokenFee incorrect");
 
             // Step 3: Send the Debt tokens to the other chain
-            debtToken.send{ value: msg.value }(_sendParam, lzSendParam.fee, account);
+            debtToken.send{ value: msg.value }(_sendParam, lzSendParam.fee, msg.sender);
         }
     }
 
