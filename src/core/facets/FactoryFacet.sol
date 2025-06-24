@@ -86,6 +86,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
             }
         }
         if (!collateralEnabled) {
+            /*
             Queue memory queueCached = s.queue;
             if (queueCached.nextSunsetIndexKey > queueCached.firstSunsetIndexKey) {
                 SunsetIndex memory sIdx = s.sunsetIndexes[queueCached.firstSunsetIndexKey];
@@ -95,6 +96,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
                     return;
                 }
             }
+            */
             s.collateralTokens.push(_collateral);
             s.indexByCollateral[_collateral] = s.collateralTokens.length;
         } else {
