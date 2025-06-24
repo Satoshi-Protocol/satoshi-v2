@@ -94,7 +94,7 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
             debtToken.safeTransfer(receiver, debtAmount);
         } else if (debtToken.peers(lzSendParam.dstEid) == 0) {
             // If the dstEid is not supported, just transfer the debt token to the msg sender
-            debtToken.safeTransfer(receiver, debtAmount);
+            debtToken.safeTransfer(msg.sender, debtAmount);
         } else {
             // Step 1: Prepare the SendParam
             SendParam memory _sendParam = SendParam(
