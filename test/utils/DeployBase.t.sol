@@ -61,7 +61,10 @@ import { IOSHIToken } from "../../src/OSHI/interfaces/IOSHIToken.sol";
 import { Config } from "../../src/core/Config.sol";
 import { GasPool } from "../../src/core/GasPool.sol";
 import { SatoshiPeriphery } from "../../src/core/helpers/SatoshiPeriphery.sol";
+
+import { SwapRouter } from "../../src/core/helpers/SwapRouter.sol";
 import { ISatoshiPeriphery } from "../../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
+import { ISwapRouter } from "../../src/core/helpers/interfaces/ISwapRouter.sol";
 
 import { IWETH } from "../../src/core/helpers/interfaces/IWETH.sol";
 import { IGasPool } from "../../src/core/interfaces/IGasPool.sol";
@@ -137,6 +140,7 @@ abstract contract DeployBase is Test {
     IBeacon internal troveManagerBeacon;
 
     ISatoshiPeriphery internal satoshiPeriphery;
+    ISwapRouter internal swapRouter;
 
     IERC20 collateralMock;
     RoundData internal initRoundData;
@@ -159,6 +163,7 @@ abstract contract DeployBase is Test {
         _deployCommunityIssuance(DEPLOYER);
         _deployRewardManager(DEPLOYER);
         _deployPeriphery(DEPLOYER);
+        _deploySwapRouter(DEPLOYER);
         _satoshiXAppInit(DEPLOYER);
         _deployHintHelpers(DEPLOYER);
         _deployVaultManager(DEPLOYER);
@@ -175,6 +180,18 @@ abstract contract DeployBase is Test {
             abi.encodeCall(ISatoshiPeriphery.initialize, (IDebtToken(address(debtToken)), address(satoshiXApp), OWNER));
         address peripheryImpl = address(new SatoshiPeriphery());
         satoshiPeriphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
+        vm.stopPrank();
+    }
+
+    function _deploySwapRouter(address deployer) internal {
+        vm.startPrank(deployer);
+        assert(address(swapRouter) == address(0)); // check if contract is not deployed
+        assert(address(debtToken) != address(0)); // check if debtToken is deployed
+        assert(address(satoshiXApp) != address(0)); // check if satoshiXApp is deployed
+        bytes memory data =
+            abi.encodeCall(ISwapRouter.initialize, (IDebtToken(address(debtToken)), address(satoshiXApp), OWNER));
+        address swapRouterImpl = address(new SwapRouter());
+        swapRouter = ISwapRouter(address(new ERC1967Proxy(swapRouterImpl, data)));
         vm.stopPrank();
     }
 
