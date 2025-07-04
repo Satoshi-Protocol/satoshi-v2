@@ -8,9 +8,9 @@ import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
-address constant OWNER = 0xFbDdd16303a7bC37b19448e738b21ECdAC0fA8d0;
-address constant SATOSHI_X_APP = 0x8dD8b12d55C73c08294664a5915475eD1c8b1F6f;
-address constant DEBT_TOKEN_ADDRESS = 0x70654AaD8B7734dc319d0C3608ec7B32e03FA162;
+address constant OWNER = 0xd3e87B4B76E6F8bFf454AAFc2AD3271C5b317d47;
+address constant SATOSHI_X_APP = 0x2863E3D0f29E2EEC6adEFC0dF0d3171DaD542c02;
+address constant DEBT_TOKEN_ADDRESS = 0x8dD8b12d55C73c08294664a5915475eD1c8b1F6f;
 
 contract DeploySwapRouterScript is Script {
     uint256 internal DEPLOYMENT_PRIVATE_KEY;

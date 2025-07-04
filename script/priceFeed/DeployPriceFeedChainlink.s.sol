@@ -6,7 +6,7 @@ import { AggregatorV3Interface } from "../../src/priceFeed/interfaces/Aggregator
 import { Script, console2 } from "forge-std/Script.sol";
 
 //! Change when deploying
-address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS = 0x9aeb30A779Eb70eEDa63EA9fcA866a21E9462c14;
+address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS = 0x4Ff345b18a2bF894F8627F41501FBf30d5C5e7BE;
 uint256 constant CHAINLINK_MAX_TIME_THRESHOLD = 86_400 + 300;
 
 contract DeployPriceFeedChainlinkScript is Script {

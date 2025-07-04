@@ -5,7 +5,7 @@ import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
 import { Script, console } from "forge-std/Script.sol";
 
 address constant DEBT_TOKEN_ADDRESS = 0xb4818BB69478730EF4e33Cc068dD94278e2766cB;
-address constant AUTH_ADDRESS = 0xFbDdd16303a7bC37b19448e738b21ECdAC0fA8d0;
+address constant AUTH_ADDRESS = 0xd3e87B4B76E6F8bFf454AAFc2AD3271C5b317d47;
 
 contract SetAuthScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;

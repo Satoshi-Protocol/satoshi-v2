@@ -596,6 +596,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         console.log("nexusYieldManagerFacet", address(nexusYieldManagerFacet));
         console.log("initializer", address(initializer));
         console.log("satoshiPeriphery", address(satoshiPeriphery));
+        console.log("swapRouter", address(swapRouter));
         console.log("gasPool", address(gasPool));
         console.log("debtToken", address(debtToken));
         console.log("communityIssuance", address(communityIssuance));
