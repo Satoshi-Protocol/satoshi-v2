@@ -37,6 +37,8 @@ interface IVault {
     error IndexOutOfRange(uint256 index);
     error VaultManagerNotSet();
     error DebtTokenNotSet();
+    error NotWhitelist(address account);
+    error NotImplemented();
 
     function executeStrategy(bytes calldata data) external;
     function executeCall(address dest, bytes calldata data) external;
