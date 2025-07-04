@@ -44,8 +44,8 @@ contract SafeVault is VaultCore {
         whitelist[to] = valid;
     }
 
-    function constructTransferData(address token, uint256 amount) external pure returns (bytes memory) {
-        return abi.encode(Option.TRANSFER, token, amount);
+    function constructTransferData(address token, address to, uint256 amount) external pure returns (bytes memory) {
+        return abi.encode(Option.TRANSFER, token, to, amount);
     }
 
     function constructExitByTroveManagerData(address, uint256) external pure override returns (bytes memory) {
