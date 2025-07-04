@@ -29,6 +29,8 @@ library Config {
     /* Liquidation */
     uint256 internal constant _100_PCT = 1_000_000_000_000_000_000; // 1e18 == 100%
 
+    uint256 internal constant _110_PCT = 1_100_000_000_000_000_000; // 110%
+
     /* PriceFeedAggregator */
     uint256 public constant PRICE_TARGET_DIGITS = 18;
 
@@ -45,4 +47,8 @@ library Config {
      * Farming
      */
     uint256 constant FARMING_PRECISION = 1e4;
+
+    /* Recovery mode grace period */
+    uint128 constant UNSET_TIMESTAMP = type(uint128).max;
+    uint128 constant MINIMUM_GRACE_PERIOD = 15 minutes;
 }

@@ -91,6 +91,12 @@ interface ILiquidationFacet {
     /// @param _operation The operation type
     event TroveLiquidated(address indexed _borrower, uint256 _debt, uint256 _coll, uint8 _operation);
 
+    event GracePeriodDurationSet(uint128 _gracePeriod);
+
+    error GracePeriodTooShort(uint128 gracePeriod);
+    error NotInGracePeriod();
+    error InGracePeriod();
+
     /// @notice Batch liquidates a list of troves
     /// @param troveManager The Trove Manager handling the liquidation
     /// @param _troveArray The array of trove addresses to be liquidated
@@ -106,4 +112,11 @@ interface ILiquidationFacet {
     /// @param maxTrovesToLiquidate The maximum number of troves to liquidate
     /// @param maxICR The maximum individual collateral ratio
     function liquidateTroves(ITroveManager troveManager, uint256 maxTrovesToLiquidate, uint256 maxICR) external;
+
+    /// @notice Set the grace period for recovery mode
+    /// @param _gracePeriod The new grace period
+    function setGracePeriod(uint128 _gracePeriod) external;
+
+    /// @notice Sync the grace period
+    function syncGracePeriod() external;
 }

@@ -209,4 +209,10 @@ library BorrowerOperationsLib {
             _maxFeePercentage <= SatoshiMath.DECIMAL_PRECISION, "Max fee percentage must less than or equal to 100%"
         );
     }
+
+    function _inRecoveryMode(AppStorage.Layout storage s) internal returns (bool) {
+        (uint256 _entireSystemColl, uint256 _entireSystemDebt) = _getGlobalSystemBalances(s);
+        uint256 TCR = SatoshiMath._computeCR(_entireSystemColl, _entireSystemDebt);
+        return _checkRecoveryMode(TCR);
+    }
 }
