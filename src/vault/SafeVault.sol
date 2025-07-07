@@ -42,6 +42,8 @@ contract SafeVault is VaultCore {
     function setWhitelist(address to, bool valid) external onlyOwner {
         Utils.ensureNonzeroAddress(to);
         whitelist[to] = valid;
+
+        emit WhitelistSet(to, valid);
     }
 
     function constructTransferData(address token, address to, uint256 amount) external pure returns (bytes memory) {
