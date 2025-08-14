@@ -34,6 +34,9 @@ contract PriceFeedChainlinkExchangeRate is Ownable {
         // fetch the price
         (, int256 price,, uint256 updatedAt,) = sources[0].source.latestRoundData();
         if (price <= 0) revert InvalidPriceInt256(price);
+        if (block.timestamp - updatedAt > sources[0].maxTimeThreshold) {
+            revert PriceTooOld();
+        }
 
         uint256 scaledPrice = getScaledPrice(uint256(price), sources[0].source.decimals());
 
@@ -48,7 +51,9 @@ contract PriceFeedChainlinkExchangeRate is Ownable {
 
         uint256 finalPrice = Math.mulDiv(scaledPrice, scaledRate, 10 ** TARGET_DIGITS);
 
-        return (0, int256(finalPrice), 0, updatedAt, 0);
+        uint256 latestUpdatedAt = Math.max(updatedAt, rateUpdatedAt);
+
+        return (0, int256(finalPrice), 0, latestUpdatedAt, 0);
     }
 
     // --- View Functions ---

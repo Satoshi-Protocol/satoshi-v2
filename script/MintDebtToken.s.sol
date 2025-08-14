@@ -5,8 +5,8 @@ import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
 address constant DEBT_TOKEN_ADDRESS = 0xb4818BB69478730EF4e33Cc068dD94278e2766cB;
-address constant MINTER_ADDRESS = 0xB08337aA8667e8CB0D9fF7d9003CEe15924bBf77;
-uint256 constant MINT_AMOUNT = 500_000 * 1e18;
+address constant MINTER_ADDRESS = 0xd3e87B4B76E6F8bFf454AAFc2AD3271C5b317d47;
+uint256 constant MINT_AMOUNT = 1 * 1e18;
 
 contract MintDebtTokenScript is Script {
     uint256 internal MINTER_PRIVATE_KEY;
