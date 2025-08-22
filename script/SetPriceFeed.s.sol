@@ -8,7 +8,7 @@ import { Script, console } from "forge-std/Script.sol";
 
 address constant SATOSHI_XAPP_ADDRESS = 0xEC272aF6e65C4D7857091225fa8ED300Df787CCF;
 address constant ASSET_ADDRESS = 0xCC0966D8418d412c599A6421b760a847eB169A8c;
-address constant PRICE_FEED_ADDRESS = 0x690070E052cae6615aD404eC7b288598eb01d8A5;
+address constant PRICE_FEED_ADDRESS = 0xEe8F21A74915eA4022f85A77a73A975B1cc00592;
 
 contract SetPriceFeedScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;

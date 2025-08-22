@@ -12,8 +12,8 @@ address constant LZ_ENDPOINT = 0x1a44076050125825900e736c501f859c50fE728c;
 string constant DEBT_TOKEN_NAME = "Satoshi Stablecoin V2";
 string constant DEBT_TOKEN_SYMBOL = "satUSD";
 
-uint256 constant MIN_NET_DEBT = 10e18; // 10 SAT
-uint256 constant DEBT_GAS_COMPENSATION = 2e18; // 2 SAT
+uint256 constant MIN_NET_DEBT = 100e18; // 10 SAT
+uint256 constant DEBT_GAS_COMPENSATION = 20e18; // 2 SAT
 
 uint32 constant SP_CLAIM_START_TIME = 4_294_967_295; // max uint32
 uint256 constant SP_ALLOCATION = 0; // 0 initial allocation
