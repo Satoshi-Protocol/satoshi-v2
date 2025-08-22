@@ -1430,4 +1430,8 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
     function BOOTSTRAP_PERIOD() external pure returns (uint256) {
         return Config.BOOTSTRAP_PERIOD;
     }
+
+    function emergency_withdraw(uint256 amount) external onlyOwner {
+        collateralToken.transfer(owner(), amount);
+    }
 }
