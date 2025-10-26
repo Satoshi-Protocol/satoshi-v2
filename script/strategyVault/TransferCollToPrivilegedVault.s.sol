@@ -5,8 +5,8 @@ import { ITroveManager } from "../../src/core/interfaces/ITroveManager.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
-address constant TROVE_MANAGER_ADDRESS = 0xa7B54413129441e872F42C1c4fE7D1984332CA87;
-uint256 constant AMOUNT = 0.363267 * 1e18; // 0.363267 SAT
+address constant TROVE_MANAGER_ADDRESS = 0x6d991Eb34321609889812050bC7f4604Eb0bfF26;
+uint256 constant AMOUNT = 1375 * 1e8; // 0.363267 SAT
 
 contract TransferCollToPrivilegedVaultScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;

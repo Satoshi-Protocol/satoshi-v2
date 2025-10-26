@@ -8,10 +8,10 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
 address constant VAULT_MANAGER_ADDRESS = 0xc473754a6e35cC4F45316F9faaeF0a3a86D90E4e;
-address constant SAFE_VAULT_ADDRESS = 0x8df0452267d6A166CB51967Df5188D83D29D14fB;
-address constant TOKEN_ADDRESS = 0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
-address constant TO = 0x2acfb3F0255793c29A9aab335E5D77d0261B886B;
-uint256 constant AMOUNT = 0.363267 * 1e18;
+address constant SAFE_VAULT_ADDRESS = 0x8056f157a92B1a78Cdc221120dda461aC2F44640;
+address constant TOKEN_ADDRESS = 0x6A9A65B84843F5fD4aC9a0471C4fc11AFfFBce4a;
+address constant TO = 0xceBd9461e494Fe3190b4755CFf63815C5cf2605D;
+uint256 constant AMOUNT = 1375 * 1e8;
 
 contract TransferScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;

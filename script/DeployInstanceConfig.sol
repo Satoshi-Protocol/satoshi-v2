@@ -6,9 +6,9 @@ address constant REWARD_MANAGER_ADDRESS = 0x7096321899f6788eC180Ad7bd5bb9AfD0a78
 address constant VAULT_MANAGER_ADDRESS = 0x6182ac22ECEE4282119522309e70B52F0eFCeb92;
 
 //NOTE: custom `PriceFeed.sol` contract for the collateral should be deploy first
-address constant PRICE_FEED_ADDRESS = 0x93736af88195abbe9c8E0abeb53Cf6550F0747F6;
-address constant COLLATERAL_ADDRESS = 0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee;
-uint256 constant MCR = 125 * 1e16; //  110 * 1e16 -> 110%
+address constant PRICE_FEED_ADDRESS = 0x1Af6626290b03803Cedf7eF32e7ADB7DaE844663;
+address constant COLLATERAL_ADDRESS = 0x6A9A65B84843F5fD4aC9a0471C4fc11AFfFBce4a;
+uint256 constant MCR = 170 * 1e16; //  110 * 1e16 -> 110%
 
 uint256 constant MINUTE_DECAY_FACTOR = 999_037_758_833_783_500; //  (half life of 12 hours)
 uint256 constant REDEMPTION_FEE_FLOOR = 1e18 / 1000 * 5; //  (0.5%)
