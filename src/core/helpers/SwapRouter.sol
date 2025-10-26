@@ -79,7 +79,7 @@ contract SwapRouter is ISwapRouter, UUPSUpgradeable, OwnableUpgradeable {
         if (amount == 0) return;
 
         token.safeTransferFrom(msg.sender, address(this), amount);
-        token.approve(xApp, amount);
+        token.safeIncreaseAllowance(xApp, amount);
     }
 
     /// @notice Withdraw the debt token to the receiver
