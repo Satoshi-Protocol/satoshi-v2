@@ -187,9 +187,7 @@ contract PellVault is VaultCore {
         IDelegationManager.QueuedWithdrawalParams[] memory queuedWithdrawal =
             new IDelegationManager.QueuedWithdrawalParams[](1);
         queuedWithdrawal[0] = IDelegationManager.QueuedWithdrawalParams({
-            strategies: strategies,
-            shares: shares,
-            withdrawer: address(this)
+            strategies: strategies, shares: shares, withdrawer: address(this)
         });
 
         uint256 nonce = IDelegationManager(delegationManager).cumulativeWithdrawalsQueued(address(this));
@@ -231,9 +229,8 @@ contract PellVault is VaultCore {
         middlewareTimesIndexes[0] = 0;
         bool[] memory receiveAsTokens = new bool[](1);
         receiveAsTokens[0] = true;
-        IDelegationManager(delegationManager).completeQueuedWithdrawals(
-            withdrawals, tokens, middlewareTimesIndexes, receiveAsTokens
-        );
+        IDelegationManager(delegationManager)
+            .completeQueuedWithdrawals(withdrawals, tokens, middlewareTimesIndexes, receiveAsTokens);
 
         _removeWithdrawalQueue(0);
 
@@ -253,7 +250,7 @@ contract PellVault is VaultCore {
         strategy_[0] = withdrawalQueue[index].strategies[0];
         if (
             uint256(withdrawalQueue[index].startTimestamp)
-                + IDelegationManager(delegationManager).getWithdrawalDelay(strategy_) > block.timestamp
+                    + IDelegationManager(delegationManager).getWithdrawalDelay(strategy_) > block.timestamp
         ) {
             revert WithdrawalTimeNotAvailable();
         }

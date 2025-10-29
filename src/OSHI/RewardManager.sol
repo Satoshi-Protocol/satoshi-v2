@@ -389,7 +389,14 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         debtToken.transfer(msg.sender, debtAmount);
     }
 
-    function _setAddresses(address _satoshiXApp, address _weth, address _debtToken, address _oshiToken) internal {
+    function _setAddresses(
+        address _satoshiXApp,
+        address _weth,
+        address _debtToken,
+        address _oshiToken
+    )
+        internal
+    {
         Utils.ensureNonzeroAddress(_satoshiXApp);
         Utils.ensureNonzeroAddress(_weth);
         Utils.ensureNonzeroAddress(_debtToken);

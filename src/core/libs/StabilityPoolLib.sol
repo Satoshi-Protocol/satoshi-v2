@@ -104,7 +104,8 @@ library StabilityPoolLib {
          * 4) Store these errors for use in the next correction when this function is called.
          * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
          */
-        uint256 collateralNumerator = (_collToAdd * SatoshiMath.DECIMAL_PRECISION) + s.lastCollateralError_Offset[idx];
+        uint256 collateralNumerator =
+            (_collToAdd * SatoshiMath.DECIMAL_PRECISION) + s.lastCollateralError_Offset[idx];
 
         if (_debtToOffset == _totalDebtTokenDeposits) {
             debtLossPerUnitStaked = SatoshiMath.DECIMAL_PRECISION; // When the Pool depletes to 0, so does each deposit

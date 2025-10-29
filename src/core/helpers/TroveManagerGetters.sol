@@ -62,11 +62,7 @@ contract TroveManagerGetters {
     /**
      * @notice Returns a list of trove managers where `account` has an existing trove
      */
-    function getActiveTroveManagersForAccount(address account)
-        external
-        view
-        returns (ITroveManager[] memory, uint256)
-    {
+    function getActiveTroveManagersForAccount(address account) external view returns (ITroveManager[] memory, uint256) {
         uint256 length = IFactoryFacet(satoshiXApp).troveManagerCount();
         ITroveManager[] memory troveManagers = new ITroveManager[](length);
         uint256 tmCount;

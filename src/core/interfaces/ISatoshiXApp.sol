@@ -5,5 +5,6 @@ import { IAccessControl } from "@solidstate/contracts/access/access_control/IAcc
 import { ISolidStateDiamond } from "@solidstate/contracts/proxy/diamond/ISolidStateDiamond.sol";
 
 interface ISatoshiXApp is ISolidStateDiamond, IAccessControl {
-// inherit from ISolidStateDiamond and IAccessControl, no additional interfaces
-}
+    // inherit from ISolidStateDiamond and IAccessControl, no additional interfaces
+
+    }

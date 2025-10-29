@@ -108,10 +108,7 @@ contract RedeemTest is DeployBase, TroveBase {
         // price drop
         _updateRoundData(
             RoundData({
-                answer: 3_050_000_000_000,
-                startedAt: block.timestamp,
-                updatedAt: block.timestamp,
-                answeredInRound: 1
+                answer: 3_050_000_000_000, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1
             })
         );
 
@@ -136,10 +133,7 @@ contract RedeemTest is DeployBase, TroveBase {
         // price drop
         _updateRoundData(
             RoundData({
-                answer: 4_000_000_000_000,
-                startedAt: block.timestamp,
-                updatedAt: block.timestamp,
-                answeredInRound: 1
+                answer: 4_000_000_000_000, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1
             })
         );
 
@@ -163,10 +157,7 @@ contract RedeemTest is DeployBase, TroveBase {
         // price drop
         _updateRoundData(
             RoundData({
-                answer: 4_000_000_000_000,
-                startedAt: block.timestamp,
-                updatedAt: block.timestamp,
-                answeredInRound: 1
+                answer: 4_000_000_000_000, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1
             })
         );
 
@@ -195,10 +186,7 @@ contract RedeemTest is DeployBase, TroveBase {
 
         _updateRoundData(
             RoundData({
-                answer: 4_000_000_000_000,
-                startedAt: block.timestamp,
-                updatedAt: block.timestamp,
-                answeredInRound: 1
+                answer: 4_000_000_000_000, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1
             })
         );
 

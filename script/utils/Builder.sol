@@ -43,9 +43,7 @@ library Builder {
         selectors[selectorIndex++] = ICoreFacet.communityIssuance.selector;
 
         facetCut = IERC2535DiamondCutInternal.FacetCut({
-            target: coreFacet,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: coreFacet, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
     }
 
@@ -83,9 +81,7 @@ library Builder {
         selectors[selectorIndex++] = IBorrowerOperationsFacet.troveManagersData.selector;
 
         facetCut = IERC2535DiamondCutInternal.FacetCut({
-            target: borrowerOperationsFacet,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: borrowerOperationsFacet, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
     }
 
@@ -107,9 +103,7 @@ library Builder {
         selectors[selectorIndex++] = IFactoryFacet.maxTMRewardRate.selector;
 
         facetCut = IERC2535DiamondCutInternal.FacetCut({
-            target: factoryFacet,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: factoryFacet, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
     }
 
@@ -129,9 +123,7 @@ library Builder {
         selectors[selectorIndex++] = ILiquidationFacet.liquidateTroves.selector;
 
         facetCut = IERC2535DiamondCutInternal.FacetCut({
-            target: liquidationFacet,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: liquidationFacet, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
     }
 
@@ -179,9 +171,7 @@ library Builder {
         selectors[selectorIndex++] = INexusYieldManagerFacet.pendingWithdrawals.selector;
 
         facetCut = IERC2535DiamondCutInternal.FacetCut({
-            target: nexusYieldManagerFacet,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: nexusYieldManagerFacet, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
     }
 
@@ -248,9 +238,7 @@ library Builder {
         selectors[selectorIndex++] = IStabilityPoolFacet.setSPRewardRate.selector;
 
         facetCut = IERC2535DiamondCutInternal.FacetCut({
-            target: stabilityPoolFacet,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: stabilityPoolFacet, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
     }
 
@@ -268,9 +256,7 @@ library Builder {
         selectors[selectorIndex++] = Initializer.init.selector;
 
         facetCut = IERC2535DiamondCutInternal.FacetCut({
-            target: initializer,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: initializer, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
     }
 

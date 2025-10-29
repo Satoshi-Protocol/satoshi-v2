@@ -208,7 +208,13 @@ interface INexusYieldManagerFacet {
      * @param stableTknAmount The amount of stable tokens to swap.
      * @return The amount of debt tokens received.
      */
-    function swapOutPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
+    function swapOutPrivileged(
+        address asset,
+        address receiver,
+        uint256 stableTknAmount
+    )
+        external
+        returns (uint256);
 
     /**
      * @notice Swaps a specified amount of debt tokens for stable tokens for a privileged account.
@@ -217,7 +223,13 @@ interface INexusYieldManagerFacet {
      * @param stableTknAmount The amount of stable tokens to swap.
      * @return The amount of debt tokens received.
      */
-    function swapInPrivileged(address asset, address receiver, uint256 stableTknAmount) external returns (uint256);
+    function swapInPrivileged(
+        address asset,
+        address receiver,
+        uint256 stableTknAmount
+    )
+        external
+        returns (uint256);
 
     /**
      * @notice Schedules a swap out of a specified amount of an asset.

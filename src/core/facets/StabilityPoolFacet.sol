@@ -7,7 +7,11 @@ import { AppStorage } from "../AppStorage.sol";
 import { Config } from "../Config.sol";
 import { IDebtToken } from "../interfaces/IDebtToken.sol";
 import {
-    AccountDeposit, IStabilityPoolFacet, Queue, Snapshots, SunsetIndex
+    AccountDeposit,
+    IStabilityPoolFacet,
+    Queue,
+    Snapshots,
+    SunsetIndex
 } from "../interfaces/IStabilityPoolFacet.sol";
 
 import { StabilityPoolLib } from "../libs/StabilityPoolLib.sol";
@@ -38,8 +42,9 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
     function startCollateralSunset(IERC20 collateral) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s.indexByCollateral[collateral] > 0, "Collateral already sunsetting");
-        s.sunsetIndexes[s.queue.nextSunsetIndexKey++] =
-            SunsetIndex(uint128(s.indexByCollateral[collateral] - 1), uint128(block.timestamp + Config.SUNSET_DURATION));
+        s.sunsetIndexes[s.queue.nextSunsetIndexKey++] = SunsetIndex(
+            uint128(s.indexByCollateral[collateral] - 1), uint128(block.timestamp + Config.SUNSET_DURATION)
+        );
         delete s.indexByCollateral[collateral]; //This will prevent calls to the SP in case of liquidations
         emit CollateralSunset(address(collateral));
     }
@@ -191,11 +196,11 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
             uint256 firstPortion = sums[i] - depSums[i];
             uint256 secondPortion = nextSums[i] / Config.SCALE_FACTOR;
             uint8 _decimals = IERC20Metadata(address(s.collateralTokens[i])).decimals();
-            depositorGains[i] += uint80(
-                (
-                    initialDeposit * SatoshiMath._getOriginalCollateralAmount(firstPortion + secondPortion, _decimals)
-                        / P_Snapshot / SatoshiMath.DECIMAL_PRECISION
-                )
+            depositorGains[
+                i
+            ] += uint80(
+                (initialDeposit * SatoshiMath._getOriginalCollateralAmount(firstPortion + secondPortion, _decimals)
+                        / P_Snapshot / SatoshiMath.DECIMAL_PRECISION)
             );
         }
         return (hasGains);
@@ -234,8 +239,8 @@ contract StabilityPoolFacet is IStabilityPoolFacet, AccessControlInternal {
                 (s.epochToScaleToG[epochSnapshot][scaleSnapshot + 1] + marginalOSHIGain) / Config.SCALE_FACTOR;
         }
 
-        return s.storedPendingReward[_depositor]
-            + (initialDeposit * (firstPortion + secondPortion)) / snapshots.P / SatoshiMath.DECIMAL_PRECISION;
+        return s.storedPendingReward[_depositor] + (initialDeposit * (firstPortion + secondPortion)) / snapshots.P
+            / SatoshiMath.DECIMAL_PRECISION;
     }
 
     function _claimableReward(AppStorage.Layout storage s, address _depositor) private view returns (uint256) {

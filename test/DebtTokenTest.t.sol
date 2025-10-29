@@ -10,8 +10,9 @@ import { DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, DEPLOYER, OWNER } from "./TestConfi
 import { DeployBase } from "./utils/DeployBase.t.sol";
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { ERC20PermitUpgradeable } from
-    "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import {
+    ERC20PermitUpgradeable
+} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import { IERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import { stdJson } from "forge-std/StdJson.sol";
 

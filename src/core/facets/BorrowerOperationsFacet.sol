@@ -352,8 +352,9 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
             require(_debtChange != 0, "BorrowerOps: Debt increase requires non-zero debtChange");
             BorrowerOperationsLib._requireValidMaxFeePercentage(_maxFeePercentage);
 
-            vars.netDebtChange +=
-                _triggerBorrowingFee(s, troveManager, collateralToken, account, _maxFeePercentage, _debtChange);
+            vars.netDebtChange += _triggerBorrowingFee(
+                s, troveManager, collateralToken, account, _maxFeePercentage, _debtChange
+            );
         }
 
         // Calculate old and new ICRs and check if adjustment satisfies all conditions for the current system mode

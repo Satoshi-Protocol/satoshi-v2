@@ -82,9 +82,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
-        IBorrowerOperationsFacet(xApp).openTrove(
-            troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
-        );
+        IBorrowerOperationsFacet(xApp)
+            .openTrove(troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint);
 
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
@@ -158,9 +157,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         payable
     {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-        IBorrowerOperationsFacet(xApp).withdrawDebt(
-            troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
-        );
+        IBorrowerOperationsFacet(xApp)
+            .withdrawDebt(troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint);
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
         require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
@@ -213,17 +211,18 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
             _beforeRepayDebt(_debtChange);
         }
 
-        IBorrowerOperationsFacet(xApp).adjustTrove(
-            troveManager,
-            msg.sender,
-            _maxFeePercentage,
-            _collDeposit,
-            _collWithdrawal,
-            _debtChange,
-            _isDebtIncrease,
-            _upperHint,
-            _lowerHint
-        );
+        IBorrowerOperationsFacet(xApp)
+            .adjustTrove(
+                troveManager,
+                msg.sender,
+                _maxFeePercentage,
+                _collDeposit,
+                _collWithdrawal,
+                _debtChange,
+                _isDebtIncrease,
+                _upperHint,
+                _lowerHint
+            );
 
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         // withdraw collateral

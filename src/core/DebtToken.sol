@@ -14,8 +14,9 @@ import { IDebtToken } from "./interfaces/IDebtToken.sol";
 import { ITroveManager } from "./interfaces/ITroveManager.sol";
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { ERC20PermitUpgradeable } from
-    "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
+import {
+    ERC20PermitUpgradeable
+} from "@openzeppelin/contracts-upgradeable/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 
 /**
  * @title DebtToken
@@ -131,7 +132,14 @@ contract DebtToken is IDebtToken, UUPSUpgradeable, ERC20PermitUpgradeable, Ownab
 
     // --- External functions ---
 
-    function transfer(address recipient, uint256 amount) public override(IDebtToken, ERC20Upgradeable) returns (bool) {
+    function transfer(
+        address recipient,
+        uint256 amount
+    )
+        public
+        override(IDebtToken, ERC20Upgradeable)
+        returns (bool)
+    {
         _requireValidRecipient(recipient);
         return super.transfer(recipient, amount);
     }

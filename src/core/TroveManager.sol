@@ -506,7 +506,14 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         return _calcRedemptionFee(getRedemptionRateWithDecay(), _collateralDrawn);
     }
 
-    function _calcRedemptionFee(uint256 _redemptionRate, uint256 _collateralDrawn) internal pure returns (uint256) {
+    function _calcRedemptionFee(
+        uint256 _redemptionRate,
+        uint256 _collateralDrawn
+    )
+        internal
+        pure
+        returns (uint256)
+    {
         uint256 redemptionFee = (_redemptionRate * _collateralDrawn) / SatoshiMath.DECIMAL_PRECISION;
         require(redemptionFee < _collateralDrawn, "Fee exceeds returned collateral");
         return redemptionFee;
