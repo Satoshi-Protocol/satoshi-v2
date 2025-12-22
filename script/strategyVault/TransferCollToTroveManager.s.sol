@@ -8,7 +8,7 @@ import { Script, console2 } from "forge-std/Script.sol";
 
 address constant VAULT_MANAGER_ADDRESS = 0xc473754a6e35cC4F45316F9faaeF0a3a86D90E4e;
 address constant TROVE_MANAGER_ADDRESS = 0x6d991Eb34321609889812050bC7f4604Eb0bfF26;
-uint256 constant AMOUNT = 500 * 1e8;
+uint256 constant AMOUNT = 875 * 1e8;
 
 contract TransferCollToTroveManagerScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;
