@@ -32,7 +32,7 @@ contract DeployPriceFeedSupraScript is Script {
         priceFeedSupraOracle = new PriceFeedSupraOracle(
             source, pullSource, SUPRA_ORACLE_PRICE_FEED_DECIMAL, SUPRA_MAX_TIME_THRESHOLD, SUPRA_ORACLE_PAIR_INDEX
         );
-        // assert(priceFeedSupraOracle.fetchPrice() > 0);
+        assert(priceFeedSupraOracle.fetchPrice() > 0);
         console.log("PriceFeedSupraOracle deployed at:", address(priceFeedSupraOracle));
 
         vm.stopBroadcast();
