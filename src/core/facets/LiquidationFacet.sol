@@ -16,6 +16,7 @@ import { IStabilityPoolFacet } from "../interfaces/IStabilityPoolFacet.sol";
 import { ITroveManager } from "../interfaces/ITroveManager.sol";
 
 import { BorrowerOperationsLib } from "../libs/BorrowerOperationsLib.sol";
+import { RecoveryModeGracePeriodLib } from "../libs/RecoveryModeGracePeriodLib.sol";
 import { StabilityPoolLib } from "../libs/StabilityPoolLib.sol";
 import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
 import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
@@ -25,6 +26,7 @@ import { IERC20Metadata } from "@solidstate/contracts/token/ERC20/metadata/IERC2
 contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableInternal {
     using StabilityPoolLib for AppStorage.Layout;
     using BorrowerOperationsLib for AppStorage.Layout;
+    using RecoveryModeGracePeriodLib for AppStorage.Layout;
 
     // --- Trove Liquidation functions ---
 
@@ -78,9 +80,15 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
             if (ICR <= Config._100_PCT && _inRecoveryMode()) {
                 singleLiquidation = _liquidateWithoutSP(s, troveManager, account);
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
-            } else if (ICR < troveManagerValues.MCR) {
+            } else if (ICR < Config._110_PCT) {
                 singleLiquidation =
                     _liquidateNormalMode(s, troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
+                debtInStabPool -= singleLiquidation.debtToOffset;
+                _applyLiquidationValuesToTotals(totals, singleLiquidation);
+            } else if (ICR < troveManagerValues.MCR) {
+                singleLiquidation = _tryLiquidateWithCap(
+                    troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
+                );
                 debtInStabPool -= singleLiquidation.debtToOffset;
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
             } else {
@@ -108,9 +116,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
 
                 uint256 TCR = SatoshiMath._computeCR(entireSystemColl, entireSystemDebt);
                 if (TCR >= Config.CCR || ICR >= TCR) break;
+                if (_checkRecoveryModeGracePeriod()) break;
 
                 singleLiquidation = _tryLiquidateWithCap(
-                    _troveManager, account, debtInStabPool, troveManagerValues.MCR, troveManagerValues.price
+                    _troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                 );
                 if (singleLiquidation.debtToOffset == 0) continue;
                 debtInStabPool -= singleLiquidation.debtToOffset;
@@ -132,6 +141,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 address(this), totals.totalDebtToOffset, totals.totalCollToSendToSP
             );
         }
+
         troveManager.finalizeLiquidation(
             msg.sender,
             totals.totalDebtToRedistribute,
@@ -184,9 +194,14 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
             uint256 ICR = troveManager.getCurrentICR(account, troveManagerValues.price);
             if (ICR <= Config._100_PCT && _inRecoveryMode()) {
                 singleLiquidation = _liquidateWithoutSP(s, troveManager, account);
-            } else if (ICR < troveManagerValues.MCR) {
+            } else if (ICR < Config._110_PCT) {
                 singleLiquidation =
                     _liquidateNormalMode(s, troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
+                debtInStabPool -= singleLiquidation.debtToOffset;
+            } else if (ICR < troveManagerValues.MCR) {
+                singleLiquidation = _tryLiquidateWithCap(
+                    troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
+                );
                 debtInStabPool -= singleLiquidation.debtToOffset;
             } else {
                 // As soon as we find a trove with ICR >= MCR we need to start tracking the global TCR with the next loop
@@ -212,15 +227,21 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 }
                 if (ICR <= Config._100_PCT && _inRecoveryMode()) {
                     singleLiquidation = _liquidateWithoutSP(s, troveManager, account);
-                } else if (ICR < troveManagerValues.MCR) {
+                } else if (ICR < Config._110_PCT) {
                     singleLiquidation =
                         _liquidateNormalMode(s, troveManager, account, debtInStabPool, troveManagerValues.sunsetting);
+                } else if (ICR < troveManagerValues.MCR) {
+                    singleLiquidation = _tryLiquidateWithCap(
+                        troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
+                    );
                 } else {
                     if (troveManagerValues.sunsetting) continue;
                     uint256 TCR = SatoshiMath._computeCR(entireSystemColl, entireSystemDebt);
                     if (TCR >= Config.CCR || ICR >= TCR) continue;
+                    // check the recovery mode grace period
+                    if (_checkRecoveryModeGracePeriod()) break;
                     singleLiquidation = _tryLiquidateWithCap(
-                        troveManager, account, debtInStabPool, troveManagerValues.MCR, troveManagerValues.price
+                        troveManager, account, debtInStabPool, Config._110_PCT, troveManagerValues.price
                     );
                     if (singleLiquidation.debtToOffset == 0) continue;
                 }
@@ -456,5 +477,35 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
         (uint256 _entireSystemColl, uint256 _entireSystemDebt) = s._getGlobalSystemBalances();
         uint256 TCR = SatoshiMath._computeCR(_entireSystemColl, _entireSystemDebt);
         return BorrowerOperationsLib._checkRecoveryMode(TCR);
+    }
+
+    function _checkRecoveryModeGracePeriod() internal view returns (bool) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        uint128 cachedLastGracePeriodStartTimestamp = s.lastGracePeriodStartTimestamp;
+        if (cachedLastGracePeriodStartTimestamp == Config.UNSET_TIMESTAMP) {
+            // grace period has never been triggered
+            return true;
+        }
+        if (uint128(block.timestamp) < cachedLastGracePeriodStartTimestamp + s.recoveryModeGracePeriodDuration) {
+            // it is still in grace period
+            return true;
+        }
+
+        return false;
+    }
+
+    // --- Grace Period ---
+    function setGracePeriod(uint128 _gracePeriod) external onlyRole(Config.OWNER_ROLE) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        if (_gracePeriod < Config.MINIMUM_GRACE_PERIOD) revert GracePeriodTooShort(_gracePeriod);
+
+        s._syncGracePeriod(_inRecoveryMode());
+        s.recoveryModeGracePeriodDuration = _gracePeriod;
+        emit GracePeriodDurationSet(_gracePeriod);
+    }
+
+    function syncGracePeriod() public {
+        AppStorage.Layout storage s = AppStorage.layout();
+        s._syncGracePeriod(_inRecoveryMode());
     }
 }

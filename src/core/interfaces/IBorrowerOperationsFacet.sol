@@ -118,4 +118,6 @@ interface IBorrowerOperationsFacet {
         returns (IERC20 collateralToken, uint16 index);
 
     function forceResetTM(ITroveManager[] calldata _troveManagers) external;
+
+    function syncGracePeriod() external;
 }

@@ -16,6 +16,7 @@ import { IDebtToken } from "../interfaces/IDebtToken.sol";
 import { ITroveManager } from "../interfaces/ITroveManager.sol";
 
 import { BorrowerOperationsLib } from "../libs/BorrowerOperationsLib.sol";
+import { RecoveryModeGracePeriodLib } from "../libs/RecoveryModeGracePeriodLib.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IERC20Metadata } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -26,6 +27,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
     using SafeERC20 for IERC20;
     using SafeERC20 for IDebtToken;
     using BorrowerOperationsLib for *;
+    using RecoveryModeGracePeriodLib for AppStorage.Layout;
 
     struct LocalVariables_adjustTrove {
         uint256 price;
@@ -177,20 +179,28 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         vars.ICR = SatoshiMath._computeCR(scaledCollateralAmount, vars.compositeDebt, vars.price);
         vars.NICR = SatoshiMath._computeNominalCR(_collateralAmount, vars.compositeDebt);
 
+        uint256 newTCR = BorrowerOperationsLib._getNewTCRFromTroveChange(
+            vars.totalPricedCollateral,
+            vars.totalDebt,
+            _collateralAmount * vars.price,
+            true,
+            vars.compositeDebt,
+            true,
+            decimals
+        ); // bools: coll increase, debt increase
+
         if (isRecoveryMode) {
             BorrowerOperationsLib._requireICRisAboveCCR(vars.ICR);
+            if (newTCR < Config.CCR) {
+                s._startGracePeriod();
+            } else {
+                // Deposit coll could exit Recovery Mode
+                s._endGracePeriod();
+            }
         } else {
             BorrowerOperationsLib._requireICRisAboveMCR(vars.ICR, troveManager.MCR());
-            uint256 newTCR = BorrowerOperationsLib._getNewTCRFromTroveChange(
-                vars.totalPricedCollateral,
-                vars.totalDebt,
-                _collateralAmount * vars.price,
-                true,
-                vars.compositeDebt,
-                true,
-                decimals
-            ); // bools: coll increase, debt increase
             BorrowerOperationsLib._requireNewTCRisAboveCCR(newTCR);
+            s._endGracePeriod();
         }
 
         // Create the trove
@@ -427,6 +437,8 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         // Burn the repaid Debt from the user's balance and the gas compensation from the Gas Pool
         s.debtToken.burnWithGasCompensation(msg.sender, debt - s.gasCompensation);
 
+        syncGracePeriod();
+
         // collect interest payable to rewardManager
         if (troveManager.interestPayable() != 0) {
             troveManager.collectInterests();
@@ -479,7 +491,6 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         uint8 decimals
     )
         internal
-        pure
     {
         /*
          *In Recovery Mode, only allow:
@@ -494,6 +505,7 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
          * - The new ICR is above MCR
          * - The adjustment won't pull the TCR below CCR
          */
+        AppStorage.Layout storage s = AppStorage.layout();
 
         // Get the trove's old ICR before the adjustment
         uint256 scaledCollAmount = SatoshiMath._getScaledCollateralAmount(_vars.coll, decimals);
@@ -511,25 +523,35 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
             decimals
         );
 
+        uint256 newTCR = BorrowerOperationsLib._getNewTCRFromTroveChange(
+            totalPricedCollateral,
+            totalDebt,
+            _vars.collChange * _vars.price,
+            _vars.isCollIncrease,
+            _vars.netDebtChange,
+            _isDebtIncrease,
+            decimals
+        );
+
         if (_isRecoveryMode) {
             require(_collWithdrawal == 0, "BorrowerOps: Collateral withdrawal not permitted Recovery Mode");
             if (_isDebtIncrease) {
                 BorrowerOperationsLib._requireICRisAboveCCR(newICR);
                 BorrowerOperationsLib._requireNewICRisAboveOldICR(newICR, oldICR);
             }
+
+            if (newTCR < Config.CCR) {
+                s._startGracePeriod();
+            } else {
+                // Deposit coll could exit Recovery Mode
+                s._endGracePeriod();
+            }
         } else {
             // if Normal Mode
             BorrowerOperationsLib._requireICRisAboveMCR(newICR, _vars.MCR);
-            uint256 newTCR = BorrowerOperationsLib._getNewTCRFromTroveChange(
-                totalPricedCollateral,
-                totalDebt,
-                _vars.collChange * _vars.price,
-                _vars.isCollIncrease,
-                _vars.netDebtChange,
-                _isDebtIncrease,
-                decimals
-            );
             BorrowerOperationsLib._requireNewTCRisAboveCCR(newTCR);
+
+            s._endGracePeriod();
         }
     }
 
@@ -537,5 +559,10 @@ contract BorrowerOperationsFacet is IBorrowerOperationsFacet, AccessControlInter
         AppStorage.Layout storage s = AppStorage.layout();
         Balances memory balances = s._fetchBalances();
         (, totalPricedCollateral, totalDebt) = BorrowerOperationsLib._getTCRData(balances);
+    }
+
+    function syncGracePeriod() public {
+        AppStorage.Layout storage s = AppStorage.layout();
+        s._syncGracePeriod(s._inRecoveryMode());
     }
 }
