@@ -502,9 +502,7 @@ abstract contract DeployBase is Test {
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = Initializer.init.selector;
         facetCuts[0] = IERC2535DiamondCutInternal.FacetCut({
-            target: address(initializer),
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: address(initializer), action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
 
         assert(address(debtToken) != address(0));
@@ -542,10 +540,7 @@ abstract contract DeployBase is Test {
     function _deployMockTroveManager(address deployer) internal returns (ISortedTroves, ITroveManager) {
         collateralMock = new ERC20Mock("Collateral", "COLL");
         initRoundData = RoundData({
-            answer: 4_000_000_000_000,
-            startedAt: block.timestamp,
-            updatedAt: block.timestamp,
-            answeredInRound: 1
+            answer: 4_000_000_000_000, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1
         });
         DeploymentParams memory deploymentParams = DeploymentParams({
             minuteDecayFactor: MINUTE_DECAY_FACTOR,
@@ -617,7 +612,13 @@ abstract contract DeployBase is Test {
         return oracleAddr;
     }
 
-    function _setPriceFeedToPriceFeedAggregatorProxy(address owner, IERC20 collateral, IPriceFeed priceFeed) internal {
+    function _setPriceFeedToPriceFeedAggregatorProxy(
+        address owner,
+        IERC20 collateral,
+        IPriceFeed priceFeed
+    )
+        internal
+    {
         vm.startPrank(owner);
         IPriceFeedAggregatorFacet(address(satoshiXApp)).setPriceFeed(collateral, priceFeed);
         vm.stopPrank();

@@ -14,7 +14,7 @@ import { IVaultManager } from "./interfaces/IVaultManager.sol";
 
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/* 
+/*
     * @title VaultManager
     * @dev The contract is responsible for managing the vaults
     * Each TroveManager has a VaultManager
@@ -40,7 +40,15 @@ contract VaultManager is IVaultManager, OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(address _debtToken, address _nexusYieldManager, address _owner) external override initializer {
+    function initialize(
+        address _debtToken,
+        address _nexusYieldManager,
+        address _owner
+    )
+        external
+        override
+        initializer
+    {
         __UUPSUpgradeable_init_unchained();
         __Ownable_init(_owner);
 

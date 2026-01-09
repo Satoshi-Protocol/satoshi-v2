@@ -48,7 +48,13 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
      *     @param maxICR Maximum ICR to liquidate. Should be set to MCR if the system
      *                   is not in recovery mode, to minimize gas costs for this call.
      */
-    function liquidateTroves(ITroveManager troveManager, uint256 maxTrovesToLiquidate, uint256 maxICR) external {
+    function liquidateTroves(
+        ITroveManager troveManager,
+        uint256 maxTrovesToLiquidate,
+        uint256 maxICR
+    )
+        external
+    {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s.enabledTroveManagers[troveManager], "TroveManager not approved");
 
@@ -114,8 +120,8 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 );
                 if (singleLiquidation.debtToOffset == 0) continue;
                 debtInStabPool -= singleLiquidation.debtToOffset;
-                entireSystemColl -=
-                    (singleLiquidation.collToSendToSP + singleLiquidation.collSurplus) * troveManagerValues.price;
+                entireSystemColl -= (singleLiquidation.collToSendToSP + singleLiquidation.collSurplus)
+                * troveManagerValues.price;
                 entireSystemDebt -= singleLiquidation.debtToOffset;
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
                 unchecked {
@@ -227,7 +233,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
 
                 debtInStabPool -= singleLiquidation.debtToOffset;
                 entireSystemColl -= (singleLiquidation.collToSendToSP + singleLiquidation.collSurplus)
-                    * troveManagerValues.price + singleLiquidation.collGasCompensation;
+                * troveManagerValues.price + singleLiquidation.collGasCompensation;
                 entireSystemDebt -= singleLiquidation.debtToOffset;
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
                 unchecked {
@@ -295,9 +301,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
             singleLiquidation.collToSendToSP,
             singleLiquidation.debtToRedistribute,
             singleLiquidation.collToRedistribute
-        ) = _getOffsetAndRedistributionVals(
-            singleLiquidation.entireTroveDebt, collToLiquidate, _debtInStabPool, sunsetting
-        );
+        ) =
+            _getOffsetAndRedistributionVals(
+                singleLiquidation.entireTroveDebt, collToLiquidate, _debtInStabPool, sunsetting
+            );
 
         troveManager.closeTroveByLiquidation(_borrower);
 

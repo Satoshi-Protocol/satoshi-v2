@@ -13,7 +13,6 @@ enum LockDuration {
     SIX, // 6 months
     NINE, // 9 months
     TWELVE // 12 months
-
 }
 
 uint256 constant NUMBER_OF_LOCK_DURATIONS = 4;
@@ -70,7 +69,13 @@ interface IRewardManager {
     function getPendingSATGain(address _user) external view returns (uint256);
     function registerTroveManager(ITroveManager _troveManager) external;
     function removeTroveManager(ITroveManager _troveManager) external;
-    function setAddresses(address _satoshiXApp, address _weth, address _debtToken, address _oshiToken) external;
+    function setAddresses(
+        address _satoshiXApp,
+        address _weth,
+        address _debtToken,
+        address _oshiToken
+    )
+        external;
     function F_SAT() external view returns (uint256);
     function F_COLL(uint256) external view returns (uint256);
     function collForFeeReceiver(uint256) external view returns (uint256);

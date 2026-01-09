@@ -288,15 +288,15 @@ contract UniV3DexVault is VaultCore {
         IERC20(deposits[tokenId].token0).approve(address(nonfungiblePositionManager), amount0ToMint);
         IERC20(deposits[tokenId].token1).approve(address(nonfungiblePositionManager), amount1ToMint);
 
-        INonfungiblePositionManager.IncreaseLiquidityParams memory params = INonfungiblePositionManager
-            .IncreaseLiquidityParams({
-            tokenId: tokenId,
-            amount0Desired: amount0ToMint,
-            amount1Desired: amount1ToMint,
-            amount0Min: amount0Min,
-            amount1Min: amount1Min,
-            deadline: block.timestamp
-        });
+        INonfungiblePositionManager.IncreaseLiquidityParams memory params =
+            INonfungiblePositionManager.IncreaseLiquidityParams({
+                tokenId: tokenId,
+                amount0Desired: amount0ToMint,
+                amount1Desired: amount1ToMint,
+                amount0Min: amount0Min,
+                amount1Min: amount1Min,
+                deadline: block.timestamp
+            });
 
         nonfungiblePositionManager.increaseLiquidity(params);
 
@@ -322,10 +322,7 @@ contract UniV3DexVault is VaultCore {
 
         // set amount0Max and amount1Max to uint256.max to collect all fees
         INonfungiblePositionManager.CollectParams memory params = INonfungiblePositionManager.CollectParams({
-            tokenId: tokenId,
-            recipient: vaultManager,
-            amount0Max: type(uint128).max,
-            amount1Max: type(uint128).max
+            tokenId: tokenId, recipient: vaultManager, amount0Max: type(uint128).max, amount1Max: type(uint128).max
         });
 
         (uint256 amount0, uint256 amount1) = nonfungiblePositionManager.collect(params);
@@ -365,18 +362,25 @@ contract UniV3DexVault is VaultCore {
         return nonfungiblePositionManager.mint(liquidityParams);
     }
 
-    function _decreaseLiquidity(uint256 tokenId, uint128 liquidity, uint256 amount0Min, uint256 amount1Min) internal {
+    function _decreaseLiquidity(
+        uint256 tokenId,
+        uint128 liquidity,
+        uint256 amount0Min,
+        uint256 amount1Min
+    )
+        internal
+    {
         if (liquidity == 0) revert ZeroLiquidity();
         if (liquidity > deposits[tokenId].liquidity) revert InvalidLiquidity(liquidity);
 
-        INonfungiblePositionManager.DecreaseLiquidityParams memory params = INonfungiblePositionManager
-            .DecreaseLiquidityParams({
-            tokenId: tokenId,
-            liquidity: liquidity,
-            amount0Min: amount0Min,
-            amount1Min: amount1Min,
-            deadline: block.timestamp
-        });
+        INonfungiblePositionManager.DecreaseLiquidityParams memory params =
+            INonfungiblePositionManager.DecreaseLiquidityParams({
+                tokenId: tokenId,
+                liquidity: liquidity,
+                amount0Min: amount0Min,
+                amount1Min: amount1Min,
+                deadline: block.timestamp
+            });
 
         nonfungiblePositionManager.decreaseLiquidity(params);
         deposits[tokenId].liquidity -= liquidity;

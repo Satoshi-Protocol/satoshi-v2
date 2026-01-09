@@ -146,10 +146,7 @@ contract TroveManagerTest is DeployBase, TroveBase {
         vm.warp(block.timestamp + 365 days);
         _updateRoundData(
             RoundData({
-                answer: 4_000_000_000_000,
-                startedAt: block.timestamp,
-                updatedAt: block.timestamp,
-                answeredInRound: 2
+                answer: 4_000_000_000_000, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 2
             })
         );
         _openTrove(USER_A, 1e18, 1000e18);

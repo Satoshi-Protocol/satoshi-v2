@@ -56,7 +56,14 @@ contract OFTMock is OFT {
         return _toSD(_amountLD);
     }
 
-    function credit(address _to, uint256 _amountToCreditLD, uint32 _srcEid) public returns (uint256 amountReceivedLD) {
+    function credit(
+        address _to,
+        uint256 _amountToCreditLD,
+        uint32 _srcEid
+    )
+        public
+        returns (uint256 amountReceivedLD)
+    {
         return _credit(_to, _amountToCreditLD, _srcEid);
     }
 
