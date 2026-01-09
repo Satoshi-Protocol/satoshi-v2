@@ -22,10 +22,10 @@ contract DeployPriceFeedChainlinkScript is Script {
     function run() public {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 
-        AggregatorV3Interface source = AggregatorV3Interface(CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0);
+        AggregatorV3Interface source = AggregatorV3Interface(CHAINLINK_PRICE_FEED_SOURCE_ADDRESS);
         priceFeedChainlink = new PriceFeedChainlink(source);
         assert(priceFeedChainlink.fetchPrice() > 0);
-        console.log("PriceFeedChainlink deployed at:", address(priceFeedChainlink));
+        console2.log("PriceFeedChainlink deployed at:", address(priceFeedChainlink));
 
         vm.stopBroadcast();
     }
