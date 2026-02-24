@@ -22,6 +22,7 @@ interface ISatoshiPeriphery {
     error InvalidZeroAddress();
     error RefundFailed();
     error InsufficientMsgValue(uint256 msgValue, uint256 requiredValue);
+    error SlippageTooHigh(uint256 actual, uint256 minimum);
 
     function debtToken() external view returns (DebtTokenWithLz);
 
@@ -100,4 +101,20 @@ interface ISatoshiPeriphery {
     )
         external
         payable;
+
+    /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn (ERC20 only)
+    /// @param fromToken     Input ERC20 token (must be approved to this contract)
+    /// @param fromAmount    Raw input amount
+    /// @param okxRouter     OKX DEX Router address from backend /okx/nym-swap response
+    /// @param okxCalldata   OKX swap calldata from backend /okx/nym-swap response
+    /// @param stableAsset   Stable token address from backend /okx/nym-swap response
+    /// @param minDebtAmount Minimum DebtToken to receive; revert if below this (slippage guard)
+    function swapInWithOkx(
+        address fromToken,
+        uint256 fromAmount,
+        address okxRouter,
+        bytes calldata okxCalldata,
+        address stableAsset,
+        uint256 minDebtAmount
+    ) external;
 }
