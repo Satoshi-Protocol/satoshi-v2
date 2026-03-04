@@ -103,15 +103,17 @@ interface ISatoshiPeriphery {
         payable;
 
     /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn (ERC20 only)
-    /// @param fromToken     Input ERC20 token (must be approved to this contract)
-    /// @param fromAmount    Raw input amount
-    /// @param okxRouter     OKX DEX Router address from backend /okx/nym-swap response
-    /// @param okxCalldata   OKX swap calldata from backend /okx/nym-swap response
-    /// @param stableAsset   Stable token address from backend /okx/nym-swap response
-    /// @param minDebtAmount Minimum DebtToken to receive; revert if below this (slippage guard)
+    /// @param fromToken          Input ERC20 token (must be approved to this contract)
+    /// @param fromAmount         Raw input amount
+    /// @param okxApproveAddress  OKX token-approve proxy address (spender for internal approval)
+    /// @param okxRouter          OKX DEX Router address from backend /okx/nym-swap response
+    /// @param okxCalldata        OKX swap calldata from backend /okx/nym-swap response
+    /// @param stableAsset        Stable token address from backend /okx/nym-swap response
+    /// @param minDebtAmount      Minimum DebtToken to receive; revert if below this (slippage guard)
     function swapInWithOkx(
         address fromToken,
         uint256 fromAmount,
+        address okxApproveAddress,
         address okxRouter,
         bytes calldata okxCalldata,
         address stableAsset,

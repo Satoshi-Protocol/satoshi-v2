@@ -354,9 +354,12 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @dev fromToken must be pre-approved to this contract by msg.sender
     /// @dev okxCalldata must be generated with this contract address as userWalletAddress
     /// @dev DebtToken is always delivered to msg.sender on the same chain
+    /// @dev okxApproveAddress is the tokenApproveAddress returned by the OKX /approve-transaction API
+    /// @dev okxRouter is the routerContractAddress returned by the OKX /swap API — these are different contracts
     function swapInWithOkx(
         address fromToken,
         uint256 fromAmount,
+        address okxApproveAddress,
         address okxRouter,
         bytes calldata okxCalldata,
         address stableAsset,
@@ -366,6 +369,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         uint256 fromTokenBefore = IERC20(fromToken).balanceOf(address(this));
 
+        // Must approve the token approve proxy, NOT the router — OKX uses a separate spender contract
+        IERC20(fromToken).approve(okxApproveAddress, fromAmount);
         IERC20(fromToken).approve(okxRouter, fromAmount);
 
         uint256 stableBalanceBefore = IERC20(stableAsset).balanceOf(address(this));
@@ -373,6 +378,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         (bool success,) = okxRouter.call(okxCalldata);
         require(success, "SatoshiPeriphery: OKX swap failed");
 
+        IERC20(fromToken).approve(okxApproveAddress, 0);
         IERC20(fromToken).approve(okxRouter, 0);
 
         uint256 fromTokenAfter = IERC20(fromToken).balanceOf(address(this));
