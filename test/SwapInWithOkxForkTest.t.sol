@@ -10,7 +10,7 @@ pragma solidity ^0.8.20;
  *   SatoshiPeriphery: RIVER → OKX DEX → USDT → NYM.swapIn → DebtToken → USER
  *
  * Refresh OKX_CALLDATA when stale (deadline ~1 week):
- *   curl "http://localhost:8083/okx/nym-swap?chainId=56&fromTokenAddress=0xdA7AD9dea9397cffdDAE2F8a052B82f1484252B3&amount=1000000000000000000&slippagePercent=1"
+ *   curl "http://api-airdrop.river.inc/okx/nym-swap?chainId=56&fromTokenAddress=0xdA7AD9dea9397cffdDAE2F8a052B82f1484252B3&amount=1000000000000000000&slippagePercent=1"
  *   Then replace OKX_CALLDATA, OKX_APPROVE_ADDR, OKX_ROUTER below.
  *
  * Run:
@@ -21,7 +21,7 @@ pragma solidity ^0.8.20;
  */
 
 import { Test } from "forge-std/Test.sol";
-import { console } from "forge-std/console.sol";
+import { console2 as console } from "forge-std/console2.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { ISatoshiPeriphery } from "../src/core/helpers/interfaces/ISatoshiPeriphery.sol";
@@ -82,6 +82,48 @@ contract SwapInWithOkxForkTest is Test {
         hex"777777771111800000000000000000000000000000000000ed0e13f837d6ebad",  // w29
         hex"777777771111000000000064fa00a9ed787f3793db668bff3e6e6e7db0f92a1b"   // w30
     );
+
+    // ── Live-refresh helper ───────────────────────────────────────────────────
+
+    struct NymSwapQuote {
+        address okxApproveAddress;
+        address okxRouter;
+        bytes   okxCalldata;
+        address stableAsset;
+        address peripheryAddress;
+    }
+
+    /// @dev Calls the local backend and parses the /okx/nym-swap response.
+    ///      Requires the backend to be running at api-airdrop.river.inc.
+    ///      Requires ffi = true in foundry.toml (already set).
+    function _fetchNymSwapQuote(
+        address fromToken,
+        uint256 amount,
+        uint256 slippagePercent
+    ) internal returns (NymSwapQuote memory q) {
+        string memory url = string.concat(
+            "http://api-airdrop.river.inc/okx/nym-swap?chainId=56&fromTokenAddress=",
+            vm.toString(fromToken),
+            "&amount=",
+            vm.toString(amount),
+            "&slippagePercent=",
+            vm.toString(slippagePercent)
+        );
+
+        string[] memory cmd = new string[](3);
+        cmd[0] = "curl";
+        cmd[1] = "-s";
+        cmd[2] = url;
+
+        bytes memory raw = vm.ffi(cmd);
+        string memory json = string(raw);
+
+        q.okxApproveAddress = vm.parseJsonAddress(json, ".okxApproveAddress");
+        q.okxRouter         = vm.parseJsonAddress(json, ".okxRouter");
+        q.okxCalldata       = vm.parseJsonBytes(json, ".okxCalldata");
+        q.stableAsset       = vm.parseJsonAddress(json, ".stableAsset");
+        q.peripheryAddress  = vm.parseJsonAddress(json, ".peripheryAddress");
+    }
 
     ISatoshiPeriphery periphery;
     IERC20 river;
@@ -225,7 +267,9 @@ contract SwapInWithOkxForkTest is Test {
                 console.logBytes4(errSel);
                 // Try to decode as Error(string)
                 if (errSel == bytes4(keccak256("Error(string)"))) {
-                    (string memory reason) = abi.decode(okxReturnData[4:], (string));
+                    bytes memory stripped = new bytes(okxReturnData.length - 4);
+                    for (uint256 i = 0; i < stripped.length; i++) stripped[i] = okxReturnData[i + 4];
+                    (string memory reason) = abi.decode(stripped, (string));
                     console.log("revert reason:", reason);
                 }
             }
@@ -307,6 +351,53 @@ contract SwapInWithOkxForkTest is Test {
 
         assertGt(userDebtAfter, userDebtBefore, "E2E: User must receive debtToken");
         assertLe(userRiverAfter, userRiverBefore, "E2E: RIVER must be consumed");
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LIVE test — fetches fresh calldata from the local backend at runtime.
+    // Requires: backend running on api-airdrop.river.inc AND ffi = true (already set).
+    // Run alone:  forge test --match-test testSwapInWithOkxLive -vvvv
+    // ─────────────────────────────────────────────────────────────────────────
+    function testSwapInWithOkxLive() public {
+        console.log("=== LIVE E2E TEST (fresh calldata via /okx/nym-swap) ===");
+
+        NymSwapQuote memory q = _fetchNymSwapQuote(RIVER_TOKEN, FROM_AMOUNT, 1);
+
+        console.log("okxApproveAddress :", q.okxApproveAddress);
+        console.log("okxRouter         :", q.okxRouter);
+        console.log("stableAsset       :", q.stableAsset);
+        console.log("peripheryAddress  :", q.peripheryAddress);
+        console.log("okxCalldata length:", q.okxCalldata.length);
+
+        deal(address(river), USER, FROM_AMOUNT);
+
+        uint256 userDebtBefore  = debtToken.balanceOf(USER);
+        uint256 userRiverBefore = river.balanceOf(USER);
+        console.log("USER RIVER before    :", userRiverBefore);
+        console.log("USER debtToken before:", userDebtBefore);
+
+        vm.startPrank(USER);
+        river.approve(q.peripheryAddress, FROM_AMOUNT);
+
+        ISatoshiPeriphery(q.peripheryAddress).swapInWithOkx(
+            RIVER_TOKEN,
+            FROM_AMOUNT,
+            q.okxApproveAddress,
+            q.okxRouter,
+            q.okxCalldata,
+            q.stableAsset,
+            0
+        );
+        vm.stopPrank();
+
+        uint256 userDebtAfter  = debtToken.balanceOf(USER);
+        uint256 userRiverAfter = river.balanceOf(USER);
+        console.log("USER RIVER after     :", userRiverAfter);
+        console.log("USER debtToken after :", userDebtAfter);
+        console.log("debtToken received   :", userDebtAfter - userDebtBefore);
+
+        assertEq(userRiverAfter, 0, "All RIVER should be spent");
+        assertGt(userDebtAfter, userDebtBefore, "User must receive debtToken");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
