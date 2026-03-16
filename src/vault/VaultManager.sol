@@ -14,7 +14,7 @@ import { IVaultManager } from "./interfaces/IVaultManager.sol";
 
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
-/* 
+/*
     * @title VaultManager
     * @dev The contract is responsible for managing the vaults
     * Each TroveManager has a VaultManager

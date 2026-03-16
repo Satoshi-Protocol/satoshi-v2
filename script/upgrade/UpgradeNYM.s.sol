@@ -29,9 +29,7 @@ contract UpgradeNYMScript is Script {
 
         IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](1);
         facetCuts[0] = IERC2535DiamondCutInternal.FacetCut({
-            target: newNYMImpl,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: newNYMImpl, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
 
         ISatoshiXApp XAPP = ISatoshiXApp(SATOSHI_X_APP_ADDRESS);

@@ -26,18 +26,21 @@ import {
 } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title Satoshi Borrower Operations Router
  *        Handle the native token and ERC20 for the borrower operations
  */
-contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable {
+contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
     using SafeERC20 for IERC20;
     using SafeERC20 for DebtTokenWithLz;
 
     DebtTokenWithLz public debtToken;
     address public xApp;
+    address public okxRouter;
+    address public okxApprove;
 
     function initialize(IDebtToken _debtToken, address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
@@ -48,6 +51,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         __Ownable_init(_owner);
         __UUPSUpgradeable_init_unchained();
+        __ReentrancyGuard_init_unchained();
     }
 
     receive() external payable {
@@ -83,9 +87,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 
-        IBorrowerOperationsFacet(xApp).openTrove(
-            troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint
-        );
+        IBorrowerOperationsFacet(xApp)
+            .openTrove(troveManager, msg.sender, _maxFeePercentage, _collAmount, _debtAmount, _upperHint, _lowerHint);
 
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
@@ -99,14 +102,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @param _collAmount The amount of additional collateral
     /// @param _upperHint The upper hint (for querying the position of the sorted trove)
     /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
-    function addColl(
-        ITroveManager troveManager,
-        uint256 _collAmount,
-        address _upperHint,
-        address _lowerHint
-    )
-        external
-    {
+    function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint) external {
         IERC20 collateralToken = troveManager.collateralToken();
 
         _beforeAddColl(collateralToken, _collAmount);
@@ -159,9 +155,8 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         payable
     {
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
-        IBorrowerOperationsFacet(xApp).withdrawDebt(
-            troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint
-        );
+        IBorrowerOperationsFacet(xApp)
+            .withdrawDebt(troveManager, msg.sender, _maxFeePercentage, _debtAmount, _upperHint, _lowerHint);
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         uint256 userDebtAmount = debtTokenBalanceAfter - debtTokenBalanceBefore;
         require(userDebtAmount == _debtAmount, "SatoshiPeriphery: Debt amount mismatch");
@@ -214,17 +209,18 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
             _beforeRepayDebt(_debtChange);
         }
 
-        IBorrowerOperationsFacet(xApp).adjustTrove(
-            troveManager,
-            msg.sender,
-            _maxFeePercentage,
-            _collDeposit,
-            _collWithdrawal,
-            _debtChange,
-            _isDebtIncrease,
-            _upperHint,
-            _lowerHint
-        );
+        IBorrowerOperationsFacet(xApp)
+            .adjustTrove(
+                troveManager,
+                msg.sender,
+                _maxFeePercentage,
+                _collDeposit,
+                _collWithdrawal,
+                _debtChange,
+                _isDebtIncrease,
+                _upperHint,
+                _lowerHint
+            );
 
         uint256 debtTokenBalanceAfter = debtToken.balanceOf(address(this));
         // withdraw collateral
@@ -349,37 +345,55 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         // No additional authorization logic is needed for this contract
     }
 
+    /// @notice Set the OKX DEX router address (routerContractAddress from OKX /swap API)
+    function setOkxRouter(address _okxRouter) external onlyOwner {
+        if (_okxRouter == address(0)) revert InvalidZeroAddress();
+        okxRouter = _okxRouter;
+        emit OkxRouterSet(_okxRouter);
+    }
+
+    /// @notice Set the OKX token-approve proxy address (tokenApproveAddress from OKX /approve-transaction API)
+    function setOkxApprove(address _okxApprove) external onlyOwner {
+        if (_okxApprove == address(0)) revert InvalidZeroAddress();
+        okxApprove = _okxApprove;
+        emit OkxApproveSet(_okxApprove);
+    }
+
     /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn
     /// @dev ERC20 only — native token input is not supported
     /// @dev fromToken must be pre-approved to this contract by msg.sender
     /// @dev okxCalldata must be generated with this contract address as userWalletAddress
     /// @dev DebtToken is always delivered to msg.sender on the same chain
-    /// @dev okxApproveAddress is the tokenApproveAddress returned by the OKX /approve-transaction API
-    /// @dev okxRouter is the routerContractAddress returned by the OKX /swap API — these are different contracts
     function swapInWithOkx(
         address fromToken,
         uint256 fromAmount,
-        address okxApproveAddress,
-        address okxRouter,
         bytes calldata okxCalldata,
         address stableAsset,
         uint256 minDebtAmount
-    ) public {
+    )
+        public
+        nonReentrant
+    {
+        address _okxRouter = okxRouter;
+        address _okxApprove = okxApprove;
+        require(_okxRouter != address(0), "SatoshiPeriphery: okxRouter not set");
+        require(_okxApprove != address(0), "SatoshiPeriphery: okxApprove not set");
+
         IERC20(fromToken).safeTransferFrom(msg.sender, address(this), fromAmount);
 
         uint256 fromTokenBefore = IERC20(fromToken).balanceOf(address(this));
 
         // Must approve the token approve proxy, NOT the router — OKX uses a separate spender contract
-        IERC20(fromToken).approve(okxApproveAddress, fromAmount);
-        IERC20(fromToken).approve(okxRouter, fromAmount);
+        IERC20(fromToken).forceApprove(_okxApprove, fromAmount);
+        IERC20(fromToken).forceApprove(_okxRouter, fromAmount);
 
         uint256 stableBalanceBefore = IERC20(stableAsset).balanceOf(address(this));
 
-        (bool success,) = okxRouter.call(okxCalldata);
+        (bool success,) = _okxRouter.call(okxCalldata);
         require(success, "SatoshiPeriphery: OKX swap failed");
 
-        IERC20(fromToken).approve(okxApproveAddress, 0);
-        IERC20(fromToken).approve(okxRouter, 0);
+        IERC20(fromToken).forceApprove(_okxApprove, 0);
+        IERC20(fromToken).forceApprove(_okxRouter, 0);
 
         uint256 fromTokenAfter = IERC20(fromToken).balanceOf(address(this));
         if (fromTokenAfter > fromTokenBefore - fromAmount) {
@@ -390,7 +404,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         uint256 stableReceived = IERC20(stableAsset).balanceOf(address(this)) - stableBalanceBefore;
         require(stableReceived > 0, "SatoshiPeriphery: No stable tokens received from OKX");
 
-        IERC20(stableAsset).approve(xApp, stableReceived);
+        IERC20(stableAsset).forceApprove(xApp, stableReceived);
 
         uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
 

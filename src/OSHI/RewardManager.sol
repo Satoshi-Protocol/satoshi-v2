@@ -416,4 +416,6 @@ contract RewardManager is IRewardManager, UUPSUpgradeable, OwnableUpgradeable {
         ) isRegistered = true;
         require(isRegistered, "RewardManager: Caller is not Valid");
     }
+
+    receive() external payable { }
 }

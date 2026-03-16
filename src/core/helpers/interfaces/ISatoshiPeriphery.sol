@@ -24,11 +24,22 @@ interface ISatoshiPeriphery {
     error InsufficientMsgValue(uint256 msgValue, uint256 requiredValue);
     error SlippageTooHigh(uint256 actual, uint256 minimum);
 
+    event OkxRouterSet(address indexed okxRouter);
+    event OkxApproveSet(address indexed okxApprove);
+
     function debtToken() external view returns (DebtTokenWithLz);
 
     function xApp() external view returns (address);
 
+    function okxRouter() external view returns (address);
+
+    function okxApprove() external view returns (address);
+
     function initialize(IDebtToken _debtToken, address _xApp, address _owner) external;
+
+    function setOkxRouter(address _okxRouter) external;
+
+    function setOkxApprove(address _okxApprove) external;
 
     function openTrove(
         ITroveManager troveManager,
@@ -42,13 +53,7 @@ interface ISatoshiPeriphery {
         external
         payable;
 
-    function addColl(
-        ITroveManager troveManager,
-        uint256 _collAmount,
-        address _upperHint,
-        address _lowerHint
-    )
-        external;
+    function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint) external;
 
     function withdrawColl(
         ITroveManager troveManager,
@@ -105,18 +110,15 @@ interface ISatoshiPeriphery {
     /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn (ERC20 only)
     /// @param fromToken          Input ERC20 token (must be approved to this contract)
     /// @param fromAmount         Raw input amount
-    /// @param okxApproveAddress  OKX token-approve proxy address (spender for internal approval)
-    /// @param okxRouter          OKX DEX Router address from backend /okx/nym-swap response
     /// @param okxCalldata        OKX swap calldata from backend /okx/nym-swap response
     /// @param stableAsset        Stable token address from backend /okx/nym-swap response
     /// @param minDebtAmount      Minimum DebtToken to receive; revert if below this (slippage guard)
     function swapInWithOkx(
         address fromToken,
         uint256 fromAmount,
-        address okxApproveAddress,
-        address okxRouter,
         bytes calldata okxCalldata,
         address stableAsset,
         uint256 minDebtAmount
-    ) external;
+    )
+        external;
 }

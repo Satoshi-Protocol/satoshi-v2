@@ -16,5 +16,6 @@ import { SolidStateDiamond } from "../library/proxy/SolidStateDiamond.sol";
  */
 // solhint-disable-next-line no-empty-blocks
 contract SatoshiXApp is SolidStateDiamond, AccessControl {
-// No extra logic
-}
+    // No extra logic
+
+    }

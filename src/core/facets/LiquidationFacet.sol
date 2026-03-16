@@ -114,8 +114,8 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
                 );
                 if (singleLiquidation.debtToOffset == 0) continue;
                 debtInStabPool -= singleLiquidation.debtToOffset;
-                entireSystemColl -=
-                    (singleLiquidation.collToSendToSP + singleLiquidation.collSurplus) * troveManagerValues.price;
+                entireSystemColl -= (singleLiquidation.collToSendToSP + singleLiquidation.collSurplus)
+                    * troveManagerValues.price;
                 entireSystemDebt -= singleLiquidation.debtToOffset;
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
                 unchecked {
@@ -295,9 +295,10 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
             singleLiquidation.collToSendToSP,
             singleLiquidation.debtToRedistribute,
             singleLiquidation.collToRedistribute
-        ) = _getOffsetAndRedistributionVals(
-            singleLiquidation.entireTroveDebt, collToLiquidate, _debtInStabPool, sunsetting
-        );
+        ) =
+            _getOffsetAndRedistributionVals(
+                singleLiquidation.entireTroveDebt, collToLiquidate, _debtInStabPool, sunsetting
+            );
 
         troveManager.closeTroveByLiquidation(_borrower);
 

@@ -186,13 +186,7 @@ interface ISlasher {
         returns (uint32);
 
     /// @notice Getter function for fetching `operatorToMiddlewareTimes[operator][index].latestServeUntil`.
-    function getMiddlewareTimesIndexServeUntilTimestamp(
-        address operator,
-        uint32 index
-    )
-        external
-        view
-        returns (uint32);
+    function getMiddlewareTimesIndexServeUntilTimestamp(address operator, uint32 index) external view returns (uint32);
 
     /// @notice Getter function for fetching `_operatorToWhitelistedContractsByUpdate[operator].size`.
     function operatorWhitelistedContractsLinkedListSize(address operator) external view returns (uint256);

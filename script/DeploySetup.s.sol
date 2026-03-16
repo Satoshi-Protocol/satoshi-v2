@@ -478,9 +478,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = Initializer.init.selector;
         facetCuts[0] = IERC2535DiamondCutInternal.FacetCut({
-            target: address(initializer),
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: address(initializer), action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: selectors
         });
 
         assert(address(debtToken) != address(0));

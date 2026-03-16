@@ -4,14 +4,7 @@ pragma solidity ^0.8.20;
 import { ITroveManager } from "../../interfaces/ITroveManager.sol";
 
 interface ITroveHelper {
-    function getNicrByTime(
-        ITroveManager troveManager,
-        address _borrower,
-        uint256 time
-    )
-        external
-        view
-        returns (uint256);
+    function getNicrByTime(ITroveManager troveManager, address _borrower, uint256 time) external view returns (uint256);
 
     function getNicrListByTime(
         ITroveManager troveManager,

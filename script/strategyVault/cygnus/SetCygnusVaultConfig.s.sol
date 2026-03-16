@@ -2,9 +2,6 @@
 pragma solidity ^0.8.20;
 
 import { CygnusVault } from "../../../src/vault/CygnusVault.sol";
-import { IVault } from "../../../src/vault/interfaces/IVault.sol";
-import { IVaultManager } from "../../../src/vault/interfaces/IVaultManager.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
 address constant CYGNUS_VAULT_ADDRESS = 0xE8c5b4517610006C1fb0eD5467E01e4bAd43558D;

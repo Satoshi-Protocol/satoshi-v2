@@ -287,13 +287,7 @@ interface IDelegationManager {
     /**
      * @notice Given array of strategies, returns array of shares for the operator
      */
-    function getOperatorShares(
-        address operator,
-        IStrategy[] memory strategies
-    )
-        external
-        view
-        returns (uint256[] memory);
+    function getOperatorShares(address operator, IStrategy[] memory strategies) external view returns (uint256[] memory);
 
     /**
      * @notice Given a list of strategies, return the minimum cooldown that must pass to withdraw

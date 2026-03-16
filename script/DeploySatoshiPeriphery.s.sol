@@ -18,8 +18,7 @@ contract DeploySatoshiPeriphery is Script {
         vm.startBroadcast(deployerKey);
 
         address peripheryImpl = address(new SatoshiPeriphery());
-        bytes memory data =
-            abi.encodeCall(ISatoshiPeriphery.initialize, (IDebtToken(debtToken), xApp, owner));
+        bytes memory data = abi.encodeCall(ISatoshiPeriphery.initialize, (IDebtToken(debtToken), xApp, owner));
         ISatoshiPeriphery periphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
 
         console.log("Implementation:", peripheryImpl);

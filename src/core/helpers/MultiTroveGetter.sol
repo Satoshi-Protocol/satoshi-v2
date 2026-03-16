@@ -76,9 +76,7 @@ contract MultiTroveGetter is IMultiTroveGetter {
                 _troves[idx].stake,
                 /* status */
                 /* arrayIndex */
-                /* interestIndex */
-                ,
-                ,
+                /* interestIndex */,,
             ) = troveManager.troves(currentTroveowner);
 
             (_troves[idx].snapshotCollateral, _troves[idx].snapshotDebt) =
@@ -125,9 +123,7 @@ contract MultiTroveGetter is IMultiTroveGetter {
                 _troves[idx].stake,
                 /* status */
                 /* arrayIndex */
-                /* interestIndex */
-                ,
-                ,
+                /* interestIndex */,,
             ) = troveManager.troves(currentTroveowner);
 
             (_troves[idx].snapshotCollateral, _troves[idx].snapshotDebt) =

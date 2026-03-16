@@ -55,12 +55,5 @@ abstract contract VaultCore is IVault, UUPSUpgradeable, OwnableUpgradeable {
 
     function getPosition(address token) external view virtual returns (uint256);
 
-    function constructExitByTroveManagerData(
-        address token,
-        uint256 amount
-    )
-        external
-        view
-        virtual
-        returns (bytes memory);
+    function constructExitByTroveManagerData(address token, uint256 amount) external view virtual returns (bytes memory);
 }

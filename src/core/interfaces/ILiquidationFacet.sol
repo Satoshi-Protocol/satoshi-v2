@@ -12,6 +12,7 @@ struct TroveManagerValues {
     ///< Minimum Collateral Ratio
     bool sunsetting;
 }
+
 ///< Indicates if the Trove Manager is being phased out
 
 /// @notice Represents values involved in a liquidation process
@@ -34,6 +35,7 @@ struct LiquidationValues {
     ///< Collateral to redistribute
     uint256 collSurplus;
 }
+
 ///< Surplus collateral
 
 /// @notice Represents total values involved in a sequence of liquidations
@@ -56,6 +58,7 @@ struct LiquidationTotals {
     ///< Total collateral to redistribute
     uint256 totalCollSurplus;
 }
+
 ///< Total collateral surplus
 
 /// @title ILiquidationFacet

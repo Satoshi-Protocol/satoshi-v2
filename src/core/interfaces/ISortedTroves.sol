@@ -116,6 +116,7 @@ struct Node {
     ///< Id of next node (smaller NICR) in the list.
     address prevId;
 }
+
 ///< Id of previous node (larger NICR) in the list.
 
 // Information for the list
