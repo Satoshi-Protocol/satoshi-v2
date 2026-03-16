@@ -13,7 +13,15 @@ contract TroveHelper is ITroveHelper {
 
     constructor() { }
 
-    function getNicrByTime(ITroveManager troveManager, address _borrower, uint256 time) public view returns (uint256) {
+    function getNicrByTime(
+        ITroveManager troveManager,
+        address _borrower,
+        uint256 time
+    )
+        public
+        view
+        returns (uint256)
+    {
         require(time >= block.timestamp, "TroveHelper: invalid time");
         (uint256 currentCollateral, uint256 currentDebt) = getTroveCollAndDebtByTime(troveManager, _borrower, time);
         uint256 NICR = SatoshiMath._computeNominalCR(currentCollateral, currentDebt);

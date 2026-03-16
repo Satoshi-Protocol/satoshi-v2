@@ -5,8 +5,8 @@ import { SafeVault } from "../../../src/vault/SafeVault.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
-address constant SAFE_VAULT_ADDRESS = 0x9Dda31F8a07B216AB5E153456DE251E0ed2e6372;
-address constant TO = 0x1234567890123456789012345678901234567890;
+address constant SAFE_VAULT_ADDRESS = 0x8df0452267d6A166CB51967Df5188D83D29D14fB;
+address constant TO = 0x2acfb3F0255793c29A9aab335E5D77d0261B886B;
 bool constant IS_VALID = true;
 
 contract SetWhitelistScript is Script {

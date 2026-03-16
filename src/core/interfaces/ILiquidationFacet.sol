@@ -108,5 +108,10 @@ interface ILiquidationFacet {
     /// @param troveManager The Trove Manager handling the liquidation
     /// @param maxTrovesToLiquidate The maximum number of troves to liquidate
     /// @param maxICR The maximum individual collateral ratio
-    function liquidateTroves(ITroveManager troveManager, uint256 maxTrovesToLiquidate, uint256 maxICR) external;
+    function liquidateTroves(
+        ITroveManager troveManager,
+        uint256 maxTrovesToLiquidate,
+        uint256 maxICR
+    )
+        external;
 }

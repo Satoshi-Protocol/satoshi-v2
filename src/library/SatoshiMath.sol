@@ -139,7 +139,14 @@ library SatoshiMath {
         return _getAbsoluteDifference(_a, _b) <= _tolerance;
     }
 
-    function _getScaledCollateralAmount(uint256 _collateralAmount, uint8 _decimals) internal pure returns (uint256) {
+    function _getScaledCollateralAmount(
+        uint256 _collateralAmount,
+        uint8 _decimals
+    )
+        internal
+        pure
+        returns (uint256)
+    {
         // Scale the collateral amount to the target digits
         uint256 scaledAmount;
         uint8 TARGET_DIGITS = 18;

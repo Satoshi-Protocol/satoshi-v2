@@ -6,12 +6,11 @@ import { Script, console } from "forge-std/Script.sol";
 import { PriceFeedChainlinkExchangeRate } from "../../src/priceFeed/PriceFeedChainlinkExchangeRate.sol";
 import { AggregatorV3Interface } from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
 import { SourceConfig } from "../../src/priceFeed/interfaces/IPriceFeed.sol";
-import {
-    CHAINLINK_MAX_TIME_THRESHOLD_0,
-    CHAINLINK_MAX_TIME_THRESHOLD_1,
-    CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0,
-    CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_1
-} from "./DeployPriceFeedConfig.sol";
+
+address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0 = 0xbC7c5023eE571e4D9C4890C90a16be05c1EEf410;
+address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_1 = 0x64c911996D3c6aC71f9b455B1E8E7266BcbD848F;
+uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_0 = 86_400 + 300;
+uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_1 = 1200 + 300;
 
 contract DeployPriceFeedChainlinkExchangeRateScript is Script {
     PriceFeedChainlinkExchangeRate internal priceFeedChainlink;

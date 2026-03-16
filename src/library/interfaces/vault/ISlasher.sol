@@ -103,7 +103,11 @@ interface ISlasher {
      * @dev removes the middleware's slashing contract to the operator's linked list and revokes the middleware's (i.e. caller's) ability to
      * slash `operator` once `serveUntil` is reached
      */
-    function recordLastStakeUpdateAndRevokeSlashingAbility(address operator, uint32 serveUntilTimestamp) external;
+    function recordLastStakeUpdateAndRevokeSlashingAbility(
+        address operator,
+        uint32 serveUntilTimestamp
+    )
+        external;
 
     /// @notice The StrategyManager contract of Pell
     function strategyManager() external view returns (IStrategyManager);
@@ -134,7 +138,13 @@ interface ISlasher {
     function latestUpdateTimestamp(address operator, address serviceContract) external view returns (uint32);
 
     /// @notice A search routine for finding the correct input value of `insertAfter` to `recordStakeUpdate` / `_updateMiddlewareList`.
-    function getCorrectValueForInsertAfter(address operator, uint32 updateTimestamp) external view returns (uint256);
+    function getCorrectValueForInsertAfter(
+        address operator,
+        uint32 updateTimestamp
+    )
+        external
+        view
+        returns (uint256);
 
     /**
      * @notice Returns 'true' if `operator` can currently complete a withdrawal started at the `withdrawalStartTimestamp`, with `middlewareTimesIndex` used

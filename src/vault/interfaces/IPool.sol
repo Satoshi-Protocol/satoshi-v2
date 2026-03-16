@@ -512,7 +512,11 @@ interface IPool {
      * @param asset The address of the underlying asset of the reserve
      * @param configuration The new configuration bitmap
      */
-    function setConfiguration(address asset, DataTypes.ReserveConfigurationMap calldata configuration) external;
+    function setConfiguration(
+        address asset,
+        DataTypes.ReserveConfigurationMap calldata configuration
+    )
+        external;
 
     /**
      * @notice Returns the configuration of the reserve
@@ -612,7 +616,11 @@ interface IPool {
      * @param flashLoanPremiumTotal The total premium, expressed in bps
      * @param flashLoanPremiumToProtocol The part of the premium sent to the protocol treasury, expressed in bps
      */
-    function updateFlashloanPremiums(uint128 flashLoanPremiumTotal, uint128 flashLoanPremiumToProtocol) external;
+    function updateFlashloanPremiums(
+        uint128 flashLoanPremiumTotal,
+        uint128 flashLoanPremiumToProtocol
+    )
+        external;
 
     /**
      * @notice Configures a new category for the eMode.

@@ -28,7 +28,14 @@ abstract contract OFTPermitUpgradeable is OFTCoreUpgradeable, ERC20PermitUpgrade
      * @dev Ownable is not initialized here on purpose. It should be initialized in the child contract to
      * accommodate the different version of Ownable.
      */
-    function __OFT_init(string memory _name, string memory _symbol, address _delegate) internal onlyInitializing {
+    function __OFT_init(
+        string memory _name,
+        string memory _symbol,
+        address _delegate
+    )
+        internal
+        onlyInitializing
+    {
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
         __OFTCore_init(_delegate);

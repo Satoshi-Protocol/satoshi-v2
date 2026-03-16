@@ -106,7 +106,12 @@ contract DeployInstanceScript is Script {
         rewardManager.registerTroveManager(troveManagerBeaconProxy);
     }
 
-    function _setCommunityIssuanceAllocation(ITroveManager troveManagerBeaconProxy, uint256 allocation) internal {
+    function _setCommunityIssuanceAllocation(
+        ITroveManager troveManagerBeaconProxy,
+        uint256 allocation
+    )
+        internal
+    {
         address[] memory _recipients = new address[](1);
         _recipients[0] = address(troveManagerBeaconProxy);
         uint256[] memory _amount = new uint256[](1);
