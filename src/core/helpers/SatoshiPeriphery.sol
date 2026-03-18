@@ -385,7 +385,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         // Must approve the token approve proxy, NOT the router — OKX uses a separate spender contract
         IERC20(fromToken).forceApprove(_okxApprove, fromAmount);
-        IERC20(fromToken).forceApprove(_okxRouter, fromAmount);
 
         uint256 stableBalanceBefore = IERC20(stableAsset).balanceOf(address(this));
 
@@ -393,7 +392,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
         require(success, "SatoshiPeriphery: OKX swap failed");
 
         IERC20(fromToken).forceApprove(_okxApprove, 0);
-        IERC20(fromToken).forceApprove(_okxRouter, 0);
 
         uint256 fromTokenAfter = IERC20(fromToken).balanceOf(address(this));
         if (fromTokenAfter > fromTokenBefore - fromAmount) {
