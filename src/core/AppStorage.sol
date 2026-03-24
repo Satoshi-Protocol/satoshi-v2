@@ -102,6 +102,9 @@ library AppStorage {
         mapping(address => AssetConfig) assetConfigs;
         mapping(address => bool) isAssetSupported;
         mapping(address => uint256) dailyMintCount;
+        address[] nymSupportedAssets;
+        mapping(address => bool) nymAssetIndexed;
+        mapping(address => uint256) nymAssetArrayIndex;
     }
 
     function layout() internal pure returns (Layout storage s) {

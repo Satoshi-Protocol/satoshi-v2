@@ -24,14 +24,46 @@ contract UpgradeNYMScript is Script {
 
         address newNYMImpl = address(new NexusYieldManagerFacet());
 
-        bytes4[] memory selectors = new bytes4[](1);
-        selectors[0] = INexusYieldManagerFacet.getAssetConfig.selector;
+        bytes4[] memory addSelectors = new bytes4[](3);
+        addSelectors[0] = INexusYieldManagerFacet.getWeightedAssetRate.selector;
+        addSelectors[1] = INexusYieldManagerFacet.isAssetSupported.selector;
+        addSelectors[2] = INexusYieldManagerFacet.getAssetConfig.selector;
 
-        IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](1);
+        bytes4[] memory replaceSelectors = new bytes4[](27);
+        replaceSelectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
+        replaceSelectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
+        replaceSelectors[2] = INexusYieldManagerFacet.swapIn.selector;
+        replaceSelectors[3] = INexusYieldManagerFacet.pause.selector;
+        replaceSelectors[4] = INexusYieldManagerFacet.resume.selector;
+        replaceSelectors[5] = INexusYieldManagerFacet.setPrivileged.selector;
+        replaceSelectors[6] = INexusYieldManagerFacet.transferTokenToPrivilegedVault.selector;
+        replaceSelectors[7] = INexusYieldManagerFacet.previewSwapOut.selector;
+        replaceSelectors[8] = INexusYieldManagerFacet.previewSwapIn.selector;
+        replaceSelectors[9] = INexusYieldManagerFacet.swapOutPrivileged.selector;
+        replaceSelectors[10] = INexusYieldManagerFacet.swapInPrivileged.selector;
+        replaceSelectors[11] = INexusYieldManagerFacet.scheduleSwapOut.selector;
+        replaceSelectors[12] = INexusYieldManagerFacet.withdraw.selector;
+        replaceSelectors[13] = INexusYieldManagerFacet.convertDebtTokenToAssetAmount.selector;
+        replaceSelectors[14] = INexusYieldManagerFacet.convertAssetToDebtTokenAmount.selector;
+        replaceSelectors[15] = INexusYieldManagerFacet.feeIn.selector;
+        replaceSelectors[16] = INexusYieldManagerFacet.feeOut.selector;
+        replaceSelectors[17] = INexusYieldManagerFacet.debtTokenMintCap.selector;
+        replaceSelectors[18] = INexusYieldManagerFacet.dailyDebtTokenMintCap.selector;
+        replaceSelectors[19] = INexusYieldManagerFacet.debtTokenMinted.selector;
+        replaceSelectors[20] = INexusYieldManagerFacet.isUsingOracle.selector;
+        replaceSelectors[21] = INexusYieldManagerFacet.swapWaitingPeriod.selector;
+        replaceSelectors[22] = INexusYieldManagerFacet.debtTokenDailyMintCapRemain.selector;
+        replaceSelectors[23] = INexusYieldManagerFacet.pendingWithdrawal.selector;
+        replaceSelectors[24] = INexusYieldManagerFacet.pendingWithdrawals.selector;
+        replaceSelectors[25] = INexusYieldManagerFacet.isNymPaused.selector;
+        replaceSelectors[26] = INexusYieldManagerFacet.dailyMintCount.selector;
+
+        IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](2);
         facetCuts[0] = IERC2535DiamondCutInternal.FacetCut({
-            target: newNYMImpl,
-            action: IERC2535DiamondCutInternal.FacetCutAction.ADD,
-            selectors: selectors
+            target: newNYMImpl, action: IERC2535DiamondCutInternal.FacetCutAction.REPLACE, selectors: replaceSelectors
+        });
+        facetCuts[1] = IERC2535DiamondCutInternal.FacetCut({
+            target: newNYMImpl, action: IERC2535DiamondCutInternal.FacetCutAction.ADD, selectors: addSelectors
         });
 
         ISatoshiXApp XAPP = ISatoshiXApp(SATOSHI_X_APP_ADDRESS);

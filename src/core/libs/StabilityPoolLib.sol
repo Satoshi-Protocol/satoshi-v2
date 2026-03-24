@@ -227,10 +227,7 @@ library StabilityPoolLib {
         return releasedToken;
     }
 
-    function _getCompoundedDebtDeposit(
-        AppStorage.Layout storage s,
-        address _depositor
-    )
+    function _getCompoundedDebtDeposit(AppStorage.Layout storage s, address _depositor)
         internal
         view
         returns (uint256)

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Script, console } from "forge-std/Script.sol";
 
 address constant PERIPHERY_PROXY_ADDRESS = 0x0a1cA3190579504761A0EFd0c94dfA2DeDe55bE2;

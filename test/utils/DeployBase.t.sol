@@ -349,7 +349,7 @@ abstract contract DeployBase is Test {
         vm.startPrank(deployer);
         assert(address(nexusYieldManagerFacet) == address(0)); // check if contract is not deployed
         nexusYieldManagerFacet = INexusYieldManagerFacet(address(new NexusYieldManagerFacet()));
-        bytes4[] memory selectors = new bytes4[](29);
+        bytes4[] memory selectors = new bytes4[](30);
         selectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
         selectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
         selectors[2] = INexusYieldManagerFacet.swapIn.selector;
@@ -379,6 +379,7 @@ abstract contract DeployBase is Test {
         selectors[26] = INexusYieldManagerFacet.dailyMintCount.selector;
         selectors[27] = INexusYieldManagerFacet.isAssetSupported.selector;
         selectors[28] = INexusYieldManagerFacet.getAssetConfig.selector;
+        selectors[29] = INexusYieldManagerFacet.getWeightedAssetRate.selector;
         vm.stopPrank();
         return (address(nexusYieldManagerFacet), selectors);
     }
@@ -612,13 +613,7 @@ abstract contract DeployBase is Test {
         return oracleAddr;
     }
 
-    function _setPriceFeedToPriceFeedAggregatorProxy(
-        address owner,
-        IERC20 collateral,
-        IPriceFeed priceFeed
-    )
-        internal
-    {
+    function _setPriceFeedToPriceFeedAggregatorProxy(address owner, IERC20 collateral, IPriceFeed priceFeed) internal {
         vm.startPrank(owner);
         IPriceFeedAggregatorFacet(address(satoshiXApp)).setPriceFeed(collateral, priceFeed);
         vm.stopPrank();

@@ -41,13 +41,7 @@ interface ISatoshiPeriphery {
         external
         payable;
 
-    function addColl(
-        ITroveManager troveManager,
-        uint256 _collAmount,
-        address _upperHint,
-        address _lowerHint
-    )
-        external;
+    function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint) external;
 
     function withdrawColl(
         ITroveManager troveManager,

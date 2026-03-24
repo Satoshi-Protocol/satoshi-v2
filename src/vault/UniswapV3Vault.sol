@@ -362,14 +362,7 @@ contract UniV3DexVault is VaultCore {
         return nonfungiblePositionManager.mint(liquidityParams);
     }
 
-    function _decreaseLiquidity(
-        uint256 tokenId,
-        uint128 liquidity,
-        uint256 amount0Min,
-        uint256 amount1Min
-    )
-        internal
-    {
+    function _decreaseLiquidity(uint256 tokenId, uint128 liquidity, uint256 amount0Min, uint256 amount1Min) internal {
         if (liquidity == 0) revert ZeroLiquidity();
         if (liquidity > deposits[tokenId].liquidity) revert InvalidLiquidity(liquidity);
 

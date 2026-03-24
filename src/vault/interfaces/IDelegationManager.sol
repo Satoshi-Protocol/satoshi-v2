@@ -334,13 +334,7 @@ interface IDelegationManager is ISignatureUtils {
     /**
      * @notice Given array of strategies, returns array of shares for the operator
      */
-    function getOperatorShares(
-        address operator,
-        IStrategy[] memory strategies
-    )
-        external
-        view
-        returns (uint256[] memory);
+    function getOperatorShares(address operator, IStrategy[] memory strategies) external view returns (uint256[] memory);
 
     /**
      * @notice Given a list of strategies, return the minimum cooldown that must pass to withdraw
@@ -376,13 +370,7 @@ interface IDelegationManager is ISignatureUtils {
      * @dev Salts are used in the `delegateTo` and `delegateToBySignature` functions. Note that these functions only process the delegationApprover's
      * signature + the provided salt if the operator being delegated to has specified a nonzero address as their `delegationApprover`.
      */
-    function delegationApproverSaltIsSpent(
-        address _delegationApprover,
-        bytes32 salt
-    )
-        external
-        view
-        returns (bool);
+    function delegationApproverSaltIsSpent(address _delegationApprover, bytes32 salt) external view returns (bool);
 
     /**
      * @notice Minimum delay enforced by this contract for completing queued withdrawals. Cooldown, and adjustable by this contract's owner,
