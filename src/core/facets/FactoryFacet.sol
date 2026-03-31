@@ -154,13 +154,7 @@ contract FactoryFacet is IFactoryFacet, AccessControlInternal {
         return ITroveManager(address(new BeaconProxy(address(s.troveManagerBeacon), data)));
     }
 
-    function setTMRewardRate(
-        uint128[] calldata _numerator,
-        uint128 _denominator
-    )
-        external
-        onlyRole(Config.OWNER_ROLE)
-    {
+    function setTMRewardRate(uint128[] calldata _numerator, uint128 _denominator) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         // console.log("setTMRewardRate", _numerator.length, s.troveManagers.length);
         require(_numerator.length == s.troveManagers.length, "Factory: invalid length");

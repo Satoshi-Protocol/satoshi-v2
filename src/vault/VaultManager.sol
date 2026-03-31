@@ -40,15 +40,7 @@ contract VaultManager is IVaultManager, OwnableUpgradeable, UUPSUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(
-        address _debtToken,
-        address _nexusYieldManager,
-        address _owner
-    )
-        external
-        override
-        initializer
-    {
+    function initialize(address _debtToken, address _nexusYieldManager, address _owner) external override initializer {
         __UUPSUpgradeable_init_unchained();
         __Ownable_init(_owner);
 

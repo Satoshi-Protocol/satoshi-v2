@@ -13,8 +13,5 @@ interface ITroveManagerGetter {
 
     function getAllCollateralsAndTroveManagers() external view returns (Collateral[] memory);
 
-    function getActiveTroveManagersForAccount(address account)
-        external
-        view
-        returns (ITroveManager[] memory, uint256);
+    function getActiveTroveManagersForAccount(address account) external view returns (ITroveManager[] memory, uint256);
 }

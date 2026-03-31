@@ -97,14 +97,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     /// @param _collAmount The amount of additional collateral
     /// @param _upperHint The upper hint (for querying the position of the sorted trove)
     /// @param _lowerHint The lower hint (for querying the position of the sorted trove)
-    function addColl(
-        ITroveManager troveManager,
-        uint256 _collAmount,
-        address _upperHint,
-        address _lowerHint
-    )
-        external
-    {
+    function addColl(ITroveManager troveManager, uint256 _collAmount, address _upperHint, address _lowerHint) external {
         IERC20 collateralToken = troveManager.collateralToken();
 
         _beforeAddColl(collateralToken, _collAmount);

@@ -612,13 +612,7 @@ abstract contract DeployBase is Test {
         return oracleAddr;
     }
 
-    function _setPriceFeedToPriceFeedAggregatorProxy(
-        address owner,
-        IERC20 collateral,
-        IPriceFeed priceFeed
-    )
-        internal
-    {
+    function _setPriceFeedToPriceFeedAggregatorProxy(address owner, IERC20 collateral, IPriceFeed priceFeed) internal {
         vm.startPrank(owner);
         IPriceFeedAggregatorFacet(address(satoshiXApp)).setPriceFeed(collateral, priceFeed);
         vm.stopPrank();

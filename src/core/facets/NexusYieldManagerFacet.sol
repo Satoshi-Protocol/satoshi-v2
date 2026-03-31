@@ -39,13 +39,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         _;
     }
 
-    function setAssetConfig(
-        address asset,
-        AssetConfig calldata assetConfig_
-    )
-        external
-        onlyRole(Config.OWNER_ROLE)
-    {
+    function setAssetConfig(address asset, AssetConfig calldata assetConfig_) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         if (assetConfig_.feeIn >= Config.BASIS_POINTS_DIVISOR || assetConfig_.feeOut >= Config.BASIS_POINTS_DIVISOR) {
             revert INexusYieldManagerFacet.InvalidFee(assetConfig_.feeIn, assetConfig_.feeOut);
@@ -477,14 +471,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
      * @param amount The amount of stable tokens.
      * @return The USD value of the given amount of stable tokens scaled by 1e18 taking into account the direction of the swap
      */
-    function _previewTokenUSDAmount(
-        address asset,
-        uint256 amount,
-        FeeDirection direction
-    )
-        internal
-        returns (uint256)
-    {
+    function _previewTokenUSDAmount(address asset, uint256 amount, FeeDirection direction) internal returns (uint256) {
         return (convertAssetToDebtTokenAmount(asset, amount) * _getPriceInUSD(asset, direction)) / Config.MANTISSA_ONE;
     }
 

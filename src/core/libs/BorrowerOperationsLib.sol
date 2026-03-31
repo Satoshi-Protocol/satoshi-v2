@@ -167,9 +167,9 @@ library BorrowerOperationsLib {
         uint256 loopEnd = balances.collaterals.length;
         for (uint256 i; i < loopEnd;) {
             totalPricedCollateral += (SatoshiMath._getScaledCollateralAmount(
-                    balances.collaterals[i], balances.decimals[i]
-                )
-                * balances.prices[i]);
+                        balances.collaterals[i], balances.decimals[i]
+                    )
+                    * balances.prices[i]);
             totalDebt += balances.debts[i];
             unchecked {
                 ++i;

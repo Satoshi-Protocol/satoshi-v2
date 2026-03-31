@@ -404,13 +404,7 @@ contract Deployer is Script, IERC2535DiamondCutInternal {
         vm.stopBroadcast();
     }
 
-    function _deployDebtToken(
-        address endpoint,
-        string memory debtTokenName,
-        string memory debtTokenSymbol
-    )
-        internal
-    {
+    function _deployDebtToken(address endpoint, string memory debtTokenName, string memory debtTokenSymbol) internal {
         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
         assert(address(debtToken) == address(0)); // check if contract is not deployed
         assert(address(gasPool) != address(0)); // check if gasPool is deployed

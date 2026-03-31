@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import { IDebtToken } from "../src/core/interfaces/IDebtToken.sol";
 import { Script, console } from "forge-std/Script.sol";
 
-address constant DEBT_TOKEN_ADDRESS = 0xb4818BB69478730EF4e33Cc068dD94278e2766cB;
+address constant DEBT_TOKEN_ADDRESS = 0xceF6c74Ce218c0E1F48cA2430635D0a65Cd3737A;
 address constant AUTH_ADDRESS = 0xd3e87B4B76E6F8bFf454AAFc2AD3271C5b317d47;
 
 contract SetAuthScript is Script {
