@@ -24,12 +24,10 @@ contract UpgradeNYMScript is Script {
 
         address newNYMImpl = address(new NexusYieldManagerFacet());
 
-        bytes4[] memory addSelectors = new bytes4[](3);
+        bytes4[] memory addSelectors = new bytes4[](1);
         addSelectors[0] = INexusYieldManagerFacet.getWeightedAssetRate.selector;
-        addSelectors[1] = INexusYieldManagerFacet.isAssetSupported.selector;
-        addSelectors[2] = INexusYieldManagerFacet.getAssetConfig.selector;
 
-        bytes4[] memory replaceSelectors = new bytes4[](27);
+        bytes4[] memory replaceSelectors = new bytes4[](29);
         replaceSelectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
         replaceSelectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
         replaceSelectors[2] = INexusYieldManagerFacet.swapIn.selector;
@@ -57,6 +55,8 @@ contract UpgradeNYMScript is Script {
         replaceSelectors[24] = INexusYieldManagerFacet.pendingWithdrawals.selector;
         replaceSelectors[25] = INexusYieldManagerFacet.isNymPaused.selector;
         replaceSelectors[26] = INexusYieldManagerFacet.dailyMintCount.selector;
+        replaceSelectors[27] = INexusYieldManagerFacet.isAssetSupported.selector;
+        replaceSelectors[28] = INexusYieldManagerFacet.getAssetConfig.selector;
 
         IERC2535DiamondCutInternal.FacetCut[] memory facetCuts = new IERC2535DiamondCutInternal.FacetCut[](2);
         facetCuts[0] = IERC2535DiamondCutInternal.FacetCut({
