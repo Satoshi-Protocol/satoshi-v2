@@ -134,6 +134,9 @@ interface INexusYieldManagerFacet {
 
     error AssetNotEnough(uint256 assetAmount, uint256 transferAmount);
 
+    /// @notice thrown when getWeightedAssetRate is called but no asset has any debtTokenMinted
+    error NoActiveAssets();
+
     /**
      * @notice Sets the configuration for a specific asset.
      * @param asset The address of the asset.
@@ -349,4 +352,13 @@ interface INexusYieldManagerFacet {
      * @return True if the asset is supported, false otherwise.
      */
     function isAssetSupported(address asset) external view returns (bool);
+
+    /**
+     * @notice Returns the weighted average rate of all supported assets, weighted by debtTokenMinted.
+     * @dev Uses raw oracle rate from PriceFeedAggregator per asset (with min/max bounds check).
+     *      Assets that are sunset or have zero debtTokenMinted are skipped.
+     *      Reverts with NoActiveAssets if no asset contributes any weight.
+     * @return weightedRate The debtTokenMinted-weighted average rate, 1e18-scaled.
+     */
+    function getWeightedAssetRate() external returns (uint256);
 }

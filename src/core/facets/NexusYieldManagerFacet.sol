@@ -54,6 +54,11 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
         assetConfig.minPrice = assetConfig_.minPrice;
         assetConfig.isUsingOracle = assetConfig_.isUsingOracle;
         s.isAssetSupported[asset] = true;
+        if (!s.nymAssetIndexed[asset]) {
+            s.nymAssetArrayIndex[asset] = s.nymSupportedAssets.length;
+            s.nymAssetIndexed[asset] = true;
+            s.nymSupportedAssets.push(asset);
+        }
 
         emit AssetConfigSetting(asset, assetConfig_);
     }
@@ -65,6 +70,21 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     function sunsetAsset(address asset) external onlyRole(Config.OWNER_ROLE) {
         AppStorage.Layout storage s = AppStorage.layout();
         s.isAssetSupported[asset] = false;
+
+        // Remove from nymSupportedAssets via swap-and-pop so the array stays clean
+        // and the asset can be cleanly re-added if setAssetConfig is called again later.
+        if (s.nymAssetIndexed[asset]) {
+            uint256 idx = s.nymAssetArrayIndex[asset];
+            uint256 lastIdx = s.nymSupportedAssets.length - 1;
+            if (idx != lastIdx) {
+                address lastAsset = s.nymSupportedAssets[lastIdx];
+                s.nymSupportedAssets[idx] = lastAsset;
+                s.nymAssetArrayIndex[lastAsset] = idx;
+            }
+            s.nymSupportedAssets.pop();
+            s.nymAssetIndexed[asset] = false;
+            delete s.nymAssetArrayIndex[asset];
+        }
 
         emit AssetSunset(asset);
     }
@@ -680,5 +700,39 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     function isAssetSupported(address asset) external view returns (bool) {
         AppStorage.Layout storage s = AppStorage.layout();
         return s.isAssetSupported[asset];
+    }
+
+    // @notice Returns the debtTokenMinted-weighted average rate of all supported assets.
+    // @dev Skips sunset assets and assets with zero debtTokenMinted.
+    //      Reverts with NoActiveAssets when no asset has any weight.
+    function getWeightedAssetRate() external returns (uint256) {
+        AppStorage.Layout storage s = AppStorage.layout();
+        uint256 totalWeight;
+        uint256 weightedSum;
+
+        for (uint256 i; i < s.nymSupportedAssets.length; ++i) {
+            address asset = s.nymSupportedAssets[i];
+            if (!s.isAssetSupported[asset]) continue;
+
+            AssetConfig storage assetConfig = s.assetConfigs[asset];
+            uint256 weight = assetConfig.debtTokenMinted;
+            if (weight == 0) continue;
+
+            uint256 rate;
+            if (!assetConfig.isUsingOracle) {
+                rate = Config.ONE_DOLLAR;
+            } else {
+                rate = IPriceFeedAggregatorFacet(address(this)).fetchPrice(IERC20(asset));
+                if (rate > assetConfig.maxPrice || rate < assetConfig.minPrice) {
+                    revert InvalidPrice(rate);
+                }
+            }
+
+            weightedSum += rate * weight;
+            totalWeight += weight;
+        }
+
+        if (totalWeight == 0) revert NoActiveAssets();
+        return weightedSum / totalWeight;
     }
 }

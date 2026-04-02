@@ -532,6 +532,167 @@ contract NexusYieldTest is DeployBase, TroveBase {
         vm.stopPrank();
     }
 
+    /* ── getWeightedAssetRate tests ── */
+
+    // (1) Single asset, no oracle → rate = ONE_DOLLAR (1e18)
+    function test_getWeightedAssetRate_noOracle() public {
+        vm.prank(OWNER);
+        nexusYieldProxy.setAssetConfig(
+            address(collateral), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, false)
+        );
+
+        deal(address(collateral), user1, 100e18);
+        vm.startPrank(user1);
+        collateral.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateral), user1, 100e18);
+        vm.stopPrank();
+
+        assertEq(nexusYieldProxy.getWeightedAssetRate(), 1e18);
+    }
+
+    // (2) Single asset with oracle at $0.95 → raw oracle price returned (no FeeDirection bias)
+    function test_getWeightedAssetRate_withOracle() public {
+        _updateRoundData(
+            RoundData({ answer: 0.95e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1 })
+        );
+        vm.prank(OWNER);
+        nexusYieldProxy.setAssetConfig(
+            address(collateral), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, true)
+        );
+
+        deal(address(collateral), user1, 100e18);
+        vm.startPrank(user1);
+        collateral.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateral), user1, 100e18);
+        vm.stopPrank();
+
+        // swapIn: actualTransferAmtInUSD = 100e18 * MIN(0.95, 1.0) = 95e18  → debtTokenMinted = 95e18
+        // getWeightedAssetRate: rate = raw oracle = 0.95e18, weight = 95e18
+        // result = 0.95e18 * 95e18 / 95e18 = 0.95e18
+        assertEq(nexusYieldProxy.getWeightedAssetRate(), 0.95e18);
+    }
+
+    // (3) Two assets with different rates → verifies weighted average formula
+    function test_getWeightedAssetRate_twoAssets_weighted() public {
+        // Asset A (collateral): oracle $1.05, fee=0
+        //   swapIn 100e18 → debtTokenMinted_A = 100e18 * MIN(1.05, 1.0) = 100e18, rate_A = 1.05e18
+        // Asset B (new ERC20): no oracle, fee=0
+        //   swapIn 100e18 → debtTokenMinted_B = 100e18, rate_B = 1e18
+        // weighted avg = (1.05e18 * 100e18 + 1e18 * 100e18) / 200e18 = 205e36 / 200e18 = 1.025e18
+        _updateRoundData(
+            RoundData({ answer: 1.05e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1 })
+        );
+        ERC20Mock collateralB = new ERC20Mock("MOCK_B", "MOCK_B");
+
+        vm.startPrank(OWNER);
+        nexusYieldProxy.setAssetConfig(
+            address(collateral), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, true)
+        );
+        nexusYieldProxy.setAssetConfig(
+            address(collateralB), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, false)
+        );
+        vm.stopPrank();
+
+        deal(address(collateral), user1, 100e18);
+        vm.startPrank(user1);
+        collateral.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateral), user1, 100e18);
+        vm.stopPrank();
+
+        deal(address(collateralB), user2, 100e18);
+        vm.startPrank(user2);
+        collateralB.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateralB), user2, 100e18);
+        vm.stopPrank();
+
+        assertEq(nexusYieldProxy.getWeightedAssetRate(), 1.025e18);
+    }
+
+    // (4) No swapIn → all debtTokenMinted = 0 → NoActiveAssets
+    function test_getWeightedAssetRate_revertNoActiveAssets() public {
+        vm.expectRevert(INexusYieldManagerFacet.NoActiveAssets.selector);
+        nexusYieldProxy.getWeightedAssetRate();
+    }
+
+    // (5) Only asset is sunset → removed from array → NoActiveAssets
+    function test_getWeightedAssetRate_sunsetExcluded() public {
+        vm.prank(OWNER);
+        nexusYieldProxy.setAssetConfig(
+            address(collateral), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, false)
+        );
+
+        deal(address(collateral), user1, 100e18);
+        vm.startPrank(user1);
+        collateral.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateral), user1, 100e18);
+        vm.stopPrank();
+
+        vm.prank(OWNER);
+        nexusYieldProxy.sunsetAsset(address(collateral));
+
+        vm.expectRevert(INexusYieldManagerFacet.NoActiveAssets.selector);
+        nexusYieldProxy.getWeightedAssetRate();
+    }
+
+    // (6) Oracle price falls below minPrice → InvalidPrice
+    function test_getWeightedAssetRate_priceOutOfRange() public {
+        vm.prank(OWNER);
+        nexusYieldProxy.setAssetConfig(
+            address(collateral), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, true)
+        );
+
+        // swapIn at valid price to establish debtTokenMinted > 0
+        _updateRoundData(
+            RoundData({ answer: 1.0e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1 })
+        );
+        deal(address(collateral), user1, 100e18);
+        vm.startPrank(user1);
+        collateral.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateral), user1, 100e18);
+        vm.stopPrank();
+
+        // oracle drops below minPrice (0.9e18)
+        _updateRoundData(
+            RoundData({ answer: 0.8e8, startedAt: block.timestamp, updatedAt: block.timestamp, answeredInRound: 1 })
+        );
+        vm.expectRevert(abi.encodeWithSelector(INexusYieldManagerFacet.InvalidPrice.selector, 0.8e18));
+        nexusYieldProxy.getWeightedAssetRate();
+    }
+
+    // (7) Sunset then re-add → debtTokenMinted is preserved (setAssetConfig only updates config fields)
+    function test_getWeightedAssetRate_sunsetAndReadd() public {
+        vm.prank(OWNER);
+        nexusYieldProxy.setAssetConfig(
+            address(collateral), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, false)
+        );
+
+        deal(address(collateral), user1, 200e18);
+        vm.startPrank(user1);
+        collateral.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateral), user1, 100e18); // debtTokenMinted = 100e18
+        vm.stopPrank();
+
+        // sunset → removed from nymSupportedAssets
+        vm.prank(OWNER);
+        nexusYieldProxy.sunsetAsset(address(collateral));
+        vm.expectRevert(INexusYieldManagerFacet.NoActiveAssets.selector);
+        nexusYieldProxy.getWeightedAssetRate();
+
+        // re-add → setAssetConfig only updates config fields; debtTokenMinted=100e18 is preserved
+        vm.prank(OWNER);
+        nexusYieldProxy.setAssetConfig(
+            address(collateral), AssetConfig(0, 0, 10_000e18, 10_000e18, 0, 0, 1.1e18, 0.9e18, false)
+        );
+        assertEq(nexusYieldProxy.getWeightedAssetRate(), 1e18);
+
+        // additional swapIn works normally
+        vm.startPrank(user1);
+        collateral.approve(address(nexusYieldProxy), 100e18);
+        nexusYieldProxy.swapIn(address(collateral), user1, 100e18);
+        vm.stopPrank();
+        assertEq(nexusYieldProxy.getWeightedAssetRate(), 1e18);
+    }
+
     /**
      * utils
      */
