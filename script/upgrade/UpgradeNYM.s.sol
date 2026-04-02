@@ -9,8 +9,7 @@ import { IERC2535DiamondCutInternal } from "@solidstate/contracts/interfaces/IER
 
 import { Script, console2 } from "forge-std/Script.sol";
 
-address payable constant SATOSHI_X_APP_ADDRESS = payable(0xd4b0eEcF327c0F1B43d487FEcFD2eA56E746A72b);
-address constant COLLATERAL_ADDRESS = 0x9827431e8b77E87C9894BD50B055D6BE56bE0030;
+address payable constant SATOSHI_X_APP_ADDRESS = payable(0xB4d4793a1CD57b6EceBADf6FcbE5aEd03e8e93eC);
 
 contract UpgradeNYMScript is Script {
     uint256 internal OWNER_PRIVATE_KEY;
@@ -71,10 +70,10 @@ contract UpgradeNYMScript is Script {
         bytes memory data = "";
         XAPP.diamondCut(facetCuts, address(0), data);
 
-        console2.log("new NYMImpl:", newNYMImpl);
+        console2.log("new NYMFacet:", newNYMImpl);
 
-        // INexusYieldManagerFacet NYMFacet = INexusYieldManagerFacet(SATOSHI_X_APP_ADDRESS);
-        // console2.log("NYMFacet.getAssetConfig.debtTokenMinted:", NYMFacet.getAssetConfig(COLLATERAL_ADDRESS).debtTokenMinted);
+        // uint256 weightAssetRate = INexusYieldManagerFacet(SATOSHI_X_APP_ADDRESS).getWeightedAssetRate();
+        // console2.log("weighted asset rate:", weightAssetRate);
 
         vm.stopBroadcast();
     }
