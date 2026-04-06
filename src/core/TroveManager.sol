@@ -842,7 +842,7 @@ contract TroveManager is ITroveManager, Initializable, OwnableUpgradeable {
         _updateIntegrals(_borrower, 0, supply);
 
         totalActiveCollateral = totalActiveCollateral + _collateralAmount;
-        uint256 _newTotalDebt = supply + _compositeDebt;
+        uint256 _newTotalDebt = totalActiveDebt + _compositeDebt;
         require(_newTotalDebt + defaultedDebt <= maxSystemDebt, "Collateral debt limit reached");
         totalActiveDebt = _newTotalDebt;
         emit TroveUpdated(_borrower, _compositeDebt, _collateralAmount, stake, TroveManagerOperation.open);
