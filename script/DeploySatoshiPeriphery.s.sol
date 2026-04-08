@@ -14,6 +14,8 @@ contract DeploySatoshiPeriphery is Script {
         address debtToken = vm.envAddress("DEBT_TOKEN");
         address xApp = vm.envAddress("X_APP");
         address owner = vm.envAddress("OWNER");
+        address okxRouter = vm.envAddress("OKX_ROUTER");
+        address okxApprove = vm.envAddress("OKX_APPROVE");
 
         vm.startBroadcast(deployerKey);
 
@@ -21,8 +23,13 @@ contract DeploySatoshiPeriphery is Script {
         bytes memory data = abi.encodeCall(ISatoshiPeriphery.initialize, (IDebtToken(debtToken), xApp, owner));
         ISatoshiPeriphery periphery = ISatoshiPeriphery(address(new ERC1967Proxy(peripheryImpl, data)));
 
+        periphery.setOkxRouter(okxRouter);
+        periphery.setOkxApprove(okxApprove);
+
         console.log("Implementation:", peripheryImpl);
         console.log("Proxy:", address(periphery));
+        console.log("OKX Router:", okxRouter);
+        console.log("OKX Approve:", okxApprove);
 
         vm.stopBroadcast();
     }

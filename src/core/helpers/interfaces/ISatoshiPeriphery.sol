@@ -107,7 +107,7 @@ interface ISatoshiPeriphery {
         external
         payable;
 
-    /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn (ERC20 only)
+    /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn
     /// @param fromToken          Input ERC20 token (must be approved to this contract)
     /// @param fromAmount         Raw input amount
     /// @param okxCalldata        OKX swap calldata from backend /okx/nym-swap response
@@ -121,4 +121,16 @@ interface ISatoshiPeriphery {
         uint256 minDebtAmount
     )
         external;
+
+    /// @notice Swap native gas token (ETH/BNB/…) → stable token via OKX DEX → DebtToken via NYM.swapIn
+    /// @param okxCalldata        OKX swap calldata from backend /okx/nym-swap response
+    /// @param stableAsset        Stable token address from backend /okx/nym-swap response
+    /// @param minDebtAmount      Minimum DebtToken to receive; revert if below this (slippage guard)
+    function swapInWithOkxNative(
+        bytes calldata okxCalldata,
+        address stableAsset,
+        uint256 minDebtAmount
+    )
+        external
+        payable;
 }

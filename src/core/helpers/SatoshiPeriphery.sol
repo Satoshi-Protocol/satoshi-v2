@@ -360,7 +360,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     }
 
     /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn
-    /// @dev ERC20 only — native token input is not supported
     /// @dev fromToken must be pre-approved to this contract by msg.sender
     /// @dev okxCalldata must be generated with this contract address as userWalletAddress
     /// @dev DebtToken is always delivered to msg.sender on the same chain
@@ -383,7 +382,6 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         uint256 fromTokenBefore = IERC20(fromToken).balanceOf(address(this));
 
-        // Must approve the token approve proxy, NOT the router — OKX uses a separate spender contract
         IERC20(fromToken).forceApprove(_okxApprove, fromAmount);
 
         uint256 stableBalanceBefore = IERC20(stableAsset).balanceOf(address(this));
@@ -399,6 +397,48 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
             IERC20(fromToken).safeTransfer(msg.sender, refund);
         }
 
+        _okxSwapInToDebt(stableAsset, stableBalanceBefore, minDebtAmount);
+    }
+
+    /// @notice Swap native gas token (ETH/BNB/…) → stable token via OKX DEX → DebtToken via NYM.swapIn
+    /// @dev msg.value is the native token amount to swap
+    /// @dev okxCalldata must be generated with this contract address as userWalletAddress
+    /// @dev DebtToken is always delivered to msg.sender on the same chain
+    function swapInWithOkxNative(
+        bytes calldata okxCalldata,
+        address stableAsset,
+        uint256 minDebtAmount
+    )
+        external
+        payable
+        nonReentrant
+    {
+        address _okxRouter = okxRouter;
+        require(_okxRouter != address(0), "SatoshiPeriphery: okxRouter not set");
+        require(msg.value > 0, "SatoshiPeriphery: No native token sent");
+
+        uint256 nativeBefore = address(this).balance - msg.value;
+        uint256 stableBalanceBefore = IERC20(stableAsset).balanceOf(address(this));
+
+        (bool success,) = _okxRouter.call{value: msg.value}(okxCalldata);
+        require(success, "SatoshiPeriphery: OKX swap failed");
+
+        uint256 nativeAfter = address(this).balance;
+        if (nativeAfter > nativeBefore) {
+            (bool refundSuccess,) = msg.sender.call{value: nativeAfter - nativeBefore}("");
+            if (!refundSuccess) revert RefundFailed();
+        }
+
+        _okxSwapInToDebt(stableAsset, stableBalanceBefore, minDebtAmount);
+    }
+
+    /// @dev Shared tail for both swapInWithOkx and swapInWithOkxNative:
+    ///      stable token → NYM.swapIn → DebtToken → msg.sender
+    function _okxSwapInToDebt(
+        address stableAsset,
+        uint256 stableBalanceBefore,
+        uint256 minDebtAmount
+    ) private {
         uint256 stableReceived = IERC20(stableAsset).balanceOf(address(this)) - stableBalanceBefore;
         require(stableReceived > 0, "SatoshiPeriphery: No stable tokens received from OKX");
 
