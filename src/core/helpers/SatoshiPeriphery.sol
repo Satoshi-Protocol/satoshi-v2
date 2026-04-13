@@ -12,6 +12,7 @@ import { ILiquidationFacet } from "../interfaces/ILiquidationFacet.sol";
 import { ITroveManager } from "../interfaces/ITroveManager.sol";
 
 import { IDebtToken } from "../interfaces/IDebtToken.sol";
+import { INexusYieldManagerFacet } from "../interfaces/INexusYieldManagerFacet.sol";
 import { ISatoshiPeriphery, LzSendParam } from "./interfaces/ISatoshiPeriphery.sol";
 import { IWETH } from "./interfaces/IWETH.sol";
 import {
@@ -25,18 +26,21 @@ import {
 } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.sol";
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { UUPSUpgradeable } from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 /**
  * @title Satoshi Borrower Operations Router
  *        Handle the native token and ERC20 for the borrower operations
  */
-contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable {
+contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradeable, ReentrancyGuardUpgradeable {
     using SafeERC20 for IERC20;
     using SafeERC20 for DebtTokenWithLz;
 
     DebtTokenWithLz public debtToken;
     address public xApp;
+    address public okxRouter;
+    address public okxApprove;
 
     function initialize(IDebtToken _debtToken, address _xApp, address _owner) external initializer {
         if (address(_debtToken) == address(0)) revert InvalidZeroAddress();
@@ -47,6 +51,7 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
 
         __Ownable_init(_owner);
         __UUPSUpgradeable_init_unchained();
+        __ReentrancyGuard_init_unchained();
     }
 
     receive() external payable {
@@ -338,5 +343,117 @@ contract SatoshiPeriphery is ISatoshiPeriphery, UUPSUpgradeable, OwnableUpgradea
     // solhint-disable-next-line no-empty-blocks
     function _authorizeUpgrade(address newImplementation) internal view override onlyOwner {
         // No additional authorization logic is needed for this contract
+    }
+
+    /// @notice Set the OKX DEX router address (routerContractAddress from OKX /swap API)
+    function setOkxRouter(address _okxRouter) external onlyOwner {
+        if (_okxRouter == address(0)) revert InvalidZeroAddress();
+        okxRouter = _okxRouter;
+        emit OkxRouterSet(_okxRouter);
+    }
+
+    /// @notice Set the OKX token-approve proxy address (tokenApproveAddress from OKX /approve-transaction API)
+    function setOkxApprove(address _okxApprove) external onlyOwner {
+        if (_okxApprove == address(0)) revert InvalidZeroAddress();
+        okxApprove = _okxApprove;
+        emit OkxApproveSet(_okxApprove);
+    }
+
+    /// @notice Swap any ERC20 → stable token via OKX DEX → DebtToken via NYM.swapIn
+    /// @dev fromToken must be pre-approved to this contract by msg.sender
+    /// @dev okxCalldata must be generated with this contract address as userWalletAddress
+    /// @dev DebtToken is always delivered to msg.sender on the same chain
+    function swapInWithOkx(
+        address fromToken,
+        uint256 fromAmount,
+        bytes calldata okxCalldata,
+        address stableAsset,
+        uint256 minDebtAmount
+    )
+        public
+        nonReentrant
+    {
+        address _okxRouter = okxRouter;
+        address _okxApprove = okxApprove;
+        require(_okxRouter != address(0), "SatoshiPeriphery: okxRouter not set");
+        require(_okxApprove != address(0), "SatoshiPeriphery: okxApprove not set");
+
+        IERC20(fromToken).safeTransferFrom(msg.sender, address(this), fromAmount);
+
+        uint256 fromTokenBefore = IERC20(fromToken).balanceOf(address(this));
+
+        IERC20(fromToken).forceApprove(_okxApprove, fromAmount);
+
+        uint256 stableBalanceBefore = IERC20(stableAsset).balanceOf(address(this));
+
+        (bool success,) = _okxRouter.call(okxCalldata);
+        require(success, "SatoshiPeriphery: OKX swap failed");
+
+        IERC20(fromToken).forceApprove(_okxApprove, 0);
+
+        uint256 fromTokenAfter = IERC20(fromToken).balanceOf(address(this));
+        if (fromTokenAfter > fromTokenBefore - fromAmount) {
+            uint256 refund = fromTokenAfter - (fromTokenBefore - fromAmount);
+            IERC20(fromToken).safeTransfer(msg.sender, refund);
+        }
+
+        _okxSwapInToDebt(stableAsset, stableBalanceBefore, minDebtAmount);
+    }
+
+    /// @notice Swap native gas token (ETH/BNB/…) → stable token via OKX DEX → DebtToken via NYM.swapIn
+    /// @dev msg.value is the native token amount to swap
+    /// @dev okxCalldata must be generated with this contract address as userWalletAddress
+    /// @dev DebtToken is always delivered to msg.sender on the same chain
+    function swapInWithOkxNative(
+        bytes calldata okxCalldata,
+        address stableAsset,
+        uint256 minDebtAmount
+    )
+        external
+        payable
+        nonReentrant
+    {
+        address _okxRouter = okxRouter;
+        require(_okxRouter != address(0), "SatoshiPeriphery: okxRouter not set");
+        require(msg.value > 0, "SatoshiPeriphery: No native token sent");
+
+        uint256 nativeBefore = address(this).balance - msg.value;
+        uint256 stableBalanceBefore = IERC20(stableAsset).balanceOf(address(this));
+
+        (bool success,) = _okxRouter.call{value: msg.value}(okxCalldata);
+        require(success, "SatoshiPeriphery: OKX swap failed");
+
+        uint256 nativeAfter = address(this).balance;
+        if (nativeAfter > nativeBefore) {
+            (bool refundSuccess,) = msg.sender.call{value: nativeAfter - nativeBefore}("");
+            if (!refundSuccess) revert RefundFailed();
+        }
+
+        _okxSwapInToDebt(stableAsset, stableBalanceBefore, minDebtAmount);
+    }
+
+    /// @dev Shared tail for both swapInWithOkx and swapInWithOkxNative:
+    ///      stable token → NYM.swapIn → DebtToken → msg.sender
+    function _okxSwapInToDebt(
+        address stableAsset,
+        uint256 stableBalanceBefore,
+        uint256 minDebtAmount
+    ) private {
+        uint256 stableReceived = IERC20(stableAsset).balanceOf(address(this)) - stableBalanceBefore;
+        require(stableReceived > 0, "SatoshiPeriphery: No stable tokens received from OKX");
+
+        IERC20(stableAsset).forceApprove(xApp, stableReceived);
+
+        uint256 debtTokenBalanceBefore = debtToken.balanceOf(address(this));
+
+        INexusYieldManagerFacet(xApp).swapIn(stableAsset, address(this), stableReceived);
+
+        uint256 debtTokenReceived = debtToken.balanceOf(address(this)) - debtTokenBalanceBefore;
+
+        if (debtTokenReceived < minDebtAmount) {
+            revert SlippageTooHigh(debtTokenReceived, minDebtAmount);
+        }
+
+        debtToken.safeTransfer(msg.sender, debtTokenReceived);
     }
 }
