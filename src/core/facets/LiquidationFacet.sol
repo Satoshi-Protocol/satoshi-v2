@@ -48,13 +48,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
      *     @param maxICR Maximum ICR to liquidate. Should be set to MCR if the system
      *                   is not in recovery mode, to minimize gas costs for this call.
      */
-    function liquidateTroves(
-        ITroveManager troveManager,
-        uint256 maxTrovesToLiquidate,
-        uint256 maxICR
-    )
-        external
-    {
+    function liquidateTroves(ITroveManager troveManager, uint256 maxTrovesToLiquidate, uint256 maxICR) external {
         AppStorage.Layout storage s = AppStorage.layout();
         require(s.enabledTroveManagers[troveManager], "TroveManager not approved");
 
@@ -233,7 +227,7 @@ contract LiquidationFacet is ILiquidationFacet, AccessControlInternal, OwnableIn
 
                 debtInStabPool -= singleLiquidation.debtToOffset;
                 entireSystemColl -= (singleLiquidation.collToSendToSP + singleLiquidation.collSurplus)
-                * troveManagerValues.price + singleLiquidation.collGasCompensation;
+                    * troveManagerValues.price + singleLiquidation.collGasCompensation;
                 entireSystemDebt -= singleLiquidation.debtToOffset;
                 _applyLiquidationValuesToTotals(totals, singleLiquidation);
                 unchecked {

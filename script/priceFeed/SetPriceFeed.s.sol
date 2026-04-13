@@ -6,9 +6,9 @@ import { IPriceFeed } from "../../src/priceFeed/interfaces/IPriceFeed.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
-address constant SATOSHI_X_APP_ADDRESS = 0x07BbC5A83B83a5C440D1CAedBF1081426d0AA4Ec;
-address constant TOKEN = 0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c;
-address constant PRICE_FEED = 0xc96e66505fe71eB4C1b4873C6CB02C55A4189aC0;
+address constant SATOSHI_X_APP_ADDRESS = 0x2863E3D0f29E2EEC6adEFC0dF0d3171DaD542c02;
+address constant TOKEN = 0x93919784C523f39CACaa98Ee0a9d96c3F32b593e;
+address constant PRICE_FEED = 0xaA738260F0c7AF2976027D9e0E56E7114991a2bF;
 
 contract SetPriceFeed is Script {
     uint256 internal OWNER_PRIVATE_KEY;

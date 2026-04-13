@@ -278,7 +278,7 @@
 //         vm.startBroadcast(DEPLOYMENT_PRIVATE_KEY);
 //         assert(address(nexusYieldManagerFacet) == address(0)); // check if contract is not deployed
 //         nexusYieldManagerFacet = INexusYieldManagerFacet(address(new NexusYieldManagerFacet()));
-//         bytes4[] memory selectors = new bytes4[](29);
+//         bytes4[] memory selectors = new bytes4[](30);
 //         selectors[0] = INexusYieldManagerFacet.setAssetConfig.selector;
 //         selectors[1] = INexusYieldManagerFacet.sunsetAsset.selector;
 //         selectors[2] = INexusYieldManagerFacet.swapIn.selector;
@@ -308,6 +308,7 @@
 //         selectors[26] = INexusYieldManagerFacet.dailyMintCount.selector;
 //         selectors[27] = INexusYieldManagerFacet.isAssetSupported.selector;
 //         selectors[28] = INexusYieldManagerFacet.getAssetConfig.selector;
+//         selectors[29] = INexusYieldManagerFacet.getWeightedAssetRate.selector;
 //         vm.stopBroadcast();
 //         return (address(nexusYieldManagerFacet), selectors);
 //     }

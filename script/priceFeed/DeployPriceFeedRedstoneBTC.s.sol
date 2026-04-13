@@ -3,12 +3,11 @@ pragma solidity ^0.8.13;
 
 import { PriceFeedRedstoneBTC } from "../../src/priceFeed/PriceFeedRedstoneBTC.sol";
 import { IPriceCalculator } from "../../src/priceFeed/interfaces/IPriceCalculator.sol";
-import {
-    REDSTONE_MAX_TIME_THRESHOLD,
-    REDSTONE_ORACLE_PRICE_FEED_DECIMAL,
-    REDSTONE_ORACLE_PRICE_FEED_SOURCE_ADDRESS
-} from "./DeployPriceFeedConfig.sol";
 import { Script, console } from "forge-std/Script.sol";
+
+address constant REDSTONE_ORACLE_PRICE_FEED_SOURCE_ADDRESS = 0xfcd454d19f9B8806F8908e99d85b8eA17b3c7346;
+uint8 constant REDSTONE_ORACLE_PRICE_FEED_DECIMAL = 18;
+uint256 constant REDSTONE_MAX_TIME_THRESHOLD = 86_400;
 
 contract DeployPriceFeedRedstoneBTCScript is Script {
     PriceFeedRedstoneBTC internal priceFeedRedstoneOracle;
