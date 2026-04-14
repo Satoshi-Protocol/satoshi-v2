@@ -5,7 +5,6 @@ import { SatoshiMath } from "../../library/SatoshiMath.sol";
 
 import { AppStorage } from "../AppStorage.sol";
 import { Config } from "../Config.sol";
-import { IDebtToken } from "../interfaces/IDebtToken.sol";
 import {
     AccountDeposit,
     IStabilityPoolFacet,

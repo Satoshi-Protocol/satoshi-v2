@@ -52,9 +52,6 @@ import { MessagingFee } from "@layerzerolabs/oft-evm/contracts/interfaces/IOFT.s
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { IERC20Permit } from "@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol";
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
-import { stdJson } from "forge-std/StdJson.sol";
-import { Vm } from "forge-std/Vm.sol";
-import { console } from "forge-std/console.sol";
 
 contract OSHITokenTest is DeployBase, TroveBase {
     using Math for uint256;

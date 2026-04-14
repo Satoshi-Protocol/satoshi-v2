@@ -2,11 +2,9 @@
 pragma solidity ^0.8.20;
 
 import { Math } from "@openzeppelin/contracts/utils/math/Math.sol";
-import { Test, console } from "forge-std/Test.sol";
-import { Vm } from "forge-std/Vm.sol";
 
 import { FlashloanTester } from "../src/test/FlashloanTester.sol";
-import { DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, DEPLOYER, OWNER } from "./TestConfig.sol";
+import { DEBT_TOKEN_NAME, DEBT_TOKEN_SYMBOL, OWNER } from "./TestConfig.sol";
 import { DeployBase } from "./utils/DeployBase.t.sol";
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
