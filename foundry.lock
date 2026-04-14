@@ -1,0 +1,32 @@
+{
+  "lib/chainsight-management-oracle": {
+    "rev": "955bad45318c98549525bbe70fa19ba7bbff893b"
+  },
+  "lib/contracts": {
+    "rev": "8ac13f30fe145f57567b641ebe61e7016c66cfe0"
+  },
+  "lib/openzeppelin-contracts": {
+    "tag": {
+      "name": "v5.2.0",
+      "rev": "acd4ff74de833399287ed6b31b4debf6b2b35527"
+    }
+  },
+  "lib/openzeppelin-contracts-upgradeable": {
+    "tag": {
+      "name": "v5.2.0",
+      "rev": "3d5fa5c24c411112bab47bec25cfa9ad0af0e6e8"
+    }
+  },
+  "lib/pyth-sdk-solidity": {
+    "rev": "11d6bcfc2e56885535a9a8e3c8417847cb20be14"
+  },
+  "lib/solidstate-solidity": {
+    "tag": {
+      "name": "v0.0.61",
+      "rev": "03fb235059c8426976c0a3cadcf176a10df23ebe"
+    }
+  },
+  "lib/solmate": {
+    "rev": "97bdb2003b70382996a79a406813f76417b1cf90"
+  }
+}

@@ -5,7 +5,6 @@ import { ERC1967Proxy } from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy
 import { IBeacon } from "@openzeppelin/contracts/proxy/beacon/IBeacon.sol";
 import { UpgradeableBeacon } from "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { IAccessControl } from "@solidstate/contracts/access/access_control/IAccessControl.sol";
 import { IERC2535DiamondCutInternal } from "@solidstate/contracts/interfaces/IERC2535DiamondCutInternal.sol";
 import { Script, console } from "forge-std/Script.sol";
 

@@ -47,3 +47,5 @@ pnpm-error.log
 log
 
 lib
+
+tron/build/
