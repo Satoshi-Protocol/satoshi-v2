@@ -7,7 +7,7 @@ import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { Script, console2 } from "forge-std/Script.sol";
 
 address constant SATOSHI_X_APP_ADDRESS = 0x2863E3D0f29E2EEC6adEFC0dF0d3171DaD542c02;
-address constant TOKEN = 0x93919784C523f39CACaa98Ee0a9d96c3F32b593e;
+address constant TOKEN = 0x796e4D53067FF374B89b2Ac101ce0c1f72ccaAc2;
 address constant PRICE_FEED = 0xaA738260F0c7AF2976027D9e0E56E7114991a2bF;
 
 contract SetPriceFeed is Script {

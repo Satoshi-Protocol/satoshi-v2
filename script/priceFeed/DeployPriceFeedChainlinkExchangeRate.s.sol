@@ -7,10 +7,10 @@ import { PriceFeedChainlinkExchangeRate } from "../../src/priceFeed/PriceFeedCha
 import { AggregatorV3Interface } from "../../src/priceFeed/interfaces/AggregatorV3Interface.sol";
 import { SourceConfig } from "../../src/priceFeed/interfaces/IPriceFeed.sol";
 
-address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0 = 0xf93b9B23c46331704EC550c24CB4110975057863;
-address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_1 = 0x264990fbd0A4796A3E3d8E37C4d5F87a3aCa5Ebf;
-uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_0 = 86_400 + 300;
-uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_1 = 60 + 300;
+address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_0 = 0xA6C00E693D96679B128D78Ee94C24B45b55EaB06;
+address constant CHAINLINK_PRICE_FEED_SOURCE_ADDRESS_1 = 0x8a6E27666CEA273958D1D39594f185F5411A2Fe4;
+uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_0 = 1440 + 300;
+uint256 constant CHAINLINK_MAX_TIME_THRESHOLD_1 = 86_400 + 300;
 
 contract DeployPriceFeedChainlinkExchangeRateScript is Script {
     PriceFeedChainlinkExchangeRate internal priceFeedChainlink;
