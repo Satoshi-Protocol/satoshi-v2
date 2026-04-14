@@ -1,0 +1,119 @@
+{
+  "contractName": "IERC20MetadataInternal",
+  "abi": [],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\n/**\n * @title ERC20 metadata internal interface\n */\ninterface IERC20MetadataInternal {}\n",
+  "sourcePath": "@solidstate/contracts/token/ERC20/metadata/IERC20MetadataInternal.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/token/ERC20/metadata/IERC20MetadataInternal.sol",
+    "exportedSymbols": {
+      "IERC20MetadataInternal": [
+        47788
+      ]
+    },
+    "id": 47789,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47786,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:197"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IERC20MetadataInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 47787,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:51:197",
+          "text": " @title ERC20 metadata internal interface"
+        },
+        "fullyImplemented": true,
+        "id": 47788,
+        "linearizedBaseContracts": [
+          47788
+        ],
+        "name": "IERC20MetadataInternal",
+        "nameLocation": "121:22:197",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 47789,
+        "src": "111:35:197",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:114:197"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/token/ERC20/metadata/IERC20MetadataInternal.sol",
+    "exportedSymbols": {
+      "IERC20MetadataInternal": [
+        47788
+      ]
+    },
+    "id": 47789,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47786,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:197"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IERC20MetadataInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 47787,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:51:197",
+          "text": " @title ERC20 metadata internal interface"
+        },
+        "fullyImplemented": true,
+        "id": 47788,
+        "linearizedBaseContracts": [
+          47788
+        ],
+        "name": "IERC20MetadataInternal",
+        "nameLocation": "121:22:197",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 47789,
+        "src": "111:35:197",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:114:197"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.822Z"
+}

@@ -1,0 +1,1800 @@
+{
+  "contractName": "IPriceFeedAggregatorFacet",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IPriceFeed",
+          "name": "priceFeed",
+          "type": "address"
+        }
+      ],
+      "name": "InvalidFeedResponse",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidPriceFeedAddress",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "contract IERC20",
+          "name": "token",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "contract IPriceFeed",
+          "name": "priceFeed",
+          "type": "address"
+        }
+      ],
+      "name": "NewOracleRegistered",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "name": "fetchPrice",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "name": "fetchPriceUnsafe",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "_token",
+          "type": "address"
+        }
+      ],
+      "name": "oracleRecords",
+      "outputs": [
+        {
+          "internalType": "contract IPriceFeed",
+          "name": "priceFeed",
+          "type": "address"
+        },
+        {
+          "internalType": "uint8",
+          "name": "decimals",
+          "type": "uint8"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "contract IERC20",
+          "name": "_token",
+          "type": "address"
+        },
+        {
+          "internalType": "contract IPriceFeed",
+          "name": "_priceFeed",
+          "type": "address"
+        }
+      ],
+      "name": "setPriceFeed",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport { IPriceFeed } from \"../../priceFeed/interfaces/IPriceFeed.sol\";\nimport { IERC20 } from \"@openzeppelin/contracts/token/ERC20/IERC20.sol\";\n\nstruct OracleRecord {\n    IPriceFeed priceFeed;\n    uint8 decimals;\n}\n\ninterface IPriceFeedAggregatorFacet {\n    /**\n     * @notice Emitted when a new oracle is registered.\n     * @param token The ERC20 token associated with the oracle.\n     * @param priceFeed The price feed contract for the oracle.\n     */\n    event NewOracleRegistered(IERC20 indexed token, IPriceFeed indexed priceFeed);\n\n    // Custom Errors --------------------------------------------------------------------------------------------------\n\n    /**\n     * @notice Error indicating an invalid price feed address.\n     */\n    error InvalidPriceFeedAddress();\n\n    /**\n     * @notice Error indicating an invalid response from the price feed.\n     * @param priceFeed The price feed contract that returned an invalid response.\n     */\n    error InvalidFeedResponse(IPriceFeed priceFeed);\n\n    /**\n     * @notice Fetches the price of a given token.\n     * @param _token The ERC20 token for which the price is to be fetched.\n     * @return The price of the token in the smallest unit.\n     */\n    function fetchPrice(IERC20 _token) external returns (uint256);\n\n    /**\n     * @notice Fetches the price of a given token without safety checks.\n     * @param _token The ERC20 token for which the price is to be fetched.\n     * @return The price of the token and the timestamp of the price.\n     */\n    function fetchPriceUnsafe(IERC20 _token) external returns (uint256, uint256);\n\n    /**\n     * @notice Sets the price feed for a given token.\n     * @param _token The ERC20 token for which the price feed is to be set.\n     * @param _priceFeed The price feed contract to be associated with the token.\n     */\n    function setPriceFeed(IERC20 _token, IPriceFeed _priceFeed) external;\n\n    /**\n     * @notice Returns the oracle record for a given token.\n     * @param _token The ERC20 token for which the oracle record is to be retrieved.\n     * @return priceFeed The price feed contract associated with the token.\n     * @return decimals The number of decimals used by the price feed.\n     */\n    function oracleRecords(IERC20 _token) external view returns (IPriceFeed priceFeed, uint8 decimals);\n}\n",
+  "sourcePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/IPriceFeedAggregatorFacet.sol",
+  "ast": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/IPriceFeedAggregatorFacet.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        37699
+      ],
+      "IPriceFeed": [
+        27568
+      ],
+      "IPriceFeedAggregatorFacet": [
+        23339
+      ],
+      "OracleRecord": [
+        23278
+      ]
+    },
+    "id": 23340,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 23268,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:24:42"
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/priceFeed/interfaces/IPriceFeed.sol",
+        "file": "../../priceFeed/interfaces/IPriceFeed.sol",
+        "id": 23270,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 23340,
+        "sourceUnit": 27569,
+        "src": "58:71:42",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 23269,
+              "name": "IPriceFeed",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 27568,
+              "src": "67:10:42",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "id": 23272,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 23340,
+        "sourceUnit": 37700,
+        "src": "130:72:42",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 23271,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 37699,
+              "src": "139:6:42",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "canonicalName": "OracleRecord",
+        "id": 23278,
+        "members": [
+          {
+            "constant": false,
+            "id": 23275,
+            "mutability": "mutable",
+            "name": "priceFeed",
+            "nameLocation": "241:9:42",
+            "nodeType": "VariableDeclaration",
+            "scope": 23278,
+            "src": "230:20:42",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+              "typeString": "contract IPriceFeed"
+            },
+            "typeName": {
+              "id": 23274,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 23273,
+                "name": "IPriceFeed",
+                "nameLocations": [
+                  "230:10:42"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 27568,
+                "src": "230:10:42"
+              },
+              "referencedDeclaration": 27568,
+              "src": "230:10:42",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                "typeString": "contract IPriceFeed"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 23277,
+            "mutability": "mutable",
+            "name": "decimals",
+            "nameLocation": "262:8:42",
+            "nodeType": "VariableDeclaration",
+            "scope": 23278,
+            "src": "256:14:42",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 23276,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "256:5:42",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "OracleRecord",
+        "nameLocation": "211:12:42",
+        "nodeType": "StructDefinition",
+        "scope": 23340,
+        "src": "204:69:42",
+        "visibility": "public"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IPriceFeedAggregatorFacet",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 23339,
+        "linearizedBaseContracts": [
+          23339
+        ],
+        "name": "IPriceFeedAggregatorFacet",
+        "nameLocation": "285:25:42",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 23279,
+              "nodeType": "StructuredDocumentation",
+              "src": "317:195:42",
+              "text": " @notice Emitted when a new oracle is registered.\n @param token The ERC20 token associated with the oracle.\n @param priceFeed The price feed contract for the oracle."
+            },
+            "eventSelector": "d47c7275e633726e4e34f435fd883a2c6bbc8b65a35278390d2ee37075651400",
+            "id": 23287,
+            "name": "NewOracleRegistered",
+            "nameLocation": "523:19:42",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 23286,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23282,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "token",
+                  "nameLocation": "558:5:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23287,
+                  "src": "543:20:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23281,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23280,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "543:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "543:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "543:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23285,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "priceFeed",
+                  "nameLocation": "584:9:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23287,
+                  "src": "565:28:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23284,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23283,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "565:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "565:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "565:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "542:52:42"
+            },
+            "src": "517:78:42"
+          },
+          {
+            "documentation": {
+              "id": 23288,
+              "nodeType": "StructuredDocumentation",
+              "src": "722:74:42",
+              "text": " @notice Error indicating an invalid price feed address."
+            },
+            "errorSelector": "e3588063",
+            "id": 23290,
+            "name": "InvalidPriceFeedAddress",
+            "nameLocation": "807:23:42",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 23289,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "830:2:42"
+            },
+            "src": "801:32:42"
+          },
+          {
+            "documentation": {
+              "id": 23291,
+              "nodeType": "StructuredDocumentation",
+              "src": "839:167:42",
+              "text": " @notice Error indicating an invalid response from the price feed.\n @param priceFeed The price feed contract that returned an invalid response."
+            },
+            "errorSelector": "5d2aed45",
+            "id": 23296,
+            "name": "InvalidFeedResponse",
+            "nameLocation": "1017:19:42",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 23295,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23294,
+                  "mutability": "mutable",
+                  "name": "priceFeed",
+                  "nameLocation": "1048:9:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23296,
+                  "src": "1037:20:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23293,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23292,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "1037:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "1037:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "1037:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1036:22:42"
+            },
+            "src": "1011:48:42"
+          },
+          {
+            "documentation": {
+              "id": 23297,
+              "nodeType": "StructuredDocumentation",
+              "src": "1065:197:42",
+              "text": " @notice Fetches the price of a given token.\n @param _token The ERC20 token for which the price is to be fetched.\n @return The price of the token in the smallest unit."
+            },
+            "functionSelector": "ace1798e",
+            "id": 23305,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "fetchPrice",
+            "nameLocation": "1276:10:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23301,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23300,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "1294:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23305,
+                  "src": "1287:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23299,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23298,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "1287:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "1287:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "1287:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1286:15:42"
+            },
+            "returnParameters": {
+              "id": 23304,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23303,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23305,
+                  "src": "1320:7:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 23302,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1320:7:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1319:9:42"
+            },
+            "scope": 23339,
+            "src": "1267:62:42",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 23306,
+              "nodeType": "StructuredDocumentation",
+              "src": "1335:229:42",
+              "text": " @notice Fetches the price of a given token without safety checks.\n @param _token The ERC20 token for which the price is to be fetched.\n @return The price of the token and the timestamp of the price."
+            },
+            "functionSelector": "061b11af",
+            "id": 23316,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "fetchPriceUnsafe",
+            "nameLocation": "1578:16:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23310,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23309,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "1602:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23316,
+                  "src": "1595:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23308,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23307,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "1595:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "1595:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "1595:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1594:15:42"
+            },
+            "returnParameters": {
+              "id": 23315,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23312,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23316,
+                  "src": "1628:7:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 23311,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1628:7:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23314,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23316,
+                  "src": "1637:7:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 23313,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1637:7:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1627:18:42"
+            },
+            "scope": 23339,
+            "src": "1569:77:42",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 23317,
+              "nodeType": "StructuredDocumentation",
+              "src": "1652:223:42",
+              "text": " @notice Sets the price feed for a given token.\n @param _token The ERC20 token for which the price feed is to be set.\n @param _priceFeed The price feed contract to be associated with the token."
+            },
+            "functionSelector": "76e11286",
+            "id": 23326,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setPriceFeed",
+            "nameLocation": "1889:12:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23324,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23320,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "1909:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23326,
+                  "src": "1902:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23319,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23318,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "1902:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "1902:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "1902:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23323,
+                  "mutability": "mutable",
+                  "name": "_priceFeed",
+                  "nameLocation": "1928:10:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23326,
+                  "src": "1917:21:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23322,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23321,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "1917:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "1917:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "1917:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1901:38:42"
+            },
+            "returnParameters": {
+              "id": 23325,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1948:0:42"
+            },
+            "scope": 23339,
+            "src": "1880:69:42",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 23327,
+              "nodeType": "StructuredDocumentation",
+              "src": "1955:303:42",
+              "text": " @notice Returns the oracle record for a given token.\n @param _token The ERC20 token for which the oracle record is to be retrieved.\n @return priceFeed The price feed contract associated with the token.\n @return decimals The number of decimals used by the price feed."
+            },
+            "functionSelector": "7cdde506",
+            "id": 23338,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "oracleRecords",
+            "nameLocation": "2272:13:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23331,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23330,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "2293:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23338,
+                  "src": "2286:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23329,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23328,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "2286:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "2286:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "2286:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2285:15:42"
+            },
+            "returnParameters": {
+              "id": 23337,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23334,
+                  "mutability": "mutable",
+                  "name": "priceFeed",
+                  "nameLocation": "2335:9:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23338,
+                  "src": "2324:20:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23333,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23332,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "2324:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "2324:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "2324:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23336,
+                  "mutability": "mutable",
+                  "name": "decimals",
+                  "nameLocation": "2352:8:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23338,
+                  "src": "2346:14:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 23335,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2346:5:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2323:38:42"
+            },
+            "scope": 23339,
+            "src": "2263:99:42",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 23340,
+        "src": "275:2089:42",
+        "usedErrors": [
+          23290,
+          23296
+        ],
+        "usedEvents": [
+          23287
+        ]
+      }
+    ],
+    "src": "32:2333:42"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/IPriceFeedAggregatorFacet.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        37699
+      ],
+      "IPriceFeed": [
+        27568
+      ],
+      "IPriceFeedAggregatorFacet": [
+        23339
+      ],
+      "OracleRecord": [
+        23278
+      ]
+    },
+    "id": 23340,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 23268,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:24:42"
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/priceFeed/interfaces/IPriceFeed.sol",
+        "file": "../../priceFeed/interfaces/IPriceFeed.sol",
+        "id": 23270,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 23340,
+        "sourceUnit": 27569,
+        "src": "58:71:42",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 23269,
+              "name": "IPriceFeed",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 27568,
+              "src": "67:10:42",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "id": 23272,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 23340,
+        "sourceUnit": 37700,
+        "src": "130:72:42",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 23271,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 37699,
+              "src": "139:6:42",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "canonicalName": "OracleRecord",
+        "id": 23278,
+        "members": [
+          {
+            "constant": false,
+            "id": 23275,
+            "mutability": "mutable",
+            "name": "priceFeed",
+            "nameLocation": "241:9:42",
+            "nodeType": "VariableDeclaration",
+            "scope": 23278,
+            "src": "230:20:42",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+              "typeString": "contract IPriceFeed"
+            },
+            "typeName": {
+              "id": 23274,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 23273,
+                "name": "IPriceFeed",
+                "nameLocations": [
+                  "230:10:42"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 27568,
+                "src": "230:10:42"
+              },
+              "referencedDeclaration": 27568,
+              "src": "230:10:42",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                "typeString": "contract IPriceFeed"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 23277,
+            "mutability": "mutable",
+            "name": "decimals",
+            "nameLocation": "262:8:42",
+            "nodeType": "VariableDeclaration",
+            "scope": 23278,
+            "src": "256:14:42",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint8",
+              "typeString": "uint8"
+            },
+            "typeName": {
+              "id": 23276,
+              "name": "uint8",
+              "nodeType": "ElementaryTypeName",
+              "src": "256:5:42",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint8",
+                "typeString": "uint8"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "OracleRecord",
+        "nameLocation": "211:12:42",
+        "nodeType": "StructDefinition",
+        "scope": 23340,
+        "src": "204:69:42",
+        "visibility": "public"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IPriceFeedAggregatorFacet",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 23339,
+        "linearizedBaseContracts": [
+          23339
+        ],
+        "name": "IPriceFeedAggregatorFacet",
+        "nameLocation": "285:25:42",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 23279,
+              "nodeType": "StructuredDocumentation",
+              "src": "317:195:42",
+              "text": " @notice Emitted when a new oracle is registered.\n @param token The ERC20 token associated with the oracle.\n @param priceFeed The price feed contract for the oracle."
+            },
+            "eventSelector": "d47c7275e633726e4e34f435fd883a2c6bbc8b65a35278390d2ee37075651400",
+            "id": 23287,
+            "name": "NewOracleRegistered",
+            "nameLocation": "523:19:42",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 23286,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23282,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "token",
+                  "nameLocation": "558:5:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23287,
+                  "src": "543:20:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23281,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23280,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "543:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "543:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "543:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23285,
+                  "indexed": true,
+                  "mutability": "mutable",
+                  "name": "priceFeed",
+                  "nameLocation": "584:9:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23287,
+                  "src": "565:28:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23284,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23283,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "565:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "565:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "565:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "542:52:42"
+            },
+            "src": "517:78:42"
+          },
+          {
+            "documentation": {
+              "id": 23288,
+              "nodeType": "StructuredDocumentation",
+              "src": "722:74:42",
+              "text": " @notice Error indicating an invalid price feed address."
+            },
+            "errorSelector": "e3588063",
+            "id": 23290,
+            "name": "InvalidPriceFeedAddress",
+            "nameLocation": "807:23:42",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 23289,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "830:2:42"
+            },
+            "src": "801:32:42"
+          },
+          {
+            "documentation": {
+              "id": 23291,
+              "nodeType": "StructuredDocumentation",
+              "src": "839:167:42",
+              "text": " @notice Error indicating an invalid response from the price feed.\n @param priceFeed The price feed contract that returned an invalid response."
+            },
+            "errorSelector": "5d2aed45",
+            "id": 23296,
+            "name": "InvalidFeedResponse",
+            "nameLocation": "1017:19:42",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 23295,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23294,
+                  "mutability": "mutable",
+                  "name": "priceFeed",
+                  "nameLocation": "1048:9:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23296,
+                  "src": "1037:20:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23293,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23292,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "1037:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "1037:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "1037:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1036:22:42"
+            },
+            "src": "1011:48:42"
+          },
+          {
+            "documentation": {
+              "id": 23297,
+              "nodeType": "StructuredDocumentation",
+              "src": "1065:197:42",
+              "text": " @notice Fetches the price of a given token.\n @param _token The ERC20 token for which the price is to be fetched.\n @return The price of the token in the smallest unit."
+            },
+            "functionSelector": "ace1798e",
+            "id": 23305,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "fetchPrice",
+            "nameLocation": "1276:10:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23301,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23300,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "1294:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23305,
+                  "src": "1287:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23299,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23298,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "1287:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "1287:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "1287:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1286:15:42"
+            },
+            "returnParameters": {
+              "id": 23304,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23303,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23305,
+                  "src": "1320:7:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 23302,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1320:7:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1319:9:42"
+            },
+            "scope": 23339,
+            "src": "1267:62:42",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 23306,
+              "nodeType": "StructuredDocumentation",
+              "src": "1335:229:42",
+              "text": " @notice Fetches the price of a given token without safety checks.\n @param _token The ERC20 token for which the price is to be fetched.\n @return The price of the token and the timestamp of the price."
+            },
+            "functionSelector": "061b11af",
+            "id": 23316,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "fetchPriceUnsafe",
+            "nameLocation": "1578:16:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23310,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23309,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "1602:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23316,
+                  "src": "1595:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23308,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23307,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "1595:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "1595:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "1595:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1594:15:42"
+            },
+            "returnParameters": {
+              "id": 23315,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23312,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23316,
+                  "src": "1628:7:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 23311,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1628:7:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23314,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23316,
+                  "src": "1637:7:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 23313,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1637:7:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1627:18:42"
+            },
+            "scope": 23339,
+            "src": "1569:77:42",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 23317,
+              "nodeType": "StructuredDocumentation",
+              "src": "1652:223:42",
+              "text": " @notice Sets the price feed for a given token.\n @param _token The ERC20 token for which the price feed is to be set.\n @param _priceFeed The price feed contract to be associated with the token."
+            },
+            "functionSelector": "76e11286",
+            "id": 23326,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setPriceFeed",
+            "nameLocation": "1889:12:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23324,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23320,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "1909:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23326,
+                  "src": "1902:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23319,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23318,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "1902:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "1902:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "1902:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23323,
+                  "mutability": "mutable",
+                  "name": "_priceFeed",
+                  "nameLocation": "1928:10:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23326,
+                  "src": "1917:21:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23322,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23321,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "1917:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "1917:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "1917:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1901:38:42"
+            },
+            "returnParameters": {
+              "id": 23325,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1948:0:42"
+            },
+            "scope": 23339,
+            "src": "1880:69:42",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 23327,
+              "nodeType": "StructuredDocumentation",
+              "src": "1955:303:42",
+              "text": " @notice Returns the oracle record for a given token.\n @param _token The ERC20 token for which the oracle record is to be retrieved.\n @return priceFeed The price feed contract associated with the token.\n @return decimals The number of decimals used by the price feed."
+            },
+            "functionSelector": "7cdde506",
+            "id": 23338,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "oracleRecords",
+            "nameLocation": "2272:13:42",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 23331,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23330,
+                  "mutability": "mutable",
+                  "name": "_token",
+                  "nameLocation": "2293:6:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23338,
+                  "src": "2286:13:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IERC20_$37699",
+                    "typeString": "contract IERC20"
+                  },
+                  "typeName": {
+                    "id": 23329,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23328,
+                      "name": "IERC20",
+                      "nameLocations": [
+                        "2286:6:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37699,
+                      "src": "2286:6:42"
+                    },
+                    "referencedDeclaration": 37699,
+                    "src": "2286:6:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IERC20_$37699",
+                      "typeString": "contract IERC20"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2285:15:42"
+            },
+            "returnParameters": {
+              "id": 23337,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23334,
+                  "mutability": "mutable",
+                  "name": "priceFeed",
+                  "nameLocation": "2335:9:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23338,
+                  "src": "2324:20:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                    "typeString": "contract IPriceFeed"
+                  },
+                  "typeName": {
+                    "id": 23333,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 23332,
+                      "name": "IPriceFeed",
+                      "nameLocations": [
+                        "2324:10:42"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 27568,
+                      "src": "2324:10:42"
+                    },
+                    "referencedDeclaration": 27568,
+                    "src": "2324:10:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IPriceFeed_$27568",
+                      "typeString": "contract IPriceFeed"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 23336,
+                  "mutability": "mutable",
+                  "name": "decimals",
+                  "nameLocation": "2352:8:42",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 23338,
+                  "src": "2346:14:42",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 23335,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2346:5:42",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2323:38:42"
+            },
+            "scope": 23339,
+            "src": "2263:99:42",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 23340,
+        "src": "275:2089:42",
+        "usedErrors": [
+          23290,
+          23296
+        ],
+        "usedEvents": [
+          23287
+        ]
+      }
+    ],
+    "src": "32:2333:42"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.773Z"
+}

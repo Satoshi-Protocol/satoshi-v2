@@ -1,0 +1,119 @@
+{
+  "contractName": "IERC165Internal",
+  "abi": [],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\n/**\n * @title ERC165 interface registration interface\n */\ninterface IERC165Internal {}\n",
+  "sourcePath": "@solidstate/contracts/interfaces/IERC165Internal.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/interfaces/IERC165Internal.sol",
+    "exportedSymbols": {
+      "IERC165Internal": [
+        45368
+      ]
+    },
+    "id": 45369,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45366,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:153"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IERC165Internal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 45367,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:57:153",
+          "text": " @title ERC165 interface registration interface"
+        },
+        "fullyImplemented": true,
+        "id": 45368,
+        "linearizedBaseContracts": [
+          45368
+        ],
+        "name": "IERC165Internal",
+        "nameLocation": "127:15:153",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 45369,
+        "src": "117:28:153",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:113:153"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/interfaces/IERC165Internal.sol",
+    "exportedSymbols": {
+      "IERC165Internal": [
+        45368
+      ]
+    },
+    "id": 45369,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45366,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:153"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IERC165Internal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 45367,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:57:153",
+          "text": " @title ERC165 interface registration interface"
+        },
+        "fullyImplemented": true,
+        "id": 45368,
+        "linearizedBaseContracts": [
+          45368
+        ],
+        "name": "IERC165Internal",
+        "nameLocation": "127:15:153",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 45369,
+        "src": "117:28:153",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:113:153"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.816Z"
+}

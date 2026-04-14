@@ -16,8 +16,6 @@ import { ITroveManager } from "../interfaces/ITroveManager.sol";
 import { BeaconProxy } from "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { AccessControlInternal } from "@solidstate/contracts/access/access_control/AccessControlInternal.sol";
-import { OwnableInternal } from "@solidstate/contracts/access/ownable/OwnableInternal.sol";
-import { console } from "forge-std/Test.sol";
 
 contract FactoryFacet is IFactoryFacet, AccessControlInternal {
     function troveManagerCount() external view returns (uint256) {

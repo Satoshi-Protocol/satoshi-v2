@@ -1,0 +1,4176 @@
+{
+  "contractName": "UUPSUpgradeable",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "target",
+          "type": "address"
+        }
+      ],
+      "name": "AddressEmptyCode",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "ERC1967InvalidImplementation",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC1967NonPayable",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "FailedCall",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidInitialization",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotInitializing",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UUPSUnauthorizedCallContext",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "slot",
+          "type": "bytes32"
+        }
+      ],
+      "name": "UUPSUnsupportedProxiableUUID",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "version",
+          "type": "uint64"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "Upgraded",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "UPGRADE_INTERFACE_VERSION",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "proxiableUUID",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newImplementation",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "name": "upgradeToAndCall",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v5.2.0) (proxy/utils/UUPSUpgradeable.sol)\n\npragma solidity ^0.8.22;\n\nimport {IERC1822Proxiable} from \"@openzeppelin/contracts/interfaces/draft-IERC1822.sol\";\nimport {ERC1967Utils} from \"@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol\";\nimport {Initializable} from \"./Initializable.sol\";\n\n/**\n * @dev An upgradeability mechanism designed for UUPS proxies. The functions included here can perform an upgrade of an\n * {ERC1967Proxy}, when this contract is set as the implementation behind such a proxy.\n *\n * A security mechanism ensures that an upgrade does not turn off upgradeability accidentally, although this risk is\n * reinstated if the upgrade retains upgradeability but removes the security mechanism, e.g. by replacing\n * `UUPSUpgradeable` with a custom implementation of upgrades.\n *\n * The {_authorizeUpgrade} function must be overridden to include access restriction to the upgrade mechanism.\n */\nabstract contract UUPSUpgradeable is Initializable, IERC1822Proxiable {\n    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable\n    address private immutable __self = address(this);\n\n    /**\n     * @dev The version of the upgrade interface of the contract. If this getter is missing, both `upgradeTo(address)`\n     * and `upgradeToAndCall(address,bytes)` are present, and `upgradeTo` must be used if no function should be called,\n     * while `upgradeToAndCall` will invoke the `receive` function if the second argument is the empty byte string.\n     * If the getter returns `\"5.0.0\"`, only `upgradeToAndCall(address,bytes)` is present, and the second argument must\n     * be the empty byte string if no function should be called, making it impossible to invoke the `receive` function\n     * during an upgrade.\n     */\n    string public constant UPGRADE_INTERFACE_VERSION = \"5.0.0\";\n\n    /**\n     * @dev The call is from an unauthorized context.\n     */\n    error UUPSUnauthorizedCallContext();\n\n    /**\n     * @dev The storage `slot` is unsupported as a UUID.\n     */\n    error UUPSUnsupportedProxiableUUID(bytes32 slot);\n\n    /**\n     * @dev Check that the execution is being performed through a delegatecall call and that the execution context is\n     * a proxy contract with an implementation (as defined in ERC-1967) pointing to self. This should only be the case\n     * for UUPS and transparent proxies that are using the current contract as their implementation. Execution of a\n     * function through ERC-1167 minimal proxies (clones) would not normally pass this test, but is not guaranteed to\n     * fail.\n     */\n    modifier onlyProxy() {\n        _checkProxy();\n        _;\n    }\n\n    /**\n     * @dev Check that the execution is not being performed through a delegate call. This allows a function to be\n     * callable on the implementing contract but not through proxies.\n     */\n    modifier notDelegated() {\n        _checkNotDelegated();\n        _;\n    }\n\n    function __UUPSUpgradeable_init() internal onlyInitializing {\n    }\n\n    function __UUPSUpgradeable_init_unchained() internal onlyInitializing {\n    }\n    /**\n     * @dev Implementation of the ERC-1822 {proxiableUUID} function. This returns the storage slot used by the\n     * implementation. It is used to validate the implementation's compatibility when performing an upgrade.\n     *\n     * IMPORTANT: A proxy pointing at a proxiable contract should not be considered proxiable itself, because this risks\n     * bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this\n     * function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier.\n     */\n    function proxiableUUID() external view virtual notDelegated returns (bytes32) {\n        return ERC1967Utils.IMPLEMENTATION_SLOT;\n    }\n\n    /**\n     * @dev Upgrade the implementation of the proxy to `newImplementation`, and subsequently execute the function call\n     * encoded in `data`.\n     *\n     * Calls {_authorizeUpgrade}.\n     *\n     * Emits an {Upgraded} event.\n     *\n     * @custom:oz-upgrades-unsafe-allow-reachable delegatecall\n     */\n    function upgradeToAndCall(address newImplementation, bytes memory data) public payable virtual onlyProxy {\n        _authorizeUpgrade(newImplementation);\n        _upgradeToAndCallUUPS(newImplementation, data);\n    }\n\n    /**\n     * @dev Reverts if the execution is not performed via delegatecall or the execution\n     * context is not of a proxy with an ERC-1967 compliant implementation pointing to self.\n     * See {_onlyProxy}.\n     */\n    function _checkProxy() internal view virtual {\n        if (\n            address(this) == __self || // Must be called through delegatecall\n            ERC1967Utils.getImplementation() != __self // Must be called through an active proxy\n        ) {\n            revert UUPSUnauthorizedCallContext();\n        }\n    }\n\n    /**\n     * @dev Reverts if the execution is performed via delegatecall.\n     * See {notDelegated}.\n     */\n    function _checkNotDelegated() internal view virtual {\n        if (address(this) != __self) {\n            // Must not be called through delegatecall\n            revert UUPSUnauthorizedCallContext();\n        }\n    }\n\n    /**\n     * @dev Function that should revert when `msg.sender` is not authorized to upgrade the contract. Called by\n     * {upgradeToAndCall}.\n     *\n     * Normally, this function will use an xref:access.adoc[access control] modifier such as {Ownable-onlyOwner}.\n     *\n     * ```solidity\n     * function _authorizeUpgrade(address) internal onlyOwner {}\n     * ```\n     */\n    function _authorizeUpgrade(address newImplementation) internal virtual;\n\n    /**\n     * @dev Performs an implementation upgrade with a security check for UUPS proxies, and additional setup call.\n     *\n     * As a security check, {proxiableUUID} is invoked in the new implementation, and the return value\n     * is expected to be the implementation slot in ERC-1967.\n     *\n     * Emits an {IERC1967-Upgraded} event.\n     */\n    function _upgradeToAndCallUUPS(address newImplementation, bytes memory data) private {\n        try IERC1822Proxiable(newImplementation).proxiableUUID() returns (bytes32 slot) {\n            if (slot != ERC1967Utils.IMPLEMENTATION_SLOT) {\n                revert UUPSUnsupportedProxiableUUID(slot);\n            }\n            ERC1967Utils.upgradeToAndCall(newImplementation, data);\n        } catch {\n            // The implementation is not UUPS\n            revert ERC1967Utils.ERC1967InvalidImplementation(newImplementation);\n        }\n    }\n}\n",
+  "sourcePath": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+  "ast": {
+    "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+    "exportedSymbols": {
+      "ERC1967Utils": [
+        36914
+      ],
+      "IERC1822Proxiable": [
+        36445
+      ],
+      "Initializable": [
+        34662
+      ],
+      "UUPSUpgradeable": [
+        34844
+      ]
+    },
+    "id": 34845,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 34664,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".22"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "115:24:98"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "file": "@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "id": 34666,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 34845,
+        "sourceUnit": 36446,
+        "src": "141:88:98",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 34665,
+              "name": "IERC1822Proxiable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 36445,
+              "src": "149:17:98",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
+        "file": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
+        "id": 34668,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 34845,
+        "sourceUnit": 36915,
+        "src": "230:84:98",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 34667,
+              "name": "ERC1967Utils",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 36914,
+              "src": "238:12:98",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "file": "./Initializable.sol",
+        "id": 34670,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 34845,
+        "sourceUnit": 34663,
+        "src": "315:50:98",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 34669,
+              "name": "Initializable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 34662,
+              "src": "323:13:98",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 34672,
+              "name": "Initializable",
+              "nameLocations": [
+                "1023:13:98"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 34662,
+              "src": "1023:13:98"
+            },
+            "id": 34673,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1023:13:98"
+          },
+          {
+            "baseName": {
+              "id": 34674,
+              "name": "IERC1822Proxiable",
+              "nameLocations": [
+                "1038:17:98"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 36445,
+              "src": "1038:17:98"
+            },
+            "id": 34675,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1038:17:98"
+          }
+        ],
+        "canonicalName": "UUPSUpgradeable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 34671,
+          "nodeType": "StructuredDocumentation",
+          "src": "367:618:98",
+          "text": " @dev An upgradeability mechanism designed for UUPS proxies. The functions included here can perform an upgrade of an\n {ERC1967Proxy}, when this contract is set as the implementation behind such a proxy.\n A security mechanism ensures that an upgrade does not turn off upgradeability accidentally, although this risk is\n reinstated if the upgrade retains upgradeability but removes the security mechanism, e.g. by replacing\n `UUPSUpgradeable` with a custom implementation of upgrades.\n The {_authorizeUpgrade} function must be overridden to include access restriction to the upgrade mechanism."
+        },
+        "fullyImplemented": false,
+        "id": 34844,
+        "linearizedBaseContracts": [
+          34844,
+          36445,
+          34662
+        ],
+        "name": "UUPSUpgradeable",
+        "nameLocation": "1004:15:98",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "documentation": {
+              "id": 34676,
+              "nodeType": "StructuredDocumentation",
+              "src": "1062:61:98",
+              "text": "@custom:oz-upgrades-unsafe-allow state-variable-immutable"
+            },
+            "id": 34682,
+            "mutability": "immutable",
+            "name": "__self",
+            "nameLocation": "1154:6:98",
+            "nodeType": "VariableDeclaration",
+            "scope": 34844,
+            "src": "1128:48:98",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 34677,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "1128:7:98",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "id": 34680,
+                  "name": "this",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 4294967268,
+                  "src": "1171:4:98",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                    "typeString": "contract UUPSUpgradeable"
+                  }
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                    "typeString": "contract UUPSUpgradeable"
+                  }
+                ],
+                "id": 34679,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": true,
+                "lValueRequested": false,
+                "nodeType": "ElementaryTypeNameExpression",
+                "src": "1163:7:98",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_type$_t_address_$",
+                  "typeString": "type(address)"
+                },
+                "typeName": {
+                  "id": 34678,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1163:7:98",
+                  "typeDescriptions": {}
+                }
+              },
+              "id": 34681,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": false,
+              "kind": "typeConversion",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "1163:13:98",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "constant": true,
+            "documentation": {
+              "id": 34683,
+              "nodeType": "StructuredDocumentation",
+              "src": "1183:631:98",
+              "text": " @dev The version of the upgrade interface of the contract. If this getter is missing, both `upgradeTo(address)`\n and `upgradeToAndCall(address,bytes)` are present, and `upgradeTo` must be used if no function should be called,\n while `upgradeToAndCall` will invoke the `receive` function if the second argument is the empty byte string.\n If the getter returns `\"5.0.0\"`, only `upgradeToAndCall(address,bytes)` is present, and the second argument must\n be the empty byte string if no function should be called, making it impossible to invoke the `receive` function\n during an upgrade."
+            },
+            "functionSelector": "ad3cb1cc",
+            "id": 34686,
+            "mutability": "constant",
+            "name": "UPGRADE_INTERFACE_VERSION",
+            "nameLocation": "1842:25:98",
+            "nodeType": "VariableDeclaration",
+            "scope": 34844,
+            "src": "1819:58:98",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory_ptr",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 34684,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "1819:6:98",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "hexValue": "352e302e30",
+              "id": 34685,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1870:7:98",
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_2ade050ecfcf8ae20ae1d10a23573f9d7e0bad85e74a2cf8338a65401e64558c",
+                "typeString": "literal_string \"5.0.0\""
+              },
+              "value": "5.0.0"
+            },
+            "visibility": "public"
+          },
+          {
+            "documentation": {
+              "id": 34687,
+              "nodeType": "StructuredDocumentation",
+              "src": "1884:65:98",
+              "text": " @dev The call is from an unauthorized context."
+            },
+            "errorSelector": "e07c8dba",
+            "id": 34689,
+            "name": "UUPSUnauthorizedCallContext",
+            "nameLocation": "1960:27:98",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 34688,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1987:2:98"
+            },
+            "src": "1954:36:98"
+          },
+          {
+            "documentation": {
+              "id": 34690,
+              "nodeType": "StructuredDocumentation",
+              "src": "1996:68:98",
+              "text": " @dev The storage `slot` is unsupported as a UUID."
+            },
+            "errorSelector": "aa1d49a4",
+            "id": 34694,
+            "name": "UUPSUnsupportedProxiableUUID",
+            "nameLocation": "2075:28:98",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 34693,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34692,
+                  "mutability": "mutable",
+                  "name": "slot",
+                  "nameLocation": "2112:4:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34694,
+                  "src": "2104:12:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 34691,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2104:7:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2103:14:98"
+            },
+            "src": "2069:49:98"
+          },
+          {
+            "body": {
+              "id": 34701,
+              "nodeType": "Block",
+              "src": "2645:41:98",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 34697,
+                      "name": "_checkProxy",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34776,
+                      "src": "2655:11:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$__$returns$__$",
+                        "typeString": "function () view"
+                      }
+                    },
+                    "id": 34698,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2655:13:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34699,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2655:13:98"
+                },
+                {
+                  "id": 34700,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2678:1:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34695,
+              "nodeType": "StructuredDocumentation",
+              "src": "2124:495:98",
+              "text": " @dev Check that the execution is being performed through a delegatecall call and that the execution context is\n a proxy contract with an implementation (as defined in ERC-1967) pointing to self. This should only be the case\n for UUPS and transparent proxies that are using the current contract as their implementation. Execution of a\n function through ERC-1167 minimal proxies (clones) would not normally pass this test, but is not guaranteed to\n fail."
+            },
+            "id": 34702,
+            "name": "onlyProxy",
+            "nameLocation": "2633:9:98",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 34696,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2642:2:98"
+            },
+            "src": "2624:62:98",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34709,
+              "nodeType": "Block",
+              "src": "2916:48:98",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 34705,
+                      "name": "_checkNotDelegated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34792,
+                      "src": "2926:18:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$__$returns$__$",
+                        "typeString": "function () view"
+                      }
+                    },
+                    "id": 34706,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2926:20:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34707,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2926:20:98"
+                },
+                {
+                  "id": 34708,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2956:1:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34703,
+              "nodeType": "StructuredDocumentation",
+              "src": "2692:195:98",
+              "text": " @dev Check that the execution is not being performed through a delegate call. This allows a function to be\n callable on the implementing contract but not through proxies."
+            },
+            "id": 34710,
+            "name": "notDelegated",
+            "nameLocation": "2901:12:98",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 34704,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2913:2:98"
+            },
+            "src": "2892:72:98",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34715,
+              "nodeType": "Block",
+              "src": "3030:7:98",
+              "statements": []
+            },
+            "id": 34716,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34713,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34712,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "3013:16:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "3013:16:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3013:16:98"
+              }
+            ],
+            "name": "__UUPSUpgradeable_init",
+            "nameLocation": "2979:22:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34711,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3001:2:98"
+            },
+            "returnParameters": {
+              "id": 34714,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3030:0:98"
+            },
+            "scope": 34844,
+            "src": "2970:67:98",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34721,
+              "nodeType": "Block",
+              "src": "3113:7:98",
+              "statements": []
+            },
+            "id": 34722,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34719,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34718,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "3096:16:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "3096:16:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3096:16:98"
+              }
+            ],
+            "name": "__UUPSUpgradeable_init_unchained",
+            "nameLocation": "3052:32:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34717,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3084:2:98"
+            },
+            "returnParameters": {
+              "id": 34720,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3113:0:98"
+            },
+            "scope": 34844,
+            "src": "3043:77:98",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              36444
+            ],
+            "body": {
+              "id": 34733,
+              "nodeType": "Block",
+              "src": "3786:56:98",
+              "statements": [
+                {
+                  "expression": {
+                    "expression": {
+                      "id": 34730,
+                      "name": "ERC1967Utils",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 36914,
+                      "src": "3803:12:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                        "typeString": "type(library ERC1967Utils)"
+                      }
+                    },
+                    "id": 34731,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberLocation": "3816:19:98",
+                    "memberName": "IMPLEMENTATION_SLOT",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": 36635,
+                    "src": "3803:32:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 34729,
+                  "id": 34732,
+                  "nodeType": "Return",
+                  "src": "3796:39:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34723,
+              "nodeType": "StructuredDocumentation",
+              "src": "3125:578:98",
+              "text": " @dev Implementation of the ERC-1822 {proxiableUUID} function. This returns the storage slot used by the\n implementation. It is used to validate the implementation's compatibility when performing an upgrade.\n IMPORTANT: A proxy pointing at a proxiable contract should not be considered proxiable itself, because this risks\n bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this\n function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier."
+            },
+            "functionSelector": "52d1902d",
+            "id": 34734,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34726,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34725,
+                  "name": "notDelegated",
+                  "nameLocations": [
+                    "3755:12:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34710,
+                  "src": "3755:12:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3755:12:98"
+              }
+            ],
+            "name": "proxiableUUID",
+            "nameLocation": "3717:13:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34724,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3730:2:98"
+            },
+            "returnParameters": {
+              "id": 34729,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34728,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34734,
+                  "src": "3777:7:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 34727,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3777:7:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3776:9:98"
+            },
+            "scope": 34844,
+            "src": "3708:134:98",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 34753,
+              "nodeType": "Block",
+              "src": "4266:109:98",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 34745,
+                        "name": "newImplementation",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34737,
+                        "src": "4294:17:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 34744,
+                      "name": "_authorizeUpgrade",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34798,
+                      "src": "4276:17:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 34746,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "4276:36:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34747,
+                  "nodeType": "ExpressionStatement",
+                  "src": "4276:36:98"
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 34749,
+                        "name": "newImplementation",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34737,
+                        "src": "4344:17:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "id": 34750,
+                        "name": "data",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34739,
+                        "src": "4363:4:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      ],
+                      "id": 34748,
+                      "name": "_upgradeToAndCallUUPS",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34843,
+                      "src": "4322:21:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$returns$__$",
+                        "typeString": "function (address,bytes memory)"
+                      }
+                    },
+                    "id": 34751,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "4322:46:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34752,
+                  "nodeType": "ExpressionStatement",
+                  "src": "4322:46:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34735,
+              "nodeType": "StructuredDocumentation",
+              "src": "3848:308:98",
+              "text": " @dev Upgrade the implementation of the proxy to `newImplementation`, and subsequently execute the function call\n encoded in `data`.\n Calls {_authorizeUpgrade}.\n Emits an {Upgraded} event.\n @custom:oz-upgrades-unsafe-allow-reachable delegatecall"
+            },
+            "functionSelector": "4f1ef286",
+            "id": 34754,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34742,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34741,
+                  "name": "onlyProxy",
+                  "nameLocations": [
+                    "4256:9:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34702,
+                  "src": "4256:9:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "4256:9:98"
+              }
+            ],
+            "name": "upgradeToAndCall",
+            "nameLocation": "4170:16:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34740,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34737,
+                  "mutability": "mutable",
+                  "name": "newImplementation",
+                  "nameLocation": "4195:17:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34754,
+                  "src": "4187:25:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 34736,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4187:7:98",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 34739,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "4227:4:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34754,
+                  "src": "4214:17:98",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 34738,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4214:5:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4186:46:98"
+            },
+            "returnParameters": {
+              "id": 34743,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4266:0:98"
+            },
+            "scope": 34844,
+            "src": "4161:214:98",
+            "stateMutability": "payable",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 34775,
+              "nodeType": "Block",
+              "src": "4648:267:98",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "id": 34769,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "commonType": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      },
+                      "id": 34763,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "arguments": [
+                          {
+                            "id": 34760,
+                            "name": "this",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967268,
+                            "src": "4683:4:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                              "typeString": "contract UUPSUpgradeable"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                              "typeString": "contract UUPSUpgradeable"
+                            }
+                          ],
+                          "id": 34759,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "4675:7:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": {
+                            "id": 34758,
+                            "name": "address",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "4675:7:98",
+                            "typeDescriptions": {}
+                          }
+                        },
+                        "id": 34761,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "4675:13:98",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "==",
+                      "rightExpression": {
+                        "id": 34762,
+                        "name": "__self",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34682,
+                        "src": "4692:6:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "src": "4675:23:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "||",
+                    "rightExpression": {
+                      "commonType": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      },
+                      "id": 34768,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "expression": {
+                            "id": 34764,
+                            "name": "ERC1967Utils",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 36914,
+                            "src": "4753:12:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                              "typeString": "type(library ERC1967Utils)"
+                            }
+                          },
+                          "id": 34765,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "4766:17:98",
+                          "memberName": "getImplementation",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 36666,
+                          "src": "4753:30:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 34766,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "4753:32:98",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "!=",
+                      "rightExpression": {
+                        "id": 34767,
+                        "name": "__self",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34682,
+                        "src": "4789:6:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "src": "4753:42:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "src": "4675:120:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 34774,
+                  "nodeType": "IfStatement",
+                  "src": "4658:251:98",
+                  "trueBody": {
+                    "id": 34773,
+                    "nodeType": "Block",
+                    "src": "4848:61:98",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 34770,
+                            "name": "UUPSUnauthorizedCallContext",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 34689,
+                            "src": "4869:27:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                              "typeString": "function () pure"
+                            }
+                          },
+                          "id": 34771,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "4869:29:98",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 34772,
+                        "nodeType": "RevertStatement",
+                        "src": "4862:36:98"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34755,
+              "nodeType": "StructuredDocumentation",
+              "src": "4381:217:98",
+              "text": " @dev Reverts if the execution is not performed via delegatecall or the execution\n context is not of a proxy with an ERC-1967 compliant implementation pointing to self.\n See {_onlyProxy}."
+            },
+            "id": 34776,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_checkProxy",
+            "nameLocation": "4612:11:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34756,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4623:2:98"
+            },
+            "returnParameters": {
+              "id": 34757,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4648:0:98"
+            },
+            "scope": 34844,
+            "src": "4603:312:98",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34791,
+              "nodeType": "Block",
+              "src": "5084:161:98",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    },
+                    "id": 34785,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "arguments": [
+                        {
+                          "id": 34782,
+                          "name": "this",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4294967268,
+                          "src": "5106:4:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                            "typeString": "contract UUPSUpgradeable"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                            "typeString": "contract UUPSUpgradeable"
+                          }
+                        ],
+                        "id": 34781,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "ElementaryTypeNameExpression",
+                        "src": "5098:7:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_address_$",
+                          "typeString": "type(address)"
+                        },
+                        "typeName": {
+                          "id": 34780,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "5098:7:98",
+                          "typeDescriptions": {}
+                        }
+                      },
+                      "id": 34783,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "5098:13:98",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 34784,
+                      "name": "__self",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34682,
+                      "src": "5115:6:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "5098:23:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 34790,
+                  "nodeType": "IfStatement",
+                  "src": "5094:145:98",
+                  "trueBody": {
+                    "id": 34789,
+                    "nodeType": "Block",
+                    "src": "5123:116:98",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 34786,
+                            "name": "UUPSUnauthorizedCallContext",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 34689,
+                            "src": "5199:27:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                              "typeString": "function () pure"
+                            }
+                          },
+                          "id": 34787,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "5199:29:98",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 34788,
+                        "nodeType": "RevertStatement",
+                        "src": "5192:36:98"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34777,
+              "nodeType": "StructuredDocumentation",
+              "src": "4921:106:98",
+              "text": " @dev Reverts if the execution is performed via delegatecall.\n See {notDelegated}."
+            },
+            "id": 34792,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_checkNotDelegated",
+            "nameLocation": "5041:18:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34778,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "5059:2:98"
+            },
+            "returnParameters": {
+              "id": 34779,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "5084:0:98"
+            },
+            "scope": 34844,
+            "src": "5032:213:98",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "documentation": {
+              "id": 34793,
+              "nodeType": "StructuredDocumentation",
+              "src": "5251:372:98",
+              "text": " @dev Function that should revert when `msg.sender` is not authorized to upgrade the contract. Called by\n {upgradeToAndCall}.\n Normally, this function will use an xref:access.adoc[access control] modifier such as {Ownable-onlyOwner}.\n ```solidity\n function _authorizeUpgrade(address) internal onlyOwner {}\n ```"
+            },
+            "id": 34798,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_authorizeUpgrade",
+            "nameLocation": "5637:17:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34796,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34795,
+                  "mutability": "mutable",
+                  "name": "newImplementation",
+                  "nameLocation": "5663:17:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34798,
+                  "src": "5655:25:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 34794,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5655:7:98",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5654:27:98"
+            },
+            "returnParameters": {
+              "id": 34797,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "5698:0:98"
+            },
+            "scope": 34844,
+            "src": "5628:71:98",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34842,
+              "nodeType": "Block",
+              "src": "6142:453:98",
+              "statements": [
+                {
+                  "clauses": [
+                    {
+                      "block": {
+                        "id": 34831,
+                        "nodeType": "Block",
+                        "src": "6232:212:98",
+                        "statements": [
+                          {
+                            "condition": {
+                              "commonType": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              },
+                              "id": 34817,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "id": 34814,
+                                "name": "slot",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 34812,
+                                "src": "6250:4:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_bytes32",
+                                  "typeString": "bytes32"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "!=",
+                              "rightExpression": {
+                                "expression": {
+                                  "id": 34815,
+                                  "name": "ERC1967Utils",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 36914,
+                                  "src": "6258:12:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                                    "typeString": "type(library ERC1967Utils)"
+                                  }
+                                },
+                                "id": 34816,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "lValueRequested": false,
+                                "memberLocation": "6271:19:98",
+                                "memberName": "IMPLEMENTATION_SLOT",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 36635,
+                                "src": "6258:32:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_bytes32",
+                                  "typeString": "bytes32"
+                                }
+                              },
+                              "src": "6250:40:98",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bool",
+                                "typeString": "bool"
+                              }
+                            },
+                            "id": 34823,
+                            "nodeType": "IfStatement",
+                            "src": "6246:120:98",
+                            "trueBody": {
+                              "id": 34822,
+                              "nodeType": "Block",
+                              "src": "6292:74:98",
+                              "statements": [
+                                {
+                                  "errorCall": {
+                                    "arguments": [
+                                      {
+                                        "id": 34819,
+                                        "name": "slot",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 34812,
+                                        "src": "6346:4:98",
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_bytes32",
+                                          "typeString": "bytes32"
+                                        }
+                                      }
+                                    ],
+                                    "expression": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_bytes32",
+                                          "typeString": "bytes32"
+                                        }
+                                      ],
+                                      "id": 34818,
+                                      "name": "UUPSUnsupportedProxiableUUID",
+                                      "nodeType": "Identifier",
+                                      "overloadedDeclarations": [],
+                                      "referencedDeclaration": 34694,
+                                      "src": "6317:28:98",
+                                      "typeDescriptions": {
+                                        "typeIdentifier": "t_function_error_pure$_t_bytes32_$returns$__$",
+                                        "typeString": "function (bytes32) pure"
+                                      }
+                                    },
+                                    "id": 34820,
+                                    "isConstant": false,
+                                    "isLValue": false,
+                                    "isPure": false,
+                                    "kind": "functionCall",
+                                    "lValueRequested": false,
+                                    "nameLocations": [],
+                                    "names": [],
+                                    "nodeType": "FunctionCall",
+                                    "src": "6317:34:98",
+                                    "tryCall": false,
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_tuple$__$",
+                                      "typeString": "tuple()"
+                                    }
+                                  },
+                                  "id": 34821,
+                                  "nodeType": "RevertStatement",
+                                  "src": "6310:41:98"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "expression": {
+                              "arguments": [
+                                {
+                                  "id": 34827,
+                                  "name": "newImplementation",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 34801,
+                                  "src": "6409:17:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  }
+                                },
+                                {
+                                  "id": 34828,
+                                  "name": "data",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 34803,
+                                  "src": "6428:4:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_bytes_memory_ptr",
+                                    "typeString": "bytes memory"
+                                  }
+                                }
+                              ],
+                              "expression": {
+                                "argumentTypes": [
+                                  {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  },
+                                  {
+                                    "typeIdentifier": "t_bytes_memory_ptr",
+                                    "typeString": "bytes memory"
+                                  }
+                                ],
+                                "expression": {
+                                  "id": 34824,
+                                  "name": "ERC1967Utils",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 36914,
+                                  "src": "6379:12:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                                    "typeString": "type(library ERC1967Utils)"
+                                  }
+                                },
+                                "id": 34826,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberLocation": "6392:16:98",
+                                "memberName": "upgradeToAndCall",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 36729,
+                                "src": "6379:29:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$returns$__$",
+                                  "typeString": "function (address,bytes memory)"
+                                }
+                              },
+                              "id": 34829,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "functionCall",
+                              "lValueRequested": false,
+                              "nameLocations": [],
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "6379:54:98",
+                              "tryCall": false,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_tuple$__$",
+                                "typeString": "tuple()"
+                              }
+                            },
+                            "id": 34830,
+                            "nodeType": "ExpressionStatement",
+                            "src": "6379:54:98"
+                          }
+                        ]
+                      },
+                      "errorName": "",
+                      "id": 34832,
+                      "nodeType": "TryCatchClause",
+                      "parameters": {
+                        "id": 34813,
+                        "nodeType": "ParameterList",
+                        "parameters": [
+                          {
+                            "constant": false,
+                            "id": 34812,
+                            "mutability": "mutable",
+                            "name": "slot",
+                            "nameLocation": "6226:4:98",
+                            "nodeType": "VariableDeclaration",
+                            "scope": 34832,
+                            "src": "6218:12:98",
+                            "stateVariable": false,
+                            "storageLocation": "default",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            },
+                            "typeName": {
+                              "id": 34811,
+                              "name": "bytes32",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "6218:7:98",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              }
+                            },
+                            "visibility": "internal"
+                          }
+                        ],
+                        "src": "6217:14:98"
+                      },
+                      "src": "6209:235:98"
+                    },
+                    {
+                      "block": {
+                        "id": 34839,
+                        "nodeType": "Block",
+                        "src": "6451:138:98",
+                        "statements": [
+                          {
+                            "errorCall": {
+                              "arguments": [
+                                {
+                                  "id": 34836,
+                                  "name": "newImplementation",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 34801,
+                                  "src": "6560:17:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  }
+                                }
+                              ],
+                              "expression": {
+                                "argumentTypes": [
+                                  {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  }
+                                ],
+                                "expression": {
+                                  "id": 34833,
+                                  "name": "ERC1967Utils",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 36914,
+                                  "src": "6518:12:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                                    "typeString": "type(library ERC1967Utils)"
+                                  }
+                                },
+                                "id": 34835,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberLocation": "6531:28:98",
+                                "memberName": "ERC1967InvalidImplementation",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 36640,
+                                "src": "6518:41:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_function_error_pure$_t_address_$returns$__$",
+                                  "typeString": "function (address) pure"
+                                }
+                              },
+                              "id": 34837,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "functionCall",
+                              "lValueRequested": false,
+                              "nameLocations": [],
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "6518:60:98",
+                              "tryCall": false,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_tuple$__$",
+                                "typeString": "tuple()"
+                              }
+                            },
+                            "id": 34838,
+                            "nodeType": "RevertStatement",
+                            "src": "6511:67:98"
+                          }
+                        ]
+                      },
+                      "errorName": "",
+                      "id": 34840,
+                      "nodeType": "TryCatchClause",
+                      "src": "6445:144:98"
+                    }
+                  ],
+                  "externalCall": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "arguments": [
+                          {
+                            "id": 34807,
+                            "name": "newImplementation",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 34801,
+                            "src": "6174:17:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 34806,
+                          "name": "IERC1822Proxiable",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 36445,
+                          "src": "6156:17:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_IERC1822Proxiable_$36445_$",
+                            "typeString": "type(contract IERC1822Proxiable)"
+                          }
+                        },
+                        "id": 34808,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "6156:36:98",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IERC1822Proxiable_$36445",
+                          "typeString": "contract IERC1822Proxiable"
+                        }
+                      },
+                      "id": 34809,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "6193:13:98",
+                      "memberName": "proxiableUUID",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 36444,
+                      "src": "6156:50:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$__$returns$_t_bytes32_$",
+                        "typeString": "function () view external returns (bytes32)"
+                      }
+                    },
+                    "id": 34810,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "6156:52:98",
+                    "tryCall": true,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 34841,
+                  "nodeType": "TryStatement",
+                  "src": "6152:437:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34799,
+              "nodeType": "StructuredDocumentation",
+              "src": "5705:347:98",
+              "text": " @dev Performs an implementation upgrade with a security check for UUPS proxies, and additional setup call.\n As a security check, {proxiableUUID} is invoked in the new implementation, and the return value\n is expected to be the implementation slot in ERC-1967.\n Emits an {IERC1967-Upgraded} event."
+            },
+            "id": 34843,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_upgradeToAndCallUUPS",
+            "nameLocation": "6066:21:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34804,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34801,
+                  "mutability": "mutable",
+                  "name": "newImplementation",
+                  "nameLocation": "6096:17:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34843,
+                  "src": "6088:25:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 34800,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6088:7:98",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 34803,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "6128:4:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34843,
+                  "src": "6115:17:98",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 34802,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6115:5:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6087:46:98"
+            },
+            "returnParameters": {
+              "id": 34805,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "6142:0:98"
+            },
+            "scope": 34844,
+            "src": "6057:538:98",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "private"
+          }
+        ],
+        "scope": 34845,
+        "src": "986:5611:98",
+        "usedErrors": [
+          34425,
+          34428,
+          34689,
+          34694,
+          36640,
+          36653,
+          38180,
+          38473
+        ],
+        "usedEvents": [
+          34433,
+          36373
+        ]
+      }
+    ],
+    "src": "115:6483:98"
+  },
+  "legacyAST": {
+    "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol",
+    "exportedSymbols": {
+      "ERC1967Utils": [
+        36914
+      ],
+      "IERC1822Proxiable": [
+        36445
+      ],
+      "Initializable": [
+        34662
+      ],
+      "UUPSUpgradeable": [
+        34844
+      ]
+    },
+    "id": 34845,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 34664,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".22"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "115:24:98"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "file": "@openzeppelin/contracts/interfaces/draft-IERC1822.sol",
+        "id": 34666,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 34845,
+        "sourceUnit": 36446,
+        "src": "141:88:98",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 34665,
+              "name": "IERC1822Proxiable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 36445,
+              "src": "149:17:98",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
+        "file": "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol",
+        "id": 34668,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 34845,
+        "sourceUnit": 36915,
+        "src": "230:84:98",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 34667,
+              "name": "ERC1967Utils",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 36914,
+              "src": "238:12:98",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "file": "./Initializable.sol",
+        "id": 34670,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 34845,
+        "sourceUnit": 34663,
+        "src": "315:50:98",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 34669,
+              "name": "Initializable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 34662,
+              "src": "323:13:98",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 34672,
+              "name": "Initializable",
+              "nameLocations": [
+                "1023:13:98"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 34662,
+              "src": "1023:13:98"
+            },
+            "id": 34673,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1023:13:98"
+          },
+          {
+            "baseName": {
+              "id": 34674,
+              "name": "IERC1822Proxiable",
+              "nameLocations": [
+                "1038:17:98"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 36445,
+              "src": "1038:17:98"
+            },
+            "id": 34675,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1038:17:98"
+          }
+        ],
+        "canonicalName": "UUPSUpgradeable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 34671,
+          "nodeType": "StructuredDocumentation",
+          "src": "367:618:98",
+          "text": " @dev An upgradeability mechanism designed for UUPS proxies. The functions included here can perform an upgrade of an\n {ERC1967Proxy}, when this contract is set as the implementation behind such a proxy.\n A security mechanism ensures that an upgrade does not turn off upgradeability accidentally, although this risk is\n reinstated if the upgrade retains upgradeability but removes the security mechanism, e.g. by replacing\n `UUPSUpgradeable` with a custom implementation of upgrades.\n The {_authorizeUpgrade} function must be overridden to include access restriction to the upgrade mechanism."
+        },
+        "fullyImplemented": false,
+        "id": 34844,
+        "linearizedBaseContracts": [
+          34844,
+          36445,
+          34662
+        ],
+        "name": "UUPSUpgradeable",
+        "nameLocation": "1004:15:98",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "documentation": {
+              "id": 34676,
+              "nodeType": "StructuredDocumentation",
+              "src": "1062:61:98",
+              "text": "@custom:oz-upgrades-unsafe-allow state-variable-immutable"
+            },
+            "id": 34682,
+            "mutability": "immutable",
+            "name": "__self",
+            "nameLocation": "1154:6:98",
+            "nodeType": "VariableDeclaration",
+            "scope": 34844,
+            "src": "1128:48:98",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 34677,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "1128:7:98",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "id": 34680,
+                  "name": "this",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 4294967268,
+                  "src": "1171:4:98",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                    "typeString": "contract UUPSUpgradeable"
+                  }
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                    "typeString": "contract UUPSUpgradeable"
+                  }
+                ],
+                "id": 34679,
+                "isConstant": false,
+                "isLValue": false,
+                "isPure": true,
+                "lValueRequested": false,
+                "nodeType": "ElementaryTypeNameExpression",
+                "src": "1163:7:98",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_type$_t_address_$",
+                  "typeString": "type(address)"
+                },
+                "typeName": {
+                  "id": 34678,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1163:7:98",
+                  "typeDescriptions": {}
+                }
+              },
+              "id": 34681,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": false,
+              "kind": "typeConversion",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "1163:13:98",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "private"
+          },
+          {
+            "constant": true,
+            "documentation": {
+              "id": 34683,
+              "nodeType": "StructuredDocumentation",
+              "src": "1183:631:98",
+              "text": " @dev The version of the upgrade interface of the contract. If this getter is missing, both `upgradeTo(address)`\n and `upgradeToAndCall(address,bytes)` are present, and `upgradeTo` must be used if no function should be called,\n while `upgradeToAndCall` will invoke the `receive` function if the second argument is the empty byte string.\n If the getter returns `\"5.0.0\"`, only `upgradeToAndCall(address,bytes)` is present, and the second argument must\n be the empty byte string if no function should be called, making it impossible to invoke the `receive` function\n during an upgrade."
+            },
+            "functionSelector": "ad3cb1cc",
+            "id": 34686,
+            "mutability": "constant",
+            "name": "UPGRADE_INTERFACE_VERSION",
+            "nameLocation": "1842:25:98",
+            "nodeType": "VariableDeclaration",
+            "scope": 34844,
+            "src": "1819:58:98",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory_ptr",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 34684,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "1819:6:98",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "hexValue": "352e302e30",
+              "id": 34685,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1870:7:98",
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_2ade050ecfcf8ae20ae1d10a23573f9d7e0bad85e74a2cf8338a65401e64558c",
+                "typeString": "literal_string \"5.0.0\""
+              },
+              "value": "5.0.0"
+            },
+            "visibility": "public"
+          },
+          {
+            "documentation": {
+              "id": 34687,
+              "nodeType": "StructuredDocumentation",
+              "src": "1884:65:98",
+              "text": " @dev The call is from an unauthorized context."
+            },
+            "errorSelector": "e07c8dba",
+            "id": 34689,
+            "name": "UUPSUnauthorizedCallContext",
+            "nameLocation": "1960:27:98",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 34688,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1987:2:98"
+            },
+            "src": "1954:36:98"
+          },
+          {
+            "documentation": {
+              "id": 34690,
+              "nodeType": "StructuredDocumentation",
+              "src": "1996:68:98",
+              "text": " @dev The storage `slot` is unsupported as a UUID."
+            },
+            "errorSelector": "aa1d49a4",
+            "id": 34694,
+            "name": "UUPSUnsupportedProxiableUUID",
+            "nameLocation": "2075:28:98",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 34693,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34692,
+                  "mutability": "mutable",
+                  "name": "slot",
+                  "nameLocation": "2112:4:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34694,
+                  "src": "2104:12:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 34691,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2104:7:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2103:14:98"
+            },
+            "src": "2069:49:98"
+          },
+          {
+            "body": {
+              "id": 34701,
+              "nodeType": "Block",
+              "src": "2645:41:98",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 34697,
+                      "name": "_checkProxy",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34776,
+                      "src": "2655:11:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$__$returns$__$",
+                        "typeString": "function () view"
+                      }
+                    },
+                    "id": 34698,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2655:13:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34699,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2655:13:98"
+                },
+                {
+                  "id": 34700,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2678:1:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34695,
+              "nodeType": "StructuredDocumentation",
+              "src": "2124:495:98",
+              "text": " @dev Check that the execution is being performed through a delegatecall call and that the execution context is\n a proxy contract with an implementation (as defined in ERC-1967) pointing to self. This should only be the case\n for UUPS and transparent proxies that are using the current contract as their implementation. Execution of a\n function through ERC-1167 minimal proxies (clones) would not normally pass this test, but is not guaranteed to\n fail."
+            },
+            "id": 34702,
+            "name": "onlyProxy",
+            "nameLocation": "2633:9:98",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 34696,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2642:2:98"
+            },
+            "src": "2624:62:98",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34709,
+              "nodeType": "Block",
+              "src": "2916:48:98",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 34705,
+                      "name": "_checkNotDelegated",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34792,
+                      "src": "2926:18:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$__$returns$__$",
+                        "typeString": "function () view"
+                      }
+                    },
+                    "id": 34706,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2926:20:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34707,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2926:20:98"
+                },
+                {
+                  "id": 34708,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2956:1:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34703,
+              "nodeType": "StructuredDocumentation",
+              "src": "2692:195:98",
+              "text": " @dev Check that the execution is not being performed through a delegate call. This allows a function to be\n callable on the implementing contract but not through proxies."
+            },
+            "id": 34710,
+            "name": "notDelegated",
+            "nameLocation": "2901:12:98",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 34704,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2913:2:98"
+            },
+            "src": "2892:72:98",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34715,
+              "nodeType": "Block",
+              "src": "3030:7:98",
+              "statements": []
+            },
+            "id": 34716,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34713,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34712,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "3013:16:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "3013:16:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3013:16:98"
+              }
+            ],
+            "name": "__UUPSUpgradeable_init",
+            "nameLocation": "2979:22:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34711,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3001:2:98"
+            },
+            "returnParameters": {
+              "id": 34714,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3030:0:98"
+            },
+            "scope": 34844,
+            "src": "2970:67:98",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34721,
+              "nodeType": "Block",
+              "src": "3113:7:98",
+              "statements": []
+            },
+            "id": 34722,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34719,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34718,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "3096:16:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "3096:16:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3096:16:98"
+              }
+            ],
+            "name": "__UUPSUpgradeable_init_unchained",
+            "nameLocation": "3052:32:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34717,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3084:2:98"
+            },
+            "returnParameters": {
+              "id": 34720,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3113:0:98"
+            },
+            "scope": 34844,
+            "src": "3043:77:98",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              36444
+            ],
+            "body": {
+              "id": 34733,
+              "nodeType": "Block",
+              "src": "3786:56:98",
+              "statements": [
+                {
+                  "expression": {
+                    "expression": {
+                      "id": 34730,
+                      "name": "ERC1967Utils",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 36914,
+                      "src": "3803:12:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                        "typeString": "type(library ERC1967Utils)"
+                      }
+                    },
+                    "id": 34731,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "memberLocation": "3816:19:98",
+                    "memberName": "IMPLEMENTATION_SLOT",
+                    "nodeType": "MemberAccess",
+                    "referencedDeclaration": 36635,
+                    "src": "3803:32:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 34729,
+                  "id": 34732,
+                  "nodeType": "Return",
+                  "src": "3796:39:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34723,
+              "nodeType": "StructuredDocumentation",
+              "src": "3125:578:98",
+              "text": " @dev Implementation of the ERC-1822 {proxiableUUID} function. This returns the storage slot used by the\n implementation. It is used to validate the implementation's compatibility when performing an upgrade.\n IMPORTANT: A proxy pointing at a proxiable contract should not be considered proxiable itself, because this risks\n bricking a proxy that upgrades to it, by delegating to itself until out of gas. Thus it is critical that this\n function revert if invoked through a proxy. This is guaranteed by the `notDelegated` modifier."
+            },
+            "functionSelector": "52d1902d",
+            "id": 34734,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34726,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34725,
+                  "name": "notDelegated",
+                  "nameLocations": [
+                    "3755:12:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34710,
+                  "src": "3755:12:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3755:12:98"
+              }
+            ],
+            "name": "proxiableUUID",
+            "nameLocation": "3717:13:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34724,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3730:2:98"
+            },
+            "returnParameters": {
+              "id": 34729,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34728,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34734,
+                  "src": "3777:7:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 34727,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3777:7:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3776:9:98"
+            },
+            "scope": 34844,
+            "src": "3708:134:98",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "external"
+          },
+          {
+            "body": {
+              "id": 34753,
+              "nodeType": "Block",
+              "src": "4266:109:98",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 34745,
+                        "name": "newImplementation",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34737,
+                        "src": "4294:17:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 34744,
+                      "name": "_authorizeUpgrade",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34798,
+                      "src": "4276:17:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 34746,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "4276:36:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34747,
+                  "nodeType": "ExpressionStatement",
+                  "src": "4276:36:98"
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 34749,
+                        "name": "newImplementation",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34737,
+                        "src": "4344:17:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      {
+                        "id": 34750,
+                        "name": "data",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34739,
+                        "src": "4363:4:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes_memory_ptr",
+                          "typeString": "bytes memory"
+                        }
+                      ],
+                      "id": 34748,
+                      "name": "_upgradeToAndCallUUPS",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34843,
+                      "src": "4322:21:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$returns$__$",
+                        "typeString": "function (address,bytes memory)"
+                      }
+                    },
+                    "id": 34751,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "4322:46:98",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 34752,
+                  "nodeType": "ExpressionStatement",
+                  "src": "4322:46:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34735,
+              "nodeType": "StructuredDocumentation",
+              "src": "3848:308:98",
+              "text": " @dev Upgrade the implementation of the proxy to `newImplementation`, and subsequently execute the function call\n encoded in `data`.\n Calls {_authorizeUpgrade}.\n Emits an {Upgraded} event.\n @custom:oz-upgrades-unsafe-allow-reachable delegatecall"
+            },
+            "functionSelector": "4f1ef286",
+            "id": 34754,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 34742,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 34741,
+                  "name": "onlyProxy",
+                  "nameLocations": [
+                    "4256:9:98"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34702,
+                  "src": "4256:9:98"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "4256:9:98"
+              }
+            ],
+            "name": "upgradeToAndCall",
+            "nameLocation": "4170:16:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34740,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34737,
+                  "mutability": "mutable",
+                  "name": "newImplementation",
+                  "nameLocation": "4195:17:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34754,
+                  "src": "4187:25:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 34736,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4187:7:98",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 34739,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "4227:4:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34754,
+                  "src": "4214:17:98",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 34738,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "4214:5:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "4186:46:98"
+            },
+            "returnParameters": {
+              "id": 34743,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4266:0:98"
+            },
+            "scope": 34844,
+            "src": "4161:214:98",
+            "stateMutability": "payable",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 34775,
+              "nodeType": "Block",
+              "src": "4648:267:98",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "id": 34769,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "commonType": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      },
+                      "id": 34763,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "arguments": [
+                          {
+                            "id": 34760,
+                            "name": "this",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967268,
+                            "src": "4683:4:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                              "typeString": "contract UUPSUpgradeable"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                              "typeString": "contract UUPSUpgradeable"
+                            }
+                          ],
+                          "id": 34759,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "lValueRequested": false,
+                          "nodeType": "ElementaryTypeNameExpression",
+                          "src": "4675:7:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_address_$",
+                            "typeString": "type(address)"
+                          },
+                          "typeName": {
+                            "id": 34758,
+                            "name": "address",
+                            "nodeType": "ElementaryTypeName",
+                            "src": "4675:7:98",
+                            "typeDescriptions": {}
+                          }
+                        },
+                        "id": 34761,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "4675:13:98",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "==",
+                      "rightExpression": {
+                        "id": 34762,
+                        "name": "__self",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34682,
+                        "src": "4692:6:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "src": "4675:23:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "||",
+                    "rightExpression": {
+                      "commonType": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      },
+                      "id": 34768,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "leftExpression": {
+                        "arguments": [],
+                        "expression": {
+                          "argumentTypes": [],
+                          "expression": {
+                            "id": 34764,
+                            "name": "ERC1967Utils",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 36914,
+                            "src": "4753:12:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                              "typeString": "type(library ERC1967Utils)"
+                            }
+                          },
+                          "id": 34765,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "4766:17:98",
+                          "memberName": "getImplementation",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 36666,
+                          "src": "4753:30:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                            "typeString": "function () view returns (address)"
+                          }
+                        },
+                        "id": 34766,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "4753:32:98",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "nodeType": "BinaryOperation",
+                      "operator": "!=",
+                      "rightExpression": {
+                        "id": 34767,
+                        "name": "__self",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 34682,
+                        "src": "4789:6:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      },
+                      "src": "4753:42:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bool",
+                        "typeString": "bool"
+                      }
+                    },
+                    "src": "4675:120:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 34774,
+                  "nodeType": "IfStatement",
+                  "src": "4658:251:98",
+                  "trueBody": {
+                    "id": 34773,
+                    "nodeType": "Block",
+                    "src": "4848:61:98",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 34770,
+                            "name": "UUPSUnauthorizedCallContext",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 34689,
+                            "src": "4869:27:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                              "typeString": "function () pure"
+                            }
+                          },
+                          "id": 34771,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "4869:29:98",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 34772,
+                        "nodeType": "RevertStatement",
+                        "src": "4862:36:98"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34755,
+              "nodeType": "StructuredDocumentation",
+              "src": "4381:217:98",
+              "text": " @dev Reverts if the execution is not performed via delegatecall or the execution\n context is not of a proxy with an ERC-1967 compliant implementation pointing to self.\n See {_onlyProxy}."
+            },
+            "id": 34776,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_checkProxy",
+            "nameLocation": "4612:11:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34756,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4623:2:98"
+            },
+            "returnParameters": {
+              "id": 34757,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "4648:0:98"
+            },
+            "scope": 34844,
+            "src": "4603:312:98",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34791,
+              "nodeType": "Block",
+              "src": "5084:161:98",
+              "statements": [
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    },
+                    "id": 34785,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "arguments": [
+                        {
+                          "id": 34782,
+                          "name": "this",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4294967268,
+                          "src": "5106:4:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                            "typeString": "contract UUPSUpgradeable"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_contract$_UUPSUpgradeable_$34844",
+                            "typeString": "contract UUPSUpgradeable"
+                          }
+                        ],
+                        "id": 34781,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "ElementaryTypeNameExpression",
+                        "src": "5098:7:98",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_address_$",
+                          "typeString": "type(address)"
+                        },
+                        "typeName": {
+                          "id": 34780,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "5098:7:98",
+                          "typeDescriptions": {}
+                        }
+                      },
+                      "id": 34783,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "5098:13:98",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 34784,
+                      "name": "__self",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 34682,
+                      "src": "5115:6:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "5098:23:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 34790,
+                  "nodeType": "IfStatement",
+                  "src": "5094:145:98",
+                  "trueBody": {
+                    "id": 34789,
+                    "nodeType": "Block",
+                    "src": "5123:116:98",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "id": 34786,
+                            "name": "UUPSUnauthorizedCallContext",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 34689,
+                            "src": "5199:27:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                              "typeString": "function () pure"
+                            }
+                          },
+                          "id": 34787,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "5199:29:98",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 34788,
+                        "nodeType": "RevertStatement",
+                        "src": "5192:36:98"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34777,
+              "nodeType": "StructuredDocumentation",
+              "src": "4921:106:98",
+              "text": " @dev Reverts if the execution is performed via delegatecall.\n See {notDelegated}."
+            },
+            "id": 34792,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_checkNotDelegated",
+            "nameLocation": "5041:18:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34778,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "5059:2:98"
+            },
+            "returnParameters": {
+              "id": 34779,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "5084:0:98"
+            },
+            "scope": 34844,
+            "src": "5032:213:98",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "documentation": {
+              "id": 34793,
+              "nodeType": "StructuredDocumentation",
+              "src": "5251:372:98",
+              "text": " @dev Function that should revert when `msg.sender` is not authorized to upgrade the contract. Called by\n {upgradeToAndCall}.\n Normally, this function will use an xref:access.adoc[access control] modifier such as {Ownable-onlyOwner}.\n ```solidity\n function _authorizeUpgrade(address) internal onlyOwner {}\n ```"
+            },
+            "id": 34798,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_authorizeUpgrade",
+            "nameLocation": "5637:17:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34796,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34795,
+                  "mutability": "mutable",
+                  "name": "newImplementation",
+                  "nameLocation": "5663:17:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34798,
+                  "src": "5655:25:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 34794,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "5655:7:98",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "5654:27:98"
+            },
+            "returnParameters": {
+              "id": 34797,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "5698:0:98"
+            },
+            "scope": 34844,
+            "src": "5628:71:98",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 34842,
+              "nodeType": "Block",
+              "src": "6142:453:98",
+              "statements": [
+                {
+                  "clauses": [
+                    {
+                      "block": {
+                        "id": 34831,
+                        "nodeType": "Block",
+                        "src": "6232:212:98",
+                        "statements": [
+                          {
+                            "condition": {
+                              "commonType": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              },
+                              "id": 34817,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "id": 34814,
+                                "name": "slot",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 34812,
+                                "src": "6250:4:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_bytes32",
+                                  "typeString": "bytes32"
+                                }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "!=",
+                              "rightExpression": {
+                                "expression": {
+                                  "id": 34815,
+                                  "name": "ERC1967Utils",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 36914,
+                                  "src": "6258:12:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                                    "typeString": "type(library ERC1967Utils)"
+                                  }
+                                },
+                                "id": 34816,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "lValueRequested": false,
+                                "memberLocation": "6271:19:98",
+                                "memberName": "IMPLEMENTATION_SLOT",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 36635,
+                                "src": "6258:32:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_bytes32",
+                                  "typeString": "bytes32"
+                                }
+                              },
+                              "src": "6250:40:98",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bool",
+                                "typeString": "bool"
+                              }
+                            },
+                            "id": 34823,
+                            "nodeType": "IfStatement",
+                            "src": "6246:120:98",
+                            "trueBody": {
+                              "id": 34822,
+                              "nodeType": "Block",
+                              "src": "6292:74:98",
+                              "statements": [
+                                {
+                                  "errorCall": {
+                                    "arguments": [
+                                      {
+                                        "id": 34819,
+                                        "name": "slot",
+                                        "nodeType": "Identifier",
+                                        "overloadedDeclarations": [],
+                                        "referencedDeclaration": 34812,
+                                        "src": "6346:4:98",
+                                        "typeDescriptions": {
+                                          "typeIdentifier": "t_bytes32",
+                                          "typeString": "bytes32"
+                                        }
+                                      }
+                                    ],
+                                    "expression": {
+                                      "argumentTypes": [
+                                        {
+                                          "typeIdentifier": "t_bytes32",
+                                          "typeString": "bytes32"
+                                        }
+                                      ],
+                                      "id": 34818,
+                                      "name": "UUPSUnsupportedProxiableUUID",
+                                      "nodeType": "Identifier",
+                                      "overloadedDeclarations": [],
+                                      "referencedDeclaration": 34694,
+                                      "src": "6317:28:98",
+                                      "typeDescriptions": {
+                                        "typeIdentifier": "t_function_error_pure$_t_bytes32_$returns$__$",
+                                        "typeString": "function (bytes32) pure"
+                                      }
+                                    },
+                                    "id": 34820,
+                                    "isConstant": false,
+                                    "isLValue": false,
+                                    "isPure": false,
+                                    "kind": "functionCall",
+                                    "lValueRequested": false,
+                                    "nameLocations": [],
+                                    "names": [],
+                                    "nodeType": "FunctionCall",
+                                    "src": "6317:34:98",
+                                    "tryCall": false,
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_tuple$__$",
+                                      "typeString": "tuple()"
+                                    }
+                                  },
+                                  "id": 34821,
+                                  "nodeType": "RevertStatement",
+                                  "src": "6310:41:98"
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "expression": {
+                              "arguments": [
+                                {
+                                  "id": 34827,
+                                  "name": "newImplementation",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 34801,
+                                  "src": "6409:17:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  }
+                                },
+                                {
+                                  "id": 34828,
+                                  "name": "data",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 34803,
+                                  "src": "6428:4:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_bytes_memory_ptr",
+                                    "typeString": "bytes memory"
+                                  }
+                                }
+                              ],
+                              "expression": {
+                                "argumentTypes": [
+                                  {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  },
+                                  {
+                                    "typeIdentifier": "t_bytes_memory_ptr",
+                                    "typeString": "bytes memory"
+                                  }
+                                ],
+                                "expression": {
+                                  "id": 34824,
+                                  "name": "ERC1967Utils",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 36914,
+                                  "src": "6379:12:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                                    "typeString": "type(library ERC1967Utils)"
+                                  }
+                                },
+                                "id": 34826,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberLocation": "6392:16:98",
+                                "memberName": "upgradeToAndCall",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 36729,
+                                "src": "6379:29:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$returns$__$",
+                                  "typeString": "function (address,bytes memory)"
+                                }
+                              },
+                              "id": 34829,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "functionCall",
+                              "lValueRequested": false,
+                              "nameLocations": [],
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "6379:54:98",
+                              "tryCall": false,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_tuple$__$",
+                                "typeString": "tuple()"
+                              }
+                            },
+                            "id": 34830,
+                            "nodeType": "ExpressionStatement",
+                            "src": "6379:54:98"
+                          }
+                        ]
+                      },
+                      "errorName": "",
+                      "id": 34832,
+                      "nodeType": "TryCatchClause",
+                      "parameters": {
+                        "id": 34813,
+                        "nodeType": "ParameterList",
+                        "parameters": [
+                          {
+                            "constant": false,
+                            "id": 34812,
+                            "mutability": "mutable",
+                            "name": "slot",
+                            "nameLocation": "6226:4:98",
+                            "nodeType": "VariableDeclaration",
+                            "scope": 34832,
+                            "src": "6218:12:98",
+                            "stateVariable": false,
+                            "storageLocation": "default",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes32",
+                              "typeString": "bytes32"
+                            },
+                            "typeName": {
+                              "id": 34811,
+                              "name": "bytes32",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "6218:7:98",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes32",
+                                "typeString": "bytes32"
+                              }
+                            },
+                            "visibility": "internal"
+                          }
+                        ],
+                        "src": "6217:14:98"
+                      },
+                      "src": "6209:235:98"
+                    },
+                    {
+                      "block": {
+                        "id": 34839,
+                        "nodeType": "Block",
+                        "src": "6451:138:98",
+                        "statements": [
+                          {
+                            "errorCall": {
+                              "arguments": [
+                                {
+                                  "id": 34836,
+                                  "name": "newImplementation",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 34801,
+                                  "src": "6560:17:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  }
+                                }
+                              ],
+                              "expression": {
+                                "argumentTypes": [
+                                  {
+                                    "typeIdentifier": "t_address",
+                                    "typeString": "address"
+                                  }
+                                ],
+                                "expression": {
+                                  "id": 34833,
+                                  "name": "ERC1967Utils",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [],
+                                  "referencedDeclaration": 36914,
+                                  "src": "6518:12:98",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_contract$_ERC1967Utils_$36914_$",
+                                    "typeString": "type(library ERC1967Utils)"
+                                  }
+                                },
+                                "id": 34835,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "lValueRequested": false,
+                                "memberLocation": "6531:28:98",
+                                "memberName": "ERC1967InvalidImplementation",
+                                "nodeType": "MemberAccess",
+                                "referencedDeclaration": 36640,
+                                "src": "6518:41:98",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_function_error_pure$_t_address_$returns$__$",
+                                  "typeString": "function (address) pure"
+                                }
+                              },
+                              "id": 34837,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "kind": "functionCall",
+                              "lValueRequested": false,
+                              "nameLocations": [],
+                              "names": [],
+                              "nodeType": "FunctionCall",
+                              "src": "6518:60:98",
+                              "tryCall": false,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_tuple$__$",
+                                "typeString": "tuple()"
+                              }
+                            },
+                            "id": 34838,
+                            "nodeType": "RevertStatement",
+                            "src": "6511:67:98"
+                          }
+                        ]
+                      },
+                      "errorName": "",
+                      "id": 34840,
+                      "nodeType": "TryCatchClause",
+                      "src": "6445:144:98"
+                    }
+                  ],
+                  "externalCall": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "arguments": [
+                          {
+                            "id": 34807,
+                            "name": "newImplementation",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 34801,
+                            "src": "6174:17:98",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 34806,
+                          "name": "IERC1822Proxiable",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 36445,
+                          "src": "6156:17:98",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_IERC1822Proxiable_$36445_$",
+                            "typeString": "type(contract IERC1822Proxiable)"
+                          }
+                        },
+                        "id": 34808,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "6156:36:98",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IERC1822Proxiable_$36445",
+                          "typeString": "contract IERC1822Proxiable"
+                        }
+                      },
+                      "id": 34809,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "6193:13:98",
+                      "memberName": "proxiableUUID",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 36444,
+                      "src": "6156:50:98",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$__$returns$_t_bytes32_$",
+                        "typeString": "function () view external returns (bytes32)"
+                      }
+                    },
+                    "id": 34810,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "6156:52:98",
+                    "tryCall": true,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 34841,
+                  "nodeType": "TryStatement",
+                  "src": "6152:437:98"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 34799,
+              "nodeType": "StructuredDocumentation",
+              "src": "5705:347:98",
+              "text": " @dev Performs an implementation upgrade with a security check for UUPS proxies, and additional setup call.\n As a security check, {proxiableUUID} is invoked in the new implementation, and the return value\n is expected to be the implementation slot in ERC-1967.\n Emits an {IERC1967-Upgraded} event."
+            },
+            "id": 34843,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_upgradeToAndCallUUPS",
+            "nameLocation": "6066:21:98",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 34804,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34801,
+                  "mutability": "mutable",
+                  "name": "newImplementation",
+                  "nameLocation": "6096:17:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34843,
+                  "src": "6088:25:98",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 34800,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6088:7:98",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 34803,
+                  "mutability": "mutable",
+                  "name": "data",
+                  "nameLocation": "6128:4:98",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 34843,
+                  "src": "6115:17:98",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_memory_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 34802,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "6115:5:98",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "6087:46:98"
+            },
+            "returnParameters": {
+              "id": 34805,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "6142:0:98"
+            },
+            "scope": 34844,
+            "src": "6057:538:98",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "private"
+          }
+        ],
+        "scope": 34845,
+        "src": "986:5611:98",
+        "usedErrors": [
+          34425,
+          34428,
+          34689,
+          34694,
+          36640,
+          36653,
+          38180,
+          38473
+        ],
+        "usedEvents": [
+          34433,
+          36373
+        ]
+      }
+    ],
+    "src": "115:6483:98"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.794Z"
+}

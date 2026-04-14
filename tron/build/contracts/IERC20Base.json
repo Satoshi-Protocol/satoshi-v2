@@ -1,0 +1,554 @@
+{
+  "contractName": "IERC20Base",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "ERC20Base__ApproveFromZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__ApproveToZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__BurnExceedsBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__BurnFromZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__InsufficientAllowance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__MintToZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__TransferExceedsBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__TransferFromZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__TransferToZeroAddress",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Approval",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "holder",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        }
+      ],
+      "name": "allowance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "approve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "holder",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "recipient",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFrom",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { IERC20 } from '../../../interfaces/IERC20.sol';\nimport { IERC20BaseInternal } from './IERC20BaseInternal.sol';\n\n/**\n * @title ERC20 base interface\n */\ninterface IERC20Base is IERC20BaseInternal, IERC20 {}\n",
+  "sourcePath": "@solidstate/contracts/token/ERC20/base/IERC20Base.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/token/ERC20/base/IERC20Base.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        45462
+      ],
+      "IERC20Base": [
+        47692
+      ],
+      "IERC20BaseInternal": [
+        47718
+      ]
+    },
+    "id": 47693,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47682,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:192"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/interfaces/IERC20.sol",
+        "file": "../../../interfaces/IERC20.sol",
+        "id": 47684,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47693,
+        "sourceUnit": 45463,
+        "src": "59:56:192",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47683,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45462,
+              "src": "68:6:192",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/token/ERC20/base/IERC20BaseInternal.sol",
+        "file": "./IERC20BaseInternal.sol",
+        "id": 47686,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47693,
+        "sourceUnit": 47719,
+        "src": "116:62:192",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47685,
+              "name": "IERC20BaseInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 47718,
+              "src": "125:18:192",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 47688,
+              "name": "IERC20BaseInternal",
+              "nameLocations": [
+                "243:18:192"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 47718,
+              "src": "243:18:192"
+            },
+            "id": 47689,
+            "nodeType": "InheritanceSpecifier",
+            "src": "243:18:192"
+          },
+          {
+            "baseName": {
+              "id": 47690,
+              "name": "IERC20",
+              "nameLocations": [
+                "263:6:192"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45462,
+              "src": "263:6:192"
+            },
+            "id": 47691,
+            "nodeType": "InheritanceSpecifier",
+            "src": "263:6:192"
+          }
+        ],
+        "canonicalName": "IERC20Base",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 47687,
+          "nodeType": "StructuredDocumentation",
+          "src": "180:38:192",
+          "text": " @title ERC20 base interface"
+        },
+        "fullyImplemented": false,
+        "id": 47692,
+        "linearizedBaseContracts": [
+          47692,
+          45462,
+          47718,
+          45482
+        ],
+        "name": "IERC20Base",
+        "nameLocation": "229:10:192",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 47693,
+        "src": "219:53:192",
+        "usedErrors": [
+          47701,
+          47703,
+          47705,
+          47707,
+          47709,
+          47711,
+          47713,
+          47715,
+          47717
+        ],
+        "usedEvents": [
+          45473,
+          45481
+        ]
+      }
+    ],
+    "src": "33:240:192"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/token/ERC20/base/IERC20Base.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        45462
+      ],
+      "IERC20Base": [
+        47692
+      ],
+      "IERC20BaseInternal": [
+        47718
+      ]
+    },
+    "id": 47693,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47682,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:192"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/interfaces/IERC20.sol",
+        "file": "../../../interfaces/IERC20.sol",
+        "id": 47684,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47693,
+        "sourceUnit": 45463,
+        "src": "59:56:192",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47683,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45462,
+              "src": "68:6:192",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/token/ERC20/base/IERC20BaseInternal.sol",
+        "file": "./IERC20BaseInternal.sol",
+        "id": 47686,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47693,
+        "sourceUnit": 47719,
+        "src": "116:62:192",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47685,
+              "name": "IERC20BaseInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 47718,
+              "src": "125:18:192",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 47688,
+              "name": "IERC20BaseInternal",
+              "nameLocations": [
+                "243:18:192"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 47718,
+              "src": "243:18:192"
+            },
+            "id": 47689,
+            "nodeType": "InheritanceSpecifier",
+            "src": "243:18:192"
+          },
+          {
+            "baseName": {
+              "id": 47690,
+              "name": "IERC20",
+              "nameLocations": [
+                "263:6:192"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45462,
+              "src": "263:6:192"
+            },
+            "id": 47691,
+            "nodeType": "InheritanceSpecifier",
+            "src": "263:6:192"
+          }
+        ],
+        "canonicalName": "IERC20Base",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 47687,
+          "nodeType": "StructuredDocumentation",
+          "src": "180:38:192",
+          "text": " @title ERC20 base interface"
+        },
+        "fullyImplemented": false,
+        "id": 47692,
+        "linearizedBaseContracts": [
+          47692,
+          45462,
+          47718,
+          45482
+        ],
+        "name": "IERC20Base",
+        "nameLocation": "229:10:192",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 47693,
+        "src": "219:53:192",
+        "usedErrors": [
+          47701,
+          47703,
+          47705,
+          47707,
+          47709,
+          47711,
+          47713,
+          47715,
+          47717
+        ],
+        "usedEvents": [
+          45473,
+          45481
+        ]
+      }
+    ],
+    "src": "33:240:192"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.821Z"
+}

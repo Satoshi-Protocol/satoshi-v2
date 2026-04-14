@@ -1,0 +1,2680 @@
+{
+  "contractName": "NoncesUpgradeable",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "currentNonce",
+          "type": "uint256"
+        }
+      ],
+      "name": "InvalidAccountNonce",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidInitialization",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotInitializing",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "version",
+          "type": "uint64"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "nonces",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/Nonces.sol)\npragma solidity ^0.8.20;\nimport {Initializable} from \"../proxy/utils/Initializable.sol\";\n\n/**\n * @dev Provides tracking nonces for addresses. Nonces will only increment.\n */\nabstract contract NoncesUpgradeable is Initializable {\n    /**\n     * @dev The nonce used for an `account` is not the expected current nonce.\n     */\n    error InvalidAccountNonce(address account, uint256 currentNonce);\n\n    /// @custom:storage-location erc7201:openzeppelin.storage.Nonces\n    struct NoncesStorage {\n        mapping(address account => uint256) _nonces;\n    }\n\n    // keccak256(abi.encode(uint256(keccak256(\"openzeppelin.storage.Nonces\")) - 1)) & ~bytes32(uint256(0xff))\n    bytes32 private constant NoncesStorageLocation = 0x5ab42ced628888259c08ac98db1eb0cf702fc1501344311d8b100cd1bfe4bb00;\n\n    function _getNoncesStorage() private pure returns (NoncesStorage storage $) {\n        assembly {\n            $.slot := NoncesStorageLocation\n        }\n    }\n\n    function __Nonces_init() internal onlyInitializing {\n    }\n\n    function __Nonces_init_unchained() internal onlyInitializing {\n    }\n    /**\n     * @dev Returns the next unused nonce for an address.\n     */\n    function nonces(address owner) public view virtual returns (uint256) {\n        NoncesStorage storage $ = _getNoncesStorage();\n        return $._nonces[owner];\n    }\n\n    /**\n     * @dev Consumes a nonce.\n     *\n     * Returns the current value and increments nonce.\n     */\n    function _useNonce(address owner) internal virtual returns (uint256) {\n        NoncesStorage storage $ = _getNoncesStorage();\n        // For each account, the nonce has an initial value of 0, can only be incremented by one, and cannot be\n        // decremented or reset. This guarantees that the nonce never overflows.\n        unchecked {\n            // It is important to do x++ and not ++x here.\n            return $._nonces[owner]++;\n        }\n    }\n\n    /**\n     * @dev Same as {_useNonce} but checking that `nonce` is the next valid for `owner`.\n     */\n    function _useCheckedNonce(address owner, uint256 nonce) internal virtual {\n        uint256 current = _useNonce(owner);\n        if (nonce != current) {\n            revert InvalidAccountNonce(owner, current);\n        }\n    }\n}\n",
+  "sourcePath": "@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable.sol",
+  "ast": {
+    "absolutePath": "@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable.sol",
+    "exportedSymbols": {
+      "Initializable": [
+        34662
+      ],
+      "NoncesUpgradeable": [
+        35787
+      ]
+    },
+    "id": 35788,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 35678,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "99:24:102"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "file": "../proxy/utils/Initializable.sol",
+        "id": 35680,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 35788,
+        "sourceUnit": 34663,
+        "src": "124:63:102",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 35679,
+              "name": "Initializable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 34662,
+              "src": "132:13:102",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 35682,
+              "name": "Initializable",
+              "nameLocations": [
+                "312:13:102"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 34662,
+              "src": "312:13:102"
+            },
+            "id": 35683,
+            "nodeType": "InheritanceSpecifier",
+            "src": "312:13:102"
+          }
+        ],
+        "canonicalName": "NoncesUpgradeable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 35681,
+          "nodeType": "StructuredDocumentation",
+          "src": "189:83:102",
+          "text": " @dev Provides tracking nonces for addresses. Nonces will only increment."
+        },
+        "fullyImplemented": true,
+        "id": 35787,
+        "linearizedBaseContracts": [
+          35787,
+          34662
+        ],
+        "name": "NoncesUpgradeable",
+        "nameLocation": "291:17:102",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 35684,
+              "nodeType": "StructuredDocumentation",
+              "src": "332:90:102",
+              "text": " @dev The nonce used for an `account` is not the expected current nonce."
+            },
+            "errorSelector": "752d88c0",
+            "id": 35690,
+            "name": "InvalidAccountNonce",
+            "nameLocation": "433:19:102",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 35689,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35686,
+                  "mutability": "mutable",
+                  "name": "account",
+                  "nameLocation": "461:7:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35690,
+                  "src": "453:15:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35685,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "453:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 35688,
+                  "mutability": "mutable",
+                  "name": "currentNonce",
+                  "nameLocation": "478:12:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35690,
+                  "src": "470:20:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35687,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "470:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "452:39:102"
+            },
+            "src": "427:65:102"
+          },
+          {
+            "canonicalName": "NoncesUpgradeable.NoncesStorage",
+            "documentation": {
+              "id": 35691,
+              "nodeType": "StructuredDocumentation",
+              "src": "498:64:102",
+              "text": "@custom:storage-location erc7201:openzeppelin.storage.Nonces"
+            },
+            "id": 35696,
+            "members": [
+              {
+                "constant": false,
+                "id": 35695,
+                "mutability": "mutable",
+                "name": "_nonces",
+                "nameLocation": "634:7:102",
+                "nodeType": "VariableDeclaration",
+                "scope": 35696,
+                "src": "598:43:102",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                  "typeString": "mapping(address => uint256)"
+                },
+                "typeName": {
+                  "id": 35694,
+                  "keyName": "account",
+                  "keyNameLocation": "614:7:102",
+                  "keyType": {
+                    "id": 35692,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "606:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "598:35:102",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                    "typeString": "mapping(address => uint256)"
+                  },
+                  "valueName": "",
+                  "valueNameLocation": "-1:-1:-1",
+                  "valueType": {
+                    "id": 35693,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "625:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "NoncesStorage",
+            "nameLocation": "574:13:102",
+            "nodeType": "StructDefinition",
+            "scope": 35787,
+            "src": "567:81:102",
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 35699,
+            "mutability": "constant",
+            "name": "NoncesStorageLocation",
+            "nameLocation": "789:21:102",
+            "nodeType": "VariableDeclaration",
+            "scope": 35787,
+            "src": "764:115:102",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 35697,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "764:7:102",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "hexValue": "307835616234326365643632383838383235396330386163393864623165623063663730326663313530313334343331316438623130306364316266653462623030",
+              "id": 35698,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "813:66:102",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_41026498920877473550552694860415970151284396403628511442111957027090812156672_by_1",
+                "typeString": "int_const 4102...(69 digits omitted)...6672"
+              },
+              "value": "0x5ab42ced628888259c08ac98db1eb0cf702fc1501344311d8b100cd1bfe4bb00"
+            },
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 35706,
+              "nodeType": "Block",
+              "src": "962:80:102",
+              "statements": [
+                {
+                  "AST": {
+                    "nativeSrc": "981:55:102",
+                    "nodeType": "YulBlock",
+                    "src": "981:55:102",
+                    "statements": [
+                      {
+                        "nativeSrc": "995:31:102",
+                        "nodeType": "YulAssignment",
+                        "src": "995:31:102",
+                        "value": {
+                          "name": "NoncesStorageLocation",
+                          "nativeSrc": "1005:21:102",
+                          "nodeType": "YulIdentifier",
+                          "src": "1005:21:102"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "$.slot",
+                            "nativeSrc": "995:6:102",
+                            "nodeType": "YulIdentifier",
+                            "src": "995:6:102"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "istanbul",
+                  "externalReferences": [
+                    {
+                      "declaration": 35703,
+                      "isOffset": false,
+                      "isSlot": true,
+                      "src": "995:6:102",
+                      "suffix": "slot",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 35699,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1005:21:102",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 35705,
+                  "nodeType": "InlineAssembly",
+                  "src": "972:64:102"
+                }
+              ]
+            },
+            "id": 35707,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_getNoncesStorage",
+            "nameLocation": "895:17:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35700,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "912:2:102"
+            },
+            "returnParameters": {
+              "id": 35704,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35703,
+                  "mutability": "mutable",
+                  "name": "$",
+                  "nameLocation": "959:1:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35707,
+                  "src": "937:23:102",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                    "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                  },
+                  "typeName": {
+                    "id": 35702,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 35701,
+                      "name": "NoncesStorage",
+                      "nameLocations": [
+                        "937:13:102"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 35696,
+                      "src": "937:13:102"
+                    },
+                    "referencedDeclaration": 35696,
+                    "src": "937:13:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                      "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "936:25:102"
+            },
+            "scope": 35787,
+            "src": "886:156:102",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 35712,
+              "nodeType": "Block",
+              "src": "1099:7:102",
+              "statements": []
+            },
+            "id": 35713,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 35710,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 35709,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1082:16:102"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1082:16:102"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1082:16:102"
+              }
+            ],
+            "name": "__Nonces_init",
+            "nameLocation": "1057:13:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35708,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1070:2:102"
+            },
+            "returnParameters": {
+              "id": 35711,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1099:0:102"
+            },
+            "scope": 35787,
+            "src": "1048:58:102",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 35718,
+              "nodeType": "Block",
+              "src": "1173:7:102",
+              "statements": []
+            },
+            "id": 35719,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 35716,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 35715,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1156:16:102"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1156:16:102"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1156:16:102"
+              }
+            ],
+            "name": "__Nonces_init_unchained",
+            "nameLocation": "1121:23:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35714,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1144:2:102"
+            },
+            "returnParameters": {
+              "id": 35717,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1173:0:102"
+            },
+            "scope": 35787,
+            "src": "1112:68:102",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 35738,
+              "nodeType": "Block",
+              "src": "1328:95:102",
+              "statements": [
+                {
+                  "assignments": [
+                    35729
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 35729,
+                      "mutability": "mutable",
+                      "name": "$",
+                      "nameLocation": "1360:1:102",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 35738,
+                      "src": "1338:23:102",
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                        "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                      },
+                      "typeName": {
+                        "id": 35728,
+                        "nodeType": "UserDefinedTypeName",
+                        "pathNode": {
+                          "id": 35727,
+                          "name": "NoncesStorage",
+                          "nameLocations": [
+                            "1338:13:102"
+                          ],
+                          "nodeType": "IdentifierPath",
+                          "referencedDeclaration": 35696,
+                          "src": "1338:13:102"
+                        },
+                        "referencedDeclaration": 35696,
+                        "src": "1338:13:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                          "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 35732,
+                  "initialValue": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 35730,
+                      "name": "_getNoncesStorage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35707,
+                      "src": "1364:17:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_pure$__$returns$_t_struct$_NoncesStorage_$35696_storage_ptr_$",
+                        "typeString": "function () pure returns (struct NoncesUpgradeable.NoncesStorage storage pointer)"
+                      }
+                    },
+                    "id": 35731,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1364:19:102",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                      "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1338:45:102"
+                },
+                {
+                  "expression": {
+                    "baseExpression": {
+                      "expression": {
+                        "id": 35733,
+                        "name": "$",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 35729,
+                        "src": "1400:1:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                          "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                        }
+                      },
+                      "id": 35734,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1402:7:102",
+                      "memberName": "_nonces",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 35695,
+                      "src": "1400:9:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                        "typeString": "mapping(address => uint256)"
+                      }
+                    },
+                    "id": 35736,
+                    "indexExpression": {
+                      "id": 35735,
+                      "name": "owner",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35722,
+                      "src": "1410:5:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "IndexAccess",
+                    "src": "1400:16:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 35726,
+                  "id": 35737,
+                  "nodeType": "Return",
+                  "src": "1393:23:102"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 35720,
+              "nodeType": "StructuredDocumentation",
+              "src": "1185:69:102",
+              "text": " @dev Returns the next unused nonce for an address."
+            },
+            "functionSelector": "7ecebe00",
+            "id": 35739,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nonces",
+            "nameLocation": "1268:6:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35723,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35722,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "1283:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35739,
+                  "src": "1275:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35721,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1275:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1274:15:102"
+            },
+            "returnParameters": {
+              "id": 35726,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35725,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35739,
+                  "src": "1319:7:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35724,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1319:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1318:9:102"
+            },
+            "scope": 35787,
+            "src": "1259:164:102",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 35760,
+              "nodeType": "Block",
+              "src": "1606:383:102",
+              "statements": [
+                {
+                  "assignments": [
+                    35749
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 35749,
+                      "mutability": "mutable",
+                      "name": "$",
+                      "nameLocation": "1638:1:102",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 35760,
+                      "src": "1616:23:102",
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                        "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                      },
+                      "typeName": {
+                        "id": 35748,
+                        "nodeType": "UserDefinedTypeName",
+                        "pathNode": {
+                          "id": 35747,
+                          "name": "NoncesStorage",
+                          "nameLocations": [
+                            "1616:13:102"
+                          ],
+                          "nodeType": "IdentifierPath",
+                          "referencedDeclaration": 35696,
+                          "src": "1616:13:102"
+                        },
+                        "referencedDeclaration": 35696,
+                        "src": "1616:13:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                          "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 35752,
+                  "initialValue": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 35750,
+                      "name": "_getNoncesStorage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35707,
+                      "src": "1642:17:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_pure$__$returns$_t_struct$_NoncesStorage_$35696_storage_ptr_$",
+                        "typeString": "function () pure returns (struct NoncesUpgradeable.NoncesStorage storage pointer)"
+                      }
+                    },
+                    "id": 35751,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1642:19:102",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                      "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1616:45:102"
+                },
+                {
+                  "id": 35759,
+                  "nodeType": "UncheckedBlock",
+                  "src": "1864:119:102",
+                  "statements": [
+                    {
+                      "expression": {
+                        "id": 35757,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "UnaryOperation",
+                        "operator": "++",
+                        "prefix": false,
+                        "src": "1954:18:102",
+                        "subExpression": {
+                          "baseExpression": {
+                            "expression": {
+                              "id": 35753,
+                              "name": "$",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 35749,
+                              "src": "1954:1:102",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                                "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                              }
+                            },
+                            "id": 35754,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1956:7:102",
+                            "memberName": "_nonces",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 35695,
+                            "src": "1954:9:102",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                              "typeString": "mapping(address => uint256)"
+                            }
+                          },
+                          "id": 35756,
+                          "indexExpression": {
+                            "id": 35755,
+                            "name": "owner",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 35742,
+                            "src": "1964:5:102",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": true,
+                          "nodeType": "IndexAccess",
+                          "src": "1954:16:102",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "functionReturnParameters": 35746,
+                      "id": 35758,
+                      "nodeType": "Return",
+                      "src": "1947:25:102"
+                    }
+                  ]
+                }
+              ]
+            },
+            "documentation": {
+              "id": 35740,
+              "nodeType": "StructuredDocumentation",
+              "src": "1429:103:102",
+              "text": " @dev Consumes a nonce.\n Returns the current value and increments nonce."
+            },
+            "id": 35761,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_useNonce",
+            "nameLocation": "1546:9:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35743,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35742,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "1564:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35761,
+                  "src": "1556:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35741,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1556:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1555:15:102"
+            },
+            "returnParameters": {
+              "id": 35746,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35745,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35761,
+                  "src": "1597:7:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35744,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1597:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1596:9:102"
+            },
+            "scope": 35787,
+            "src": "1537:452:102",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 35785,
+              "nodeType": "Block",
+              "src": "2173:149:102",
+              "statements": [
+                {
+                  "assignments": [
+                    35770
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 35770,
+                      "mutability": "mutable",
+                      "name": "current",
+                      "nameLocation": "2191:7:102",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 35785,
+                      "src": "2183:15:102",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 35769,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2183:7:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 35774,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 35772,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 35764,
+                        "src": "2211:5:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 35771,
+                      "name": "_useNonce",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35761,
+                      "src": "2201:9:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) returns (uint256)"
+                      }
+                    },
+                    "id": 35773,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2201:16:102",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2183:34:102"
+                },
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 35777,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 35775,
+                      "name": "nonce",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35766,
+                      "src": "2231:5:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 35776,
+                      "name": "current",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35770,
+                      "src": "2240:7:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2231:16:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 35784,
+                  "nodeType": "IfStatement",
+                  "src": "2227:89:102",
+                  "trueBody": {
+                    "id": 35783,
+                    "nodeType": "Block",
+                    "src": "2249:67:102",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [
+                            {
+                              "id": 35779,
+                              "name": "owner",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 35764,
+                              "src": "2290:5:102",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            },
+                            {
+                              "id": 35780,
+                              "name": "current",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 35770,
+                              "src": "2297:7:102",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              },
+                              {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            ],
+                            "id": 35778,
+                            "name": "InvalidAccountNonce",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 35690,
+                            "src": "2270:19:102",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$_t_address_$_t_uint256_$returns$__$",
+                              "typeString": "function (address,uint256) pure"
+                            }
+                          },
+                          "id": 35781,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "2270:35:102",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 35782,
+                        "nodeType": "RevertStatement",
+                        "src": "2263:42:102"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "documentation": {
+              "id": 35762,
+              "nodeType": "StructuredDocumentation",
+              "src": "1995:100:102",
+              "text": " @dev Same as {_useNonce} but checking that `nonce` is the next valid for `owner`."
+            },
+            "id": 35786,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_useCheckedNonce",
+            "nameLocation": "2109:16:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35767,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35764,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "2134:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35786,
+                  "src": "2126:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35763,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2126:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 35766,
+                  "mutability": "mutable",
+                  "name": "nonce",
+                  "nameLocation": "2149:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35786,
+                  "src": "2141:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35765,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2141:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2125:30:102"
+            },
+            "returnParameters": {
+              "id": 35768,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2173:0:102"
+            },
+            "scope": 35787,
+            "src": "2100:222:102",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 35788,
+        "src": "273:2051:102",
+        "usedErrors": [
+          34425,
+          34428,
+          35690
+        ],
+        "usedEvents": [
+          34433
+        ]
+      }
+    ],
+    "src": "99:2226:102"
+  },
+  "legacyAST": {
+    "absolutePath": "@openzeppelin/contracts-upgradeable/utils/NoncesUpgradeable.sol",
+    "exportedSymbols": {
+      "Initializable": [
+        34662
+      ],
+      "NoncesUpgradeable": [
+        35787
+      ]
+    },
+    "id": 35788,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 35678,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "99:24:102"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+        "file": "../proxy/utils/Initializable.sol",
+        "id": 35680,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 35788,
+        "sourceUnit": 34663,
+        "src": "124:63:102",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 35679,
+              "name": "Initializable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 34662,
+              "src": "132:13:102",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 35682,
+              "name": "Initializable",
+              "nameLocations": [
+                "312:13:102"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 34662,
+              "src": "312:13:102"
+            },
+            "id": 35683,
+            "nodeType": "InheritanceSpecifier",
+            "src": "312:13:102"
+          }
+        ],
+        "canonicalName": "NoncesUpgradeable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 35681,
+          "nodeType": "StructuredDocumentation",
+          "src": "189:83:102",
+          "text": " @dev Provides tracking nonces for addresses. Nonces will only increment."
+        },
+        "fullyImplemented": true,
+        "id": 35787,
+        "linearizedBaseContracts": [
+          35787,
+          34662
+        ],
+        "name": "NoncesUpgradeable",
+        "nameLocation": "291:17:102",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 35684,
+              "nodeType": "StructuredDocumentation",
+              "src": "332:90:102",
+              "text": " @dev The nonce used for an `account` is not the expected current nonce."
+            },
+            "errorSelector": "752d88c0",
+            "id": 35690,
+            "name": "InvalidAccountNonce",
+            "nameLocation": "433:19:102",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 35689,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35686,
+                  "mutability": "mutable",
+                  "name": "account",
+                  "nameLocation": "461:7:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35690,
+                  "src": "453:15:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35685,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "453:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 35688,
+                  "mutability": "mutable",
+                  "name": "currentNonce",
+                  "nameLocation": "478:12:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35690,
+                  "src": "470:20:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35687,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "470:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "452:39:102"
+            },
+            "src": "427:65:102"
+          },
+          {
+            "canonicalName": "NoncesUpgradeable.NoncesStorage",
+            "documentation": {
+              "id": 35691,
+              "nodeType": "StructuredDocumentation",
+              "src": "498:64:102",
+              "text": "@custom:storage-location erc7201:openzeppelin.storage.Nonces"
+            },
+            "id": 35696,
+            "members": [
+              {
+                "constant": false,
+                "id": 35695,
+                "mutability": "mutable",
+                "name": "_nonces",
+                "nameLocation": "634:7:102",
+                "nodeType": "VariableDeclaration",
+                "scope": 35696,
+                "src": "598:43:102",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                  "typeString": "mapping(address => uint256)"
+                },
+                "typeName": {
+                  "id": 35694,
+                  "keyName": "account",
+                  "keyNameLocation": "614:7:102",
+                  "keyType": {
+                    "id": 35692,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "606:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "598:35:102",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                    "typeString": "mapping(address => uint256)"
+                  },
+                  "valueName": "",
+                  "valueNameLocation": "-1:-1:-1",
+                  "valueType": {
+                    "id": 35693,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "625:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "NoncesStorage",
+            "nameLocation": "574:13:102",
+            "nodeType": "StructDefinition",
+            "scope": 35787,
+            "src": "567:81:102",
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 35699,
+            "mutability": "constant",
+            "name": "NoncesStorageLocation",
+            "nameLocation": "789:21:102",
+            "nodeType": "VariableDeclaration",
+            "scope": 35787,
+            "src": "764:115:102",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 35697,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "764:7:102",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "hexValue": "307835616234326365643632383838383235396330386163393864623165623063663730326663313530313334343331316438623130306364316266653462623030",
+              "id": 35698,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "number",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "813:66:102",
+              "typeDescriptions": {
+                "typeIdentifier": "t_rational_41026498920877473550552694860415970151284396403628511442111957027090812156672_by_1",
+                "typeString": "int_const 4102...(69 digits omitted)...6672"
+              },
+              "value": "0x5ab42ced628888259c08ac98db1eb0cf702fc1501344311d8b100cd1bfe4bb00"
+            },
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 35706,
+              "nodeType": "Block",
+              "src": "962:80:102",
+              "statements": [
+                {
+                  "AST": {
+                    "nativeSrc": "981:55:102",
+                    "nodeType": "YulBlock",
+                    "src": "981:55:102",
+                    "statements": [
+                      {
+                        "nativeSrc": "995:31:102",
+                        "nodeType": "YulAssignment",
+                        "src": "995:31:102",
+                        "value": {
+                          "name": "NoncesStorageLocation",
+                          "nativeSrc": "1005:21:102",
+                          "nodeType": "YulIdentifier",
+                          "src": "1005:21:102"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "$.slot",
+                            "nativeSrc": "995:6:102",
+                            "nodeType": "YulIdentifier",
+                            "src": "995:6:102"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "istanbul",
+                  "externalReferences": [
+                    {
+                      "declaration": 35703,
+                      "isOffset": false,
+                      "isSlot": true,
+                      "src": "995:6:102",
+                      "suffix": "slot",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 35699,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "1005:21:102",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 35705,
+                  "nodeType": "InlineAssembly",
+                  "src": "972:64:102"
+                }
+              ]
+            },
+            "id": 35707,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_getNoncesStorage",
+            "nameLocation": "895:17:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35700,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "912:2:102"
+            },
+            "returnParameters": {
+              "id": 35704,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35703,
+                  "mutability": "mutable",
+                  "name": "$",
+                  "nameLocation": "959:1:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35707,
+                  "src": "937:23:102",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                    "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                  },
+                  "typeName": {
+                    "id": 35702,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 35701,
+                      "name": "NoncesStorage",
+                      "nameLocations": [
+                        "937:13:102"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 35696,
+                      "src": "937:13:102"
+                    },
+                    "referencedDeclaration": 35696,
+                    "src": "937:13:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                      "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "936:25:102"
+            },
+            "scope": 35787,
+            "src": "886:156:102",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 35712,
+              "nodeType": "Block",
+              "src": "1099:7:102",
+              "statements": []
+            },
+            "id": 35713,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 35710,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 35709,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1082:16:102"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1082:16:102"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1082:16:102"
+              }
+            ],
+            "name": "__Nonces_init",
+            "nameLocation": "1057:13:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35708,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1070:2:102"
+            },
+            "returnParameters": {
+              "id": 35711,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1099:0:102"
+            },
+            "scope": 35787,
+            "src": "1048:58:102",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 35718,
+              "nodeType": "Block",
+              "src": "1173:7:102",
+              "statements": []
+            },
+            "id": 35719,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 35716,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 35715,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1156:16:102"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1156:16:102"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1156:16:102"
+              }
+            ],
+            "name": "__Nonces_init_unchained",
+            "nameLocation": "1121:23:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35714,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1144:2:102"
+            },
+            "returnParameters": {
+              "id": 35717,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1173:0:102"
+            },
+            "scope": 35787,
+            "src": "1112:68:102",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 35738,
+              "nodeType": "Block",
+              "src": "1328:95:102",
+              "statements": [
+                {
+                  "assignments": [
+                    35729
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 35729,
+                      "mutability": "mutable",
+                      "name": "$",
+                      "nameLocation": "1360:1:102",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 35738,
+                      "src": "1338:23:102",
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                        "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                      },
+                      "typeName": {
+                        "id": 35728,
+                        "nodeType": "UserDefinedTypeName",
+                        "pathNode": {
+                          "id": 35727,
+                          "name": "NoncesStorage",
+                          "nameLocations": [
+                            "1338:13:102"
+                          ],
+                          "nodeType": "IdentifierPath",
+                          "referencedDeclaration": 35696,
+                          "src": "1338:13:102"
+                        },
+                        "referencedDeclaration": 35696,
+                        "src": "1338:13:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                          "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 35732,
+                  "initialValue": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 35730,
+                      "name": "_getNoncesStorage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35707,
+                      "src": "1364:17:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_pure$__$returns$_t_struct$_NoncesStorage_$35696_storage_ptr_$",
+                        "typeString": "function () pure returns (struct NoncesUpgradeable.NoncesStorage storage pointer)"
+                      }
+                    },
+                    "id": 35731,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1364:19:102",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                      "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1338:45:102"
+                },
+                {
+                  "expression": {
+                    "baseExpression": {
+                      "expression": {
+                        "id": 35733,
+                        "name": "$",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 35729,
+                        "src": "1400:1:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                          "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                        }
+                      },
+                      "id": 35734,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1402:7:102",
+                      "memberName": "_nonces",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 35695,
+                      "src": "1400:9:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                        "typeString": "mapping(address => uint256)"
+                      }
+                    },
+                    "id": 35736,
+                    "indexExpression": {
+                      "id": 35735,
+                      "name": "owner",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35722,
+                      "src": "1410:5:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "IndexAccess",
+                    "src": "1400:16:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 35726,
+                  "id": 35737,
+                  "nodeType": "Return",
+                  "src": "1393:23:102"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 35720,
+              "nodeType": "StructuredDocumentation",
+              "src": "1185:69:102",
+              "text": " @dev Returns the next unused nonce for an address."
+            },
+            "functionSelector": "7ecebe00",
+            "id": 35739,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nonces",
+            "nameLocation": "1268:6:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35723,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35722,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "1283:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35739,
+                  "src": "1275:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35721,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1275:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1274:15:102"
+            },
+            "returnParameters": {
+              "id": 35726,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35725,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35739,
+                  "src": "1319:7:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35724,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1319:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1318:9:102"
+            },
+            "scope": 35787,
+            "src": "1259:164:102",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 35760,
+              "nodeType": "Block",
+              "src": "1606:383:102",
+              "statements": [
+                {
+                  "assignments": [
+                    35749
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 35749,
+                      "mutability": "mutable",
+                      "name": "$",
+                      "nameLocation": "1638:1:102",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 35760,
+                      "src": "1616:23:102",
+                      "stateVariable": false,
+                      "storageLocation": "storage",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                        "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                      },
+                      "typeName": {
+                        "id": 35748,
+                        "nodeType": "UserDefinedTypeName",
+                        "pathNode": {
+                          "id": 35747,
+                          "name": "NoncesStorage",
+                          "nameLocations": [
+                            "1616:13:102"
+                          ],
+                          "nodeType": "IdentifierPath",
+                          "referencedDeclaration": 35696,
+                          "src": "1616:13:102"
+                        },
+                        "referencedDeclaration": 35696,
+                        "src": "1616:13:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                          "typeString": "struct NoncesUpgradeable.NoncesStorage"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 35752,
+                  "initialValue": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 35750,
+                      "name": "_getNoncesStorage",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35707,
+                      "src": "1642:17:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_pure$__$returns$_t_struct$_NoncesStorage_$35696_storage_ptr_$",
+                        "typeString": "function () pure returns (struct NoncesUpgradeable.NoncesStorage storage pointer)"
+                      }
+                    },
+                    "id": 35751,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1642:19:102",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                      "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "1616:45:102"
+                },
+                {
+                  "id": 35759,
+                  "nodeType": "UncheckedBlock",
+                  "src": "1864:119:102",
+                  "statements": [
+                    {
+                      "expression": {
+                        "id": 35757,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "nodeType": "UnaryOperation",
+                        "operator": "++",
+                        "prefix": false,
+                        "src": "1954:18:102",
+                        "subExpression": {
+                          "baseExpression": {
+                            "expression": {
+                              "id": 35753,
+                              "name": "$",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 35749,
+                              "src": "1954:1:102",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_NoncesStorage_$35696_storage_ptr",
+                                "typeString": "struct NoncesUpgradeable.NoncesStorage storage pointer"
+                              }
+                            },
+                            "id": 35754,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1956:7:102",
+                            "memberName": "_nonces",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 35695,
+                            "src": "1954:9:102",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_mapping$_t_address_$_t_uint256_$",
+                              "typeString": "mapping(address => uint256)"
+                            }
+                          },
+                          "id": 35756,
+                          "indexExpression": {
+                            "id": 35755,
+                            "name": "owner",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 35742,
+                            "src": "1964:5:102",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": true,
+                          "isPure": false,
+                          "lValueRequested": true,
+                          "nodeType": "IndexAccess",
+                          "src": "1954:16:102",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "functionReturnParameters": 35746,
+                      "id": 35758,
+                      "nodeType": "Return",
+                      "src": "1947:25:102"
+                    }
+                  ]
+                }
+              ]
+            },
+            "documentation": {
+              "id": 35740,
+              "nodeType": "StructuredDocumentation",
+              "src": "1429:103:102",
+              "text": " @dev Consumes a nonce.\n Returns the current value and increments nonce."
+            },
+            "id": 35761,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_useNonce",
+            "nameLocation": "1546:9:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35743,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35742,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "1564:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35761,
+                  "src": "1556:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35741,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1556:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1555:15:102"
+            },
+            "returnParameters": {
+              "id": 35746,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35745,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35761,
+                  "src": "1597:7:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35744,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1597:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1596:9:102"
+            },
+            "scope": 35787,
+            "src": "1537:452:102",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 35785,
+              "nodeType": "Block",
+              "src": "2173:149:102",
+              "statements": [
+                {
+                  "assignments": [
+                    35770
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 35770,
+                      "mutability": "mutable",
+                      "name": "current",
+                      "nameLocation": "2191:7:102",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 35785,
+                      "src": "2183:15:102",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      },
+                      "typeName": {
+                        "id": 35769,
+                        "name": "uint256",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2183:7:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 35774,
+                  "initialValue": {
+                    "arguments": [
+                      {
+                        "id": 35772,
+                        "name": "owner",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 35764,
+                        "src": "2211:5:102",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 35771,
+                      "name": "_useNonce",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35761,
+                      "src": "2201:9:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$_t_uint256_$",
+                        "typeString": "function (address) returns (uint256)"
+                      }
+                    },
+                    "id": 35773,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2201:16:102",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2183:34:102"
+                },
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 35777,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 35775,
+                      "name": "nonce",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35766,
+                      "src": "2231:5:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "!=",
+                    "rightExpression": {
+                      "id": 35776,
+                      "name": "current",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 35770,
+                      "src": "2240:7:102",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2231:16:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 35784,
+                  "nodeType": "IfStatement",
+                  "src": "2227:89:102",
+                  "trueBody": {
+                    "id": 35783,
+                    "nodeType": "Block",
+                    "src": "2249:67:102",
+                    "statements": [
+                      {
+                        "errorCall": {
+                          "arguments": [
+                            {
+                              "id": 35779,
+                              "name": "owner",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 35764,
+                              "src": "2290:5:102",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              }
+                            },
+                            {
+                              "id": 35780,
+                              "name": "current",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 35770,
+                              "src": "2297:7:102",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_address",
+                                "typeString": "address"
+                              },
+                              {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            ],
+                            "id": 35778,
+                            "name": "InvalidAccountNonce",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 35690,
+                            "src": "2270:19:102",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_error_pure$_t_address_$_t_uint256_$returns$__$",
+                              "typeString": "function (address,uint256) pure"
+                            }
+                          },
+                          "id": 35781,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "2270:35:102",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_tuple$__$",
+                            "typeString": "tuple()"
+                          }
+                        },
+                        "id": 35782,
+                        "nodeType": "RevertStatement",
+                        "src": "2263:42:102"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "documentation": {
+              "id": 35762,
+              "nodeType": "StructuredDocumentation",
+              "src": "1995:100:102",
+              "text": " @dev Same as {_useNonce} but checking that `nonce` is the next valid for `owner`."
+            },
+            "id": 35786,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_useCheckedNonce",
+            "nameLocation": "2109:16:102",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 35767,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 35764,
+                  "mutability": "mutable",
+                  "name": "owner",
+                  "nameLocation": "2134:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35786,
+                  "src": "2126:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 35763,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2126:7:102",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 35766,
+                  "mutability": "mutable",
+                  "name": "nonce",
+                  "nameLocation": "2149:5:102",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 35786,
+                  "src": "2141:13:102",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 35765,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2141:7:102",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2125:30:102"
+            },
+            "returnParameters": {
+              "id": 35768,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2173:0:102"
+            },
+            "scope": 35787,
+            "src": "2100:222:102",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 35788,
+        "src": "273:2051:102",
+        "usedErrors": [
+          34425,
+          34428,
+          35690
+        ],
+        "usedEvents": [
+          34433
+        ]
+      }
+    ],
+    "src": "99:2226:102"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.796Z"
+}

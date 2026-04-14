@@ -1,0 +1,147 @@
+{
+  "contractName": "IReentrancyGuard",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "ReentrancyGuard__ReentrantCall",
+      "type": "error"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\ninterface IReentrancyGuard {\n    error ReentrancyGuard__ReentrantCall();\n}\n",
+  "sourcePath": "@solidstate/contracts/security/reentrancy_guard/IReentrancyGuard.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/security/reentrancy_guard/IReentrancyGuard.sol",
+    "exportedSymbols": {
+      "IReentrancyGuard": [
+        47566
+      ]
+    },
+    "id": 47567,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47563,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:188"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IReentrancyGuard",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": true,
+        "id": 47566,
+        "linearizedBaseContracts": [
+          47566
+        ],
+        "name": "IReentrancyGuard",
+        "nameLocation": "69:16:188",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "bb6b8f9a",
+            "id": 47565,
+            "name": "ReentrancyGuard__ReentrantCall",
+            "nameLocation": "98:30:188",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47564,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "128:2:188"
+            },
+            "src": "92:39:188"
+          }
+        ],
+        "scope": 47567,
+        "src": "59:74:188",
+        "usedErrors": [
+          47565
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:101:188"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/security/reentrancy_guard/IReentrancyGuard.sol",
+    "exportedSymbols": {
+      "IReentrancyGuard": [
+        47566
+      ]
+    },
+    "id": 47567,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47563,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:188"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IReentrancyGuard",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": true,
+        "id": 47566,
+        "linearizedBaseContracts": [
+          47566
+        ],
+        "name": "IReentrancyGuard",
+        "nameLocation": "69:16:188",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "bb6b8f9a",
+            "id": 47565,
+            "name": "ReentrancyGuard__ReentrantCall",
+            "nameLocation": "98:30:188",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47564,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "128:2:188"
+            },
+            "src": "92:39:188"
+          }
+        ],
+        "scope": 47567,
+        "src": "59:74:188",
+        "usedErrors": [
+          47565
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:101:188"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.821Z"
+}

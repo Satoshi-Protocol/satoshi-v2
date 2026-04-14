@@ -1,0 +1,489 @@
+{
+  "contractName": "IDiamondFallback",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Proxy__ImplementationIsNotContract",
+      "type": "error"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
+    },
+    {
+      "inputs": [],
+      "name": "getFallbackAddress",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "fallbackAddress",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "fallbackAddress",
+          "type": "address"
+        }
+      ],
+      "name": "setFallbackAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { IDiamondBase } from '../base/IDiamondBase.sol';\n\ninterface IDiamondFallback is IDiamondBase {\n    /**\n     * @notice query the address of the fallback implementation\n     * @return fallbackAddress address of fallback implementation\n     */\n    function getFallbackAddress()\n        external\n        view\n        returns (address fallbackAddress);\n\n    /**\n     * @notice set the address of the fallback implementation\n     * @param fallbackAddress address of fallback implementation\n     */\n    function setFallbackAddress(address fallbackAddress) external;\n}\n",
+  "sourcePath": "@solidstate/contracts/proxy/diamond/fallback/IDiamondFallback.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/fallback/IDiamondFallback.sol",
+    "exportedSymbols": {
+      "IDiamondBase": [
+        45871
+      ],
+      "IDiamondFallback": [
+        45989
+      ]
+    },
+    "id": 45990,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45972,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:174"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/proxy/diamond/base/IDiamondBase.sol",
+        "file": "../base/IDiamondBase.sol",
+        "id": 45974,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 45990,
+        "sourceUnit": 45872,
+        "src": "59:56:174",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 45973,
+              "name": "IDiamondBase",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45871,
+              "src": "68:12:174",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 45975,
+              "name": "IDiamondBase",
+              "nameLocations": [
+                "147:12:174"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45871,
+              "src": "147:12:174"
+            },
+            "id": 45976,
+            "nodeType": "InheritanceSpecifier",
+            "src": "147:12:174"
+          }
+        ],
+        "canonicalName": "IDiamondFallback",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 45989,
+        "linearizedBaseContracts": [
+          45989,
+          45871,
+          45713
+        ],
+        "name": "IDiamondFallback",
+        "nameLocation": "127:16:174",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 45977,
+              "nodeType": "StructuredDocumentation",
+              "src": "166:141:174",
+              "text": " @notice query the address of the fallback implementation\n @return fallbackAddress address of fallback implementation"
+            },
+            "functionSelector": "2c408059",
+            "id": 45982,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getFallbackAddress",
+            "nameLocation": "321:18:174",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45978,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "339:2:174"
+            },
+            "returnParameters": {
+              "id": 45981,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 45980,
+                  "mutability": "mutable",
+                  "name": "fallbackAddress",
+                  "nameLocation": "397:15:174",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 45982,
+                  "src": "389:23:174",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 45979,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "389:7:174",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "388:25:174"
+            },
+            "scope": 45989,
+            "src": "312:102:174",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 45983,
+              "nodeType": "StructuredDocumentation",
+              "src": "420:138:174",
+              "text": " @notice set the address of the fallback implementation\n @param fallbackAddress address of fallback implementation"
+            },
+            "functionSelector": "91423765",
+            "id": 45988,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setFallbackAddress",
+            "nameLocation": "572:18:174",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45986,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 45985,
+                  "mutability": "mutable",
+                  "name": "fallbackAddress",
+                  "nameLocation": "599:15:174",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 45988,
+                  "src": "591:23:174",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 45984,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "591:7:174",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "590:25:174"
+            },
+            "returnParameters": {
+              "id": 45987,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "624:0:174"
+            },
+            "scope": 45989,
+            "src": "563:62:174",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 45990,
+        "src": "117:510:174",
+        "usedErrors": [
+          45709
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:595:174"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/fallback/IDiamondFallback.sol",
+    "exportedSymbols": {
+      "IDiamondBase": [
+        45871
+      ],
+      "IDiamondFallback": [
+        45989
+      ]
+    },
+    "id": 45990,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45972,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:174"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/proxy/diamond/base/IDiamondBase.sol",
+        "file": "../base/IDiamondBase.sol",
+        "id": 45974,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 45990,
+        "sourceUnit": 45872,
+        "src": "59:56:174",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 45973,
+              "name": "IDiamondBase",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45871,
+              "src": "68:12:174",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 45975,
+              "name": "IDiamondBase",
+              "nameLocations": [
+                "147:12:174"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45871,
+              "src": "147:12:174"
+            },
+            "id": 45976,
+            "nodeType": "InheritanceSpecifier",
+            "src": "147:12:174"
+          }
+        ],
+        "canonicalName": "IDiamondFallback",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 45989,
+        "linearizedBaseContracts": [
+          45989,
+          45871,
+          45713
+        ],
+        "name": "IDiamondFallback",
+        "nameLocation": "127:16:174",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 45977,
+              "nodeType": "StructuredDocumentation",
+              "src": "166:141:174",
+              "text": " @notice query the address of the fallback implementation\n @return fallbackAddress address of fallback implementation"
+            },
+            "functionSelector": "2c408059",
+            "id": 45982,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getFallbackAddress",
+            "nameLocation": "321:18:174",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45978,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "339:2:174"
+            },
+            "returnParameters": {
+              "id": 45981,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 45980,
+                  "mutability": "mutable",
+                  "name": "fallbackAddress",
+                  "nameLocation": "397:15:174",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 45982,
+                  "src": "389:23:174",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 45979,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "389:7:174",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "388:25:174"
+            },
+            "scope": 45989,
+            "src": "312:102:174",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 45983,
+              "nodeType": "StructuredDocumentation",
+              "src": "420:138:174",
+              "text": " @notice set the address of the fallback implementation\n @param fallbackAddress address of fallback implementation"
+            },
+            "functionSelector": "91423765",
+            "id": 45988,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setFallbackAddress",
+            "nameLocation": "572:18:174",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45986,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 45985,
+                  "mutability": "mutable",
+                  "name": "fallbackAddress",
+                  "nameLocation": "599:15:174",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 45988,
+                  "src": "591:23:174",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 45984,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "591:7:174",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "590:25:174"
+            },
+            "returnParameters": {
+              "id": 45987,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "624:0:174"
+            },
+            "scope": 45989,
+            "src": "563:62:174",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 45990,
+        "src": "117:510:174",
+        "usedErrors": [
+          45709
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:595:174"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.817Z"
+}

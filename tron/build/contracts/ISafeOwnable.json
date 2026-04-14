@@ -1,0 +1,576 @@
+{
+  "contractName": "ISafeOwnable",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Ownable__NotOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Ownable__NotTransitiveOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SafeOwnable__NotNomineeOwner",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "acceptOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nomineeOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { IOwnable } from './IOwnable.sol';\nimport { ISafeOwnableInternal } from './ISafeOwnableInternal.sol';\n\ninterface ISafeOwnable is ISafeOwnableInternal, IOwnable {\n    /**\n     * @notice get the nominated owner who has permission to call acceptOwnership\n     */\n    function nomineeOwner() external view returns (address);\n\n    /**\n     * @notice accept transfer of contract ownership\n     */\n    function acceptOwnership() external;\n}\n",
+  "sourcePath": "@solidstate/contracts/access/ownable/ISafeOwnable.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/access/ownable/ISafeOwnable.sol",
+    "exportedSymbols": {
+      "IOwnable": [
+        44327
+      ],
+      "ISafeOwnable": [
+        44359
+      ],
+      "ISafeOwnableInternal": [
+        44368
+      ]
+    },
+    "id": 44360,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 44340,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:143"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/IOwnable.sol",
+        "file": "./IOwnable.sol",
+        "id": 44342,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44360,
+        "sourceUnit": 44328,
+        "src": "59:42:143",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44341,
+              "name": "IOwnable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44327,
+              "src": "68:8:143",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/ISafeOwnableInternal.sol",
+        "file": "./ISafeOwnableInternal.sol",
+        "id": 44344,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44360,
+        "sourceUnit": 44369,
+        "src": "102:66:143",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44343,
+              "name": "ISafeOwnableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44368,
+              "src": "111:20:143",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 44345,
+              "name": "ISafeOwnableInternal",
+              "nameLocations": [
+                "196:20:143"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44368,
+              "src": "196:20:143"
+            },
+            "id": 44346,
+            "nodeType": "InheritanceSpecifier",
+            "src": "196:20:143"
+          },
+          {
+            "baseName": {
+              "id": 44347,
+              "name": "IOwnable",
+              "nameLocations": [
+                "218:8:143"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44327,
+              "src": "218:8:143"
+            },
+            "id": 44348,
+            "nodeType": "InheritanceSpecifier",
+            "src": "218:8:143"
+          }
+        ],
+        "canonicalName": "ISafeOwnable",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 44359,
+        "linearizedBaseContracts": [
+          44359,
+          44327,
+          45388,
+          44368,
+          44338,
+          45398
+        ],
+        "name": "ISafeOwnable",
+        "nameLocation": "180:12:143",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 44349,
+              "nodeType": "StructuredDocumentation",
+              "src": "233:93:143",
+              "text": " @notice get the nominated owner who has permission to call acceptOwnership"
+            },
+            "functionSelector": "8ab5150a",
+            "id": 44354,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nomineeOwner",
+            "nameLocation": "340:12:143",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44350,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "352:2:143"
+            },
+            "returnParameters": {
+              "id": 44353,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44352,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 44354,
+                  "src": "378:7:143",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 44351,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "378:7:143",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "377:9:143"
+            },
+            "scope": 44359,
+            "src": "331:56:143",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 44355,
+              "nodeType": "StructuredDocumentation",
+              "src": "393:64:143",
+              "text": " @notice accept transfer of contract ownership"
+            },
+            "functionSelector": "79ba5097",
+            "id": 44358,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "acceptOwnership",
+            "nameLocation": "471:15:143",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44356,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "486:2:143"
+            },
+            "returnParameters": {
+              "id": 44357,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "497:0:143"
+            },
+            "scope": 44359,
+            "src": "462:36:143",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 44360,
+        "src": "170:330:143",
+        "usedErrors": [
+          44335,
+          44337,
+          44367
+        ],
+        "usedEvents": [
+          45397
+        ]
+      }
+    ],
+    "src": "33:468:143"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/access/ownable/ISafeOwnable.sol",
+    "exportedSymbols": {
+      "IOwnable": [
+        44327
+      ],
+      "ISafeOwnable": [
+        44359
+      ],
+      "ISafeOwnableInternal": [
+        44368
+      ]
+    },
+    "id": 44360,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 44340,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:143"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/IOwnable.sol",
+        "file": "./IOwnable.sol",
+        "id": 44342,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44360,
+        "sourceUnit": 44328,
+        "src": "59:42:143",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44341,
+              "name": "IOwnable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44327,
+              "src": "68:8:143",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/ISafeOwnableInternal.sol",
+        "file": "./ISafeOwnableInternal.sol",
+        "id": 44344,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44360,
+        "sourceUnit": 44369,
+        "src": "102:66:143",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44343,
+              "name": "ISafeOwnableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44368,
+              "src": "111:20:143",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 44345,
+              "name": "ISafeOwnableInternal",
+              "nameLocations": [
+                "196:20:143"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44368,
+              "src": "196:20:143"
+            },
+            "id": 44346,
+            "nodeType": "InheritanceSpecifier",
+            "src": "196:20:143"
+          },
+          {
+            "baseName": {
+              "id": 44347,
+              "name": "IOwnable",
+              "nameLocations": [
+                "218:8:143"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44327,
+              "src": "218:8:143"
+            },
+            "id": 44348,
+            "nodeType": "InheritanceSpecifier",
+            "src": "218:8:143"
+          }
+        ],
+        "canonicalName": "ISafeOwnable",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 44359,
+        "linearizedBaseContracts": [
+          44359,
+          44327,
+          45388,
+          44368,
+          44338,
+          45398
+        ],
+        "name": "ISafeOwnable",
+        "nameLocation": "180:12:143",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 44349,
+              "nodeType": "StructuredDocumentation",
+              "src": "233:93:143",
+              "text": " @notice get the nominated owner who has permission to call acceptOwnership"
+            },
+            "functionSelector": "8ab5150a",
+            "id": 44354,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nomineeOwner",
+            "nameLocation": "340:12:143",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44350,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "352:2:143"
+            },
+            "returnParameters": {
+              "id": 44353,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44352,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 44354,
+                  "src": "378:7:143",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 44351,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "378:7:143",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "377:9:143"
+            },
+            "scope": 44359,
+            "src": "331:56:143",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 44355,
+              "nodeType": "StructuredDocumentation",
+              "src": "393:64:143",
+              "text": " @notice accept transfer of contract ownership"
+            },
+            "functionSelector": "79ba5097",
+            "id": 44358,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "acceptOwnership",
+            "nameLocation": "471:15:143",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44356,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "486:2:143"
+            },
+            "returnParameters": {
+              "id": 44357,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "497:0:143"
+            },
+            "scope": 44359,
+            "src": "462:36:143",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 44360,
+        "src": "170:330:143",
+        "usedErrors": [
+          44335,
+          44337,
+          44367
+        ],
+        "usedEvents": [
+          45397
+        ]
+      }
+    ],
+    "src": "33:468:143"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.815Z"
+}

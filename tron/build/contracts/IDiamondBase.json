@@ -1,0 +1,211 @@
+{
+  "contractName": "IDiamondBase",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Proxy__ImplementationIsNotContract",
+      "type": "error"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { IProxy } from '../../IProxy.sol';\n\ninterface IDiamondBase is IProxy {}\n",
+  "sourcePath": "@solidstate/contracts/proxy/diamond/base/IDiamondBase.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/base/IDiamondBase.sol",
+    "exportedSymbols": {
+      "IDiamondBase": [
+        45871
+      ],
+      "IProxy": [
+        45713
+      ]
+    },
+    "id": 45872,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45866,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:172"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/proxy/IProxy.sol",
+        "file": "../../IProxy.sol",
+        "id": 45868,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 45872,
+        "sourceUnit": 45714,
+        "src": "59:42:172",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 45867,
+              "name": "IProxy",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45713,
+              "src": "68:6:172",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 45869,
+              "name": "IProxy",
+              "nameLocations": [
+                "129:6:172"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45713,
+              "src": "129:6:172"
+            },
+            "id": 45870,
+            "nodeType": "InheritanceSpecifier",
+            "src": "129:6:172"
+          }
+        ],
+        "canonicalName": "IDiamondBase",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 45871,
+        "linearizedBaseContracts": [
+          45871,
+          45713
+        ],
+        "name": "IDiamondBase",
+        "nameLocation": "113:12:172",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 45872,
+        "src": "103:35:172",
+        "usedErrors": [
+          45709
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:106:172"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/base/IDiamondBase.sol",
+    "exportedSymbols": {
+      "IDiamondBase": [
+        45871
+      ],
+      "IProxy": [
+        45713
+      ]
+    },
+    "id": 45872,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45866,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:172"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/proxy/IProxy.sol",
+        "file": "../../IProxy.sol",
+        "id": 45868,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 45872,
+        "sourceUnit": 45714,
+        "src": "59:42:172",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 45867,
+              "name": "IProxy",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45713,
+              "src": "68:6:172",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 45869,
+              "name": "IProxy",
+              "nameLocations": [
+                "129:6:172"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45713,
+              "src": "129:6:172"
+            },
+            "id": 45870,
+            "nodeType": "InheritanceSpecifier",
+            "src": "129:6:172"
+          }
+        ],
+        "canonicalName": "IDiamondBase",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 45871,
+        "linearizedBaseContracts": [
+          45871,
+          45713
+        ],
+        "name": "IDiamondBase",
+        "nameLocation": "113:12:172",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 45872,
+        "src": "103:35:172",
+        "usedErrors": [
+          45709
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:106:172"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.817Z"
+}

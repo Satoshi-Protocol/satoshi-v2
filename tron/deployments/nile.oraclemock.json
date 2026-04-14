@@ -1,0 +1,15 @@
+{
+  "network": "nile",
+  "deployer": "TG566o3ZXWGXqzwN6xbpZV6kBdxSE83cu8",
+  "oracleMock": "TZHim86dG3vmETDjwZ893Qie1snm1Km8e3",
+  "source": "TZHim86dG3vmETDjwZ893Qie1snm1Km8e3",
+  "decimals": 18,
+  "version": "1",
+  "maxTimeThreshold": "8640000",
+  "initialAnswer": "100000000000000000000000",
+  "latestRoundId": "1",
+  "latestAnswer": "100000000000000000000000",
+  "latestStartedAt": "1772870615",
+  "latestUpdatedAt": "1772870615",
+  "latestAnsweredInRound": "1"
+}

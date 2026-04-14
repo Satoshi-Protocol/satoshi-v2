@@ -1,0 +1,585 @@
+{
+  "contractName": "IERC20BaseInternal",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "ERC20Base__ApproveFromZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__ApproveToZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__BurnExceedsBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__BurnFromZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__InsufficientAllowance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__MintToZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__TransferExceedsBalance",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__TransferFromZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ERC20Base__TransferToZeroAddress",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Approval",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { IERC20Internal } from '../../../interfaces/IERC20Internal.sol';\n\n/**\n * @title ERC20 base interface\n */\ninterface IERC20BaseInternal is IERC20Internal {\n    error ERC20Base__ApproveFromZeroAddress();\n    error ERC20Base__ApproveToZeroAddress();\n    error ERC20Base__BurnExceedsBalance();\n    error ERC20Base__BurnFromZeroAddress();\n    error ERC20Base__InsufficientAllowance();\n    error ERC20Base__MintToZeroAddress();\n    error ERC20Base__TransferExceedsBalance();\n    error ERC20Base__TransferFromZeroAddress();\n    error ERC20Base__TransferToZeroAddress();\n}\n",
+  "sourcePath": "@solidstate/contracts/token/ERC20/base/IERC20BaseInternal.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/token/ERC20/base/IERC20BaseInternal.sol",
+    "exportedSymbols": {
+      "IERC20BaseInternal": [
+        47718
+      ],
+      "IERC20Internal": [
+        45482
+      ]
+    },
+    "id": 47719,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47694,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:193"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/interfaces/IERC20Internal.sol",
+        "file": "../../../interfaces/IERC20Internal.sol",
+        "id": 47696,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47719,
+        "sourceUnit": 45483,
+        "src": "59:72:193",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47695,
+              "name": "IERC20Internal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45482,
+              "src": "68:14:193",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 47698,
+              "name": "IERC20Internal",
+              "nameLocations": [
+                "204:14:193"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45482,
+              "src": "204:14:193"
+            },
+            "id": 47699,
+            "nodeType": "InheritanceSpecifier",
+            "src": "204:14:193"
+          }
+        ],
+        "canonicalName": "IERC20BaseInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 47697,
+          "nodeType": "StructuredDocumentation",
+          "src": "133:38:193",
+          "text": " @title ERC20 base interface"
+        },
+        "fullyImplemented": true,
+        "id": 47718,
+        "linearizedBaseContracts": [
+          47718,
+          45482
+        ],
+        "name": "IERC20BaseInternal",
+        "nameLocation": "182:18:193",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "5a68b7ab",
+            "id": 47701,
+            "name": "ERC20Base__ApproveFromZeroAddress",
+            "nameLocation": "231:33:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47700,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "264:2:193"
+            },
+            "src": "225:42:193"
+          },
+          {
+            "errorSelector": "c5241600",
+            "id": 47703,
+            "name": "ERC20Base__ApproveToZeroAddress",
+            "nameLocation": "278:31:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47702,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "309:2:193"
+            },
+            "src": "272:40:193"
+          },
+          {
+            "errorSelector": "b1d35b23",
+            "id": 47705,
+            "name": "ERC20Base__BurnExceedsBalance",
+            "nameLocation": "323:29:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47704,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "352:2:193"
+            },
+            "src": "317:38:193"
+          },
+          {
+            "errorSelector": "f1e2c4ee",
+            "id": 47707,
+            "name": "ERC20Base__BurnFromZeroAddress",
+            "nameLocation": "366:30:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47706,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "396:2:193"
+            },
+            "src": "360:39:193"
+          },
+          {
+            "errorSelector": "01c2999e",
+            "id": 47709,
+            "name": "ERC20Base__InsufficientAllowance",
+            "nameLocation": "410:32:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47708,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "442:2:193"
+            },
+            "src": "404:41:193"
+          },
+          {
+            "errorSelector": "da007acd",
+            "id": 47711,
+            "name": "ERC20Base__MintToZeroAddress",
+            "nameLocation": "456:28:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47710,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "484:2:193"
+            },
+            "src": "450:37:193"
+          },
+          {
+            "errorSelector": "7183160b",
+            "id": 47713,
+            "name": "ERC20Base__TransferExceedsBalance",
+            "nameLocation": "498:33:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47712,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "531:2:193"
+            },
+            "src": "492:42:193"
+          },
+          {
+            "errorSelector": "68551d5f",
+            "id": 47715,
+            "name": "ERC20Base__TransferFromZeroAddress",
+            "nameLocation": "545:34:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47714,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "579:2:193"
+            },
+            "src": "539:43:193"
+          },
+          {
+            "errorSelector": "82899144",
+            "id": 47717,
+            "name": "ERC20Base__TransferToZeroAddress",
+            "nameLocation": "593:32:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47716,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "625:2:193"
+            },
+            "src": "587:41:193"
+          }
+        ],
+        "scope": 47719,
+        "src": "172:458:193",
+        "usedErrors": [
+          47701,
+          47703,
+          47705,
+          47707,
+          47709,
+          47711,
+          47713,
+          47715,
+          47717
+        ],
+        "usedEvents": [
+          45473,
+          45481
+        ]
+      }
+    ],
+    "src": "33:598:193"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/token/ERC20/base/IERC20BaseInternal.sol",
+    "exportedSymbols": {
+      "IERC20BaseInternal": [
+        47718
+      ],
+      "IERC20Internal": [
+        45482
+      ]
+    },
+    "id": 47719,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47694,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:193"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/interfaces/IERC20Internal.sol",
+        "file": "../../../interfaces/IERC20Internal.sol",
+        "id": 47696,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47719,
+        "sourceUnit": 45483,
+        "src": "59:72:193",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47695,
+              "name": "IERC20Internal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45482,
+              "src": "68:14:193",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 47698,
+              "name": "IERC20Internal",
+              "nameLocations": [
+                "204:14:193"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45482,
+              "src": "204:14:193"
+            },
+            "id": 47699,
+            "nodeType": "InheritanceSpecifier",
+            "src": "204:14:193"
+          }
+        ],
+        "canonicalName": "IERC20BaseInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 47697,
+          "nodeType": "StructuredDocumentation",
+          "src": "133:38:193",
+          "text": " @title ERC20 base interface"
+        },
+        "fullyImplemented": true,
+        "id": 47718,
+        "linearizedBaseContracts": [
+          47718,
+          45482
+        ],
+        "name": "IERC20BaseInternal",
+        "nameLocation": "182:18:193",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "5a68b7ab",
+            "id": 47701,
+            "name": "ERC20Base__ApproveFromZeroAddress",
+            "nameLocation": "231:33:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47700,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "264:2:193"
+            },
+            "src": "225:42:193"
+          },
+          {
+            "errorSelector": "c5241600",
+            "id": 47703,
+            "name": "ERC20Base__ApproveToZeroAddress",
+            "nameLocation": "278:31:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47702,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "309:2:193"
+            },
+            "src": "272:40:193"
+          },
+          {
+            "errorSelector": "b1d35b23",
+            "id": 47705,
+            "name": "ERC20Base__BurnExceedsBalance",
+            "nameLocation": "323:29:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47704,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "352:2:193"
+            },
+            "src": "317:38:193"
+          },
+          {
+            "errorSelector": "f1e2c4ee",
+            "id": 47707,
+            "name": "ERC20Base__BurnFromZeroAddress",
+            "nameLocation": "366:30:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47706,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "396:2:193"
+            },
+            "src": "360:39:193"
+          },
+          {
+            "errorSelector": "01c2999e",
+            "id": 47709,
+            "name": "ERC20Base__InsufficientAllowance",
+            "nameLocation": "410:32:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47708,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "442:2:193"
+            },
+            "src": "404:41:193"
+          },
+          {
+            "errorSelector": "da007acd",
+            "id": 47711,
+            "name": "ERC20Base__MintToZeroAddress",
+            "nameLocation": "456:28:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47710,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "484:2:193"
+            },
+            "src": "450:37:193"
+          },
+          {
+            "errorSelector": "7183160b",
+            "id": 47713,
+            "name": "ERC20Base__TransferExceedsBalance",
+            "nameLocation": "498:33:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47712,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "531:2:193"
+            },
+            "src": "492:42:193"
+          },
+          {
+            "errorSelector": "68551d5f",
+            "id": 47715,
+            "name": "ERC20Base__TransferFromZeroAddress",
+            "nameLocation": "545:34:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47714,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "579:2:193"
+            },
+            "src": "539:43:193"
+          },
+          {
+            "errorSelector": "82899144",
+            "id": 47717,
+            "name": "ERC20Base__TransferToZeroAddress",
+            "nameLocation": "593:32:193",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47716,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "625:2:193"
+            },
+            "src": "587:41:193"
+          }
+        ],
+        "scope": 47719,
+        "src": "172:458:193",
+        "usedErrors": [
+          47701,
+          47703,
+          47705,
+          47707,
+          47709,
+          47711,
+          47713,
+          47715,
+          47717
+        ],
+        "usedEvents": [
+          45473,
+          45481
+        ]
+      }
+    ],
+    "src": "33:598:193"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.821Z"
+}

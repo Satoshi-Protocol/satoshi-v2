@@ -1,0 +1,273 @@
+{
+  "contractName": "IERC2535DiamondLoupeInternal",
+  "abi": [],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\n/**\n * @title ERC2535 read interface for internal functions\n * @dev see https://eips.ethereum.org/EIPS/eip-2535\n */\ninterface IERC2535DiamondLoupeInternal {\n    struct Facet {\n        address target;\n        bytes4[] selectors;\n    }\n}\n",
+  "sourcePath": "@solidstate/contracts/interfaces/IERC2535DiamondLoupeInternal.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/interfaces/IERC2535DiamondLoupeInternal.sol",
+    "exportedSymbols": {
+      "IERC2535DiamondLoupeInternal": [
+        45579
+      ]
+    },
+    "id": 45580,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45571,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:161"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IERC2535DiamondLoupeInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 45572,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:115:161",
+          "text": " @title ERC2535 read interface for internal functions\n @dev see https://eips.ethereum.org/EIPS/eip-2535"
+        },
+        "fullyImplemented": true,
+        "id": 45579,
+        "linearizedBaseContracts": [
+          45579
+        ],
+        "name": "IERC2535DiamondLoupeInternal",
+        "nameLocation": "185:28:161",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IERC2535DiamondLoupeInternal.Facet",
+            "id": 45578,
+            "members": [
+              {
+                "constant": false,
+                "id": 45574,
+                "mutability": "mutable",
+                "name": "target",
+                "nameLocation": "251:6:161",
+                "nodeType": "VariableDeclaration",
+                "scope": 45578,
+                "src": "243:14:161",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 45573,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "243:7:161",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45577,
+                "mutability": "mutable",
+                "name": "selectors",
+                "nameLocation": "276:9:161",
+                "nodeType": "VariableDeclaration",
+                "scope": 45578,
+                "src": "267:18:161",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_bytes4_$dyn_storage_ptr",
+                  "typeString": "bytes4[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 45575,
+                    "name": "bytes4",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "267:6:161",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes4",
+                      "typeString": "bytes4"
+                    }
+                  },
+                  "id": 45576,
+                  "nodeType": "ArrayTypeName",
+                  "src": "267:8:161",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes4_$dyn_storage_ptr",
+                    "typeString": "bytes4[]"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Facet",
+            "nameLocation": "227:5:161",
+            "nodeType": "StructDefinition",
+            "scope": 45579,
+            "src": "220:72:161",
+            "visibility": "public"
+          }
+        ],
+        "scope": 45580,
+        "src": "175:119:161",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:262:161"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/interfaces/IERC2535DiamondLoupeInternal.sol",
+    "exportedSymbols": {
+      "IERC2535DiamondLoupeInternal": [
+        45579
+      ]
+    },
+    "id": 45580,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45571,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:161"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IERC2535DiamondLoupeInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 45572,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:115:161",
+          "text": " @title ERC2535 read interface for internal functions\n @dev see https://eips.ethereum.org/EIPS/eip-2535"
+        },
+        "fullyImplemented": true,
+        "id": 45579,
+        "linearizedBaseContracts": [
+          45579
+        ],
+        "name": "IERC2535DiamondLoupeInternal",
+        "nameLocation": "185:28:161",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IERC2535DiamondLoupeInternal.Facet",
+            "id": 45578,
+            "members": [
+              {
+                "constant": false,
+                "id": 45574,
+                "mutability": "mutable",
+                "name": "target",
+                "nameLocation": "251:6:161",
+                "nodeType": "VariableDeclaration",
+                "scope": 45578,
+                "src": "243:14:161",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 45573,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "243:7:161",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45577,
+                "mutability": "mutable",
+                "name": "selectors",
+                "nameLocation": "276:9:161",
+                "nodeType": "VariableDeclaration",
+                "scope": 45578,
+                "src": "267:18:161",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_array$_t_bytes4_$dyn_storage_ptr",
+                  "typeString": "bytes4[]"
+                },
+                "typeName": {
+                  "baseType": {
+                    "id": 45575,
+                    "name": "bytes4",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "267:6:161",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes4",
+                      "typeString": "bytes4"
+                    }
+                  },
+                  "id": 45576,
+                  "nodeType": "ArrayTypeName",
+                  "src": "267:8:161",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes4_$dyn_storage_ptr",
+                    "typeString": "bytes4[]"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Facet",
+            "nameLocation": "227:5:161",
+            "nodeType": "StructDefinition",
+            "scope": 45579,
+            "src": "220:72:161",
+            "visibility": "public"
+          }
+        ],
+        "scope": 45580,
+        "src": "175:119:161",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:262:161"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.817Z"
+}

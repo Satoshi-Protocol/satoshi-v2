@@ -1,0 +1,252 @@
+{
+  "contractName": "IInitializableInternal",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Initializable__AlreadyInitialized",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "version",
+          "type": "uint8"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\ninterface IInitializableInternal {\n    error Initializable__AlreadyInitialized();\n\n    event Initialized(uint8 version);\n}\n",
+  "sourcePath": "@solidstate/contracts/security/initializable/IInitializableInternal.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/security/initializable/IInitializableInternal.sol",
+    "exportedSymbols": {
+      "IInitializableInternal": [
+        47445
+      ]
+    },
+    "id": 47446,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47438,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:184"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IInitializableInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": true,
+        "id": 47445,
+        "linearizedBaseContracts": [
+          47445
+        ],
+        "name": "IInitializableInternal",
+        "nameLocation": "69:22:184",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "2e8adaaa",
+            "id": 47440,
+            "name": "Initializable__AlreadyInitialized",
+            "nameLocation": "104:33:184",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47439,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "137:2:184"
+            },
+            "src": "98:42:184"
+          },
+          {
+            "anonymous": false,
+            "eventSelector": "7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498",
+            "id": 47444,
+            "name": "Initialized",
+            "nameLocation": "152:11:184",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 47443,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 47442,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "version",
+                  "nameLocation": "170:7:184",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 47444,
+                  "src": "164:13:184",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 47441,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "164:5:184",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "163:15:184"
+            },
+            "src": "146:33:184"
+          }
+        ],
+        "scope": 47446,
+        "src": "59:122:184",
+        "usedErrors": [
+          47440
+        ],
+        "usedEvents": [
+          47444
+        ]
+      }
+    ],
+    "src": "33:149:184"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/security/initializable/IInitializableInternal.sol",
+    "exportedSymbols": {
+      "IInitializableInternal": [
+        47445
+      ]
+    },
+    "id": 47446,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47438,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:184"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IInitializableInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": true,
+        "id": 47445,
+        "linearizedBaseContracts": [
+          47445
+        ],
+        "name": "IInitializableInternal",
+        "nameLocation": "69:22:184",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "2e8adaaa",
+            "id": 47440,
+            "name": "Initializable__AlreadyInitialized",
+            "nameLocation": "104:33:184",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 47439,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "137:2:184"
+            },
+            "src": "98:42:184"
+          },
+          {
+            "anonymous": false,
+            "eventSelector": "7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498",
+            "id": 47444,
+            "name": "Initialized",
+            "nameLocation": "152:11:184",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 47443,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 47442,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "version",
+                  "nameLocation": "170:7:184",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 47444,
+                  "src": "164:13:184",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  },
+                  "typeName": {
+                    "id": 47441,
+                    "name": "uint8",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "164:5:184",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint8",
+                      "typeString": "uint8"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "163:15:184"
+            },
+            "src": "146:33:184"
+          }
+        ],
+        "scope": 47446,
+        "src": "59:122:184",
+        "usedErrors": [
+          47440
+        ],
+        "usedEvents": [
+          47444
+        ]
+      }
+    ],
+    "src": "33:149:184"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.821Z"
+}

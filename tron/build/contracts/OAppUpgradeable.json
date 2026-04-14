@@ -1,0 +1,1969 @@
+{
+  "contractName": "OAppUpgradeable",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidDelegate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidEndpointCall",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidInitialization",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "LzTokenUnavailable",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        }
+      ],
+      "name": "NoPeer",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "msgValue",
+          "type": "uint256"
+        }
+      ],
+      "name": "NotEnoughNative",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotInitializing",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "OnlyEndpoint",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "sender",
+          "type": "bytes32"
+        }
+      ],
+      "name": "OnlyPeer",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint64",
+          "name": "version",
+          "type": "uint64"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "peer",
+          "type": "bytes32"
+        }
+      ],
+      "name": "PeerSet",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "srcEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "sender",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "nonce",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct Origin",
+          "name": "origin",
+          "type": "tuple"
+        }
+      ],
+      "name": "allowInitializePath",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "endpoint",
+      "outputs": [
+        {
+          "internalType": "contract ILayerZeroEndpointV2",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "srcEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "sender",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "nonce",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct Origin",
+          "name": "",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes",
+          "name": "",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "_sender",
+          "type": "address"
+        }
+      ],
+      "name": "isComposeMsgSender",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "srcEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "sender",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "nonce",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct Origin",
+          "name": "_origin",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_guid",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "_executor",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_extraData",
+          "type": "bytes"
+        }
+      ],
+      "name": "lzReceive",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "nextNonce",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "nonce",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "oAppVersion",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "senderVersion",
+          "type": "uint64"
+        },
+        {
+          "internalType": "uint64",
+          "name": "receiverVersion",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "pure",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_eid",
+          "type": "uint32"
+        }
+      ],
+      "name": "peers",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_delegate",
+          "type": "address"
+        }
+      ],
+      "name": "setDelegate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_eid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_peer",
+          "type": "bytes32"
+        }
+      ],
+      "name": "setPeer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\n// @dev Import the 'MessagingFee' and 'MessagingReceipt' so it's exposed to OApp implementers\n// solhint-disable-next-line no-unused-import\nimport { OAppSenderUpgradeable, MessagingFee, MessagingReceipt } from \"./OAppSenderUpgradeable.sol\";\n// @dev Import the 'Origin' so it's exposed to OApp implementers\n// solhint-disable-next-line no-unused-import\nimport { OAppReceiverUpgradeable, Origin } from \"./OAppReceiverUpgradeable.sol\";\nimport { OAppCoreUpgradeable } from \"./OAppCoreUpgradeable.sol\";\n\n/**\n * @title OApp\n * @dev Abstract contract serving as the base for OApp implementation, combining OAppSender and OAppReceiver functionality.\n */\nabstract contract OAppUpgradeable is OAppSenderUpgradeable, OAppReceiverUpgradeable {\n    /**\n     * @dev Constructor to initialize the OApp with the provided endpoint and owner.\n     * @param _endpoint The address of the LOCAL LayerZero endpoint.\n     */\n    constructor(address _endpoint) OAppCoreUpgradeable(_endpoint) {}\n\n    /**\n     * @dev Initializes the OApp with the provided delegate.\n     * @param _delegate The delegate capable of making OApp configurations inside of the endpoint.\n     *\n     * @dev The delegate typically should be set as the owner of the contract.\n     * @dev Ownable is not initialized here on purpose. It should be initialized in the child contract to\n     * accommodate the different version of Ownable.\n     */\n    function __OApp_init(address _delegate) internal onlyInitializing {\n        __OAppCore_init(_delegate);\n        __OAppReceiver_init_unchained();\n        __OAppSender_init_unchained();\n    }\n\n    function __OApp_init_unchained() internal onlyInitializing {}\n\n    /**\n     * @notice Retrieves the OApp version information.\n     * @return senderVersion The version of the OAppSender.sol implementation.\n     * @return receiverVersion The version of the OAppReceiver.sol implementation.\n     */\n    function oAppVersion()\n        public\n        pure\n        virtual\n        override(OAppSenderUpgradeable, OAppReceiverUpgradeable)\n        returns (uint64 senderVersion, uint64 receiverVersion)\n    {\n        return (SENDER_VERSION, RECEIVER_VERSION);\n    }\n}\n",
+  "sourcePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol",
+  "ast": {
+    "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol",
+    "exportedSymbols": {
+      "MessagingFee": [
+        29967
+      ],
+      "MessagingReceipt": [
+        29962
+      ],
+      "OAppCoreUpgradeable": [
+        31442
+      ],
+      "OAppReceiverUpgradeable": [
+        31613
+      ],
+      "OAppSenderUpgradeable": [
+        31818
+      ],
+      "OAppUpgradeable": [
+        31886
+      ],
+      "Origin": [
+        29974
+      ]
+    },
+    "id": 31887,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 31820,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:80"
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppSenderUpgradeable.sol",
+        "file": "./OAppSenderUpgradeable.sol",
+        "id": 31824,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 31887,
+        "sourceUnit": 31819,
+        "src": "199:100:80",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 31821,
+              "name": "OAppSenderUpgradeable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31818,
+              "src": "208:21:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 31822,
+              "name": "MessagingFee",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29967,
+              "src": "231:12:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 31823,
+              "name": "MessagingReceipt",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29962,
+              "src": "245:16:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppReceiverUpgradeable.sol",
+        "file": "./OAppReceiverUpgradeable.sol",
+        "id": 31827,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 31887,
+        "sourceUnit": 31614,
+        "src": "411:80:80",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 31825,
+              "name": "OAppReceiverUpgradeable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31613,
+              "src": "420:23:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 31826,
+              "name": "Origin",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29974,
+              "src": "445:6:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppCoreUpgradeable.sol",
+        "file": "./OAppCoreUpgradeable.sol",
+        "id": 31829,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 31887,
+        "sourceUnit": 31443,
+        "src": "492:64:80",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 31828,
+              "name": "OAppCoreUpgradeable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31442,
+              "src": "501:19:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 31831,
+              "name": "OAppSenderUpgradeable",
+              "nameLocations": [
+                "742:21:80"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 31818,
+              "src": "742:21:80"
+            },
+            "id": 31832,
+            "nodeType": "InheritanceSpecifier",
+            "src": "742:21:80"
+          },
+          {
+            "baseName": {
+              "id": 31833,
+              "name": "OAppReceiverUpgradeable",
+              "nameLocations": [
+                "765:23:80"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 31613,
+              "src": "765:23:80"
+            },
+            "id": 31834,
+            "nodeType": "InheritanceSpecifier",
+            "src": "765:23:80"
+          }
+        ],
+        "canonicalName": "OAppUpgradeable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 31830,
+          "nodeType": "StructuredDocumentation",
+          "src": "558:146:80",
+          "text": " @title OApp\n @dev Abstract contract serving as the base for OApp implementation, combining OAppSender and OAppReceiver functionality."
+        },
+        "fullyImplemented": false,
+        "id": 31886,
+        "linearizedBaseContracts": [
+          31886,
+          31613,
+          31818,
+          31442,
+          34408,
+          35676,
+          34662,
+          32711,
+          32794,
+          30172
+        ],
+        "name": "OAppUpgradeable",
+        "nameLocation": "723:15:80",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 31843,
+              "nodeType": "Block",
+              "src": "1027:2:80",
+              "statements": []
+            },
+            "documentation": {
+              "id": 31835,
+              "nodeType": "StructuredDocumentation",
+              "src": "795:165:80",
+              "text": " @dev Constructor to initialize the OApp with the provided endpoint and owner.\n @param _endpoint The address of the LOCAL LayerZero endpoint."
+            },
+            "id": 31844,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 31840,
+                    "name": "_endpoint",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 31837,
+                    "src": "1016:9:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 31841,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 31839,
+                  "name": "OAppCoreUpgradeable",
+                  "nameLocations": [
+                    "996:19:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 31442,
+                  "src": "996:19:80"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "996:30:80"
+              }
+            ],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 31838,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 31837,
+                  "mutability": "mutable",
+                  "name": "_endpoint",
+                  "nameLocation": "985:9:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31844,
+                  "src": "977:17:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 31836,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "977:7:80",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "976:19:80"
+            },
+            "returnParameters": {
+              "id": 31842,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1027:0:80"
+            },
+            "scope": 31886,
+            "src": "965:64:80",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 31862,
+              "nodeType": "Block",
+              "src": "1522:123:80",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 31853,
+                        "name": "_delegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 31847,
+                        "src": "1548:9:80",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 31852,
+                      "name": "__OAppCore_init",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 31316,
+                      "src": "1532:15:80",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 31854,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1532:26:80",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 31855,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1532:26:80"
+                },
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 31856,
+                      "name": "__OAppReceiver_init_unchained",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 31480,
+                      "src": "1568:29:80",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+                        "typeString": "function ()"
+                      }
+                    },
+                    "id": 31857,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1568:31:80",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 31858,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1568:31:80"
+                },
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 31859,
+                      "name": "__OAppSender_init_unchained",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 31659,
+                      "src": "1609:27:80",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+                        "typeString": "function ()"
+                      }
+                    },
+                    "id": 31860,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1609:29:80",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 31861,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1609:29:80"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 31845,
+              "nodeType": "StructuredDocumentation",
+              "src": "1035:416:80",
+              "text": " @dev Initializes the OApp with the provided delegate.\n @param _delegate The delegate capable of making OApp configurations inside of the endpoint.\n @dev The delegate typically should be set as the owner of the contract.\n @dev Ownable is not initialized here on purpose. It should be initialized in the child contract to\n accommodate the different version of Ownable."
+            },
+            "id": 31863,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 31850,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 31849,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1505:16:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1505:16:80"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1505:16:80"
+              }
+            ],
+            "name": "__OApp_init",
+            "nameLocation": "1465:11:80",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 31848,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 31847,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "1485:9:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31863,
+                  "src": "1477:17:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 31846,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1477:7:80",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1476:19:80"
+            },
+            "returnParameters": {
+              "id": 31851,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1522:0:80"
+            },
+            "scope": 31886,
+            "src": "1456:189:80",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 31868,
+              "nodeType": "Block",
+              "src": "1710:2:80",
+              "statements": []
+            },
+            "id": 31869,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 31866,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 31865,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1693:16:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1693:16:80"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1693:16:80"
+              }
+            ],
+            "name": "__OApp_init_unchained",
+            "nameLocation": "1660:21:80",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 31864,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1681:2:80"
+            },
+            "returnParameters": {
+              "id": 31867,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1710:0:80"
+            },
+            "scope": 31886,
+            "src": "1651:61:80",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              31493,
+              31672
+            ],
+            "body": {
+              "id": 31884,
+              "nodeType": "Block",
+              "src": "2150:58:80",
+              "statements": [
+                {
+                  "expression": {
+                    "components": [
+                      {
+                        "id": 31880,
+                        "name": "SENDER_VERSION",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 31640,
+                        "src": "2168:14:80",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint64",
+                          "typeString": "uint64"
+                        }
+                      },
+                      {
+                        "id": 31881,
+                        "name": "RECEIVER_VERSION",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 31461,
+                        "src": "2184:16:80",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint64",
+                          "typeString": "uint64"
+                        }
+                      }
+                    ],
+                    "id": 31882,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "2167:34:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$_t_uint64_$_t_uint64_$",
+                      "typeString": "tuple(uint64,uint64)"
+                    }
+                  },
+                  "functionReturnParameters": 31879,
+                  "id": 31883,
+                  "nodeType": "Return",
+                  "src": "2160:41:80"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 31870,
+              "nodeType": "StructuredDocumentation",
+              "src": "1718:228:80",
+              "text": " @notice Retrieves the OApp version information.\n @return senderVersion The version of the OAppSender.sol implementation.\n @return receiverVersion The version of the OAppReceiver.sol implementation."
+            },
+            "functionSelector": "17442b70",
+            "id": 31885,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "oAppVersion",
+            "nameLocation": "1960:11:80",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 31874,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [
+                {
+                  "id": 31872,
+                  "name": "OAppSenderUpgradeable",
+                  "nameLocations": [
+                    "2035:21:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 31818,
+                  "src": "2035:21:80"
+                },
+                {
+                  "id": 31873,
+                  "name": "OAppReceiverUpgradeable",
+                  "nameLocations": [
+                    "2058:23:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 31613,
+                  "src": "2058:23:80"
+                }
+              ],
+              "src": "2026:56:80"
+            },
+            "parameters": {
+              "id": 31871,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1971:2:80"
+            },
+            "returnParameters": {
+              "id": 31879,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 31876,
+                  "mutability": "mutable",
+                  "name": "senderVersion",
+                  "nameLocation": "2107:13:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31885,
+                  "src": "2100:20:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 31875,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2100:6:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 31878,
+                  "mutability": "mutable",
+                  "name": "receiverVersion",
+                  "nameLocation": "2129:15:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31885,
+                  "src": "2122:22:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 31877,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2122:6:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2099:46:80"
+            },
+            "scope": 31886,
+            "src": "1951:257:80",
+            "stateMutability": "pure",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "scope": 31887,
+        "src": "705:1505:80",
+        "usedErrors": [
+          31458,
+          31635,
+          31637,
+          32659,
+          32663,
+          32665,
+          32667,
+          34244,
+          34249,
+          34425,
+          34428
+        ],
+        "usedEvents": [
+          32673,
+          34255,
+          34433
+        ]
+      }
+    ],
+    "src": "33:2178:80"
+  },
+  "legacyAST": {
+    "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol",
+    "exportedSymbols": {
+      "MessagingFee": [
+        29967
+      ],
+      "MessagingReceipt": [
+        29962
+      ],
+      "OAppCoreUpgradeable": [
+        31442
+      ],
+      "OAppReceiverUpgradeable": [
+        31613
+      ],
+      "OAppSenderUpgradeable": [
+        31818
+      ],
+      "OAppUpgradeable": [
+        31886
+      ],
+      "Origin": [
+        29974
+      ]
+    },
+    "id": 31887,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 31820,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:80"
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppSenderUpgradeable.sol",
+        "file": "./OAppSenderUpgradeable.sol",
+        "id": 31824,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 31887,
+        "sourceUnit": 31819,
+        "src": "199:100:80",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 31821,
+              "name": "OAppSenderUpgradeable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31818,
+              "src": "208:21:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 31822,
+              "name": "MessagingFee",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29967,
+              "src": "231:12:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 31823,
+              "name": "MessagingReceipt",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29962,
+              "src": "245:16:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppReceiverUpgradeable.sol",
+        "file": "./OAppReceiverUpgradeable.sol",
+        "id": 31827,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 31887,
+        "sourceUnit": 31614,
+        "src": "411:80:80",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 31825,
+              "name": "OAppReceiverUpgradeable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31613,
+              "src": "420:23:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 31826,
+              "name": "Origin",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29974,
+              "src": "445:6:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppCoreUpgradeable.sol",
+        "file": "./OAppCoreUpgradeable.sol",
+        "id": 31829,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 31887,
+        "sourceUnit": 31443,
+        "src": "492:64:80",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 31828,
+              "name": "OAppCoreUpgradeable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31442,
+              "src": "501:19:80",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 31831,
+              "name": "OAppSenderUpgradeable",
+              "nameLocations": [
+                "742:21:80"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 31818,
+              "src": "742:21:80"
+            },
+            "id": 31832,
+            "nodeType": "InheritanceSpecifier",
+            "src": "742:21:80"
+          },
+          {
+            "baseName": {
+              "id": 31833,
+              "name": "OAppReceiverUpgradeable",
+              "nameLocations": [
+                "765:23:80"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 31613,
+              "src": "765:23:80"
+            },
+            "id": 31834,
+            "nodeType": "InheritanceSpecifier",
+            "src": "765:23:80"
+          }
+        ],
+        "canonicalName": "OAppUpgradeable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 31830,
+          "nodeType": "StructuredDocumentation",
+          "src": "558:146:80",
+          "text": " @title OApp\n @dev Abstract contract serving as the base for OApp implementation, combining OAppSender and OAppReceiver functionality."
+        },
+        "fullyImplemented": false,
+        "id": 31886,
+        "linearizedBaseContracts": [
+          31886,
+          31613,
+          31818,
+          31442,
+          34408,
+          35676,
+          34662,
+          32711,
+          32794,
+          30172
+        ],
+        "name": "OAppUpgradeable",
+        "nameLocation": "723:15:80",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 31843,
+              "nodeType": "Block",
+              "src": "1027:2:80",
+              "statements": []
+            },
+            "documentation": {
+              "id": 31835,
+              "nodeType": "StructuredDocumentation",
+              "src": "795:165:80",
+              "text": " @dev Constructor to initialize the OApp with the provided endpoint and owner.\n @param _endpoint The address of the LOCAL LayerZero endpoint."
+            },
+            "id": 31844,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 31840,
+                    "name": "_endpoint",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 31837,
+                    "src": "1016:9:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  }
+                ],
+                "id": 31841,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 31839,
+                  "name": "OAppCoreUpgradeable",
+                  "nameLocations": [
+                    "996:19:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 31442,
+                  "src": "996:19:80"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "996:30:80"
+              }
+            ],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 31838,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 31837,
+                  "mutability": "mutable",
+                  "name": "_endpoint",
+                  "nameLocation": "985:9:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31844,
+                  "src": "977:17:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 31836,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "977:7:80",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "976:19:80"
+            },
+            "returnParameters": {
+              "id": 31842,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1027:0:80"
+            },
+            "scope": 31886,
+            "src": "965:64:80",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 31862,
+              "nodeType": "Block",
+              "src": "1522:123:80",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 31853,
+                        "name": "_delegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 31847,
+                        "src": "1548:9:80",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "id": 31852,
+                      "name": "__OAppCore_init",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 31316,
+                      "src": "1532:15:80",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 31854,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1532:26:80",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 31855,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1532:26:80"
+                },
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 31856,
+                      "name": "__OAppReceiver_init_unchained",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 31480,
+                      "src": "1568:29:80",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+                        "typeString": "function ()"
+                      }
+                    },
+                    "id": 31857,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1568:31:80",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 31858,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1568:31:80"
+                },
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 31859,
+                      "name": "__OAppSender_init_unchained",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 31659,
+                      "src": "1609:27:80",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+                        "typeString": "function ()"
+                      }
+                    },
+                    "id": 31860,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1609:29:80",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 31861,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1609:29:80"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 31845,
+              "nodeType": "StructuredDocumentation",
+              "src": "1035:416:80",
+              "text": " @dev Initializes the OApp with the provided delegate.\n @param _delegate The delegate capable of making OApp configurations inside of the endpoint.\n @dev The delegate typically should be set as the owner of the contract.\n @dev Ownable is not initialized here on purpose. It should be initialized in the child contract to\n accommodate the different version of Ownable."
+            },
+            "id": 31863,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 31850,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 31849,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1505:16:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1505:16:80"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1505:16:80"
+              }
+            ],
+            "name": "__OApp_init",
+            "nameLocation": "1465:11:80",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 31848,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 31847,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "1485:9:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31863,
+                  "src": "1477:17:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 31846,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1477:7:80",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1476:19:80"
+            },
+            "returnParameters": {
+              "id": 31851,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1522:0:80"
+            },
+            "scope": 31886,
+            "src": "1456:189:80",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 31868,
+              "nodeType": "Block",
+              "src": "1710:2:80",
+              "statements": []
+            },
+            "id": 31869,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 31866,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 31865,
+                  "name": "onlyInitializing",
+                  "nameLocations": [
+                    "1693:16:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 34571,
+                  "src": "1693:16:80"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1693:16:80"
+              }
+            ],
+            "name": "__OApp_init_unchained",
+            "nameLocation": "1660:21:80",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 31864,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1681:2:80"
+            },
+            "returnParameters": {
+              "id": 31867,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1710:0:80"
+            },
+            "scope": 31886,
+            "src": "1651:61:80",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              31493,
+              31672
+            ],
+            "body": {
+              "id": 31884,
+              "nodeType": "Block",
+              "src": "2150:58:80",
+              "statements": [
+                {
+                  "expression": {
+                    "components": [
+                      {
+                        "id": 31880,
+                        "name": "SENDER_VERSION",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 31640,
+                        "src": "2168:14:80",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint64",
+                          "typeString": "uint64"
+                        }
+                      },
+                      {
+                        "id": 31881,
+                        "name": "RECEIVER_VERSION",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 31461,
+                        "src": "2184:16:80",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint64",
+                          "typeString": "uint64"
+                        }
+                      }
+                    ],
+                    "id": 31882,
+                    "isConstant": false,
+                    "isInlineArray": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "lValueRequested": false,
+                    "nodeType": "TupleExpression",
+                    "src": "2167:34:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$_t_uint64_$_t_uint64_$",
+                      "typeString": "tuple(uint64,uint64)"
+                    }
+                  },
+                  "functionReturnParameters": 31879,
+                  "id": 31883,
+                  "nodeType": "Return",
+                  "src": "2160:41:80"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 31870,
+              "nodeType": "StructuredDocumentation",
+              "src": "1718:228:80",
+              "text": " @notice Retrieves the OApp version information.\n @return senderVersion The version of the OAppSender.sol implementation.\n @return receiverVersion The version of the OAppReceiver.sol implementation."
+            },
+            "functionSelector": "17442b70",
+            "id": 31885,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "oAppVersion",
+            "nameLocation": "1960:11:80",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 31874,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [
+                {
+                  "id": 31872,
+                  "name": "OAppSenderUpgradeable",
+                  "nameLocations": [
+                    "2035:21:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 31818,
+                  "src": "2035:21:80"
+                },
+                {
+                  "id": 31873,
+                  "name": "OAppReceiverUpgradeable",
+                  "nameLocations": [
+                    "2058:23:80"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 31613,
+                  "src": "2058:23:80"
+                }
+              ],
+              "src": "2026:56:80"
+            },
+            "parameters": {
+              "id": 31871,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1971:2:80"
+            },
+            "returnParameters": {
+              "id": 31879,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 31876,
+                  "mutability": "mutable",
+                  "name": "senderVersion",
+                  "nameLocation": "2107:13:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31885,
+                  "src": "2100:20:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 31875,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2100:6:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 31878,
+                  "mutability": "mutable",
+                  "name": "receiverVersion",
+                  "nameLocation": "2129:15:80",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31885,
+                  "src": "2122:22:80",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 31877,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2122:6:80",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2099:46:80"
+            },
+            "scope": 31886,
+            "src": "1951:257:80",
+            "stateMutability": "pure",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "scope": 31887,
+        "src": "705:1505:80",
+        "usedErrors": [
+          31458,
+          31635,
+          31637,
+          32659,
+          32663,
+          32665,
+          32667,
+          34244,
+          34249,
+          34425,
+          34428
+        ],
+        "usedEvents": [
+          32673,
+          34255,
+          34433
+        ]
+      }
+    ],
+    "src": "33:2178:80"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.789Z"
+}

@@ -1,0 +1,417 @@
+{
+  "contractName": "IMessagingContext",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "getSendContext",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "dstEid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "isSendingMessage",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity >=0.8.0;\n\ninterface IMessagingContext {\n    function isSendingMessage() external view returns (bool);\n\n    function getSendContext() external view returns (uint32 dstEid, address sender);\n}\n",
+  "sourcePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessagingContext.sol",
+  "ast": {
+    "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessagingContext.sol",
+    "exportedSymbols": {
+      "IMessagingContext": [
+        30709
+      ]
+    },
+    "id": 30710,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 30696,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:73"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IMessagingContext",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 30709,
+        "linearizedBaseContracts": [
+          30709
+        ],
+        "name": "IMessagingContext",
+        "nameLocation": "69:17:73",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "79624ca9",
+            "id": 30701,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isSendingMessage",
+            "nameLocation": "102:16:73",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30697,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "118:2:73"
+            },
+            "returnParameters": {
+              "id": 30700,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30699,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30701,
+                  "src": "144:4:73",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 30698,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "144:4:73",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "143:6:73"
+            },
+            "scope": 30709,
+            "src": "93:57:73",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "14f651a9",
+            "id": 30708,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getSendContext",
+            "nameLocation": "165:14:73",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30702,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "179:2:73"
+            },
+            "returnParameters": {
+              "id": 30707,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30704,
+                  "mutability": "mutable",
+                  "name": "dstEid",
+                  "nameLocation": "212:6:73",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30708,
+                  "src": "205:13:73",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 30703,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "205:6:73",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30706,
+                  "mutability": "mutable",
+                  "name": "sender",
+                  "nameLocation": "228:6:73",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30708,
+                  "src": "220:14:73",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 30705,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "220:7:73",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "204:31:73"
+            },
+            "scope": 30709,
+            "src": "156:80:73",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 30710,
+        "src": "59:179:73",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:206:73"
+  },
+  "legacyAST": {
+    "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessagingContext.sol",
+    "exportedSymbols": {
+      "IMessagingContext": [
+        30709
+      ]
+    },
+    "id": 30710,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 30696,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:73"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IMessagingContext",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 30709,
+        "linearizedBaseContracts": [
+          30709
+        ],
+        "name": "IMessagingContext",
+        "nameLocation": "69:17:73",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "79624ca9",
+            "id": 30701,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isSendingMessage",
+            "nameLocation": "102:16:73",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30697,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "118:2:73"
+            },
+            "returnParameters": {
+              "id": 30700,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30699,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30701,
+                  "src": "144:4:73",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 30698,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "144:4:73",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "143:6:73"
+            },
+            "scope": 30709,
+            "src": "93:57:73",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "14f651a9",
+            "id": 30708,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getSendContext",
+            "nameLocation": "165:14:73",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30702,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "179:2:73"
+            },
+            "returnParameters": {
+              "id": 30707,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30704,
+                  "mutability": "mutable",
+                  "name": "dstEid",
+                  "nameLocation": "212:6:73",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30708,
+                  "src": "205:13:73",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 30703,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "205:6:73",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30706,
+                  "mutability": "mutable",
+                  "name": "sender",
+                  "nameLocation": "228:6:73",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30708,
+                  "src": "220:14:73",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 30705,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "220:7:73",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "204:31:73"
+            },
+            "scope": 30709,
+            "src": "156:80:73",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 30710,
+        "src": "59:179:73",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:206:73"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.786Z"
+}

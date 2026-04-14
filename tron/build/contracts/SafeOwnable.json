@@ -1,0 +1,1284 @@
+{
+  "contractName": "SafeOwnable",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Ownable__NotOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Ownable__NotTransitiveOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "SafeOwnable__NotNomineeOwner",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "acceptOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "nomineeOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { Ownable } from './Ownable.sol';\nimport { ISafeOwnable } from './ISafeOwnable.sol';\nimport { OwnableInternal } from './OwnableInternal.sol';\nimport { SafeOwnableInternal } from './SafeOwnableInternal.sol';\n\n/**\n * @title Ownership access control based on ERC173 with ownership transfer safety check\n */\nabstract contract SafeOwnable is ISafeOwnable, Ownable, SafeOwnableInternal {\n    /**\n     * @inheritdoc ISafeOwnable\n     */\n    function nomineeOwner() public view virtual returns (address) {\n        return _nomineeOwner();\n    }\n\n    /**\n     * @inheritdoc ISafeOwnable\n     */\n    function acceptOwnership() public virtual onlyNomineeOwner {\n        _acceptOwnership();\n    }\n\n    function _transferOwnership(\n        address account\n    ) internal virtual override(OwnableInternal, SafeOwnableInternal) {\n        super._transferOwnership(account);\n    }\n}\n",
+  "sourcePath": "@solidstate/contracts/access/ownable/SafeOwnable.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/access/ownable/SafeOwnable.sol",
+    "exportedSymbols": {
+      "ISafeOwnable": [
+        44359
+      ],
+      "Ownable": [
+        44405
+      ],
+      "OwnableInternal": [
+        44530
+      ],
+      "SafeOwnable": [
+        44606
+      ],
+      "SafeOwnableInternal": [
+        44687
+      ]
+    },
+    "id": 44607,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 44555,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:148"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/Ownable.sol",
+        "file": "./Ownable.sol",
+        "id": 44557,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44406,
+        "src": "59:40:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44556,
+              "name": "Ownable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44405,
+              "src": "68:7:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/ISafeOwnable.sol",
+        "file": "./ISafeOwnable.sol",
+        "id": 44559,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44360,
+        "src": "100:50:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44558,
+              "name": "ISafeOwnable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44359,
+              "src": "109:12:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/OwnableInternal.sol",
+        "file": "./OwnableInternal.sol",
+        "id": 44561,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44531,
+        "src": "151:56:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44560,
+              "name": "OwnableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44530,
+              "src": "160:15:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/SafeOwnableInternal.sol",
+        "file": "./SafeOwnableInternal.sol",
+        "id": 44563,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44688,
+        "src": "208:64:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44562,
+              "name": "SafeOwnableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44687,
+              "src": "217:19:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 44565,
+              "name": "ISafeOwnable",
+              "nameLocations": [
+                "403:12:148"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44359,
+              "src": "403:12:148"
+            },
+            "id": 44566,
+            "nodeType": "InheritanceSpecifier",
+            "src": "403:12:148"
+          },
+          {
+            "baseName": {
+              "id": 44567,
+              "name": "Ownable",
+              "nameLocations": [
+                "417:7:148"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44405,
+              "src": "417:7:148"
+            },
+            "id": 44568,
+            "nodeType": "InheritanceSpecifier",
+            "src": "417:7:148"
+          },
+          {
+            "baseName": {
+              "id": 44569,
+              "name": "SafeOwnableInternal",
+              "nameLocations": [
+                "426:19:148"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44687,
+              "src": "426:19:148"
+            },
+            "id": 44570,
+            "nodeType": "InheritanceSpecifier",
+            "src": "426:19:148"
+          }
+        ],
+        "canonicalName": "SafeOwnable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 44564,
+          "nodeType": "StructuredDocumentation",
+          "src": "274:95:148",
+          "text": " @title Ownership access control based on ERC173 with ownership transfer safety check"
+        },
+        "fullyImplemented": true,
+        "id": 44606,
+        "linearizedBaseContracts": [
+          44606,
+          44687,
+          44405,
+          44530,
+          44359,
+          44327,
+          45388,
+          44368,
+          44338,
+          45398
+        ],
+        "name": "SafeOwnable",
+        "nameLocation": "388:11:148",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "baseFunctions": [
+              44354
+            ],
+            "body": {
+              "id": 44579,
+              "nodeType": "Block",
+              "src": "562:39:148",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 44576,
+                      "name": "_nomineeOwner",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 44643,
+                      "src": "579:13:148",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                        "typeString": "function () view returns (address)"
+                      }
+                    },
+                    "id": 44577,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "579:15:148",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 44575,
+                  "id": 44578,
+                  "nodeType": "Return",
+                  "src": "572:22:148"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 44571,
+              "nodeType": "StructuredDocumentation",
+              "src": "452:43:148",
+              "text": " @inheritdoc ISafeOwnable"
+            },
+            "functionSelector": "8ab5150a",
+            "id": 44580,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nomineeOwner",
+            "nameLocation": "509:12:148",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44572,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "521:2:148"
+            },
+            "returnParameters": {
+              "id": 44575,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44574,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 44580,
+                  "src": "553:7:148",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 44573,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "553:7:148",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "552:9:148"
+            },
+            "scope": 44606,
+            "src": "500:101:148",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              44358
+            ],
+            "body": {
+              "id": 44589,
+              "nodeType": "Block",
+              "src": "714:35:148",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 44586,
+                      "name": "_acceptOwnership",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 44659,
+                      "src": "724:16:148",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+                        "typeString": "function ()"
+                      }
+                    },
+                    "id": 44587,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "724:18:148",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 44588,
+                  "nodeType": "ExpressionStatement",
+                  "src": "724:18:148"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 44581,
+              "nodeType": "StructuredDocumentation",
+              "src": "607:43:148",
+              "text": " @inheritdoc ISafeOwnable"
+            },
+            "functionSelector": "79ba5097",
+            "id": 44590,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 44584,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 44583,
+                  "name": "onlyNomineeOwner",
+                  "nameLocations": [
+                    "697:16:148"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 44631,
+                  "src": "697:16:148"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "697:16:148"
+              }
+            ],
+            "name": "acceptOwnership",
+            "nameLocation": "664:15:148",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44582,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "679:2:148"
+            },
+            "returnParameters": {
+              "id": 44585,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "714:0:148"
+            },
+            "scope": 44606,
+            "src": "655:94:148",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              44502,
+              44671
+            ],
+            "body": {
+              "id": 44604,
+              "nodeType": "Block",
+              "src": "878:50:148",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 44601,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 44592,
+                        "src": "913:7:148",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "id": 44598,
+                        "name": "super",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967271,
+                        "src": "888:5:148",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_super$_SafeOwnable_$44606_$",
+                          "typeString": "type(contract super SafeOwnable)"
+                        }
+                      },
+                      "id": 44600,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "894:18:148",
+                      "memberName": "_transferOwnership",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 44671,
+                      "src": "888:24:148",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 44602,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "888:33:148",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 44603,
+                  "nodeType": "ExpressionStatement",
+                  "src": "888:33:148"
+                }
+              ]
+            },
+            "id": 44605,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_transferOwnership",
+            "nameLocation": "764:18:148",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 44596,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [
+                {
+                  "id": 44594,
+                  "name": "OwnableInternal",
+                  "nameLocations": [
+                    "840:15:148"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 44530,
+                  "src": "840:15:148"
+                },
+                {
+                  "id": 44595,
+                  "name": "SafeOwnableInternal",
+                  "nameLocations": [
+                    "857:19:148"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 44687,
+                  "src": "857:19:148"
+                }
+              ],
+              "src": "831:46:148"
+            },
+            "parameters": {
+              "id": 44593,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44592,
+                  "mutability": "mutable",
+                  "name": "account",
+                  "nameLocation": "800:7:148",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 44605,
+                  "src": "792:15:148",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 44591,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "792:7:148",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "782:31:148"
+            },
+            "returnParameters": {
+              "id": 44597,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "878:0:148"
+            },
+            "scope": 44606,
+            "src": "755:173:148",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 44607,
+        "src": "370:560:148",
+        "usedErrors": [
+          44335,
+          44337,
+          44367
+        ],
+        "usedEvents": [
+          45397
+        ]
+      }
+    ],
+    "src": "33:898:148"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/access/ownable/SafeOwnable.sol",
+    "exportedSymbols": {
+      "ISafeOwnable": [
+        44359
+      ],
+      "Ownable": [
+        44405
+      ],
+      "OwnableInternal": [
+        44530
+      ],
+      "SafeOwnable": [
+        44606
+      ],
+      "SafeOwnableInternal": [
+        44687
+      ]
+    },
+    "id": 44607,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 44555,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:148"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/Ownable.sol",
+        "file": "./Ownable.sol",
+        "id": 44557,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44406,
+        "src": "59:40:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44556,
+              "name": "Ownable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44405,
+              "src": "68:7:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/ISafeOwnable.sol",
+        "file": "./ISafeOwnable.sol",
+        "id": 44559,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44360,
+        "src": "100:50:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44558,
+              "name": "ISafeOwnable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44359,
+              "src": "109:12:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/OwnableInternal.sol",
+        "file": "./OwnableInternal.sol",
+        "id": 44561,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44531,
+        "src": "151:56:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44560,
+              "name": "OwnableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44530,
+              "src": "160:15:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@solidstate/contracts/access/ownable/SafeOwnableInternal.sol",
+        "file": "./SafeOwnableInternal.sol",
+        "id": 44563,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 44607,
+        "sourceUnit": 44688,
+        "src": "208:64:148",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 44562,
+              "name": "SafeOwnableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 44687,
+              "src": "217:19:148",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 44565,
+              "name": "ISafeOwnable",
+              "nameLocations": [
+                "403:12:148"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44359,
+              "src": "403:12:148"
+            },
+            "id": 44566,
+            "nodeType": "InheritanceSpecifier",
+            "src": "403:12:148"
+          },
+          {
+            "baseName": {
+              "id": 44567,
+              "name": "Ownable",
+              "nameLocations": [
+                "417:7:148"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44405,
+              "src": "417:7:148"
+            },
+            "id": 44568,
+            "nodeType": "InheritanceSpecifier",
+            "src": "417:7:148"
+          },
+          {
+            "baseName": {
+              "id": 44569,
+              "name": "SafeOwnableInternal",
+              "nameLocations": [
+                "426:19:148"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 44687,
+              "src": "426:19:148"
+            },
+            "id": 44570,
+            "nodeType": "InheritanceSpecifier",
+            "src": "426:19:148"
+          }
+        ],
+        "canonicalName": "SafeOwnable",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 44564,
+          "nodeType": "StructuredDocumentation",
+          "src": "274:95:148",
+          "text": " @title Ownership access control based on ERC173 with ownership transfer safety check"
+        },
+        "fullyImplemented": true,
+        "id": 44606,
+        "linearizedBaseContracts": [
+          44606,
+          44687,
+          44405,
+          44530,
+          44359,
+          44327,
+          45388,
+          44368,
+          44338,
+          45398
+        ],
+        "name": "SafeOwnable",
+        "nameLocation": "388:11:148",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "baseFunctions": [
+              44354
+            ],
+            "body": {
+              "id": 44579,
+              "nodeType": "Block",
+              "src": "562:39:148",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 44576,
+                      "name": "_nomineeOwner",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 44643,
+                      "src": "579:13:148",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$__$returns$_t_address_$",
+                        "typeString": "function () view returns (address)"
+                      }
+                    },
+                    "id": 44577,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "579:15:148",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "functionReturnParameters": 44575,
+                  "id": 44578,
+                  "nodeType": "Return",
+                  "src": "572:22:148"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 44571,
+              "nodeType": "StructuredDocumentation",
+              "src": "452:43:148",
+              "text": " @inheritdoc ISafeOwnable"
+            },
+            "functionSelector": "8ab5150a",
+            "id": 44580,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nomineeOwner",
+            "nameLocation": "509:12:148",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44572,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "521:2:148"
+            },
+            "returnParameters": {
+              "id": 44575,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44574,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 44580,
+                  "src": "553:7:148",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 44573,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "553:7:148",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "552:9:148"
+            },
+            "scope": 44606,
+            "src": "500:101:148",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              44358
+            ],
+            "body": {
+              "id": 44589,
+              "nodeType": "Block",
+              "src": "714:35:148",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "id": 44586,
+                      "name": "_acceptOwnership",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 44659,
+                      "src": "724:16:148",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
+                        "typeString": "function ()"
+                      }
+                    },
+                    "id": 44587,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "724:18:148",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 44588,
+                  "nodeType": "ExpressionStatement",
+                  "src": "724:18:148"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 44581,
+              "nodeType": "StructuredDocumentation",
+              "src": "607:43:148",
+              "text": " @inheritdoc ISafeOwnable"
+            },
+            "functionSelector": "79ba5097",
+            "id": 44590,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 44584,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 44583,
+                  "name": "onlyNomineeOwner",
+                  "nameLocations": [
+                    "697:16:148"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 44631,
+                  "src": "697:16:148"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "697:16:148"
+              }
+            ],
+            "name": "acceptOwnership",
+            "nameLocation": "664:15:148",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 44582,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "679:2:148"
+            },
+            "returnParameters": {
+              "id": 44585,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "714:0:148"
+            },
+            "scope": 44606,
+            "src": "655:94:148",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              44502,
+              44671
+            ],
+            "body": {
+              "id": 44604,
+              "nodeType": "Block",
+              "src": "878:50:148",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 44601,
+                        "name": "account",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 44592,
+                        "src": "913:7:148",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "id": 44598,
+                        "name": "super",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967271,
+                        "src": "888:5:148",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_super$_SafeOwnable_$44606_$",
+                          "typeString": "type(contract super SafeOwnable)"
+                        }
+                      },
+                      "id": 44600,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "894:18:148",
+                      "memberName": "_transferOwnership",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 44671,
+                      "src": "888:24:148",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address)"
+                      }
+                    },
+                    "id": 44602,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "888:33:148",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 44603,
+                  "nodeType": "ExpressionStatement",
+                  "src": "888:33:148"
+                }
+              ]
+            },
+            "id": 44605,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_transferOwnership",
+            "nameLocation": "764:18:148",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 44596,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [
+                {
+                  "id": 44594,
+                  "name": "OwnableInternal",
+                  "nameLocations": [
+                    "840:15:148"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 44530,
+                  "src": "840:15:148"
+                },
+                {
+                  "id": 44595,
+                  "name": "SafeOwnableInternal",
+                  "nameLocations": [
+                    "857:19:148"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 44687,
+                  "src": "857:19:148"
+                }
+              ],
+              "src": "831:46:148"
+            },
+            "parameters": {
+              "id": 44593,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44592,
+                  "mutability": "mutable",
+                  "name": "account",
+                  "nameLocation": "800:7:148",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 44605,
+                  "src": "792:15:148",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 44591,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "792:7:148",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "782:31:148"
+            },
+            "returnParameters": {
+              "id": 44597,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "878:0:148"
+            },
+            "scope": 44606,
+            "src": "755:173:148",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 44607,
+        "src": "370:560:148",
+        "usedErrors": [
+          44335,
+          44337,
+          44367
+        ],
+        "usedEvents": [
+          45397
+        ]
+      }
+    ],
+    "src": "33:898:148"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.815Z"
+}

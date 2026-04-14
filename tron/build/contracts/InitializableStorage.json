@@ -1,0 +1,685 @@
+{
+  "contractName": "InitializableStorage",
+  "abi": [],
+  "bytecode": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e5822122012f78413a85c38505a1fa32d5cee3e43c9257f08488ae12a39c946ddc4074fa664736f6c63430008160033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e5822122012f78413a85c38505a1fa32d5cee3e43c9257f08488ae12a39c946ddc4074fa664736f6c63430008160033",
+  "sourceMap": "59:361:187:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;59:361:187;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "59:361:187:-:0;;;;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nlibrary InitializableStorage {\n    struct Layout {\n        uint8 initialized;\n    }\n\n    bytes32 internal constant STORAGE_SLOT =\n        keccak256('solidstate.contracts.storage.Initializable');\n\n    function layout() internal pure returns (Layout storage l) {\n        bytes32 slot = STORAGE_SLOT;\n        assembly {\n            l.slot := slot\n        }\n    }\n}\n",
+  "sourcePath": "@solidstate/contracts/security/initializable/InitializableStorage.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/security/initializable/InitializableStorage.sol",
+    "exportedSymbols": {
+      "InitializableStorage": [
+        47561
+      ]
+    },
+    "id": 47562,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47540,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:187"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "InitializableStorage",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "fullyImplemented": true,
+        "id": 47561,
+        "linearizedBaseContracts": [
+          47561
+        ],
+        "name": "InitializableStorage",
+        "nameLocation": "67:20:187",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "InitializableStorage.Layout",
+            "id": 47543,
+            "members": [
+              {
+                "constant": false,
+                "id": 47542,
+                "mutability": "mutable",
+                "name": "initialized",
+                "nameLocation": "124:11:187",
+                "nodeType": "VariableDeclaration",
+                "scope": 47543,
+                "src": "118:17:187",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 47541,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "118:5:187",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Layout",
+            "nameLocation": "101:6:187",
+            "nodeType": "StructDefinition",
+            "scope": 47561,
+            "src": "94:48:187",
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 47548,
+            "mutability": "constant",
+            "name": "STORAGE_SLOT",
+            "nameLocation": "174:12:187",
+            "nodeType": "VariableDeclaration",
+            "scope": 47561,
+            "src": "148:104:187",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 47544,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "148:7:187",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "736f6c696473746174652e636f6e7472616374732e73746f726167652e496e697469616c697a61626c65",
+                  "id": 47546,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "string",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "207:44:187",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_stringliteral_58200b7f57da39f2faa846ff29bd836ec3d3f012ed3975da2cd78f1b83b59cf1",
+                    "typeString": "literal_string \"solidstate.contracts.storage.Initializable\""
+                  },
+                  "value": "solidstate.contracts.storage.Initializable"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_stringliteral_58200b7f57da39f2faa846ff29bd836ec3d3f012ed3975da2cd78f1b83b59cf1",
+                    "typeString": "literal_string \"solidstate.contracts.storage.Initializable\""
+                  }
+                ],
+                "id": 47545,
+                "name": "keccak256",
+                "nodeType": "Identifier",
+                "overloadedDeclarations": [],
+                "referencedDeclaration": 4294967288,
+                "src": "197:9:187",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                  "typeString": "function (bytes memory) pure returns (bytes32)"
+                }
+              },
+              "id": 47547,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "functionCall",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "197:55:187",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 47559,
+              "nodeType": "Block",
+              "src": "318:100:187",
+              "statements": [
+                {
+                  "assignments": [
+                    47555
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 47555,
+                      "mutability": "mutable",
+                      "name": "slot",
+                      "nameLocation": "336:4:187",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 47559,
+                      "src": "328:12:187",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 47554,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "328:7:187",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 47557,
+                  "initialValue": {
+                    "id": 47556,
+                    "name": "STORAGE_SLOT",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 47548,
+                    "src": "343:12:187",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "328:27:187"
+                },
+                {
+                  "AST": {
+                    "nativeSrc": "374:38:187",
+                    "nodeType": "YulBlock",
+                    "src": "374:38:187",
+                    "statements": [
+                      {
+                        "nativeSrc": "388:14:187",
+                        "nodeType": "YulAssignment",
+                        "src": "388:14:187",
+                        "value": {
+                          "name": "slot",
+                          "nativeSrc": "398:4:187",
+                          "nodeType": "YulIdentifier",
+                          "src": "398:4:187"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "l.slot",
+                            "nativeSrc": "388:6:187",
+                            "nodeType": "YulIdentifier",
+                            "src": "388:6:187"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "istanbul",
+                  "externalReferences": [
+                    {
+                      "declaration": 47552,
+                      "isOffset": false,
+                      "isSlot": true,
+                      "src": "388:6:187",
+                      "suffix": "slot",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 47555,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "398:4:187",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 47558,
+                  "nodeType": "InlineAssembly",
+                  "src": "365:47:187"
+                }
+              ]
+            },
+            "id": 47560,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "layout",
+            "nameLocation": "268:6:187",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 47549,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "274:2:187"
+            },
+            "returnParameters": {
+              "id": 47553,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 47552,
+                  "mutability": "mutable",
+                  "name": "l",
+                  "nameLocation": "315:1:187",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 47560,
+                  "src": "300:16:187",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Layout_$47543_storage_ptr",
+                    "typeString": "struct InitializableStorage.Layout"
+                  },
+                  "typeName": {
+                    "id": 47551,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 47550,
+                      "name": "Layout",
+                      "nameLocations": [
+                        "300:6:187"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 47543,
+                      "src": "300:6:187"
+                    },
+                    "referencedDeclaration": 47543,
+                    "src": "300:6:187",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Layout_$47543_storage_ptr",
+                      "typeString": "struct InitializableStorage.Layout"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "299:18:187"
+            },
+            "scope": 47561,
+            "src": "259:159:187",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 47562,
+        "src": "59:361:187",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:388:187"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/security/initializable/InitializableStorage.sol",
+    "exportedSymbols": {
+      "InitializableStorage": [
+        47561
+      ]
+    },
+    "id": 47562,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47540,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:187"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "InitializableStorage",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "fullyImplemented": true,
+        "id": 47561,
+        "linearizedBaseContracts": [
+          47561
+        ],
+        "name": "InitializableStorage",
+        "nameLocation": "67:20:187",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "InitializableStorage.Layout",
+            "id": 47543,
+            "members": [
+              {
+                "constant": false,
+                "id": 47542,
+                "mutability": "mutable",
+                "name": "initialized",
+                "nameLocation": "124:11:187",
+                "nodeType": "VariableDeclaration",
+                "scope": 47543,
+                "src": "118:17:187",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint8",
+                  "typeString": "uint8"
+                },
+                "typeName": {
+                  "id": 47541,
+                  "name": "uint8",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "118:5:187",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint8",
+                    "typeString": "uint8"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Layout",
+            "nameLocation": "101:6:187",
+            "nodeType": "StructDefinition",
+            "scope": 47561,
+            "src": "94:48:187",
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 47548,
+            "mutability": "constant",
+            "name": "STORAGE_SLOT",
+            "nameLocation": "174:12:187",
+            "nodeType": "VariableDeclaration",
+            "scope": 47561,
+            "src": "148:104:187",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 47544,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "148:7:187",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "736f6c696473746174652e636f6e7472616374732e73746f726167652e496e697469616c697a61626c65",
+                  "id": 47546,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "string",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "207:44:187",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_stringliteral_58200b7f57da39f2faa846ff29bd836ec3d3f012ed3975da2cd78f1b83b59cf1",
+                    "typeString": "literal_string \"solidstate.contracts.storage.Initializable\""
+                  },
+                  "value": "solidstate.contracts.storage.Initializable"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_stringliteral_58200b7f57da39f2faa846ff29bd836ec3d3f012ed3975da2cd78f1b83b59cf1",
+                    "typeString": "literal_string \"solidstate.contracts.storage.Initializable\""
+                  }
+                ],
+                "id": 47545,
+                "name": "keccak256",
+                "nodeType": "Identifier",
+                "overloadedDeclarations": [],
+                "referencedDeclaration": 4294967288,
+                "src": "197:9:187",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                  "typeString": "function (bytes memory) pure returns (bytes32)"
+                }
+              },
+              "id": 47547,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "functionCall",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "197:55:187",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 47559,
+              "nodeType": "Block",
+              "src": "318:100:187",
+              "statements": [
+                {
+                  "assignments": [
+                    47555
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 47555,
+                      "mutability": "mutable",
+                      "name": "slot",
+                      "nameLocation": "336:4:187",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 47559,
+                      "src": "328:12:187",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 47554,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "328:7:187",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 47557,
+                  "initialValue": {
+                    "id": 47556,
+                    "name": "STORAGE_SLOT",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 47548,
+                    "src": "343:12:187",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "328:27:187"
+                },
+                {
+                  "AST": {
+                    "nativeSrc": "374:38:187",
+                    "nodeType": "YulBlock",
+                    "src": "374:38:187",
+                    "statements": [
+                      {
+                        "nativeSrc": "388:14:187",
+                        "nodeType": "YulAssignment",
+                        "src": "388:14:187",
+                        "value": {
+                          "name": "slot",
+                          "nativeSrc": "398:4:187",
+                          "nodeType": "YulIdentifier",
+                          "src": "398:4:187"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "l.slot",
+                            "nativeSrc": "388:6:187",
+                            "nodeType": "YulIdentifier",
+                            "src": "388:6:187"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "istanbul",
+                  "externalReferences": [
+                    {
+                      "declaration": 47552,
+                      "isOffset": false,
+                      "isSlot": true,
+                      "src": "388:6:187",
+                      "suffix": "slot",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 47555,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "398:4:187",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 47558,
+                  "nodeType": "InlineAssembly",
+                  "src": "365:47:187"
+                }
+              ]
+            },
+            "id": 47560,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "layout",
+            "nameLocation": "268:6:187",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 47549,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "274:2:187"
+            },
+            "returnParameters": {
+              "id": 47553,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 47552,
+                  "mutability": "mutable",
+                  "name": "l",
+                  "nameLocation": "315:1:187",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 47560,
+                  "src": "300:16:187",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Layout_$47543_storage_ptr",
+                    "typeString": "struct InitializableStorage.Layout"
+                  },
+                  "typeName": {
+                    "id": 47551,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 47550,
+                      "name": "Layout",
+                      "nameLocations": [
+                        "300:6:187"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 47543,
+                      "src": "300:6:187"
+                    },
+                    "referencedDeclaration": 47543,
+                    "src": "300:6:187",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Layout_$47543_storage_ptr",
+                      "typeString": "struct InitializableStorage.Layout"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "299:18:187"
+            },
+            "scope": 47561,
+            "src": "259:159:187",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 47562,
+        "src": "59:361:187",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:388:187"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.821Z"
+}

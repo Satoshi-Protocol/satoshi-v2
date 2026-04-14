@@ -1,0 +1,26 @@
+{
+  "network": "nile",
+  "satoshiXApp": "TNMpZce8TgLuMzFXKWsLw5S9qawdC4KDXo",
+  "collateral": "TYcwYsfpYsa8jtQ2GzacVLpCB3AQuxyySe",
+  "priceFeed": "TZHim86dG3vmETDjwZ893Qie1snm1Km8e3",
+  "troveManager": "TNEU8Ri8GbsD3eDgsxKnEBPJED4iY1tGbq",
+  "sortedTroves": "TMWv7AtMw9PTCJRReywrSgkCeYVh9SN7Au",
+  "rewardManager": "TYP6Lss4aGGyrmVCfD7d3cQ2YXM6be3qrg",
+  "communityIssuance": "TKSpR9uK95DLTEVooVv7KjdXh4MBUaXhp3",
+  "vaultManager": "TP56UbwBbfiGnMYbponyTYqYaVT1yexixM",
+  "params": {
+    "minuteDecayFactor": "999037758833783500",
+    "redemptionFeeFloor": "5000000000000000",
+    "maxRedemptionFee": "50000000000000000",
+    "borrowingFeeFloor": "5000000000000000",
+    "maxBorrowingFee": "50000000000000000",
+    "interestRateInBps": "0",
+    "maxDebt": "1000000000000000000000000000",
+    "MCR": "1700000000000000000",
+    "rewardRate": "0",
+    "OSHIAllocation": "0",
+    "claimStartTime": "4294967295"
+  },
+  "retainPercentage": "0",
+  "refillPercentage": "0"
+}

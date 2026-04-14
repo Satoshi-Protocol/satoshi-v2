@@ -1,0 +1,224 @@
+{
+  "contractName": "IInitializable",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Initializable__AlreadyInitialized",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "version",
+          "type": "uint8"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { IInitializableInternal } from './IInitializableInternal.sol';\n\ninterface IInitializable is IInitializableInternal {}\n",
+  "sourcePath": "@solidstate/contracts/security/initializable/IInitializable.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/security/initializable/IInitializable.sol",
+    "exportedSymbols": {
+      "IInitializable": [
+        47436
+      ],
+      "IInitializableInternal": [
+        47445
+      ]
+    },
+    "id": 47437,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47431,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:183"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/security/initializable/IInitializableInternal.sol",
+        "file": "./IInitializableInternal.sol",
+        "id": 47433,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47437,
+        "sourceUnit": 47446,
+        "src": "59:70:183",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47432,
+              "name": "IInitializableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 47445,
+              "src": "68:22:183",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 47434,
+              "name": "IInitializableInternal",
+              "nameLocations": [
+                "159:22:183"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 47445,
+              "src": "159:22:183"
+            },
+            "id": 47435,
+            "nodeType": "InheritanceSpecifier",
+            "src": "159:22:183"
+          }
+        ],
+        "canonicalName": "IInitializable",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": true,
+        "id": 47436,
+        "linearizedBaseContracts": [
+          47436,
+          47445
+        ],
+        "name": "IInitializable",
+        "nameLocation": "141:14:183",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 47437,
+        "src": "131:53:183",
+        "usedErrors": [
+          47440
+        ],
+        "usedEvents": [
+          47444
+        ]
+      }
+    ],
+    "src": "33:152:183"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/security/initializable/IInitializable.sol",
+    "exportedSymbols": {
+      "IInitializable": [
+        47436
+      ],
+      "IInitializableInternal": [
+        47445
+      ]
+    },
+    "id": 47437,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 47431,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:183"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/security/initializable/IInitializableInternal.sol",
+        "file": "./IInitializableInternal.sol",
+        "id": 47433,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 47437,
+        "sourceUnit": 47446,
+        "src": "59:70:183",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 47432,
+              "name": "IInitializableInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 47445,
+              "src": "68:22:183",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 47434,
+              "name": "IInitializableInternal",
+              "nameLocations": [
+                "159:22:183"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 47445,
+              "src": "159:22:183"
+            },
+            "id": 47435,
+            "nodeType": "InheritanceSpecifier",
+            "src": "159:22:183"
+          }
+        ],
+        "canonicalName": "IInitializable",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": true,
+        "id": 47436,
+        "linearizedBaseContracts": [
+          47436,
+          47445
+        ],
+        "name": "IInitializable",
+        "nameLocation": "141:14:183",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 47437,
+        "src": "131:53:183",
+        "usedErrors": [
+          47440
+        ],
+        "usedEvents": [
+          47444
+        ]
+      }
+    ],
+    "src": "33:152:183"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.821Z"
+}

@@ -1,0 +1,209 @@
+{
+  "contractName": "IDiamondReadableInternal",
+  "abi": [],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { IERC2535DiamondLoupeInternal } from '../../../interfaces/IERC2535DiamondLoupeInternal.sol';\n\n/**\n * @title Diamond proxy introspection interface needed for internal functions\n * @dev see https://eips.ethereum.org/EIPS/eip-2535\n */\ninterface IDiamondReadableInternal is IERC2535DiamondLoupeInternal {}\n",
+  "sourcePath": "@solidstate/contracts/proxy/diamond/readable/IDiamondReadableInternal.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/readable/IDiamondReadableInternal.sol",
+    "exportedSymbols": {
+      "IDiamondReadableInternal": [
+        46596
+      ],
+      "IERC2535DiamondLoupeInternal": [
+        45579
+      ]
+    },
+    "id": 46597,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 46590,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:178"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/interfaces/IERC2535DiamondLoupeInternal.sol",
+        "file": "../../../interfaces/IERC2535DiamondLoupeInternal.sol",
+        "id": 46592,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 46597,
+        "sourceUnit": 45580,
+        "src": "59:100:178",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 46591,
+              "name": "IERC2535DiamondLoupeInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45579,
+              "src": "68:28:178",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 46594,
+              "name": "IERC2535DiamondLoupeInternal",
+              "nameLocations": [
+                "337:28:178"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45579,
+              "src": "337:28:178"
+            },
+            "id": 46595,
+            "nodeType": "InheritanceSpecifier",
+            "src": "337:28:178"
+          }
+        ],
+        "canonicalName": "IDiamondReadableInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 46593,
+          "nodeType": "StructuredDocumentation",
+          "src": "161:137:178",
+          "text": " @title Diamond proxy introspection interface needed for internal functions\n @dev see https://eips.ethereum.org/EIPS/eip-2535"
+        },
+        "fullyImplemented": true,
+        "id": 46596,
+        "linearizedBaseContracts": [
+          46596,
+          45579
+        ],
+        "name": "IDiamondReadableInternal",
+        "nameLocation": "309:24:178",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 46597,
+        "src": "299:69:178",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:336:178"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/readable/IDiamondReadableInternal.sol",
+    "exportedSymbols": {
+      "IDiamondReadableInternal": [
+        46596
+      ],
+      "IERC2535DiamondLoupeInternal": [
+        45579
+      ]
+    },
+    "id": 46597,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 46590,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:178"
+      },
+      {
+        "absolutePath": "@solidstate/contracts/interfaces/IERC2535DiamondLoupeInternal.sol",
+        "file": "../../../interfaces/IERC2535DiamondLoupeInternal.sol",
+        "id": 46592,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 46597,
+        "sourceUnit": 45580,
+        "src": "59:100:178",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 46591,
+              "name": "IERC2535DiamondLoupeInternal",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 45579,
+              "src": "68:28:178",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 46594,
+              "name": "IERC2535DiamondLoupeInternal",
+              "nameLocations": [
+                "337:28:178"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 45579,
+              "src": "337:28:178"
+            },
+            "id": 46595,
+            "nodeType": "InheritanceSpecifier",
+            "src": "337:28:178"
+          }
+        ],
+        "canonicalName": "IDiamondReadableInternal",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 46593,
+          "nodeType": "StructuredDocumentation",
+          "src": "161:137:178",
+          "text": " @title Diamond proxy introspection interface needed for internal functions\n @dev see https://eips.ethereum.org/EIPS/eip-2535"
+        },
+        "fullyImplemented": true,
+        "id": 46596,
+        "linearizedBaseContracts": [
+          46596,
+          45579
+        ],
+        "name": "IDiamondReadableInternal",
+        "nameLocation": "309:24:178",
+        "nodeType": "ContractDefinition",
+        "nodes": [],
+        "scope": 46597,
+        "src": "299:69:178",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:336:178"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.819Z"
+}

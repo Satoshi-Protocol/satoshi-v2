@@ -1,0 +1,12 @@
+{
+  "network": "nile",
+  "deployer": "TG566o3ZXWGXqzwN6xbpZV6kBdxSE83cu8",
+  "erc20Mock": "TYcwYsfpYsa8jtQ2GzacVLpCB3AQuxyySe",
+  "name": "ERC20 Mock",
+  "symbol": "MCK",
+  "decimals": 18,
+  "initialMint": "0",
+  "mintTo": "TG566o3ZXWGXqzwN6xbpZV6kBdxSE83cu8",
+  "totalSupply": "1000000000000000000000000",
+  "mintToBalance": "1000000000000000000000000"
+}

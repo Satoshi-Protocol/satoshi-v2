@@ -1,0 +1,3335 @@
+{
+  "contractName": "OAppCore",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidDelegate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidEndpointCall",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        }
+      ],
+      "name": "NoPeer",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "sender",
+          "type": "bytes32"
+        }
+      ],
+      "name": "OnlyPeer",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "peer",
+          "type": "bytes32"
+        }
+      ],
+      "name": "PeerSet",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "endpoint",
+      "outputs": [
+        {
+          "internalType": "contract ILayerZeroEndpointV2",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "oAppVersion",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "senderVersion",
+          "type": "uint64"
+        },
+        {
+          "internalType": "uint64",
+          "name": "receiverVersion",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        }
+      ],
+      "name": "peers",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "peer",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_delegate",
+          "type": "address"
+        }
+      ],
+      "name": "setDelegate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_eid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_peer",
+          "type": "bytes32"
+        }
+      ],
+      "name": "setPeer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { Ownable } from \"@openzeppelin/contracts/access/Ownable.sol\";\nimport { IOAppCore, ILayerZeroEndpointV2 } from \"./interfaces/IOAppCore.sol\";\n\n/**\n * @title OAppCore\n * @dev Abstract contract implementing the IOAppCore interface with basic OApp configurations.\n */\nabstract contract OAppCore is IOAppCore, Ownable {\n    // The LayerZero endpoint associated with the given OApp\n    ILayerZeroEndpointV2 public immutable endpoint;\n\n    // Mapping to store peers associated with corresponding endpoints\n    mapping(uint32 eid => bytes32 peer) public peers;\n\n    /**\n     * @dev Constructor to initialize the OAppCore with the provided endpoint and delegate.\n     * @param _endpoint The address of the LOCAL Layer Zero endpoint.\n     * @param _delegate The delegate capable of making OApp configurations inside of the endpoint.\n     *\n     * @dev The delegate typically should be set as the owner of the contract.\n     */\n    constructor(address _endpoint, address _delegate) {\n        endpoint = ILayerZeroEndpointV2(_endpoint);\n\n        if (_delegate == address(0)) revert InvalidDelegate();\n        endpoint.setDelegate(_delegate);\n    }\n\n    /**\n     * @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n     * @param _eid The endpoint ID.\n     * @param _peer The address of the peer to be associated with the corresponding endpoint.\n     *\n     * @dev Only the owner/admin of the OApp can call this function.\n     * @dev Indicates that the peer is trusted to send LayerZero messages to this OApp.\n     * @dev Set this to bytes32(0) to remove the peer address.\n     * @dev Peer is a bytes32 to accommodate non-evm chains.\n     */\n    function setPeer(uint32 _eid, bytes32 _peer) public virtual onlyOwner {\n        _setPeer(_eid, _peer);\n    }\n\n    /**\n     * @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n     * @param _eid The endpoint ID.\n     * @param _peer The address of the peer to be associated with the corresponding endpoint.\n     *\n     * @dev Indicates that the peer is trusted to send LayerZero messages to this OApp.\n     * @dev Set this to bytes32(0) to remove the peer address.\n     * @dev Peer is a bytes32 to accommodate non-evm chains.\n     */\n    function _setPeer(uint32 _eid, bytes32 _peer) internal virtual {\n        peers[_eid] = _peer;\n        emit PeerSet(_eid, _peer);\n    }\n\n    /**\n     * @notice Internal function to get the peer address associated with a specific endpoint; reverts if NOT set.\n     * ie. the peer is set to bytes32(0).\n     * @param _eid The endpoint ID.\n     * @return peer The address of the peer associated with the specified endpoint.\n     */\n    function _getPeerOrRevert(uint32 _eid) internal view virtual returns (bytes32) {\n        bytes32 peer = peers[_eid];\n        if (peer == bytes32(0)) revert NoPeer(_eid);\n        return peer;\n    }\n\n    /**\n     * @notice Sets the delegate address for the OApp.\n     * @param _delegate The address of the delegate to be set.\n     *\n     * @dev Only the owner/admin of the OApp can call this function.\n     * @dev Provides the ability for a delegate to set configs, on behalf of the OApp, directly on the Endpoint contract.\n     */\n    function setDelegate(address _delegate) public onlyOwner {\n        endpoint.setDelegate(_delegate);\n    }\n}\n",
+  "sourcePath": "@layerzerolabs/oapp-evm/contracts/oapp/OAppCore.sol",
+  "ast": {
+    "absolutePath": "@layerzerolabs/oapp-evm/contracts/oapp/OAppCore.sol",
+    "exportedSymbols": {
+      "ILayerZeroEndpointV2": [
+        30136
+      ],
+      "IOAppCore": [
+        32711
+      ],
+      "OAppCore": [
+        32462
+      ],
+      "Ownable": [
+        36279
+      ]
+    },
+    "id": 32463,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 32334,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:83"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
+        "file": "@openzeppelin/contracts/access/Ownable.sol",
+        "id": 32336,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 32463,
+        "sourceUnit": 36280,
+        "src": "59:69:83",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32335,
+              "name": "Ownable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 36279,
+              "src": "68:7:83",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppCore.sol",
+        "file": "./interfaces/IOAppCore.sol",
+        "id": 32339,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 32463,
+        "sourceUnit": 32712,
+        "src": "129:77:83",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32337,
+              "name": "IOAppCore",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 32711,
+              "src": "138:9:83",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 32338,
+              "name": "ILayerZeroEndpointV2",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 30136,
+              "src": "149:20:83",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 32341,
+              "name": "IOAppCore",
+              "nameLocations": [
+                "360:9:83"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 32711,
+              "src": "360:9:83"
+            },
+            "id": 32342,
+            "nodeType": "InheritanceSpecifier",
+            "src": "360:9:83"
+          },
+          {
+            "baseName": {
+              "id": 32343,
+              "name": "Ownable",
+              "nameLocations": [
+                "371:7:83"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 36279,
+              "src": "371:7:83"
+            },
+            "id": 32344,
+            "nodeType": "InheritanceSpecifier",
+            "src": "371:7:83"
+          }
+        ],
+        "canonicalName": "OAppCore",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 32340,
+          "nodeType": "StructuredDocumentation",
+          "src": "208:121:83",
+          "text": " @title OAppCore\n @dev Abstract contract implementing the IOAppCore interface with basic OApp configurations."
+        },
+        "fullyImplemented": false,
+        "id": 32462,
+        "linearizedBaseContracts": [
+          32462,
+          36279,
+          38460,
+          32711
+        ],
+        "name": "OAppCore",
+        "nameLocation": "348:8:83",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "baseFunctions": [
+              32688
+            ],
+            "constant": false,
+            "functionSelector": "5e280f11",
+            "id": 32347,
+            "mutability": "immutable",
+            "name": "endpoint",
+            "nameLocation": "484:8:83",
+            "nodeType": "VariableDeclaration",
+            "scope": 32462,
+            "src": "446:46:83",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+              "typeString": "contract ILayerZeroEndpointV2"
+            },
+            "typeName": {
+              "id": 32346,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 32345,
+                "name": "ILayerZeroEndpointV2",
+                "nameLocations": [
+                  "446:20:83"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 30136,
+                "src": "446:20:83"
+              },
+              "referencedDeclaration": 30136,
+              "src": "446:20:83",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                "typeString": "contract ILayerZeroEndpointV2"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              32696
+            ],
+            "constant": false,
+            "functionSelector": "bb0b6a53",
+            "id": 32351,
+            "mutability": "mutable",
+            "name": "peers",
+            "nameLocation": "612:5:83",
+            "nodeType": "VariableDeclaration",
+            "scope": 32462,
+            "src": "569:48:83",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+              "typeString": "mapping(uint32 => bytes32)"
+            },
+            "typeName": {
+              "id": 32350,
+              "keyName": "eid",
+              "keyNameLocation": "584:3:83",
+              "keyType": {
+                "id": 32348,
+                "name": "uint32",
+                "nodeType": "ElementaryTypeName",
+                "src": "577:6:83",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint32",
+                  "typeString": "uint32"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "569:35:83",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+                "typeString": "mapping(uint32 => bytes32)"
+              },
+              "valueName": "peer",
+              "valueNameLocation": "599:4:83",
+              "valueType": {
+                "id": 32349,
+                "name": "bytes32",
+                "nodeType": "ElementaryTypeName",
+                "src": "591:7:83",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 32381,
+              "nodeType": "Block",
+              "src": "1037:164:83",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 32363,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 32359,
+                      "name": "endpoint",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32347,
+                      "src": "1047:8:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                        "typeString": "contract ILayerZeroEndpointV2"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "id": 32361,
+                          "name": "_endpoint",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32354,
+                          "src": "1079:9:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 32360,
+                        "name": "ILayerZeroEndpointV2",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 30136,
+                        "src": "1058:20:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_ILayerZeroEndpointV2_$30136_$",
+                          "typeString": "type(contract ILayerZeroEndpointV2)"
+                        }
+                      },
+                      "id": 32362,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1058:31:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                        "typeString": "contract ILayerZeroEndpointV2"
+                      }
+                    },
+                    "src": "1047:42:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                      "typeString": "contract ILayerZeroEndpointV2"
+                    }
+                  },
+                  "id": 32364,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1047:42:83"
+                },
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    },
+                    "id": 32370,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 32365,
+                      "name": "_delegate",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32356,
+                      "src": "1104:9:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "arguments": [
+                        {
+                          "hexValue": "30",
+                          "id": 32368,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1125:1:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          },
+                          "value": "0"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          }
+                        ],
+                        "id": 32367,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "ElementaryTypeNameExpression",
+                        "src": "1117:7:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_address_$",
+                          "typeString": "type(address)"
+                        },
+                        "typeName": {
+                          "id": 32366,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1117:7:83",
+                          "typeDescriptions": {}
+                        }
+                      },
+                      "id": 32369,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1117:10:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "1104:23:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 32374,
+                  "nodeType": "IfStatement",
+                  "src": "1100:53:83",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 32371,
+                        "name": "InvalidDelegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32667,
+                        "src": "1136:15:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                          "typeString": "function () pure"
+                        }
+                      },
+                      "id": 32372,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1136:17:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 32373,
+                    "nodeType": "RevertStatement",
+                    "src": "1129:24:83"
+                  }
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 32378,
+                        "name": "_delegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32356,
+                        "src": "1184:9:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "id": 32375,
+                        "name": "endpoint",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32347,
+                        "src": "1163:8:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                          "typeString": "contract ILayerZeroEndpointV2"
+                        }
+                      },
+                      "id": 32377,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1172:11:83",
+                      "memberName": "setDelegate",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 30135,
+                      "src": "1163:20:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address) external"
+                      }
+                    },
+                    "id": 32379,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1163:31:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32380,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1163:31:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32352,
+              "nodeType": "StructuredDocumentation",
+              "src": "624:358:83",
+              "text": " @dev Constructor to initialize the OAppCore with the provided endpoint and delegate.\n @param _endpoint The address of the LOCAL Layer Zero endpoint.\n @param _delegate The delegate capable of making OApp configurations inside of the endpoint.\n @dev The delegate typically should be set as the owner of the contract."
+            },
+            "id": 32382,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32357,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32354,
+                  "mutability": "mutable",
+                  "name": "_endpoint",
+                  "nameLocation": "1007:9:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32382,
+                  "src": "999:17:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32353,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "999:7:83",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32356,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "1026:9:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32382,
+                  "src": "1018:17:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32355,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1018:7:83",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "998:38:83"
+            },
+            "returnParameters": {
+              "id": 32358,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1037:0:83"
+            },
+            "scope": 32462,
+            "src": "987:214:83",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              32704
+            ],
+            "body": {
+              "id": 32397,
+              "nodeType": "Block",
+              "src": "1794:38:83",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 32393,
+                        "name": "_eid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32385,
+                        "src": "1813:4:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        }
+                      },
+                      {
+                        "id": 32394,
+                        "name": "_peer",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32387,
+                        "src": "1819:5:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      ],
+                      "id": 32392,
+                      "name": "_setPeer",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32418,
+                      "src": "1804:8:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_uint32_$_t_bytes32_$returns$__$",
+                        "typeString": "function (uint32,bytes32)"
+                      }
+                    },
+                    "id": 32395,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1804:21:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32396,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1804:21:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32383,
+              "nodeType": "StructuredDocumentation",
+              "src": "1207:512:83",
+              "text": " @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n @param _eid The endpoint ID.\n @param _peer The address of the peer to be associated with the corresponding endpoint.\n @dev Only the owner/admin of the OApp can call this function.\n @dev Indicates that the peer is trusted to send LayerZero messages to this OApp.\n @dev Set this to bytes32(0) to remove the peer address.\n @dev Peer is a bytes32 to accommodate non-evm chains."
+            },
+            "functionSelector": "3400288b",
+            "id": 32398,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 32390,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 32389,
+                  "name": "onlyOwner",
+                  "nameLocations": [
+                    "1784:9:83"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 36190,
+                  "src": "1784:9:83"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1784:9:83"
+              }
+            ],
+            "name": "setPeer",
+            "nameLocation": "1733:7:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32388,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32385,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "1748:4:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32398,
+                  "src": "1741:11:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32384,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1741:6:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32387,
+                  "mutability": "mutable",
+                  "name": "_peer",
+                  "nameLocation": "1762:5:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32398,
+                  "src": "1754:13:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32386,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1754:7:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1740:28:83"
+            },
+            "returnParameters": {
+              "id": 32391,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1794:0:83"
+            },
+            "scope": 32462,
+            "src": "1724:108:83",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 32417,
+              "nodeType": "Block",
+              "src": "2349:71:83",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 32410,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "id": 32406,
+                        "name": "peers",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32351,
+                        "src": "2359:5:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+                          "typeString": "mapping(uint32 => bytes32)"
+                        }
+                      },
+                      "id": 32408,
+                      "indexExpression": {
+                        "id": 32407,
+                        "name": "_eid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32401,
+                        "src": "2365:4:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "2359:11:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 32409,
+                      "name": "_peer",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32403,
+                      "src": "2373:5:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "2359:19:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 32411,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2359:19:83"
+                },
+                {
+                  "eventCall": {
+                    "arguments": [
+                      {
+                        "id": 32413,
+                        "name": "_eid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32401,
+                        "src": "2401:4:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        }
+                      },
+                      {
+                        "id": 32414,
+                        "name": "_peer",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32403,
+                        "src": "2407:5:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      ],
+                      "id": 32412,
+                      "name": "PeerSet",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32673,
+                      "src": "2393:7:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint32_$_t_bytes32_$returns$__$",
+                        "typeString": "function (uint32,bytes32)"
+                      }
+                    },
+                    "id": 32415,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2393:20:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32416,
+                  "nodeType": "EmitStatement",
+                  "src": "2388:25:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32399,
+              "nodeType": "StructuredDocumentation",
+              "src": "1838:443:83",
+              "text": " @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n @param _eid The endpoint ID.\n @param _peer The address of the peer to be associated with the corresponding endpoint.\n @dev Indicates that the peer is trusted to send LayerZero messages to this OApp.\n @dev Set this to bytes32(0) to remove the peer address.\n @dev Peer is a bytes32 to accommodate non-evm chains."
+            },
+            "id": 32418,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_setPeer",
+            "nameLocation": "2295:8:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32404,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32401,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "2311:4:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32418,
+                  "src": "2304:11:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32400,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2304:6:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32403,
+                  "mutability": "mutable",
+                  "name": "_peer",
+                  "nameLocation": "2325:5:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32418,
+                  "src": "2317:13:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32402,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2317:7:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2303:28:83"
+            },
+            "returnParameters": {
+              "id": 32405,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2349:0:83"
+            },
+            "scope": 32462,
+            "src": "2286:134:83",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 32445,
+              "nodeType": "Block",
+              "src": "2797:117:83",
+              "statements": [
+                {
+                  "assignments": [
+                    32427
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 32427,
+                      "mutability": "mutable",
+                      "name": "peer",
+                      "nameLocation": "2815:4:83",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 32445,
+                      "src": "2807:12:83",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 32426,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2807:7:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 32431,
+                  "initialValue": {
+                    "baseExpression": {
+                      "id": 32428,
+                      "name": "peers",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32351,
+                      "src": "2822:5:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+                        "typeString": "mapping(uint32 => bytes32)"
+                      }
+                    },
+                    "id": 32430,
+                    "indexExpression": {
+                      "id": 32429,
+                      "name": "_eid",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32421,
+                      "src": "2828:4:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint32",
+                        "typeString": "uint32"
+                      }
+                    },
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "IndexAccess",
+                    "src": "2822:11:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2807:26:83"
+                },
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    },
+                    "id": 32437,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 32432,
+                      "name": "peer",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32427,
+                      "src": "2847:4:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "arguments": [
+                        {
+                          "hexValue": "30",
+                          "id": 32435,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "2863:1:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          },
+                          "value": "0"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          }
+                        ],
+                        "id": 32434,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "ElementaryTypeNameExpression",
+                        "src": "2855:7:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_bytes32_$",
+                          "typeString": "type(bytes32)"
+                        },
+                        "typeName": {
+                          "id": 32433,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2855:7:83",
+                          "typeDescriptions": {}
+                        }
+                      },
+                      "id": 32436,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2855:10:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "2847:18:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 32442,
+                  "nodeType": "IfStatement",
+                  "src": "2843:43:83",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [
+                        {
+                          "id": 32439,
+                          "name": "_eid",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32421,
+                          "src": "2881:4:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          }
+                        ],
+                        "id": 32438,
+                        "name": "NoPeer",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32663,
+                        "src": "2874:6:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$_t_uint32_$returns$__$",
+                          "typeString": "function (uint32) pure"
+                        }
+                      },
+                      "id": 32440,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2874:12:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 32441,
+                    "nodeType": "RevertStatement",
+                    "src": "2867:19:83"
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 32443,
+                    "name": "peer",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 32427,
+                    "src": "2903:4:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 32425,
+                  "id": 32444,
+                  "nodeType": "Return",
+                  "src": "2896:11:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32419,
+              "nodeType": "StructuredDocumentation",
+              "src": "2426:287:83",
+              "text": " @notice Internal function to get the peer address associated with a specific endpoint; reverts if NOT set.\n ie. the peer is set to bytes32(0).\n @param _eid The endpoint ID.\n @return peer The address of the peer associated with the specified endpoint."
+            },
+            "id": 32446,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_getPeerOrRevert",
+            "nameLocation": "2727:16:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32422,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32421,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "2751:4:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32446,
+                  "src": "2744:11:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32420,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2744:6:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2743:13:83"
+            },
+            "returnParameters": {
+              "id": 32425,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32424,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32446,
+                  "src": "2788:7:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32423,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2788:7:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2787:9:83"
+            },
+            "scope": 32462,
+            "src": "2718:196:83",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              32710
+            ],
+            "body": {
+              "id": 32460,
+              "nodeType": "Block",
+              "src": "3309:48:83",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 32457,
+                        "name": "_delegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32449,
+                        "src": "3340:9:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "id": 32454,
+                        "name": "endpoint",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32347,
+                        "src": "3319:8:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                          "typeString": "contract ILayerZeroEndpointV2"
+                        }
+                      },
+                      "id": 32456,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "3328:11:83",
+                      "memberName": "setDelegate",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 30135,
+                      "src": "3319:20:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address) external"
+                      }
+                    },
+                    "id": 32458,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "3319:31:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32459,
+                  "nodeType": "ExpressionStatement",
+                  "src": "3319:31:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32447,
+              "nodeType": "StructuredDocumentation",
+              "src": "2920:327:83",
+              "text": " @notice Sets the delegate address for the OApp.\n @param _delegate The address of the delegate to be set.\n @dev Only the owner/admin of the OApp can call this function.\n @dev Provides the ability for a delegate to set configs, on behalf of the OApp, directly on the Endpoint contract."
+            },
+            "functionSelector": "ca5eb5e1",
+            "id": 32461,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 32452,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 32451,
+                  "name": "onlyOwner",
+                  "nameLocations": [
+                    "3299:9:83"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 36190,
+                  "src": "3299:9:83"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3299:9:83"
+              }
+            ],
+            "name": "setDelegate",
+            "nameLocation": "3261:11:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32450,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32449,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "3281:9:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32461,
+                  "src": "3273:17:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32448,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3273:7:83",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3272:19:83"
+            },
+            "returnParameters": {
+              "id": 32453,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3309:0:83"
+            },
+            "scope": 32462,
+            "src": "3252:105:83",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 32463,
+        "src": "330:3029:83",
+        "usedErrors": [
+          32659,
+          32663,
+          32665,
+          32667,
+          36145,
+          36150
+        ],
+        "usedEvents": [
+          32673,
+          36156
+        ]
+      }
+    ],
+    "src": "33:3327:83"
+  },
+  "legacyAST": {
+    "absolutePath": "@layerzerolabs/oapp-evm/contracts/oapp/OAppCore.sol",
+    "exportedSymbols": {
+      "ILayerZeroEndpointV2": [
+        30136
+      ],
+      "IOAppCore": [
+        32711
+      ],
+      "OAppCore": [
+        32462
+      ],
+      "Ownable": [
+        36279
+      ]
+    },
+    "id": 32463,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 32334,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:83"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/access/Ownable.sol",
+        "file": "@openzeppelin/contracts/access/Ownable.sol",
+        "id": 32336,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 32463,
+        "sourceUnit": 36280,
+        "src": "59:69:83",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32335,
+              "name": "Ownable",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 36279,
+              "src": "68:7:83",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppCore.sol",
+        "file": "./interfaces/IOAppCore.sol",
+        "id": 32339,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 32463,
+        "sourceUnit": 32712,
+        "src": "129:77:83",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32337,
+              "name": "IOAppCore",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 32711,
+              "src": "138:9:83",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          },
+          {
+            "foreign": {
+              "id": 32338,
+              "name": "ILayerZeroEndpointV2",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 30136,
+              "src": "149:20:83",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 32341,
+              "name": "IOAppCore",
+              "nameLocations": [
+                "360:9:83"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 32711,
+              "src": "360:9:83"
+            },
+            "id": 32342,
+            "nodeType": "InheritanceSpecifier",
+            "src": "360:9:83"
+          },
+          {
+            "baseName": {
+              "id": 32343,
+              "name": "Ownable",
+              "nameLocations": [
+                "371:7:83"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 36279,
+              "src": "371:7:83"
+            },
+            "id": 32344,
+            "nodeType": "InheritanceSpecifier",
+            "src": "371:7:83"
+          }
+        ],
+        "canonicalName": "OAppCore",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "documentation": {
+          "id": 32340,
+          "nodeType": "StructuredDocumentation",
+          "src": "208:121:83",
+          "text": " @title OAppCore\n @dev Abstract contract implementing the IOAppCore interface with basic OApp configurations."
+        },
+        "fullyImplemented": false,
+        "id": 32462,
+        "linearizedBaseContracts": [
+          32462,
+          36279,
+          38460,
+          32711
+        ],
+        "name": "OAppCore",
+        "nameLocation": "348:8:83",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "baseFunctions": [
+              32688
+            ],
+            "constant": false,
+            "functionSelector": "5e280f11",
+            "id": 32347,
+            "mutability": "immutable",
+            "name": "endpoint",
+            "nameLocation": "484:8:83",
+            "nodeType": "VariableDeclaration",
+            "scope": 32462,
+            "src": "446:46:83",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+              "typeString": "contract ILayerZeroEndpointV2"
+            },
+            "typeName": {
+              "id": 32346,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 32345,
+                "name": "ILayerZeroEndpointV2",
+                "nameLocations": [
+                  "446:20:83"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 30136,
+                "src": "446:20:83"
+              },
+              "referencedDeclaration": 30136,
+              "src": "446:20:83",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                "typeString": "contract ILayerZeroEndpointV2"
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              32696
+            ],
+            "constant": false,
+            "functionSelector": "bb0b6a53",
+            "id": 32351,
+            "mutability": "mutable",
+            "name": "peers",
+            "nameLocation": "612:5:83",
+            "nodeType": "VariableDeclaration",
+            "scope": 32462,
+            "src": "569:48:83",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+              "typeString": "mapping(uint32 => bytes32)"
+            },
+            "typeName": {
+              "id": 32350,
+              "keyName": "eid",
+              "keyNameLocation": "584:3:83",
+              "keyType": {
+                "id": 32348,
+                "name": "uint32",
+                "nodeType": "ElementaryTypeName",
+                "src": "577:6:83",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint32",
+                  "typeString": "uint32"
+                }
+              },
+              "nodeType": "Mapping",
+              "src": "569:35:83",
+              "typeDescriptions": {
+                "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+                "typeString": "mapping(uint32 => bytes32)"
+              },
+              "valueName": "peer",
+              "valueNameLocation": "599:4:83",
+              "valueType": {
+                "id": 32349,
+                "name": "bytes32",
+                "nodeType": "ElementaryTypeName",
+                "src": "591:7:83",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bytes32",
+                  "typeString": "bytes32"
+                }
+              }
+            },
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 32381,
+              "nodeType": "Block",
+              "src": "1037:164:83",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 32363,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 32359,
+                      "name": "endpoint",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32347,
+                      "src": "1047:8:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                        "typeString": "contract ILayerZeroEndpointV2"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "id": 32361,
+                          "name": "_endpoint",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32354,
+                          "src": "1079:9:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        ],
+                        "id": 32360,
+                        "name": "ILayerZeroEndpointV2",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 30136,
+                        "src": "1058:20:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_contract$_ILayerZeroEndpointV2_$30136_$",
+                          "typeString": "type(contract ILayerZeroEndpointV2)"
+                        }
+                      },
+                      "id": 32362,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1058:31:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                        "typeString": "contract ILayerZeroEndpointV2"
+                      }
+                    },
+                    "src": "1047:42:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                      "typeString": "contract ILayerZeroEndpointV2"
+                    }
+                  },
+                  "id": 32364,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1047:42:83"
+                },
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    },
+                    "id": 32370,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 32365,
+                      "name": "_delegate",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32356,
+                      "src": "1104:9:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "arguments": [
+                        {
+                          "hexValue": "30",
+                          "id": 32368,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "1125:1:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          },
+                          "value": "0"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          }
+                        ],
+                        "id": 32367,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "ElementaryTypeNameExpression",
+                        "src": "1117:7:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_address_$",
+                          "typeString": "type(address)"
+                        },
+                        "typeName": {
+                          "id": 32366,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1117:7:83",
+                          "typeDescriptions": {}
+                        }
+                      },
+                      "id": 32369,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1117:10:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "1104:23:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 32374,
+                  "nodeType": "IfStatement",
+                  "src": "1100:53:83",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "id": 32371,
+                        "name": "InvalidDelegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32667,
+                        "src": "1136:15:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$__$returns$__$",
+                          "typeString": "function () pure"
+                        }
+                      },
+                      "id": 32372,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1136:17:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 32373,
+                    "nodeType": "RevertStatement",
+                    "src": "1129:24:83"
+                  }
+                },
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 32378,
+                        "name": "_delegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32356,
+                        "src": "1184:9:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "id": 32375,
+                        "name": "endpoint",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32347,
+                        "src": "1163:8:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                          "typeString": "contract ILayerZeroEndpointV2"
+                        }
+                      },
+                      "id": 32377,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1172:11:83",
+                      "memberName": "setDelegate",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 30135,
+                      "src": "1163:20:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address) external"
+                      }
+                    },
+                    "id": 32379,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1163:31:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32380,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1163:31:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32352,
+              "nodeType": "StructuredDocumentation",
+              "src": "624:358:83",
+              "text": " @dev Constructor to initialize the OAppCore with the provided endpoint and delegate.\n @param _endpoint The address of the LOCAL Layer Zero endpoint.\n @param _delegate The delegate capable of making OApp configurations inside of the endpoint.\n @dev The delegate typically should be set as the owner of the contract."
+            },
+            "id": 32382,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32357,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32354,
+                  "mutability": "mutable",
+                  "name": "_endpoint",
+                  "nameLocation": "1007:9:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32382,
+                  "src": "999:17:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32353,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "999:7:83",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32356,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "1026:9:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32382,
+                  "src": "1018:17:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32355,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1018:7:83",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "998:38:83"
+            },
+            "returnParameters": {
+              "id": 32358,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1037:0:83"
+            },
+            "scope": 32462,
+            "src": "987:214:83",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              32704
+            ],
+            "body": {
+              "id": 32397,
+              "nodeType": "Block",
+              "src": "1794:38:83",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 32393,
+                        "name": "_eid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32385,
+                        "src": "1813:4:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        }
+                      },
+                      {
+                        "id": 32394,
+                        "name": "_peer",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32387,
+                        "src": "1819:5:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      ],
+                      "id": 32392,
+                      "name": "_setPeer",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32418,
+                      "src": "1804:8:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_nonpayable$_t_uint32_$_t_bytes32_$returns$__$",
+                        "typeString": "function (uint32,bytes32)"
+                      }
+                    },
+                    "id": 32395,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1804:21:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32396,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1804:21:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32383,
+              "nodeType": "StructuredDocumentation",
+              "src": "1207:512:83",
+              "text": " @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n @param _eid The endpoint ID.\n @param _peer The address of the peer to be associated with the corresponding endpoint.\n @dev Only the owner/admin of the OApp can call this function.\n @dev Indicates that the peer is trusted to send LayerZero messages to this OApp.\n @dev Set this to bytes32(0) to remove the peer address.\n @dev Peer is a bytes32 to accommodate non-evm chains."
+            },
+            "functionSelector": "3400288b",
+            "id": 32398,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 32390,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 32389,
+                  "name": "onlyOwner",
+                  "nameLocations": [
+                    "1784:9:83"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 36190,
+                  "src": "1784:9:83"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1784:9:83"
+              }
+            ],
+            "name": "setPeer",
+            "nameLocation": "1733:7:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32388,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32385,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "1748:4:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32398,
+                  "src": "1741:11:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32384,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1741:6:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32387,
+                  "mutability": "mutable",
+                  "name": "_peer",
+                  "nameLocation": "1762:5:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32398,
+                  "src": "1754:13:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32386,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1754:7:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1740:28:83"
+            },
+            "returnParameters": {
+              "id": 32391,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1794:0:83"
+            },
+            "scope": 32462,
+            "src": "1724:108:83",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 32417,
+              "nodeType": "Block",
+              "src": "2349:71:83",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 32410,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "baseExpression": {
+                        "id": 32406,
+                        "name": "peers",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32351,
+                        "src": "2359:5:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+                          "typeString": "mapping(uint32 => bytes32)"
+                        }
+                      },
+                      "id": 32408,
+                      "indexExpression": {
+                        "id": 32407,
+                        "name": "_eid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32401,
+                        "src": "2365:4:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        }
+                      },
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "nodeType": "IndexAccess",
+                      "src": "2359:11:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 32409,
+                      "name": "_peer",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32403,
+                      "src": "2373:5:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "2359:19:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 32411,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2359:19:83"
+                },
+                {
+                  "eventCall": {
+                    "arguments": [
+                      {
+                        "id": 32413,
+                        "name": "_eid",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32401,
+                        "src": "2401:4:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        }
+                      },
+                      {
+                        "id": 32414,
+                        "name": "_peer",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32403,
+                        "src": "2407:5:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_uint32",
+                          "typeString": "uint32"
+                        },
+                        {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      ],
+                      "id": 32412,
+                      "name": "PeerSet",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32673,
+                      "src": "2393:7:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_event_nonpayable$_t_uint32_$_t_bytes32_$returns$__$",
+                        "typeString": "function (uint32,bytes32)"
+                      }
+                    },
+                    "id": 32415,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2393:20:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32416,
+                  "nodeType": "EmitStatement",
+                  "src": "2388:25:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32399,
+              "nodeType": "StructuredDocumentation",
+              "src": "1838:443:83",
+              "text": " @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n @param _eid The endpoint ID.\n @param _peer The address of the peer to be associated with the corresponding endpoint.\n @dev Indicates that the peer is trusted to send LayerZero messages to this OApp.\n @dev Set this to bytes32(0) to remove the peer address.\n @dev Peer is a bytes32 to accommodate non-evm chains."
+            },
+            "id": 32418,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_setPeer",
+            "nameLocation": "2295:8:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32404,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32401,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "2311:4:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32418,
+                  "src": "2304:11:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32400,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2304:6:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32403,
+                  "mutability": "mutable",
+                  "name": "_peer",
+                  "nameLocation": "2325:5:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32418,
+                  "src": "2317:13:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32402,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2317:7:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2303:28:83"
+            },
+            "returnParameters": {
+              "id": 32405,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2349:0:83"
+            },
+            "scope": 32462,
+            "src": "2286:134:83",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 32445,
+              "nodeType": "Block",
+              "src": "2797:117:83",
+              "statements": [
+                {
+                  "assignments": [
+                    32427
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 32427,
+                      "mutability": "mutable",
+                      "name": "peer",
+                      "nameLocation": "2815:4:83",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 32445,
+                      "src": "2807:12:83",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 32426,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "2807:7:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 32431,
+                  "initialValue": {
+                    "baseExpression": {
+                      "id": 32428,
+                      "name": "peers",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32351,
+                      "src": "2822:5:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_mapping$_t_uint32_$_t_bytes32_$",
+                        "typeString": "mapping(uint32 => bytes32)"
+                      }
+                    },
+                    "id": 32430,
+                    "indexExpression": {
+                      "id": 32429,
+                      "name": "_eid",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32421,
+                      "src": "2828:4:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint32",
+                        "typeString": "uint32"
+                      }
+                    },
+                    "isConstant": false,
+                    "isLValue": true,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "nodeType": "IndexAccess",
+                    "src": "2822:11:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "2807:26:83"
+                },
+                {
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    },
+                    "id": 32437,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 32432,
+                      "name": "peer",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 32427,
+                      "src": "2847:4:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "arguments": [
+                        {
+                          "hexValue": "30",
+                          "id": 32435,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": true,
+                          "kind": "number",
+                          "lValueRequested": false,
+                          "nodeType": "Literal",
+                          "src": "2863:1:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          },
+                          "value": "0"
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_rational_0_by_1",
+                            "typeString": "int_const 0"
+                          }
+                        ],
+                        "id": 32434,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "ElementaryTypeNameExpression",
+                        "src": "2855:7:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_bytes32_$",
+                          "typeString": "type(bytes32)"
+                        },
+                        "typeName": {
+                          "id": 32433,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2855:7:83",
+                          "typeDescriptions": {}
+                        }
+                      },
+                      "id": 32436,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "typeConversion",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2855:10:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "2847:18:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 32442,
+                  "nodeType": "IfStatement",
+                  "src": "2843:43:83",
+                  "trueBody": {
+                    "errorCall": {
+                      "arguments": [
+                        {
+                          "id": 32439,
+                          "name": "_eid",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32421,
+                          "src": "2881:4:83",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          }
+                        ],
+                        "id": 32438,
+                        "name": "NoPeer",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32663,
+                        "src": "2874:6:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_error_pure$_t_uint32_$returns$__$",
+                          "typeString": "function (uint32) pure"
+                        }
+                      },
+                      "id": 32440,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2874:12:83",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_tuple$__$",
+                        "typeString": "tuple()"
+                      }
+                    },
+                    "id": 32441,
+                    "nodeType": "RevertStatement",
+                    "src": "2867:19:83"
+                  }
+                },
+                {
+                  "expression": {
+                    "id": 32443,
+                    "name": "peer",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 32427,
+                    "src": "2903:4:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "functionReturnParameters": 32425,
+                  "id": 32444,
+                  "nodeType": "Return",
+                  "src": "2896:11:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32419,
+              "nodeType": "StructuredDocumentation",
+              "src": "2426:287:83",
+              "text": " @notice Internal function to get the peer address associated with a specific endpoint; reverts if NOT set.\n ie. the peer is set to bytes32(0).\n @param _eid The endpoint ID.\n @return peer The address of the peer associated with the specified endpoint."
+            },
+            "id": 32446,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "_getPeerOrRevert",
+            "nameLocation": "2727:16:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32422,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32421,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "2751:4:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32446,
+                  "src": "2744:11:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32420,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2744:6:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2743:13:83"
+            },
+            "returnParameters": {
+              "id": 32425,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32424,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32446,
+                  "src": "2788:7:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32423,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2788:7:83",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2787:9:83"
+            },
+            "scope": 32462,
+            "src": "2718:196:83",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              32710
+            ],
+            "body": {
+              "id": 32460,
+              "nodeType": "Block",
+              "src": "3309:48:83",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 32457,
+                        "name": "_delegate",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32449,
+                        "src": "3340:9:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        }
+                      ],
+                      "expression": {
+                        "id": 32454,
+                        "name": "endpoint",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32347,
+                        "src": "3319:8:83",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                          "typeString": "contract ILayerZeroEndpointV2"
+                        }
+                      },
+                      "id": 32456,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "3328:11:83",
+                      "memberName": "setDelegate",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 30135,
+                      "src": "3319:20:83",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
+                        "typeString": "function (address) external"
+                      }
+                    },
+                    "id": 32458,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "3319:31:83",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 32459,
+                  "nodeType": "ExpressionStatement",
+                  "src": "3319:31:83"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32447,
+              "nodeType": "StructuredDocumentation",
+              "src": "2920:327:83",
+              "text": " @notice Sets the delegate address for the OApp.\n @param _delegate The address of the delegate to be set.\n @dev Only the owner/admin of the OApp can call this function.\n @dev Provides the ability for a delegate to set configs, on behalf of the OApp, directly on the Endpoint contract."
+            },
+            "functionSelector": "ca5eb5e1",
+            "id": 32461,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "id": 32452,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 32451,
+                  "name": "onlyOwner",
+                  "nameLocations": [
+                    "3299:9:83"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 36190,
+                  "src": "3299:9:83"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3299:9:83"
+              }
+            ],
+            "name": "setDelegate",
+            "nameLocation": "3261:11:83",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32450,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32449,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "3281:9:83",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32461,
+                  "src": "3273:17:83",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32448,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3273:7:83",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3272:19:83"
+            },
+            "returnParameters": {
+              "id": 32453,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3309:0:83"
+            },
+            "scope": 32462,
+            "src": "3252:105:83",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 32463,
+        "src": "330:3029:83",
+        "usedErrors": [
+          32659,
+          32663,
+          32665,
+          32667,
+          36145,
+          36150
+        ],
+        "usedEvents": [
+          32673,
+          36156
+        ]
+      }
+    ],
+    "src": "33:3327:83"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.790Z"
+}

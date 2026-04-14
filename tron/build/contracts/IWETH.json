@@ -1,0 +1,609 @@
+{
+  "contractName": "IWETH",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Approval",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        }
+      ],
+      "name": "allowance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "approve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFrom",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n// solhint-disable-next-line\npragma solidity ^0.8.20;\n\nimport { IERC20 } from \"@openzeppelin/contracts/token/ERC20/IERC20.sol\";\n\n/**\n * @title WETH interface\n * @author Term Structure Labs\n * @notice Interface for WETH contract\n */\ninterface IWETH is IERC20 {\n    /// @notice Deposit ETH to get WETH\n    function deposit() external payable;\n\n    /// @notice Withdraw WETH to get ETH\n    function withdraw(uint256) external;\n}\n",
+  "sourcePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/helpers/interfaces/IWETH.sol",
+  "ast": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/helpers/interfaces/IWETH.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        37699
+      ],
+      "IWETH": [
+        21934
+      ]
+    },
+    "id": 21935,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 21918,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "61:24:34"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "id": 21920,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 21935,
+        "sourceUnit": 37700,
+        "src": "87:72:34",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 21919,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 37699,
+              "src": "96:6:34",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 21922,
+              "name": "IERC20",
+              "nameLocations": [
+                "283:6:34"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 37699,
+              "src": "283:6:34"
+            },
+            "id": 21923,
+            "nodeType": "InheritanceSpecifier",
+            "src": "283:6:34"
+          }
+        ],
+        "canonicalName": "IWETH",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 21921,
+          "nodeType": "StructuredDocumentation",
+          "src": "161:102:34",
+          "text": " @title WETH interface\n @author Term Structure Labs\n @notice Interface for WETH contract"
+        },
+        "fullyImplemented": false,
+        "id": 21934,
+        "linearizedBaseContracts": [
+          21934,
+          37699
+        ],
+        "name": "IWETH",
+        "nameLocation": "274:5:34",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 21924,
+              "nodeType": "StructuredDocumentation",
+              "src": "296:35:34",
+              "text": "@notice Deposit ETH to get WETH"
+            },
+            "functionSelector": "d0e30db0",
+            "id": 21927,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deposit",
+            "nameLocation": "345:7:34",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 21925,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "352:2:34"
+            },
+            "returnParameters": {
+              "id": 21926,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "371:0:34"
+            },
+            "scope": 21934,
+            "src": "336:36:34",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 21928,
+              "nodeType": "StructuredDocumentation",
+              "src": "378:36:34",
+              "text": "@notice Withdraw WETH to get ETH"
+            },
+            "functionSelector": "2e1a7d4d",
+            "id": 21933,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "withdraw",
+            "nameLocation": "428:8:34",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 21931,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 21930,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21933,
+                  "src": "437:7:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 21929,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "437:7:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "436:9:34"
+            },
+            "returnParameters": {
+              "id": 21932,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "454:0:34"
+            },
+            "scope": 21934,
+            "src": "419:36:34",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 21935,
+        "src": "264:193:34",
+        "usedErrors": [],
+        "usedEvents": [
+          37633,
+          37642
+        ]
+      }
+    ],
+    "src": "61:397:34"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/helpers/interfaces/IWETH.sol",
+    "exportedSymbols": {
+      "IERC20": [
+        37699
+      ],
+      "IWETH": [
+        21934
+      ]
+    },
+    "id": 21935,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 21918,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "61:24:34"
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "file": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+        "id": 21920,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 21935,
+        "sourceUnit": 37700,
+        "src": "87:72:34",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 21919,
+              "name": "IERC20",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 37699,
+              "src": "96:6:34",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 21922,
+              "name": "IERC20",
+              "nameLocations": [
+                "283:6:34"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 37699,
+              "src": "283:6:34"
+            },
+            "id": 21923,
+            "nodeType": "InheritanceSpecifier",
+            "src": "283:6:34"
+          }
+        ],
+        "canonicalName": "IWETH",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 21921,
+          "nodeType": "StructuredDocumentation",
+          "src": "161:102:34",
+          "text": " @title WETH interface\n @author Term Structure Labs\n @notice Interface for WETH contract"
+        },
+        "fullyImplemented": false,
+        "id": 21934,
+        "linearizedBaseContracts": [
+          21934,
+          37699
+        ],
+        "name": "IWETH",
+        "nameLocation": "274:5:34",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 21924,
+              "nodeType": "StructuredDocumentation",
+              "src": "296:35:34",
+              "text": "@notice Deposit ETH to get WETH"
+            },
+            "functionSelector": "d0e30db0",
+            "id": 21927,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deposit",
+            "nameLocation": "345:7:34",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 21925,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "352:2:34"
+            },
+            "returnParameters": {
+              "id": 21926,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "371:0:34"
+            },
+            "scope": 21934,
+            "src": "336:36:34",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 21928,
+              "nodeType": "StructuredDocumentation",
+              "src": "378:36:34",
+              "text": "@notice Withdraw WETH to get ETH"
+            },
+            "functionSelector": "2e1a7d4d",
+            "id": 21933,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "withdraw",
+            "nameLocation": "428:8:34",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 21931,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 21930,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21933,
+                  "src": "437:7:34",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 21929,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "437:7:34",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "436:9:34"
+            },
+            "returnParameters": {
+              "id": 21932,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "454:0:34"
+            },
+            "scope": 21934,
+            "src": "419:36:34",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 21935,
+        "src": "264:193:34",
+        "usedErrors": [],
+        "usedEvents": [
+          37633,
+          37642
+        ]
+      }
+    ],
+    "src": "61:397:34"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.770Z"
+}

@@ -1,0 +1,203 @@
+{
+  "contractName": "IProxy",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "Proxy__ImplementationIsNotContract",
+      "type": "error"
+    },
+    {
+      "stateMutability": "payable",
+      "type": "fallback"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\ninterface IProxy {\n    error Proxy__ImplementationIsNotContract();\n\n    fallback() external payable;\n}\n",
+  "sourcePath": "@solidstate/contracts/proxy/IProxy.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/proxy/IProxy.sol",
+    "exportedSymbols": {
+      "IProxy": [
+        45713
+      ]
+    },
+    "id": 45714,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45707,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:167"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IProxy",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 45713,
+        "linearizedBaseContracts": [
+          45713
+        ],
+        "name": "IProxy",
+        "nameLocation": "69:6:167",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "87c9fc34",
+            "id": 45709,
+            "name": "Proxy__ImplementationIsNotContract",
+            "nameLocation": "88:34:167",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 45708,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "122:2:167"
+            },
+            "src": "82:43:167"
+          },
+          {
+            "id": 45712,
+            "implemented": false,
+            "kind": "fallback",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45710,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "139:2:167"
+            },
+            "returnParameters": {
+              "id": 45711,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "158:0:167"
+            },
+            "scope": 45713,
+            "src": "131:28:167",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 45714,
+        "src": "59:102:167",
+        "usedErrors": [
+          45709
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:129:167"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/proxy/IProxy.sol",
+    "exportedSymbols": {
+      "IProxy": [
+        45713
+      ]
+    },
+    "id": 45714,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45707,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:167"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IProxy",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 45713,
+        "linearizedBaseContracts": [
+          45713
+        ],
+        "name": "IProxy",
+        "nameLocation": "69:6:167",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "87c9fc34",
+            "id": 45709,
+            "name": "Proxy__ImplementationIsNotContract",
+            "nameLocation": "88:34:167",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 45708,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "122:2:167"
+            },
+            "src": "82:43:167"
+          },
+          {
+            "id": 45712,
+            "implemented": false,
+            "kind": "fallback",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45710,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "139:2:167"
+            },
+            "returnParameters": {
+              "id": 45711,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "158:0:167"
+            },
+            "scope": 45713,
+            "src": "131:28:167",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 45714,
+        "src": "59:102:167",
+        "usedErrors": [
+          45709
+        ],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:129:167"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.817Z"
+}

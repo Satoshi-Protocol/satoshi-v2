@@ -1,0 +1,1547 @@
+{
+  "contractName": "IOAppCore",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "InvalidDelegate",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidEndpointCall",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        }
+      ],
+      "name": "NoPeer",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "sender",
+          "type": "bytes32"
+        }
+      ],
+      "name": "OnlyPeer",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint32",
+          "name": "eid",
+          "type": "uint32"
+        },
+        {
+          "indexed": false,
+          "internalType": "bytes32",
+          "name": "peer",
+          "type": "bytes32"
+        }
+      ],
+      "name": "PeerSet",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "endpoint",
+      "outputs": [
+        {
+          "internalType": "contract ILayerZeroEndpointV2",
+          "name": "iEndpoint",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "oAppVersion",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "senderVersion",
+          "type": "uint64"
+        },
+        {
+          "internalType": "uint64",
+          "name": "receiverVersion",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_eid",
+          "type": "uint32"
+        }
+      ],
+      "name": "peers",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "peer",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_delegate",
+          "type": "address"
+        }
+      ],
+      "name": "setDelegate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_eid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_peer",
+          "type": "bytes32"
+        }
+      ],
+      "name": "setPeer",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { ILayerZeroEndpointV2 } from \"@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol\";\n\n/**\n * @title IOAppCore\n */\ninterface IOAppCore {\n    // Custom error messages\n    error OnlyPeer(uint32 eid, bytes32 sender);\n    error NoPeer(uint32 eid);\n    error InvalidEndpointCall();\n    error InvalidDelegate();\n\n    // Event emitted when a peer (OApp) is set for a corresponding endpoint\n    event PeerSet(uint32 eid, bytes32 peer);\n\n    /**\n     * @notice Retrieves the OApp version information.\n     * @return senderVersion The version of the OAppSender.sol contract.\n     * @return receiverVersion The version of the OAppReceiver.sol contract.\n     */\n    function oAppVersion() external view returns (uint64 senderVersion, uint64 receiverVersion);\n\n    /**\n     * @notice Retrieves the LayerZero endpoint associated with the OApp.\n     * @return iEndpoint The LayerZero endpoint as an interface.\n     */\n    function endpoint() external view returns (ILayerZeroEndpointV2 iEndpoint);\n\n    /**\n     * @notice Retrieves the peer (OApp) associated with a corresponding endpoint.\n     * @param _eid The endpoint ID.\n     * @return peer The peer address (OApp instance) associated with the corresponding endpoint.\n     */\n    function peers(uint32 _eid) external view returns (bytes32 peer);\n\n    /**\n     * @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n     * @param _eid The endpoint ID.\n     * @param _peer The address of the peer to be associated with the corresponding endpoint.\n     */\n    function setPeer(uint32 _eid, bytes32 _peer) external;\n\n    /**\n     * @notice Sets the delegate address for the OApp Core.\n     * @param _delegate The address of the delegate to be set.\n     */\n    function setDelegate(address _delegate) external;\n}\n",
+  "sourcePath": "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppCore.sol",
+  "ast": {
+    "absolutePath": "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppCore.sol",
+    "exportedSymbols": {
+      "ILayerZeroEndpointV2": [
+        30136
+      ],
+      "IOAppCore": [
+        32711
+      ]
+    },
+    "id": 32712,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 32650,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:85"
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "file": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "id": 32652,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 32712,
+        "sourceUnit": 30137,
+        "src": "59:119:85",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32651,
+              "name": "ILayerZeroEndpointV2",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 30136,
+              "src": "68:20:85",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IOAppCore",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 32653,
+          "nodeType": "StructuredDocumentation",
+          "src": "180:27:85",
+          "text": " @title IOAppCore"
+        },
+        "fullyImplemented": false,
+        "id": 32711,
+        "linearizedBaseContracts": [
+          32711
+        ],
+        "name": "IOAppCore",
+        "nameLocation": "218:9:85",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "c26bebcc",
+            "id": 32659,
+            "name": "OnlyPeer",
+            "nameLocation": "269:8:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32658,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32655,
+                  "mutability": "mutable",
+                  "name": "eid",
+                  "nameLocation": "285:3:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32659,
+                  "src": "278:10:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32654,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "278:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32657,
+                  "mutability": "mutable",
+                  "name": "sender",
+                  "nameLocation": "298:6:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32659,
+                  "src": "290:14:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32656,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "290:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "277:28:85"
+            },
+            "src": "263:43:85"
+          },
+          {
+            "errorSelector": "f6ff4fb7",
+            "id": 32663,
+            "name": "NoPeer",
+            "nameLocation": "317:6:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32662,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32661,
+                  "mutability": "mutable",
+                  "name": "eid",
+                  "nameLocation": "331:3:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32663,
+                  "src": "324:10:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32660,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "324:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "323:12:85"
+            },
+            "src": "311:25:85"
+          },
+          {
+            "errorSelector": "0fbdec0a",
+            "id": 32665,
+            "name": "InvalidEndpointCall",
+            "nameLocation": "347:19:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32664,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "366:2:85"
+            },
+            "src": "341:28:85"
+          },
+          {
+            "errorSelector": "b5863604",
+            "id": 32667,
+            "name": "InvalidDelegate",
+            "nameLocation": "380:15:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32666,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "395:2:85"
+            },
+            "src": "374:24:85"
+          },
+          {
+            "anonymous": false,
+            "eventSelector": "238399d427b947898edb290f5ff0f9109849b1c3ba196a42e35f00c50a54b98b",
+            "id": 32673,
+            "name": "PeerSet",
+            "nameLocation": "486:7:85",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 32672,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32669,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "eid",
+                  "nameLocation": "501:3:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32673,
+                  "src": "494:10:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32668,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "494:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32671,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "peer",
+                  "nameLocation": "514:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32673,
+                  "src": "506:12:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32670,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "506:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "493:26:85"
+            },
+            "src": "480:40:85"
+          },
+          {
+            "documentation": {
+              "id": 32674,
+              "nodeType": "StructuredDocumentation",
+              "src": "526:216:85",
+              "text": " @notice Retrieves the OApp version information.\n @return senderVersion The version of the OAppSender.sol contract.\n @return receiverVersion The version of the OAppReceiver.sol contract."
+            },
+            "functionSelector": "17442b70",
+            "id": 32681,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "oAppVersion",
+            "nameLocation": "756:11:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32675,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "767:2:85"
+            },
+            "returnParameters": {
+              "id": 32680,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32677,
+                  "mutability": "mutable",
+                  "name": "senderVersion",
+                  "nameLocation": "800:13:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32681,
+                  "src": "793:20:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 32676,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "793:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32679,
+                  "mutability": "mutable",
+                  "name": "receiverVersion",
+                  "nameLocation": "822:15:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32681,
+                  "src": "815:22:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 32678,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "815:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "792:46:85"
+            },
+            "scope": 32711,
+            "src": "747:92:85",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32682,
+              "nodeType": "StructuredDocumentation",
+              "src": "845:150:85",
+              "text": " @notice Retrieves the LayerZero endpoint associated with the OApp.\n @return iEndpoint The LayerZero endpoint as an interface."
+            },
+            "functionSelector": "5e280f11",
+            "id": 32688,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "endpoint",
+            "nameLocation": "1009:8:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32683,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1017:2:85"
+            },
+            "returnParameters": {
+              "id": 32687,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32686,
+                  "mutability": "mutable",
+                  "name": "iEndpoint",
+                  "nameLocation": "1064:9:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32688,
+                  "src": "1043:30:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                    "typeString": "contract ILayerZeroEndpointV2"
+                  },
+                  "typeName": {
+                    "id": 32685,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 32684,
+                      "name": "ILayerZeroEndpointV2",
+                      "nameLocations": [
+                        "1043:20:85"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 30136,
+                      "src": "1043:20:85"
+                    },
+                    "referencedDeclaration": 30136,
+                    "src": "1043:20:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                      "typeString": "contract ILayerZeroEndpointV2"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1042:32:85"
+            },
+            "scope": 32711,
+            "src": "1000:75:85",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32689,
+              "nodeType": "StructuredDocumentation",
+              "src": "1081:227:85",
+              "text": " @notice Retrieves the peer (OApp) associated with a corresponding endpoint.\n @param _eid The endpoint ID.\n @return peer The peer address (OApp instance) associated with the corresponding endpoint."
+            },
+            "functionSelector": "bb0b6a53",
+            "id": 32696,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "peers",
+            "nameLocation": "1322:5:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32692,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32691,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "1335:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32696,
+                  "src": "1328:11:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32690,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1328:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1327:13:85"
+            },
+            "returnParameters": {
+              "id": 32695,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32694,
+                  "mutability": "mutable",
+                  "name": "peer",
+                  "nameLocation": "1372:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32696,
+                  "src": "1364:12:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32693,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1364:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1363:14:85"
+            },
+            "scope": 32711,
+            "src": "1313:65:85",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32697,
+              "nodeType": "StructuredDocumentation",
+              "src": "1384:224:85",
+              "text": " @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n @param _eid The endpoint ID.\n @param _peer The address of the peer to be associated with the corresponding endpoint."
+            },
+            "functionSelector": "3400288b",
+            "id": 32704,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setPeer",
+            "nameLocation": "1622:7:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32702,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32699,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "1637:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32704,
+                  "src": "1630:11:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32698,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1630:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32701,
+                  "mutability": "mutable",
+                  "name": "_peer",
+                  "nameLocation": "1651:5:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32704,
+                  "src": "1643:13:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32700,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1643:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1629:28:85"
+            },
+            "returnParameters": {
+              "id": 32703,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1666:0:85"
+            },
+            "scope": 32711,
+            "src": "1613:54:85",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32705,
+              "nodeType": "StructuredDocumentation",
+              "src": "1673:134:85",
+              "text": " @notice Sets the delegate address for the OApp Core.\n @param _delegate The address of the delegate to be set."
+            },
+            "functionSelector": "ca5eb5e1",
+            "id": 32710,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setDelegate",
+            "nameLocation": "1821:11:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32708,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32707,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "1841:9:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32710,
+                  "src": "1833:17:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32706,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1833:7:85",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1832:19:85"
+            },
+            "returnParameters": {
+              "id": 32709,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1860:0:85"
+            },
+            "scope": 32711,
+            "src": "1812:49:85",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 32712,
+        "src": "208:1655:85",
+        "usedErrors": [
+          32659,
+          32663,
+          32665,
+          32667
+        ],
+        "usedEvents": [
+          32673
+        ]
+      }
+    ],
+    "src": "33:1831:85"
+  },
+  "legacyAST": {
+    "absolutePath": "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppCore.sol",
+    "exportedSymbols": {
+      "ILayerZeroEndpointV2": [
+        30136
+      ],
+      "IOAppCore": [
+        32711
+      ]
+    },
+    "id": 32712,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 32650,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:85"
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "file": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "id": 32652,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 32712,
+        "sourceUnit": 30137,
+        "src": "59:119:85",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32651,
+              "name": "ILayerZeroEndpointV2",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 30136,
+              "src": "68:20:85",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IOAppCore",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": {
+          "id": 32653,
+          "nodeType": "StructuredDocumentation",
+          "src": "180:27:85",
+          "text": " @title IOAppCore"
+        },
+        "fullyImplemented": false,
+        "id": 32711,
+        "linearizedBaseContracts": [
+          32711
+        ],
+        "name": "IOAppCore",
+        "nameLocation": "218:9:85",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "errorSelector": "c26bebcc",
+            "id": 32659,
+            "name": "OnlyPeer",
+            "nameLocation": "269:8:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32658,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32655,
+                  "mutability": "mutable",
+                  "name": "eid",
+                  "nameLocation": "285:3:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32659,
+                  "src": "278:10:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32654,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "278:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32657,
+                  "mutability": "mutable",
+                  "name": "sender",
+                  "nameLocation": "298:6:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32659,
+                  "src": "290:14:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32656,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "290:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "277:28:85"
+            },
+            "src": "263:43:85"
+          },
+          {
+            "errorSelector": "f6ff4fb7",
+            "id": 32663,
+            "name": "NoPeer",
+            "nameLocation": "317:6:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32662,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32661,
+                  "mutability": "mutable",
+                  "name": "eid",
+                  "nameLocation": "331:3:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32663,
+                  "src": "324:10:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32660,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "324:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "323:12:85"
+            },
+            "src": "311:25:85"
+          },
+          {
+            "errorSelector": "0fbdec0a",
+            "id": 32665,
+            "name": "InvalidEndpointCall",
+            "nameLocation": "347:19:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32664,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "366:2:85"
+            },
+            "src": "341:28:85"
+          },
+          {
+            "errorSelector": "b5863604",
+            "id": 32667,
+            "name": "InvalidDelegate",
+            "nameLocation": "380:15:85",
+            "nodeType": "ErrorDefinition",
+            "parameters": {
+              "id": 32666,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "395:2:85"
+            },
+            "src": "374:24:85"
+          },
+          {
+            "anonymous": false,
+            "eventSelector": "238399d427b947898edb290f5ff0f9109849b1c3ba196a42e35f00c50a54b98b",
+            "id": 32673,
+            "name": "PeerSet",
+            "nameLocation": "486:7:85",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 32672,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32669,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "eid",
+                  "nameLocation": "501:3:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32673,
+                  "src": "494:10:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32668,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "494:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32671,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "peer",
+                  "nameLocation": "514:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32673,
+                  "src": "506:12:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32670,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "506:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "493:26:85"
+            },
+            "src": "480:40:85"
+          },
+          {
+            "documentation": {
+              "id": 32674,
+              "nodeType": "StructuredDocumentation",
+              "src": "526:216:85",
+              "text": " @notice Retrieves the OApp version information.\n @return senderVersion The version of the OAppSender.sol contract.\n @return receiverVersion The version of the OAppReceiver.sol contract."
+            },
+            "functionSelector": "17442b70",
+            "id": 32681,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "oAppVersion",
+            "nameLocation": "756:11:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32675,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "767:2:85"
+            },
+            "returnParameters": {
+              "id": 32680,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32677,
+                  "mutability": "mutable",
+                  "name": "senderVersion",
+                  "nameLocation": "800:13:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32681,
+                  "src": "793:20:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 32676,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "793:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32679,
+                  "mutability": "mutable",
+                  "name": "receiverVersion",
+                  "nameLocation": "822:15:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32681,
+                  "src": "815:22:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 32678,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "815:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "792:46:85"
+            },
+            "scope": 32711,
+            "src": "747:92:85",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32682,
+              "nodeType": "StructuredDocumentation",
+              "src": "845:150:85",
+              "text": " @notice Retrieves the LayerZero endpoint associated with the OApp.\n @return iEndpoint The LayerZero endpoint as an interface."
+            },
+            "functionSelector": "5e280f11",
+            "id": 32688,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "endpoint",
+            "nameLocation": "1009:8:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32683,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1017:2:85"
+            },
+            "returnParameters": {
+              "id": 32687,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32686,
+                  "mutability": "mutable",
+                  "name": "iEndpoint",
+                  "nameLocation": "1064:9:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32688,
+                  "src": "1043:30:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                    "typeString": "contract ILayerZeroEndpointV2"
+                  },
+                  "typeName": {
+                    "id": 32685,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 32684,
+                      "name": "ILayerZeroEndpointV2",
+                      "nameLocations": [
+                        "1043:20:85"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 30136,
+                      "src": "1043:20:85"
+                    },
+                    "referencedDeclaration": 30136,
+                    "src": "1043:20:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ILayerZeroEndpointV2_$30136",
+                      "typeString": "contract ILayerZeroEndpointV2"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1042:32:85"
+            },
+            "scope": 32711,
+            "src": "1000:75:85",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32689,
+              "nodeType": "StructuredDocumentation",
+              "src": "1081:227:85",
+              "text": " @notice Retrieves the peer (OApp) associated with a corresponding endpoint.\n @param _eid The endpoint ID.\n @return peer The peer address (OApp instance) associated with the corresponding endpoint."
+            },
+            "functionSelector": "bb0b6a53",
+            "id": 32696,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "peers",
+            "nameLocation": "1322:5:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32692,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32691,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "1335:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32696,
+                  "src": "1328:11:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32690,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1328:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1327:13:85"
+            },
+            "returnParameters": {
+              "id": 32695,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32694,
+                  "mutability": "mutable",
+                  "name": "peer",
+                  "nameLocation": "1372:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32696,
+                  "src": "1364:12:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32693,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1364:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1363:14:85"
+            },
+            "scope": 32711,
+            "src": "1313:65:85",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32697,
+              "nodeType": "StructuredDocumentation",
+              "src": "1384:224:85",
+              "text": " @notice Sets the peer address (OApp instance) for a corresponding endpoint.\n @param _eid The endpoint ID.\n @param _peer The address of the peer to be associated with the corresponding endpoint."
+            },
+            "functionSelector": "3400288b",
+            "id": 32704,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setPeer",
+            "nameLocation": "1622:7:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32702,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32699,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "1637:4:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32704,
+                  "src": "1630:11:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 32698,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1630:6:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 32701,
+                  "mutability": "mutable",
+                  "name": "_peer",
+                  "nameLocation": "1651:5:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32704,
+                  "src": "1643:13:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 32700,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1643:7:85",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1629:28:85"
+            },
+            "returnParameters": {
+              "id": 32703,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1666:0:85"
+            },
+            "scope": 32711,
+            "src": "1613:54:85",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 32705,
+              "nodeType": "StructuredDocumentation",
+              "src": "1673:134:85",
+              "text": " @notice Sets the delegate address for the OApp Core.\n @param _delegate The address of the delegate to be set."
+            },
+            "functionSelector": "ca5eb5e1",
+            "id": 32710,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setDelegate",
+            "nameLocation": "1821:11:85",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32708,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32707,
+                  "mutability": "mutable",
+                  "name": "_delegate",
+                  "nameLocation": "1841:9:85",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 32710,
+                  "src": "1833:17:85",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 32706,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1833:7:85",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1832:19:85"
+            },
+            "returnParameters": {
+              "id": 32709,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1860:0:85"
+            },
+            "scope": 32711,
+            "src": "1812:49:85",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 32712,
+        "src": "208:1655:85",
+        "usedErrors": [
+          32659,
+          32663,
+          32665,
+          32667
+        ],
+        "usedEvents": [
+          32673
+        ]
+      }
+    ],
+    "src": "33:1831:85"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.790Z"
+}

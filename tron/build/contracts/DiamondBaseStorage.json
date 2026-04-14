@@ -1,0 +1,953 @@
+{
+  "contractName": "DiamondBaseStorage",
+  "abi": [],
+  "bytecode": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e582212204d9787e0eddab4012275896c63078a21fc12b8f2b80d7dc1342fe2ef6391f6f264736f6c63430008160033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e582212204d9787e0eddab4012275896c63078a21fc12b8f2b80d7dc1342fe2ef6391f6f264736f6c63430008160033",
+  "sourceMap": "138:669:171:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;138:669:171;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "138:669:171:-:0;;;;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\n/**\n * @dev derived from https://github.com/mudgen/diamond-2 (MIT license)\n */\nlibrary DiamondBaseStorage {\n    struct Layout {\n        // function selector => (facet address, selector slug position)\n        mapping(bytes4 => bytes32) selectorInfo;\n        // total number of selectors registered\n        uint16 selectorCount;\n        // array of 32-byte slugs with 8 selectors each\n        mapping(uint256 => bytes32) selectorSlugs;\n        address fallbackAddress;\n    }\n\n    bytes32 internal constant STORAGE_SLOT =\n        keccak256('solidstate.contracts.storage.DiamondBase');\n\n    function layout() internal pure returns (Layout storage l) {\n        bytes32 slot = STORAGE_SLOT;\n        assembly {\n            l.slot := slot\n        }\n    }\n}\n",
+  "sourcePath": "@solidstate/contracts/proxy/diamond/base/DiamondBaseStorage.sol",
+  "ast": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/base/DiamondBaseStorage.sol",
+    "exportedSymbols": {
+      "DiamondBaseStorage": [
+        45864
+      ]
+    },
+    "id": 45865,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45832,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:171"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "DiamondBaseStorage",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": {
+          "id": 45833,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:78:171",
+          "text": " @dev derived from https://github.com/mudgen/diamond-2 (MIT license)"
+        },
+        "fullyImplemented": true,
+        "id": 45864,
+        "linearizedBaseContracts": [
+          45864
+        ],
+        "name": "DiamondBaseStorage",
+        "nameLocation": "146:18:171",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "DiamondBaseStorage.Layout",
+            "id": 45846,
+            "members": [
+              {
+                "constant": false,
+                "id": 45837,
+                "mutability": "mutable",
+                "name": "selectorInfo",
+                "nameLocation": "294:12:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "267:39:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_bytes4_$_t_bytes32_$",
+                  "typeString": "mapping(bytes4 => bytes32)"
+                },
+                "typeName": {
+                  "id": 45836,
+                  "keyName": "",
+                  "keyNameLocation": "-1:-1:-1",
+                  "keyType": {
+                    "id": 45834,
+                    "name": "bytes4",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "275:6:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes4",
+                      "typeString": "bytes4"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "267:26:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_bytes4_$_t_bytes32_$",
+                    "typeString": "mapping(bytes4 => bytes32)"
+                  },
+                  "valueName": "",
+                  "valueNameLocation": "-1:-1:-1",
+                  "valueType": {
+                    "id": 45835,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "285:7:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45839,
+                "mutability": "mutable",
+                "name": "selectorCount",
+                "nameLocation": "371:13:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "364:20:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint16",
+                  "typeString": "uint16"
+                },
+                "typeName": {
+                  "id": 45838,
+                  "name": "uint16",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "364:6:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45843,
+                "mutability": "mutable",
+                "name": "selectorSlugs",
+                "nameLocation": "478:13:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "450:41:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                  "typeString": "mapping(uint256 => bytes32)"
+                },
+                "typeName": {
+                  "id": 45842,
+                  "keyName": "",
+                  "keyNameLocation": "-1:-1:-1",
+                  "keyType": {
+                    "id": 45840,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "458:7:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "450:27:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                    "typeString": "mapping(uint256 => bytes32)"
+                  },
+                  "valueName": "",
+                  "valueNameLocation": "-1:-1:-1",
+                  "valueType": {
+                    "id": 45841,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "469:7:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45845,
+                "mutability": "mutable",
+                "name": "fallbackAddress",
+                "nameLocation": "509:15:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "501:23:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 45844,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "501:7:171",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Layout",
+            "nameLocation": "178:6:171",
+            "nodeType": "StructDefinition",
+            "scope": 45864,
+            "src": "171:360:171",
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 45851,
+            "mutability": "constant",
+            "name": "STORAGE_SLOT",
+            "nameLocation": "563:12:171",
+            "nodeType": "VariableDeclaration",
+            "scope": 45864,
+            "src": "537:102:171",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 45847,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "537:7:171",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "736f6c696473746174652e636f6e7472616374732e73746f726167652e4469616d6f6e6442617365",
+                  "id": 45849,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "string",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "596:42:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_stringliteral_177481ac65e4292921c69f62d1cc7f57541261e5d61c8175cf4e36a01c9bfc93",
+                    "typeString": "literal_string \"solidstate.contracts.storage.DiamondBase\""
+                  },
+                  "value": "solidstate.contracts.storage.DiamondBase"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_stringliteral_177481ac65e4292921c69f62d1cc7f57541261e5d61c8175cf4e36a01c9bfc93",
+                    "typeString": "literal_string \"solidstate.contracts.storage.DiamondBase\""
+                  }
+                ],
+                "id": 45848,
+                "name": "keccak256",
+                "nodeType": "Identifier",
+                "overloadedDeclarations": [],
+                "referencedDeclaration": 4294967288,
+                "src": "586:9:171",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                  "typeString": "function (bytes memory) pure returns (bytes32)"
+                }
+              },
+              "id": 45850,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "functionCall",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "586:53:171",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 45862,
+              "nodeType": "Block",
+              "src": "705:100:171",
+              "statements": [
+                {
+                  "assignments": [
+                    45858
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 45858,
+                      "mutability": "mutable",
+                      "name": "slot",
+                      "nameLocation": "723:4:171",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 45862,
+                      "src": "715:12:171",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 45857,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "715:7:171",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 45860,
+                  "initialValue": {
+                    "id": 45859,
+                    "name": "STORAGE_SLOT",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 45851,
+                    "src": "730:12:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "715:27:171"
+                },
+                {
+                  "AST": {
+                    "nativeSrc": "761:38:171",
+                    "nodeType": "YulBlock",
+                    "src": "761:38:171",
+                    "statements": [
+                      {
+                        "nativeSrc": "775:14:171",
+                        "nodeType": "YulAssignment",
+                        "src": "775:14:171",
+                        "value": {
+                          "name": "slot",
+                          "nativeSrc": "785:4:171",
+                          "nodeType": "YulIdentifier",
+                          "src": "785:4:171"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "l.slot",
+                            "nativeSrc": "775:6:171",
+                            "nodeType": "YulIdentifier",
+                            "src": "775:6:171"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "istanbul",
+                  "externalReferences": [
+                    {
+                      "declaration": 45855,
+                      "isOffset": false,
+                      "isSlot": true,
+                      "src": "775:6:171",
+                      "suffix": "slot",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 45858,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "785:4:171",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 45861,
+                  "nodeType": "InlineAssembly",
+                  "src": "752:47:171"
+                }
+              ]
+            },
+            "id": 45863,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "layout",
+            "nameLocation": "655:6:171",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45852,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "661:2:171"
+            },
+            "returnParameters": {
+              "id": 45856,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 45855,
+                  "mutability": "mutable",
+                  "name": "l",
+                  "nameLocation": "702:1:171",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 45863,
+                  "src": "687:16:171",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Layout_$45846_storage_ptr",
+                    "typeString": "struct DiamondBaseStorage.Layout"
+                  },
+                  "typeName": {
+                    "id": 45854,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 45853,
+                      "name": "Layout",
+                      "nameLocations": [
+                        "687:6:171"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 45846,
+                      "src": "687:6:171"
+                    },
+                    "referencedDeclaration": 45846,
+                    "src": "687:6:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Layout_$45846_storage_ptr",
+                      "typeString": "struct DiamondBaseStorage.Layout"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "686:18:171"
+            },
+            "scope": 45864,
+            "src": "646:159:171",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 45865,
+        "src": "138:669:171",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:775:171"
+  },
+  "legacyAST": {
+    "absolutePath": "@solidstate/contracts/proxy/diamond/base/DiamondBaseStorage.sol",
+    "exportedSymbols": {
+      "DiamondBaseStorage": [
+        45864
+      ]
+    },
+    "id": 45865,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 45832,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:171"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "DiamondBaseStorage",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": {
+          "id": 45833,
+          "nodeType": "StructuredDocumentation",
+          "src": "59:78:171",
+          "text": " @dev derived from https://github.com/mudgen/diamond-2 (MIT license)"
+        },
+        "fullyImplemented": true,
+        "id": 45864,
+        "linearizedBaseContracts": [
+          45864
+        ],
+        "name": "DiamondBaseStorage",
+        "nameLocation": "146:18:171",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "DiamondBaseStorage.Layout",
+            "id": 45846,
+            "members": [
+              {
+                "constant": false,
+                "id": 45837,
+                "mutability": "mutable",
+                "name": "selectorInfo",
+                "nameLocation": "294:12:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "267:39:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_bytes4_$_t_bytes32_$",
+                  "typeString": "mapping(bytes4 => bytes32)"
+                },
+                "typeName": {
+                  "id": 45836,
+                  "keyName": "",
+                  "keyNameLocation": "-1:-1:-1",
+                  "keyType": {
+                    "id": 45834,
+                    "name": "bytes4",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "275:6:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes4",
+                      "typeString": "bytes4"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "267:26:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_bytes4_$_t_bytes32_$",
+                    "typeString": "mapping(bytes4 => bytes32)"
+                  },
+                  "valueName": "",
+                  "valueNameLocation": "-1:-1:-1",
+                  "valueType": {
+                    "id": 45835,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "285:7:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45839,
+                "mutability": "mutable",
+                "name": "selectorCount",
+                "nameLocation": "371:13:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "364:20:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint16",
+                  "typeString": "uint16"
+                },
+                "typeName": {
+                  "id": 45838,
+                  "name": "uint16",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "364:6:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint16",
+                    "typeString": "uint16"
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45843,
+                "mutability": "mutable",
+                "name": "selectorSlugs",
+                "nameLocation": "478:13:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "450:41:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                  "typeString": "mapping(uint256 => bytes32)"
+                },
+                "typeName": {
+                  "id": 45842,
+                  "keyName": "",
+                  "keyNameLocation": "-1:-1:-1",
+                  "keyType": {
+                    "id": 45840,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "458:7:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "nodeType": "Mapping",
+                  "src": "450:27:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_mapping$_t_uint256_$_t_bytes32_$",
+                    "typeString": "mapping(uint256 => bytes32)"
+                  },
+                  "valueName": "",
+                  "valueNameLocation": "-1:-1:-1",
+                  "valueType": {
+                    "id": 45841,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "469:7:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  }
+                },
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 45845,
+                "mutability": "mutable",
+                "name": "fallbackAddress",
+                "nameLocation": "509:15:171",
+                "nodeType": "VariableDeclaration",
+                "scope": 45846,
+                "src": "501:23:171",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address",
+                  "typeString": "address"
+                },
+                "typeName": {
+                  "id": 45844,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "501:7:171",
+                  "stateMutability": "nonpayable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  }
+                },
+                "visibility": "internal"
+              }
+            ],
+            "name": "Layout",
+            "nameLocation": "178:6:171",
+            "nodeType": "StructDefinition",
+            "scope": 45864,
+            "src": "171:360:171",
+            "visibility": "public"
+          },
+          {
+            "constant": true,
+            "id": 45851,
+            "mutability": "constant",
+            "name": "STORAGE_SLOT",
+            "nameLocation": "563:12:171",
+            "nodeType": "VariableDeclaration",
+            "scope": 45864,
+            "src": "537:102:171",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 45847,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "537:7:171",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "value": {
+              "arguments": [
+                {
+                  "hexValue": "736f6c696473746174652e636f6e7472616374732e73746f726167652e4469616d6f6e6442617365",
+                  "id": 45849,
+                  "isConstant": false,
+                  "isLValue": false,
+                  "isPure": true,
+                  "kind": "string",
+                  "lValueRequested": false,
+                  "nodeType": "Literal",
+                  "src": "596:42:171",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_stringliteral_177481ac65e4292921c69f62d1cc7f57541261e5d61c8175cf4e36a01c9bfc93",
+                    "typeString": "literal_string \"solidstate.contracts.storage.DiamondBase\""
+                  },
+                  "value": "solidstate.contracts.storage.DiamondBase"
+                }
+              ],
+              "expression": {
+                "argumentTypes": [
+                  {
+                    "typeIdentifier": "t_stringliteral_177481ac65e4292921c69f62d1cc7f57541261e5d61c8175cf4e36a01c9bfc93",
+                    "typeString": "literal_string \"solidstate.contracts.storage.DiamondBase\""
+                  }
+                ],
+                "id": 45848,
+                "name": "keccak256",
+                "nodeType": "Identifier",
+                "overloadedDeclarations": [],
+                "referencedDeclaration": 4294967288,
+                "src": "586:9:171",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                  "typeString": "function (bytes memory) pure returns (bytes32)"
+                }
+              },
+              "id": 45850,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "functionCall",
+              "lValueRequested": false,
+              "nameLocations": [],
+              "names": [],
+              "nodeType": "FunctionCall",
+              "src": "586:53:171",
+              "tryCall": false,
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 45862,
+              "nodeType": "Block",
+              "src": "705:100:171",
+              "statements": [
+                {
+                  "assignments": [
+                    45858
+                  ],
+                  "declarations": [
+                    {
+                      "constant": false,
+                      "id": 45858,
+                      "mutability": "mutable",
+                      "name": "slot",
+                      "nameLocation": "723:4:171",
+                      "nodeType": "VariableDeclaration",
+                      "scope": 45862,
+                      "src": "715:12:171",
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      },
+                      "typeName": {
+                        "id": 45857,
+                        "name": "bytes32",
+                        "nodeType": "ElementaryTypeName",
+                        "src": "715:7:171",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bytes32",
+                          "typeString": "bytes32"
+                        }
+                      },
+                      "visibility": "internal"
+                    }
+                  ],
+                  "id": 45860,
+                  "initialValue": {
+                    "id": 45859,
+                    "name": "STORAGE_SLOT",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 45851,
+                    "src": "730:12:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "nodeType": "VariableDeclarationStatement",
+                  "src": "715:27:171"
+                },
+                {
+                  "AST": {
+                    "nativeSrc": "761:38:171",
+                    "nodeType": "YulBlock",
+                    "src": "761:38:171",
+                    "statements": [
+                      {
+                        "nativeSrc": "775:14:171",
+                        "nodeType": "YulAssignment",
+                        "src": "775:14:171",
+                        "value": {
+                          "name": "slot",
+                          "nativeSrc": "785:4:171",
+                          "nodeType": "YulIdentifier",
+                          "src": "785:4:171"
+                        },
+                        "variableNames": [
+                          {
+                            "name": "l.slot",
+                            "nativeSrc": "775:6:171",
+                            "nodeType": "YulIdentifier",
+                            "src": "775:6:171"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  "evmVersion": "istanbul",
+                  "externalReferences": [
+                    {
+                      "declaration": 45855,
+                      "isOffset": false,
+                      "isSlot": true,
+                      "src": "775:6:171",
+                      "suffix": "slot",
+                      "valueSize": 1
+                    },
+                    {
+                      "declaration": 45858,
+                      "isOffset": false,
+                      "isSlot": false,
+                      "src": "785:4:171",
+                      "valueSize": 1
+                    }
+                  ],
+                  "id": 45861,
+                  "nodeType": "InlineAssembly",
+                  "src": "752:47:171"
+                }
+              ]
+            },
+            "id": 45863,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "layout",
+            "nameLocation": "655:6:171",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45852,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "661:2:171"
+            },
+            "returnParameters": {
+              "id": 45856,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 45855,
+                  "mutability": "mutable",
+                  "name": "l",
+                  "nameLocation": "702:1:171",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 45863,
+                  "src": "687:16:171",
+                  "stateVariable": false,
+                  "storageLocation": "storage",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Layout_$45846_storage_ptr",
+                    "typeString": "struct DiamondBaseStorage.Layout"
+                  },
+                  "typeName": {
+                    "id": 45854,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 45853,
+                      "name": "Layout",
+                      "nameLocations": [
+                        "687:6:171"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 45846,
+                      "src": "687:6:171"
+                    },
+                    "referencedDeclaration": 45846,
+                    "src": "687:6:171",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Layout_$45846_storage_ptr",
+                      "typeString": "struct DiamondBaseStorage.Layout"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "686:18:171"
+            },
+            "scope": 45864,
+            "src": "646:159:171",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 45865,
+        "src": "138:669:171",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:775:171"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.817Z"
+}

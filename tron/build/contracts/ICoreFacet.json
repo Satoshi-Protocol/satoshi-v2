@@ -1,0 +1,2513 @@
+{
+  "contractName": "ICoreFacet",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "feeReceiver",
+          "type": "address"
+        }
+      ],
+      "name": "FeeReceiverSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "guardian",
+          "type": "address"
+        }
+      ],
+      "name": "GuardianSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "Paused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "rewardManager",
+          "type": "address"
+        }
+      ],
+      "name": "RewardManagerSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "Unpaused",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "communityIssuance",
+      "outputs": [
+        {
+          "internalType": "contract ICommunityIssuance",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "debtToken",
+      "outputs": [
+        {
+          "internalType": "contract IDebtToken",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "feeReceiver",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "gasCompensation",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "rewardManager",
+      "outputs": [
+        {
+          "internalType": "contract IRewardManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_feeReceiver",
+          "type": "address"
+        }
+      ],
+      "name": "setFeeReceiver",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bool",
+          "name": "_paused",
+          "type": "bool"
+        }
+      ],
+      "name": "setPaused",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_rewardManager",
+          "type": "address"
+        }
+      ],
+      "name": "setRewardManager",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sortedTrovesBeacon",
+      "outputs": [
+        {
+          "internalType": "contract IBeacon",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "startTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "troveManagerBeacon",
+      "outputs": [
+        {
+          "internalType": "contract IBeacon",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport { ICommunityIssuance } from \"../../OSHI/interfaces/ICommunityIssuance.sol\";\nimport { IRewardManager } from \"../../OSHI/interfaces/IRewardManager.sol\";\nimport { IDebtToken } from \"./IDebtToken.sol\";\nimport { IBeacon } from \"@openzeppelin/contracts/proxy/beacon/IBeacon.sol\";\n\ninterface ICoreFacet {\n    /// @notice Emitted when the reward manager is set\n    /// @param rewardManager The address of the reward manager\n    event RewardManagerSet(address rewardManager);\n\n    /// @notice Emitted when the fee receiver is set\n    /// @param feeReceiver The address of the fee receiver\n    event FeeReceiverSet(address feeReceiver);\n\n    /// @notice Emitted when the guardian is set\n    /// @param guardian The address of the guardian\n    event GuardianSet(address guardian);\n\n    /// @notice Emitted when the protocol is paused\n    event Paused();\n\n    /// @notice Emitted when the protocol is unpaused\n    event Unpaused();\n\n    /// @notice Sets the fee receiver address\n    /// @param _feeReceiver The address to set as the fee receiver\n    function setFeeReceiver(address _feeReceiver) external;\n\n    /// @notice Sets the reward manager address\n    /// @param _rewardManager The address to set as the reward manager\n    function setRewardManager(address _rewardManager) external;\n\n    /// @notice Sets the paused state of the protocol\n    /// @param _paused The boolean value to set the paused state\n    function setPaused(bool _paused) external;\n\n    /// @notice Returns the address of the fee receiver\n    /// @return The address of the fee receiver\n    function feeReceiver() external view returns (address);\n\n    /// @notice Returns the reward manager interface\n    /// @return The IRewardManager interface\n    function rewardManager() external view returns (IRewardManager);\n\n    /// @notice Returns the paused state of the protocol\n    /// @return A boolean indicating if the protocol is paused\n    function paused() external view returns (bool);\n\n    /// @notice Returns the start time of the protocol\n    /// @return The start time as a uint256\n    function startTime() external view returns (uint256);\n\n    /// @notice Returns the debt token interface\n    /// @return The IDebtToken interface\n    function debtToken() external view returns (IDebtToken);\n\n    /// @notice Returns the gas compensation amount\n    /// @return The gas compensation as a uint256\n    function gasCompensation() external view returns (uint256);\n\n    /// @notice Returns the sorted troves beacon interface\n    /// @return The IBeacon interface for sorted troves\n    function sortedTrovesBeacon() external view returns (IBeacon);\n\n    /// @notice Returns the trove manager beacon interface\n    /// @return The IBeacon interface for the trove manager\n    function troveManagerBeacon() external view returns (IBeacon);\n\n    /// @notice Returns the community issuance interface\n    /// @return The ICommunityIssuance interface\n    function communityIssuance() external view returns (ICommunityIssuance);\n}\n",
+  "sourcePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/ICoreFacet.sol",
+  "ast": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/ICoreFacet.sol",
+    "exportedSymbols": {
+      "IBeacon": [
+        37018
+      ],
+      "ICommunityIssuance": [
+        2021
+      ],
+      "ICoreFacet": [
+        22293
+      ],
+      "IDebtToken": [
+        22483
+      ],
+      "IRewardManager": [
+        2359
+      ]
+    },
+    "id": 22294,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 22186,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:24:36"
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/OSHI/interfaces/ICommunityIssuance.sol",
+        "file": "../../OSHI/interfaces/ICommunityIssuance.sol",
+        "id": 22188,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 2022,
+        "src": "58:82:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22187,
+              "name": "ICommunityIssuance",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 2021,
+              "src": "67:18:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/OSHI/interfaces/IRewardManager.sol",
+        "file": "../../OSHI/interfaces/IRewardManager.sol",
+        "id": 22190,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 2360,
+        "src": "141:74:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22189,
+              "name": "IRewardManager",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 2359,
+              "src": "150:14:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/IDebtToken.sol",
+        "file": "./IDebtToken.sol",
+        "id": 22192,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 22484,
+        "src": "216:46:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22191,
+              "name": "IDebtToken",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 22483,
+              "src": "225:10:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "file": "@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "id": 22194,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 37019,
+        "src": "263:75:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22193,
+              "name": "IBeacon",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 37018,
+              "src": "272:7:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ICoreFacet",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 22293,
+        "linearizedBaseContracts": [
+          22293
+        ],
+        "name": "ICoreFacet",
+        "nameLocation": "350:10:36",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22195,
+              "nodeType": "StructuredDocumentation",
+              "src": "367:113:36",
+              "text": "@notice Emitted when the reward manager is set\n @param rewardManager The address of the reward manager"
+            },
+            "eventSelector": "4b722357462a92ae2776fce05f39902ac96cb04d2fe661eb688f4a72ab069cff",
+            "id": 22199,
+            "name": "RewardManagerSet",
+            "nameLocation": "491:16:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22198,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22197,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "rewardManager",
+                  "nameLocation": "516:13:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22199,
+                  "src": "508:21:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22196,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "508:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "507:23:36"
+            },
+            "src": "485:46:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22200,
+              "nodeType": "StructuredDocumentation",
+              "src": "537:107:36",
+              "text": "@notice Emitted when the fee receiver is set\n @param feeReceiver The address of the fee receiver"
+            },
+            "eventSelector": "bdf37c276f641820b141429d245add2552b4118c0866e5a78638e3de5ef18d9d",
+            "id": 22204,
+            "name": "FeeReceiverSet",
+            "nameLocation": "655:14:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22203,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22202,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "feeReceiver",
+                  "nameLocation": "678:11:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22204,
+                  "src": "670:19:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22201,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "670:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "669:21:36"
+            },
+            "src": "649:42:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22205,
+              "nodeType": "StructuredDocumentation",
+              "src": "697:96:36",
+              "text": "@notice Emitted when the guardian is set\n @param guardian The address of the guardian"
+            },
+            "eventSelector": "e6c09ffe4572dc9ceaa5ddde4ae41befa655d6fdfe8052077af0970f700e942e",
+            "id": 22209,
+            "name": "GuardianSet",
+            "nameLocation": "804:11:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22208,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22207,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "guardian",
+                  "nameLocation": "824:8:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22209,
+                  "src": "816:16:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22206,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "816:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "815:18:36"
+            },
+            "src": "798:36:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22210,
+              "nodeType": "StructuredDocumentation",
+              "src": "840:47:36",
+              "text": "@notice Emitted when the protocol is paused"
+            },
+            "eventSelector": "9e87fac88ff661f02d44f95383c817fece4bce600a3dab7a54406878b965e752",
+            "id": 22212,
+            "name": "Paused",
+            "nameLocation": "898:6:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22211,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "904:2:36"
+            },
+            "src": "892:15:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22213,
+              "nodeType": "StructuredDocumentation",
+              "src": "913:49:36",
+              "text": "@notice Emitted when the protocol is unpaused"
+            },
+            "eventSelector": "a45f47fdea8a1efdd9029a5691c7f759c32b7c698632b563573e155625d16933",
+            "id": 22215,
+            "name": "Unpaused",
+            "nameLocation": "973:8:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22214,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "981:2:36"
+            },
+            "src": "967:17:36"
+          },
+          {
+            "documentation": {
+              "id": 22216,
+              "nodeType": "StructuredDocumentation",
+              "src": "990:108:36",
+              "text": "@notice Sets the fee receiver address\n @param _feeReceiver The address to set as the fee receiver"
+            },
+            "functionSelector": "efdcd974",
+            "id": 22221,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setFeeReceiver",
+            "nameLocation": "1112:14:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22219,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22218,
+                  "mutability": "mutable",
+                  "name": "_feeReceiver",
+                  "nameLocation": "1135:12:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22221,
+                  "src": "1127:20:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22217,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1127:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1126:22:36"
+            },
+            "returnParameters": {
+              "id": 22220,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1157:0:36"
+            },
+            "scope": 22293,
+            "src": "1103:55:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22222,
+              "nodeType": "StructuredDocumentation",
+              "src": "1164:114:36",
+              "text": "@notice Sets the reward manager address\n @param _rewardManager The address to set as the reward manager"
+            },
+            "functionSelector": "153ee554",
+            "id": 22227,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setRewardManager",
+            "nameLocation": "1292:16:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22225,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22224,
+                  "mutability": "mutable",
+                  "name": "_rewardManager",
+                  "nameLocation": "1317:14:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22227,
+                  "src": "1309:22:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22223,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1309:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1308:24:36"
+            },
+            "returnParameters": {
+              "id": 22226,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1341:0:36"
+            },
+            "scope": 22293,
+            "src": "1283:59:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22228,
+              "nodeType": "StructuredDocumentation",
+              "src": "1348:114:36",
+              "text": "@notice Sets the paused state of the protocol\n @param _paused The boolean value to set the paused state"
+            },
+            "functionSelector": "16c38b3c",
+            "id": 22233,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setPaused",
+            "nameLocation": "1476:9:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22231,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22230,
+                  "mutability": "mutable",
+                  "name": "_paused",
+                  "nameLocation": "1491:7:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22233,
+                  "src": "1486:12:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 22229,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1486:4:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1485:14:36"
+            },
+            "returnParameters": {
+              "id": 22232,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1508:0:36"
+            },
+            "scope": 22293,
+            "src": "1467:42:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22234,
+              "nodeType": "StructuredDocumentation",
+              "src": "1515:99:36",
+              "text": "@notice Returns the address of the fee receiver\n @return The address of the fee receiver"
+            },
+            "functionSelector": "b3f00674",
+            "id": 22239,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "feeReceiver",
+            "nameLocation": "1628:11:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22235,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1639:2:36"
+            },
+            "returnParameters": {
+              "id": 22238,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22237,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22239,
+                  "src": "1665:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22236,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1665:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1664:9:36"
+            },
+            "scope": 22293,
+            "src": "1619:55:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22240,
+              "nodeType": "StructuredDocumentation",
+              "src": "1680:93:36",
+              "text": "@notice Returns the reward manager interface\n @return The IRewardManager interface"
+            },
+            "functionSelector": "0f4ef8a6",
+            "id": 22246,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "rewardManager",
+            "nameLocation": "1787:13:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22241,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1800:2:36"
+            },
+            "returnParameters": {
+              "id": 22245,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22244,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22246,
+                  "src": "1826:14:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IRewardManager_$2359",
+                    "typeString": "contract IRewardManager"
+                  },
+                  "typeName": {
+                    "id": 22243,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22242,
+                      "name": "IRewardManager",
+                      "nameLocations": [
+                        "1826:14:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 2359,
+                      "src": "1826:14:36"
+                    },
+                    "referencedDeclaration": 2359,
+                    "src": "1826:14:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IRewardManager_$2359",
+                      "typeString": "contract IRewardManager"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1825:16:36"
+            },
+            "scope": 22293,
+            "src": "1778:64:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22247,
+              "nodeType": "StructuredDocumentation",
+              "src": "1848:115:36",
+              "text": "@notice Returns the paused state of the protocol\n @return A boolean indicating if the protocol is paused"
+            },
+            "functionSelector": "5c975abb",
+            "id": 22252,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "paused",
+            "nameLocation": "1977:6:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22248,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1983:2:36"
+            },
+            "returnParameters": {
+              "id": 22251,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22250,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22252,
+                  "src": "2009:4:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 22249,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2009:4:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2008:6:36"
+            },
+            "scope": 22293,
+            "src": "1968:47:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22253,
+              "nodeType": "StructuredDocumentation",
+              "src": "2021:94:36",
+              "text": "@notice Returns the start time of the protocol\n @return The start time as a uint256"
+            },
+            "functionSelector": "78e97925",
+            "id": 22258,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "startTime",
+            "nameLocation": "2129:9:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22254,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2138:2:36"
+            },
+            "returnParameters": {
+              "id": 22257,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22256,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22258,
+                  "src": "2164:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 22255,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2164:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2163:9:36"
+            },
+            "scope": 22293,
+            "src": "2120:53:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22259,
+              "nodeType": "StructuredDocumentation",
+              "src": "2179:85:36",
+              "text": "@notice Returns the debt token interface\n @return The IDebtToken interface"
+            },
+            "functionSelector": "f8d89898",
+            "id": 22265,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "debtToken",
+            "nameLocation": "2278:9:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22260,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2287:2:36"
+            },
+            "returnParameters": {
+              "id": 22264,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22263,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22265,
+                  "src": "2313:10:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IDebtToken_$22483",
+                    "typeString": "contract IDebtToken"
+                  },
+                  "typeName": {
+                    "id": 22262,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22261,
+                      "name": "IDebtToken",
+                      "nameLocations": [
+                        "2313:10:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 22483,
+                      "src": "2313:10:36"
+                    },
+                    "referencedDeclaration": 22483,
+                    "src": "2313:10:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IDebtToken_$22483",
+                      "typeString": "contract IDebtToken"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2312:12:36"
+            },
+            "scope": 22293,
+            "src": "2269:56:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22266,
+              "nodeType": "StructuredDocumentation",
+              "src": "2331:97:36",
+              "text": "@notice Returns the gas compensation amount\n @return The gas compensation as a uint256"
+            },
+            "functionSelector": "84f5c2d2",
+            "id": 22271,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "gasCompensation",
+            "nameLocation": "2442:15:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22267,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2457:2:36"
+            },
+            "returnParameters": {
+              "id": 22270,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22269,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22271,
+                  "src": "2483:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 22268,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2483:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2482:9:36"
+            },
+            "scope": 22293,
+            "src": "2433:59:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22272,
+              "nodeType": "StructuredDocumentation",
+              "src": "2498:110:36",
+              "text": "@notice Returns the sorted troves beacon interface\n @return The IBeacon interface for sorted troves"
+            },
+            "functionSelector": "3edc8ceb",
+            "id": 22278,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sortedTrovesBeacon",
+            "nameLocation": "2622:18:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22273,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2640:2:36"
+            },
+            "returnParameters": {
+              "id": 22277,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22276,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22278,
+                  "src": "2666:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IBeacon_$37018",
+                    "typeString": "contract IBeacon"
+                  },
+                  "typeName": {
+                    "id": 22275,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22274,
+                      "name": "IBeacon",
+                      "nameLocations": [
+                        "2666:7:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37018,
+                      "src": "2666:7:36"
+                    },
+                    "referencedDeclaration": 37018,
+                    "src": "2666:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBeacon_$37018",
+                      "typeString": "contract IBeacon"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2665:9:36"
+            },
+            "scope": 22293,
+            "src": "2613:62:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22279,
+              "nodeType": "StructuredDocumentation",
+              "src": "2681:114:36",
+              "text": "@notice Returns the trove manager beacon interface\n @return The IBeacon interface for the trove manager"
+            },
+            "functionSelector": "9868e1bf",
+            "id": 22285,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "troveManagerBeacon",
+            "nameLocation": "2809:18:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22280,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2827:2:36"
+            },
+            "returnParameters": {
+              "id": 22284,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22283,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22285,
+                  "src": "2853:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IBeacon_$37018",
+                    "typeString": "contract IBeacon"
+                  },
+                  "typeName": {
+                    "id": 22282,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22281,
+                      "name": "IBeacon",
+                      "nameLocations": [
+                        "2853:7:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37018,
+                      "src": "2853:7:36"
+                    },
+                    "referencedDeclaration": 37018,
+                    "src": "2853:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBeacon_$37018",
+                      "typeString": "contract IBeacon"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2852:9:36"
+            },
+            "scope": 22293,
+            "src": "2800:62:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22286,
+              "nodeType": "StructuredDocumentation",
+              "src": "2868:101:36",
+              "text": "@notice Returns the community issuance interface\n @return The ICommunityIssuance interface"
+            },
+            "functionSelector": "95fb16bb",
+            "id": 22292,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "communityIssuance",
+            "nameLocation": "2983:17:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22287,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3000:2:36"
+            },
+            "returnParameters": {
+              "id": 22291,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22290,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22292,
+                  "src": "3026:18:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ICommunityIssuance_$2021",
+                    "typeString": "contract ICommunityIssuance"
+                  },
+                  "typeName": {
+                    "id": 22289,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22288,
+                      "name": "ICommunityIssuance",
+                      "nameLocations": [
+                        "3026:18:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 2021,
+                      "src": "3026:18:36"
+                    },
+                    "referencedDeclaration": 2021,
+                    "src": "3026:18:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ICommunityIssuance_$2021",
+                      "typeString": "contract ICommunityIssuance"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3025:20:36"
+            },
+            "scope": 22293,
+            "src": "2974:72:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 22294,
+        "src": "340:2708:36",
+        "usedErrors": [],
+        "usedEvents": [
+          22199,
+          22204,
+          22209,
+          22212,
+          22215
+        ]
+      }
+    ],
+    "src": "32:3017:36"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/ICoreFacet.sol",
+    "exportedSymbols": {
+      "IBeacon": [
+        37018
+      ],
+      "ICommunityIssuance": [
+        2021
+      ],
+      "ICoreFacet": [
+        22293
+      ],
+      "IDebtToken": [
+        22483
+      ],
+      "IRewardManager": [
+        2359
+      ]
+    },
+    "id": 22294,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 22186,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:24:36"
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/OSHI/interfaces/ICommunityIssuance.sol",
+        "file": "../../OSHI/interfaces/ICommunityIssuance.sol",
+        "id": 22188,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 2022,
+        "src": "58:82:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22187,
+              "name": "ICommunityIssuance",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 2021,
+              "src": "67:18:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/OSHI/interfaces/IRewardManager.sol",
+        "file": "../../OSHI/interfaces/IRewardManager.sol",
+        "id": 22190,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 2360,
+        "src": "141:74:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22189,
+              "name": "IRewardManager",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 2359,
+              "src": "150:14:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/IDebtToken.sol",
+        "file": "./IDebtToken.sol",
+        "id": 22192,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 22484,
+        "src": "216:46:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22191,
+              "name": "IDebtToken",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 22483,
+              "src": "225:10:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "file": "@openzeppelin/contracts/proxy/beacon/IBeacon.sol",
+        "id": 22194,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 22294,
+        "sourceUnit": 37019,
+        "src": "263:75:36",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 22193,
+              "name": "IBeacon",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 37018,
+              "src": "272:7:36",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ICoreFacet",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 22293,
+        "linearizedBaseContracts": [
+          22293
+        ],
+        "name": "ICoreFacet",
+        "nameLocation": "350:10:36",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22195,
+              "nodeType": "StructuredDocumentation",
+              "src": "367:113:36",
+              "text": "@notice Emitted when the reward manager is set\n @param rewardManager The address of the reward manager"
+            },
+            "eventSelector": "4b722357462a92ae2776fce05f39902ac96cb04d2fe661eb688f4a72ab069cff",
+            "id": 22199,
+            "name": "RewardManagerSet",
+            "nameLocation": "491:16:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22198,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22197,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "rewardManager",
+                  "nameLocation": "516:13:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22199,
+                  "src": "508:21:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22196,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "508:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "507:23:36"
+            },
+            "src": "485:46:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22200,
+              "nodeType": "StructuredDocumentation",
+              "src": "537:107:36",
+              "text": "@notice Emitted when the fee receiver is set\n @param feeReceiver The address of the fee receiver"
+            },
+            "eventSelector": "bdf37c276f641820b141429d245add2552b4118c0866e5a78638e3de5ef18d9d",
+            "id": 22204,
+            "name": "FeeReceiverSet",
+            "nameLocation": "655:14:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22203,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22202,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "feeReceiver",
+                  "nameLocation": "678:11:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22204,
+                  "src": "670:19:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22201,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "670:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "669:21:36"
+            },
+            "src": "649:42:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22205,
+              "nodeType": "StructuredDocumentation",
+              "src": "697:96:36",
+              "text": "@notice Emitted when the guardian is set\n @param guardian The address of the guardian"
+            },
+            "eventSelector": "e6c09ffe4572dc9ceaa5ddde4ae41befa655d6fdfe8052077af0970f700e942e",
+            "id": 22209,
+            "name": "GuardianSet",
+            "nameLocation": "804:11:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22208,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22207,
+                  "indexed": false,
+                  "mutability": "mutable",
+                  "name": "guardian",
+                  "nameLocation": "824:8:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22209,
+                  "src": "816:16:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22206,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "816:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "815:18:36"
+            },
+            "src": "798:36:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22210,
+              "nodeType": "StructuredDocumentation",
+              "src": "840:47:36",
+              "text": "@notice Emitted when the protocol is paused"
+            },
+            "eventSelector": "9e87fac88ff661f02d44f95383c817fece4bce600a3dab7a54406878b965e752",
+            "id": 22212,
+            "name": "Paused",
+            "nameLocation": "898:6:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22211,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "904:2:36"
+            },
+            "src": "892:15:36"
+          },
+          {
+            "anonymous": false,
+            "documentation": {
+              "id": 22213,
+              "nodeType": "StructuredDocumentation",
+              "src": "913:49:36",
+              "text": "@notice Emitted when the protocol is unpaused"
+            },
+            "eventSelector": "a45f47fdea8a1efdd9029a5691c7f759c32b7c698632b563573e155625d16933",
+            "id": 22215,
+            "name": "Unpaused",
+            "nameLocation": "973:8:36",
+            "nodeType": "EventDefinition",
+            "parameters": {
+              "id": 22214,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "981:2:36"
+            },
+            "src": "967:17:36"
+          },
+          {
+            "documentation": {
+              "id": 22216,
+              "nodeType": "StructuredDocumentation",
+              "src": "990:108:36",
+              "text": "@notice Sets the fee receiver address\n @param _feeReceiver The address to set as the fee receiver"
+            },
+            "functionSelector": "efdcd974",
+            "id": 22221,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setFeeReceiver",
+            "nameLocation": "1112:14:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22219,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22218,
+                  "mutability": "mutable",
+                  "name": "_feeReceiver",
+                  "nameLocation": "1135:12:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22221,
+                  "src": "1127:20:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22217,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1127:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1126:22:36"
+            },
+            "returnParameters": {
+              "id": 22220,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1157:0:36"
+            },
+            "scope": 22293,
+            "src": "1103:55:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22222,
+              "nodeType": "StructuredDocumentation",
+              "src": "1164:114:36",
+              "text": "@notice Sets the reward manager address\n @param _rewardManager The address to set as the reward manager"
+            },
+            "functionSelector": "153ee554",
+            "id": 22227,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setRewardManager",
+            "nameLocation": "1292:16:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22225,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22224,
+                  "mutability": "mutable",
+                  "name": "_rewardManager",
+                  "nameLocation": "1317:14:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22227,
+                  "src": "1309:22:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22223,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1309:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1308:24:36"
+            },
+            "returnParameters": {
+              "id": 22226,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1341:0:36"
+            },
+            "scope": 22293,
+            "src": "1283:59:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22228,
+              "nodeType": "StructuredDocumentation",
+              "src": "1348:114:36",
+              "text": "@notice Sets the paused state of the protocol\n @param _paused The boolean value to set the paused state"
+            },
+            "functionSelector": "16c38b3c",
+            "id": 22233,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "setPaused",
+            "nameLocation": "1476:9:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22231,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22230,
+                  "mutability": "mutable",
+                  "name": "_paused",
+                  "nameLocation": "1491:7:36",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22233,
+                  "src": "1486:12:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 22229,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1486:4:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1485:14:36"
+            },
+            "returnParameters": {
+              "id": 22232,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1508:0:36"
+            },
+            "scope": 22293,
+            "src": "1467:42:36",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22234,
+              "nodeType": "StructuredDocumentation",
+              "src": "1515:99:36",
+              "text": "@notice Returns the address of the fee receiver\n @return The address of the fee receiver"
+            },
+            "functionSelector": "b3f00674",
+            "id": 22239,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "feeReceiver",
+            "nameLocation": "1628:11:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22235,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1639:2:36"
+            },
+            "returnParameters": {
+              "id": 22238,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22237,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22239,
+                  "src": "1665:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 22236,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1665:7:36",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1664:9:36"
+            },
+            "scope": 22293,
+            "src": "1619:55:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22240,
+              "nodeType": "StructuredDocumentation",
+              "src": "1680:93:36",
+              "text": "@notice Returns the reward manager interface\n @return The IRewardManager interface"
+            },
+            "functionSelector": "0f4ef8a6",
+            "id": 22246,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "rewardManager",
+            "nameLocation": "1787:13:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22241,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1800:2:36"
+            },
+            "returnParameters": {
+              "id": 22245,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22244,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22246,
+                  "src": "1826:14:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IRewardManager_$2359",
+                    "typeString": "contract IRewardManager"
+                  },
+                  "typeName": {
+                    "id": 22243,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22242,
+                      "name": "IRewardManager",
+                      "nameLocations": [
+                        "1826:14:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 2359,
+                      "src": "1826:14:36"
+                    },
+                    "referencedDeclaration": 2359,
+                    "src": "1826:14:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IRewardManager_$2359",
+                      "typeString": "contract IRewardManager"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1825:16:36"
+            },
+            "scope": 22293,
+            "src": "1778:64:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22247,
+              "nodeType": "StructuredDocumentation",
+              "src": "1848:115:36",
+              "text": "@notice Returns the paused state of the protocol\n @return A boolean indicating if the protocol is paused"
+            },
+            "functionSelector": "5c975abb",
+            "id": 22252,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "paused",
+            "nameLocation": "1977:6:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22248,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1983:2:36"
+            },
+            "returnParameters": {
+              "id": 22251,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22250,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22252,
+                  "src": "2009:4:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 22249,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2009:4:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2008:6:36"
+            },
+            "scope": 22293,
+            "src": "1968:47:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22253,
+              "nodeType": "StructuredDocumentation",
+              "src": "2021:94:36",
+              "text": "@notice Returns the start time of the protocol\n @return The start time as a uint256"
+            },
+            "functionSelector": "78e97925",
+            "id": 22258,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "startTime",
+            "nameLocation": "2129:9:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22254,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2138:2:36"
+            },
+            "returnParameters": {
+              "id": 22257,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22256,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22258,
+                  "src": "2164:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 22255,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2164:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2163:9:36"
+            },
+            "scope": 22293,
+            "src": "2120:53:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22259,
+              "nodeType": "StructuredDocumentation",
+              "src": "2179:85:36",
+              "text": "@notice Returns the debt token interface\n @return The IDebtToken interface"
+            },
+            "functionSelector": "f8d89898",
+            "id": 22265,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "debtToken",
+            "nameLocation": "2278:9:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22260,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2287:2:36"
+            },
+            "returnParameters": {
+              "id": 22264,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22263,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22265,
+                  "src": "2313:10:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IDebtToken_$22483",
+                    "typeString": "contract IDebtToken"
+                  },
+                  "typeName": {
+                    "id": 22262,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22261,
+                      "name": "IDebtToken",
+                      "nameLocations": [
+                        "2313:10:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 22483,
+                      "src": "2313:10:36"
+                    },
+                    "referencedDeclaration": 22483,
+                    "src": "2313:10:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IDebtToken_$22483",
+                      "typeString": "contract IDebtToken"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2312:12:36"
+            },
+            "scope": 22293,
+            "src": "2269:56:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22266,
+              "nodeType": "StructuredDocumentation",
+              "src": "2331:97:36",
+              "text": "@notice Returns the gas compensation amount\n @return The gas compensation as a uint256"
+            },
+            "functionSelector": "84f5c2d2",
+            "id": 22271,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "gasCompensation",
+            "nameLocation": "2442:15:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22267,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2457:2:36"
+            },
+            "returnParameters": {
+              "id": 22270,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22269,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22271,
+                  "src": "2483:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 22268,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2483:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2482:9:36"
+            },
+            "scope": 22293,
+            "src": "2433:59:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22272,
+              "nodeType": "StructuredDocumentation",
+              "src": "2498:110:36",
+              "text": "@notice Returns the sorted troves beacon interface\n @return The IBeacon interface for sorted troves"
+            },
+            "functionSelector": "3edc8ceb",
+            "id": 22278,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sortedTrovesBeacon",
+            "nameLocation": "2622:18:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22273,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2640:2:36"
+            },
+            "returnParameters": {
+              "id": 22277,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22276,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22278,
+                  "src": "2666:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IBeacon_$37018",
+                    "typeString": "contract IBeacon"
+                  },
+                  "typeName": {
+                    "id": 22275,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22274,
+                      "name": "IBeacon",
+                      "nameLocations": [
+                        "2666:7:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37018,
+                      "src": "2666:7:36"
+                    },
+                    "referencedDeclaration": 37018,
+                    "src": "2666:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBeacon_$37018",
+                      "typeString": "contract IBeacon"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2665:9:36"
+            },
+            "scope": 22293,
+            "src": "2613:62:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22279,
+              "nodeType": "StructuredDocumentation",
+              "src": "2681:114:36",
+              "text": "@notice Returns the trove manager beacon interface\n @return The IBeacon interface for the trove manager"
+            },
+            "functionSelector": "9868e1bf",
+            "id": 22285,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "troveManagerBeacon",
+            "nameLocation": "2809:18:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22280,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2827:2:36"
+            },
+            "returnParameters": {
+              "id": 22284,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22283,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22285,
+                  "src": "2853:7:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IBeacon_$37018",
+                    "typeString": "contract IBeacon"
+                  },
+                  "typeName": {
+                    "id": 22282,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22281,
+                      "name": "IBeacon",
+                      "nameLocations": [
+                        "2853:7:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 37018,
+                      "src": "2853:7:36"
+                    },
+                    "referencedDeclaration": 37018,
+                    "src": "2853:7:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IBeacon_$37018",
+                      "typeString": "contract IBeacon"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2852:9:36"
+            },
+            "scope": 22293,
+            "src": "2800:62:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 22286,
+              "nodeType": "StructuredDocumentation",
+              "src": "2868:101:36",
+              "text": "@notice Returns the community issuance interface\n @return The ICommunityIssuance interface"
+            },
+            "functionSelector": "95fb16bb",
+            "id": 22292,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "communityIssuance",
+            "nameLocation": "2983:17:36",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 22287,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3000:2:36"
+            },
+            "returnParameters": {
+              "id": 22291,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 22290,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 22292,
+                  "src": "3026:18:36",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ICommunityIssuance_$2021",
+                    "typeString": "contract ICommunityIssuance"
+                  },
+                  "typeName": {
+                    "id": 22289,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 22288,
+                      "name": "ICommunityIssuance",
+                      "nameLocations": [
+                        "3026:18:36"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 2021,
+                      "src": "3026:18:36"
+                    },
+                    "referencedDeclaration": 2021,
+                    "src": "3026:18:36",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ICommunityIssuance_$2021",
+                      "typeString": "contract ICommunityIssuance"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3025:20:36"
+            },
+            "scope": 22293,
+            "src": "2974:72:36",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 22294,
+        "src": "340:2708:36",
+        "usedErrors": [],
+        "usedEvents": [
+          22199,
+          22204,
+          22209,
+          22212,
+          22215
+        ]
+      }
+    ],
+    "src": "32:3017:36"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.771Z"
+}

@@ -1,0 +1,1030 @@
+{
+  "contractName": "ILayerZeroReceiver",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "srcEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "sender",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "nonce",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct Origin",
+          "name": "_origin",
+          "type": "tuple"
+        }
+      ],
+      "name": "allowInitializePath",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "uint32",
+              "name": "srcEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "sender",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "uint64",
+              "name": "nonce",
+              "type": "uint64"
+            }
+          ],
+          "internalType": "struct Origin",
+          "name": "_origin",
+          "type": "tuple"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_guid",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_message",
+          "type": "bytes"
+        },
+        {
+          "internalType": "address",
+          "name": "_executor",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "_extraData",
+          "type": "bytes"
+        }
+      ],
+      "name": "lzReceive",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint32",
+          "name": "_eid",
+          "type": "uint32"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_sender",
+          "type": "bytes32"
+        }
+      ],
+      "name": "nextNonce",
+      "outputs": [
+        {
+          "internalType": "uint64",
+          "name": "",
+          "type": "uint64"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity >=0.8.0;\n\nimport { Origin } from \"./ILayerZeroEndpointV2.sol\";\n\ninterface ILayerZeroReceiver {\n    function allowInitializePath(Origin calldata _origin) external view returns (bool);\n\n    function nextNonce(uint32 _eid, bytes32 _sender) external view returns (uint64);\n\n    function lzReceive(\n        Origin calldata _origin,\n        bytes32 _guid,\n        bytes calldata _message,\n        address _executor,\n        bytes calldata _extraData\n    ) external payable;\n}\n",
+  "sourcePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroReceiver.sol",
+  "ast": {
+    "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroReceiver.sol",
+    "exportedSymbols": {
+      "ILayerZeroReceiver": [
+        30172
+      ],
+      "Origin": [
+        29974
+      ]
+    },
+    "id": 30173,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 30138,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:68"
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "file": "./ILayerZeroEndpointV2.sol",
+        "id": 30140,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 30173,
+        "sourceUnit": 30137,
+        "src": "59:52:68",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 30139,
+              "name": "Origin",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29974,
+              "src": "68:6:68",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ILayerZeroReceiver",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 30172,
+        "linearizedBaseContracts": [
+          30172
+        ],
+        "name": "ILayerZeroReceiver",
+        "nameLocation": "123:18:68",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "ff7bd03d",
+            "id": 30148,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "allowInitializePath",
+            "nameLocation": "157:19:68",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30144,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30143,
+                  "mutability": "mutable",
+                  "name": "_origin",
+                  "nameLocation": "193:7:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30148,
+                  "src": "177:23:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Origin_$29974_calldata_ptr",
+                    "typeString": "struct Origin"
+                  },
+                  "typeName": {
+                    "id": 30142,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 30141,
+                      "name": "Origin",
+                      "nameLocations": [
+                        "177:6:68"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 29974,
+                      "src": "177:6:68"
+                    },
+                    "referencedDeclaration": 29974,
+                    "src": "177:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+                      "typeString": "struct Origin"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "176:25:68"
+            },
+            "returnParameters": {
+              "id": 30147,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30146,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30148,
+                  "src": "225:4:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 30145,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "225:4:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "224:6:68"
+            },
+            "scope": 30172,
+            "src": "148:83:68",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "7d25a05e",
+            "id": 30157,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nextNonce",
+            "nameLocation": "246:9:68",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30153,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30150,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "263:4:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30157,
+                  "src": "256:11:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 30149,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "256:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30152,
+                  "mutability": "mutable",
+                  "name": "_sender",
+                  "nameLocation": "277:7:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30157,
+                  "src": "269:15:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 30151,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "269:7:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "255:30:68"
+            },
+            "returnParameters": {
+              "id": 30156,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30155,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30157,
+                  "src": "309:6:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 30154,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "309:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "308:8:68"
+            },
+            "scope": 30172,
+            "src": "237:80:68",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "13137d65",
+            "id": 30171,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "lzReceive",
+            "nameLocation": "332:9:68",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30169,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30160,
+                  "mutability": "mutable",
+                  "name": "_origin",
+                  "nameLocation": "367:7:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "351:23:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Origin_$29974_calldata_ptr",
+                    "typeString": "struct Origin"
+                  },
+                  "typeName": {
+                    "id": 30159,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 30158,
+                      "name": "Origin",
+                      "nameLocations": [
+                        "351:6:68"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 29974,
+                      "src": "351:6:68"
+                    },
+                    "referencedDeclaration": 29974,
+                    "src": "351:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+                      "typeString": "struct Origin"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30162,
+                  "mutability": "mutable",
+                  "name": "_guid",
+                  "nameLocation": "392:5:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "384:13:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 30161,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "384:7:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30164,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "422:8:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "407:23:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 30163,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "407:5:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30166,
+                  "mutability": "mutable",
+                  "name": "_executor",
+                  "nameLocation": "448:9:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "440:17:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 30165,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "440:7:68",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30168,
+                  "mutability": "mutable",
+                  "name": "_extraData",
+                  "nameLocation": "482:10:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "467:25:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 30167,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "467:5:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "341:157:68"
+            },
+            "returnParameters": {
+              "id": 30170,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "515:0:68"
+            },
+            "scope": 30172,
+            "src": "323:193:68",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 30173,
+        "src": "113:405:68",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:486:68"
+  },
+  "legacyAST": {
+    "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroReceiver.sol",
+    "exportedSymbols": {
+      "ILayerZeroReceiver": [
+        30172
+      ],
+      "Origin": [
+        29974
+      ]
+    },
+    "id": 30173,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 30138,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.8",
+          ".0"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:68"
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "file": "./ILayerZeroEndpointV2.sol",
+        "id": 30140,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 30173,
+        "sourceUnit": 30137,
+        "src": "59:52:68",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 30139,
+              "name": "Origin",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29974,
+              "src": "68:6:68",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "ILayerZeroReceiver",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 30172,
+        "linearizedBaseContracts": [
+          30172
+        ],
+        "name": "ILayerZeroReceiver",
+        "nameLocation": "123:18:68",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "ff7bd03d",
+            "id": 30148,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "allowInitializePath",
+            "nameLocation": "157:19:68",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30144,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30143,
+                  "mutability": "mutable",
+                  "name": "_origin",
+                  "nameLocation": "193:7:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30148,
+                  "src": "177:23:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Origin_$29974_calldata_ptr",
+                    "typeString": "struct Origin"
+                  },
+                  "typeName": {
+                    "id": 30142,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 30141,
+                      "name": "Origin",
+                      "nameLocations": [
+                        "177:6:68"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 29974,
+                      "src": "177:6:68"
+                    },
+                    "referencedDeclaration": 29974,
+                    "src": "177:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+                      "typeString": "struct Origin"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "176:25:68"
+            },
+            "returnParameters": {
+              "id": 30147,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30146,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30148,
+                  "src": "225:4:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 30145,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "225:4:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "224:6:68"
+            },
+            "scope": 30172,
+            "src": "148:83:68",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "7d25a05e",
+            "id": 30157,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "nextNonce",
+            "nameLocation": "246:9:68",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30153,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30150,
+                  "mutability": "mutable",
+                  "name": "_eid",
+                  "nameLocation": "263:4:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30157,
+                  "src": "256:11:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint32",
+                    "typeString": "uint32"
+                  },
+                  "typeName": {
+                    "id": 30149,
+                    "name": "uint32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "256:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30152,
+                  "mutability": "mutable",
+                  "name": "_sender",
+                  "nameLocation": "277:7:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30157,
+                  "src": "269:15:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 30151,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "269:7:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "255:30:68"
+            },
+            "returnParameters": {
+              "id": 30156,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30155,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30157,
+                  "src": "309:6:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint64",
+                    "typeString": "uint64"
+                  },
+                  "typeName": {
+                    "id": 30154,
+                    "name": "uint64",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "309:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint64",
+                      "typeString": "uint64"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "308:8:68"
+            },
+            "scope": 30172,
+            "src": "237:80:68",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "13137d65",
+            "id": 30171,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "lzReceive",
+            "nameLocation": "332:9:68",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 30169,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 30160,
+                  "mutability": "mutable",
+                  "name": "_origin",
+                  "nameLocation": "367:7:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "351:23:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_Origin_$29974_calldata_ptr",
+                    "typeString": "struct Origin"
+                  },
+                  "typeName": {
+                    "id": 30159,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 30158,
+                      "name": "Origin",
+                      "nameLocations": [
+                        "351:6:68"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 29974,
+                      "src": "351:6:68"
+                    },
+                    "referencedDeclaration": 29974,
+                    "src": "351:6:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+                      "typeString": "struct Origin"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30162,
+                  "mutability": "mutable",
+                  "name": "_guid",
+                  "nameLocation": "392:5:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "384:13:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes32",
+                    "typeString": "bytes32"
+                  },
+                  "typeName": {
+                    "id": 30161,
+                    "name": "bytes32",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "384:7:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30164,
+                  "mutability": "mutable",
+                  "name": "_message",
+                  "nameLocation": "422:8:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "407:23:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 30163,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "407:5:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30166,
+                  "mutability": "mutable",
+                  "name": "_executor",
+                  "nameLocation": "448:9:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "440:17:68",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 30165,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "440:7:68",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 30168,
+                  "mutability": "mutable",
+                  "name": "_extraData",
+                  "nameLocation": "482:10:68",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 30171,
+                  "src": "467:25:68",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 30167,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "467:5:68",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "341:157:68"
+            },
+            "returnParameters": {
+              "id": 30170,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "515:0:68"
+            },
+            "scope": 30172,
+            "src": "323:193:68",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 30173,
+        "src": "113:405:68",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:486:68"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.785Z"
+}

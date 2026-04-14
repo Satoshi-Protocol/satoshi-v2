@@ -1,0 +1,3697 @@
+{
+  "contractName": "PacketDecoder",
+  "abi": [],
+  "bytecode": "0x60566037600b82828239805160001a607314602a57634e487b7160e01b600052600060045260246000fd5b30600052607381538281f3fe73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e58221220386fb6f34cf41e4d5317e3d0acd7672b81d58b06632dd2fc1ddc2f330e69335d64736f6c63430008160033",
+  "deployedBytecode": "0x73000000000000000000000000000000000000000030146080604052600080fdfea26474726f6e58221220386fb6f34cf41e4d5317e3d0acd7672b81d58b06632dd2fc1ddc2f330e69335d64736f6c63430008160033",
+  "sourceMap": "942:1527:91:-:0;;;;;;;;;;;;;;;-1:-1:-1;;;942:1527:91;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "942:1527:91:-:0;;;;;;;;",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity ^0.8.20;\n\nimport { Origin } from \"@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol\";\nimport { PacketV1Codec } from \"@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol\";\n\n/**\n * @title InboundPacket\n * @dev Structure representing an inbound packet received by the contract.\n */\nstruct InboundPacket {\n    Origin origin; // Origin information of the packet.\n    uint32 dstEid; // Destination endpointId of the packet.\n    address receiver; // Receiver address for the packet.\n    bytes32 guid; // Unique identifier of the packet.\n    uint256 value; // msg.value of the packet.\n    address executor; // Executor address for the packet.\n    bytes message; // Message payload of the packet.\n    bytes extraData; // Additional arbitrary data for the packet.\n}\n\n/**\n * @title PacketDecoder\n * @dev Library for decoding LayerZero packets.\n */\nlibrary PacketDecoder {\n    using PacketV1Codec for bytes;\n\n    /**\n     * @dev Decode an inbound packet from the given packet data.\n     * @param _packet The packet data to decode.\n     * @return packet An InboundPacket struct representing the decoded packet.\n     */\n    function decode(bytes calldata _packet) internal pure returns (InboundPacket memory packet) {\n        packet.origin = Origin(_packet.srcEid(), _packet.sender(), _packet.nonce());\n        packet.dstEid = _packet.dstEid();\n        packet.receiver = _packet.receiverB20();\n        packet.guid = _packet.guid();\n        packet.message = _packet.message();\n    }\n\n    /**\n     * @dev Decode multiple inbound packets from the given packet data and associated message values.\n     * @param _packets An array of packet data to decode.\n     * @param _packetMsgValues An array of associated message values for each packet.\n     * @return packets An array of InboundPacket structs representing the decoded packets.\n     */\n    function decode(\n        bytes[] calldata _packets,\n        uint256[] memory _packetMsgValues\n    ) internal pure returns (InboundPacket[] memory packets) {\n        packets = new InboundPacket[](_packets.length);\n        for (uint256 i = 0; i < _packets.length; i++) {\n            bytes calldata packet = _packets[i];\n            packets[i] = PacketDecoder.decode(packet);\n            // @dev Allows the verifier to specify the msg.value that gets passed in lzReceive.\n            packets[i].value = _packetMsgValues[i];\n        }\n    }\n}\n",
+  "sourcePath": "@layerzerolabs/oapp-evm/contracts/precrime/libs/Packet.sol",
+  "ast": {
+    "absolutePath": "@layerzerolabs/oapp-evm/contracts/precrime/libs/Packet.sol",
+    "exportedSymbols": {
+      "InboundPacket": [
+        32957
+      ],
+      "Origin": [
+        29974
+      ],
+      "PacketDecoder": [
+        33082
+      ],
+      "PacketV1Codec": [
+        31259
+      ]
+    },
+    "id": 33083,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 32934,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:91"
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "file": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "id": 32936,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 33083,
+        "sourceUnit": 30137,
+        "src": "59:105:91",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32935,
+              "name": "Origin",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29974,
+              "src": "68:6:91",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol",
+        "file": "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol",
+        "id": 32938,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 33083,
+        "sourceUnit": 31260,
+        "src": "165:110:91",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32937,
+              "name": "PacketV1Codec",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31259,
+              "src": "174:13:91",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "canonicalName": "InboundPacket",
+        "documentation": {
+          "id": 32939,
+          "nodeType": "StructuredDocumentation",
+          "src": "277:106:91",
+          "text": " @title InboundPacket\n @dev Structure representing an inbound packet received by the contract."
+        },
+        "id": 32957,
+        "members": [
+          {
+            "constant": false,
+            "id": 32942,
+            "mutability": "mutable",
+            "name": "origin",
+            "nameLocation": "418:6:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "411:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+              "typeString": "struct Origin"
+            },
+            "typeName": {
+              "id": 32941,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 32940,
+                "name": "Origin",
+                "nameLocations": [
+                  "411:6:91"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 29974,
+                "src": "411:6:91"
+              },
+              "referencedDeclaration": 29974,
+              "src": "411:6:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+                "typeString": "struct Origin"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32944,
+            "mutability": "mutable",
+            "name": "dstEid",
+            "nameLocation": "474:6:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "467:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint32",
+              "typeString": "uint32"
+            },
+            "typeName": {
+              "id": 32943,
+              "name": "uint32",
+              "nodeType": "ElementaryTypeName",
+              "src": "467:6:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint32",
+                "typeString": "uint32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32946,
+            "mutability": "mutable",
+            "name": "receiver",
+            "nameLocation": "535:8:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "527:16:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 32945,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "527:7:91",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32948,
+            "mutability": "mutable",
+            "name": "guid",
+            "nameLocation": "593:4:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "585:12:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 32947,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "585:7:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32950,
+            "mutability": "mutable",
+            "name": "value",
+            "nameLocation": "647:5:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "639:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 32949,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "639:7:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32952,
+            "mutability": "mutable",
+            "name": "executor",
+            "nameLocation": "694:8:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "686:16:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 32951,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "686:7:91",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32954,
+            "mutability": "mutable",
+            "name": "message",
+            "nameLocation": "750:7:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "744:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes_storage_ptr",
+              "typeString": "bytes"
+            },
+            "typeName": {
+              "id": 32953,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "744:5:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32956,
+            "mutability": "mutable",
+            "name": "extraData",
+            "nameLocation": "803:9:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "797:15:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes_storage_ptr",
+              "typeString": "bytes"
+            },
+            "typeName": {
+              "id": 32955,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "797:5:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "InboundPacket",
+        "nameLocation": "391:13:91",
+        "nodeType": "StructDefinition",
+        "scope": 33083,
+        "src": "384:476:91",
+        "visibility": "public"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "PacketDecoder",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": {
+          "id": 32958,
+          "nodeType": "StructuredDocumentation",
+          "src": "862:79:91",
+          "text": " @title PacketDecoder\n @dev Library for decoding LayerZero packets."
+        },
+        "fullyImplemented": true,
+        "id": 33082,
+        "linearizedBaseContracts": [
+          33082
+        ],
+        "name": "PacketDecoder",
+        "nameLocation": "950:13:91",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "global": false,
+            "id": 32961,
+            "libraryName": {
+              "id": 32959,
+              "name": "PacketV1Codec",
+              "nameLocations": [
+                "976:13:91"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 31259,
+              "src": "976:13:91"
+            },
+            "nodeType": "UsingForDirective",
+            "src": "970:30:91",
+            "typeName": {
+              "id": 32960,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "994:5:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            }
+          },
+          {
+            "body": {
+              "id": 33018,
+              "nodeType": "Block",
+              "src": "1307:265:91",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 32984,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 32970,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1317:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 32972,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1324:6:91",
+                      "memberName": "origin",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32942,
+                      "src": "1317:13:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Origin_$29974_memory_ptr",
+                        "typeString": "struct Origin memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "expression": {
+                              "id": 32974,
+                              "name": "_packet",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 32964,
+                              "src": "1340:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_calldata_ptr",
+                                "typeString": "bytes calldata"
+                              }
+                            },
+                            "id": 32975,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1348:6:91",
+                            "memberName": "srcEid",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 31119,
+                            "src": "1340:14:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_uint32_$attached_to$_t_bytes_calldata_ptr_$",
+                              "typeString": "function (bytes calldata) pure returns (uint32)"
+                            }
+                          },
+                          "id": 32976,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1340:16:91",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          }
+                        },
+                        {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "expression": {
+                              "id": 32977,
+                              "name": "_packet",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 32964,
+                              "src": "1358:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_calldata_ptr",
+                                "typeString": "bytes calldata"
+                              }
+                            },
+                            "id": 32978,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1366:6:91",
+                            "memberName": "sender",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 31135,
+                            "src": "1358:14:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_bytes32_$attached_to$_t_bytes_calldata_ptr_$",
+                              "typeString": "function (bytes calldata) pure returns (bytes32)"
+                            }
+                          },
+                          "id": 32979,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1358:16:91",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        },
+                        {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "expression": {
+                              "id": 32980,
+                              "name": "_packet",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 32964,
+                              "src": "1376:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_calldata_ptr",
+                                "typeString": "bytes calldata"
+                              }
+                            },
+                            "id": 32981,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1384:5:91",
+                            "memberName": "nonce",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 31100,
+                            "src": "1376:13:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_uint64_$attached_to$_t_bytes_calldata_ptr_$",
+                              "typeString": "function (bytes calldata) pure returns (uint64)"
+                            }
+                          },
+                          "id": 32982,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1376:15:91",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint64",
+                            "typeString": "uint64"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          },
+                          {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          },
+                          {
+                            "typeIdentifier": "t_uint64",
+                            "typeString": "uint64"
+                          }
+                        ],
+                        "id": 32973,
+                        "name": "Origin",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 29974,
+                        "src": "1333:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_struct$_Origin_$29974_storage_ptr_$",
+                          "typeString": "type(struct Origin storage pointer)"
+                        }
+                      },
+                      "id": 32983,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "structConstructorCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1333:59:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Origin_$29974_memory_ptr",
+                        "typeString": "struct Origin memory"
+                      }
+                    },
+                    "src": "1317:75:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Origin_$29974_memory_ptr",
+                      "typeString": "struct Origin memory"
+                    }
+                  },
+                  "id": 32985,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1317:75:91"
+                },
+                {
+                  "expression": {
+                    "id": 32992,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 32986,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1402:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 32988,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1409:6:91",
+                      "memberName": "dstEid",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32944,
+                      "src": "1402:13:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint32",
+                        "typeString": "uint32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 32989,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1418:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 32990,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1426:6:91",
+                        "memberName": "dstEid",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31168,
+                        "src": "1418:14:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_uint32_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (uint32)"
+                        }
+                      },
+                      "id": 32991,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1418:16:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint32",
+                        "typeString": "uint32"
+                      }
+                    },
+                    "src": "1402:32:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "id": 32993,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1402:32:91"
+                },
+                {
+                  "expression": {
+                    "id": 33000,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 32994,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1444:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 32996,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1451:8:91",
+                      "memberName": "receiver",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32946,
+                      "src": "1444:15:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 32997,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1462:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 32998,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1470:11:91",
+                        "memberName": "receiverB20",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31198,
+                        "src": "1462:19:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_address_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (address)"
+                        }
+                      },
+                      "id": 32999,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1462:21:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "1444:39:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 33001,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1444:39:91"
+                },
+                {
+                  "expression": {
+                    "id": 33008,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 33002,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1493:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 33004,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1500:4:91",
+                      "memberName": "guid",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32948,
+                      "src": "1493:11:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 33005,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1507:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 33006,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1515:4:91",
+                        "memberName": "guid",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31214,
+                        "src": "1507:12:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_bytes32_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (bytes32)"
+                        }
+                      },
+                      "id": 33007,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1507:14:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "1493:28:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 33009,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1493:28:91"
+                },
+                {
+                  "expression": {
+                    "id": 33016,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 33010,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1531:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 33012,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1538:7:91",
+                      "memberName": "message",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32954,
+                      "src": "1531:14:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_memory_ptr",
+                        "typeString": "bytes memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 33013,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1548:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 33014,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1556:7:91",
+                        "memberName": "message",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31229,
+                        "src": "1548:15:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_bytes_calldata_ptr_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (bytes calldata)"
+                        }
+                      },
+                      "id": 33015,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1548:17:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_calldata_ptr",
+                        "typeString": "bytes calldata"
+                      }
+                    },
+                    "src": "1531:34:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_memory_ptr",
+                      "typeString": "bytes memory"
+                    }
+                  },
+                  "id": 33017,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1531:34:91"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32962,
+              "nodeType": "StructuredDocumentation",
+              "src": "1006:204:91",
+              "text": " @dev Decode an inbound packet from the given packet data.\n @param _packet The packet data to decode.\n @return packet An InboundPacket struct representing the decoded packet."
+            },
+            "id": 33019,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "decode",
+            "nameLocation": "1224:6:91",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32965,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32964,
+                  "mutability": "mutable",
+                  "name": "_packet",
+                  "nameLocation": "1246:7:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33019,
+                  "src": "1231:22:91",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 32963,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1231:5:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1230:24:91"
+            },
+            "returnParameters": {
+              "id": 32969,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32968,
+                  "mutability": "mutable",
+                  "name": "packet",
+                  "nameLocation": "1299:6:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33019,
+                  "src": "1278:27:91",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                    "typeString": "struct InboundPacket"
+                  },
+                  "typeName": {
+                    "id": 32967,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 32966,
+                      "name": "InboundPacket",
+                      "nameLocations": [
+                        "1278:13:91"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 32957,
+                      "src": "1278:13:91"
+                    },
+                    "referencedDeclaration": 32957,
+                    "src": "1278:13:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_InboundPacket_$32957_storage_ptr",
+                      "typeString": "struct InboundPacket"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1277:29:91"
+            },
+            "scope": 33082,
+            "src": "1215:357:91",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 33080,
+              "nodeType": "Block",
+              "src": "2086:381:91",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 33041,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 33033,
+                      "name": "packets",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 33031,
+                      "src": "2096:7:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                        "typeString": "struct InboundPacket memory[] memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "expression": {
+                            "id": 33038,
+                            "name": "_packets",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 33023,
+                            "src": "2126:8:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                              "typeString": "bytes calldata[] calldata"
+                            }
+                          },
+                          "id": 33039,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "2135:6:91",
+                          "memberName": "length",
+                          "nodeType": "MemberAccess",
+                          "src": "2126:15:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "id": 33037,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "NewExpression",
+                        "src": "2106:19:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_objectcreation_pure$_t_uint256_$returns$_t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr_$",
+                          "typeString": "function (uint256) pure returns (struct InboundPacket memory[] memory)"
+                        },
+                        "typeName": {
+                          "baseType": {
+                            "id": 33035,
+                            "nodeType": "UserDefinedTypeName",
+                            "pathNode": {
+                              "id": 33034,
+                              "name": "InboundPacket",
+                              "nameLocations": [
+                                "2110:13:91"
+                              ],
+                              "nodeType": "IdentifierPath",
+                              "referencedDeclaration": 32957,
+                              "src": "2110:13:91"
+                            },
+                            "referencedDeclaration": 32957,
+                            "src": "2110:13:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_InboundPacket_$32957_storage_ptr",
+                              "typeString": "struct InboundPacket"
+                            }
+                          },
+                          "id": 33036,
+                          "nodeType": "ArrayTypeName",
+                          "src": "2110:15:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_storage_$dyn_storage_ptr",
+                            "typeString": "struct InboundPacket[]"
+                          }
+                        }
+                      },
+                      "id": 33040,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2106:36:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                        "typeString": "struct InboundPacket memory[] memory"
+                      }
+                    },
+                    "src": "2096:46:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                      "typeString": "struct InboundPacket memory[] memory"
+                    }
+                  },
+                  "id": 33042,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2096:46:91"
+                },
+                {
+                  "body": {
+                    "id": 33078,
+                    "nodeType": "Block",
+                    "src": "2198:263:91",
+                    "statements": [
+                      {
+                        "assignments": [
+                          33055
+                        ],
+                        "declarations": [
+                          {
+                            "constant": false,
+                            "id": 33055,
+                            "mutability": "mutable",
+                            "name": "packet",
+                            "nameLocation": "2227:6:91",
+                            "nodeType": "VariableDeclaration",
+                            "scope": 33078,
+                            "src": "2212:21:91",
+                            "stateVariable": false,
+                            "storageLocation": "calldata",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes_calldata_ptr",
+                              "typeString": "bytes"
+                            },
+                            "typeName": {
+                              "id": 33054,
+                              "name": "bytes",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "2212:5:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_storage_ptr",
+                                "typeString": "bytes"
+                              }
+                            },
+                            "visibility": "internal"
+                          }
+                        ],
+                        "id": 33059,
+                        "initialValue": {
+                          "baseExpression": {
+                            "id": 33056,
+                            "name": "_packets",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 33023,
+                            "src": "2236:8:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                              "typeString": "bytes calldata[] calldata"
+                            }
+                          },
+                          "id": 33058,
+                          "indexExpression": {
+                            "id": 33057,
+                            "name": "i",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 33044,
+                            "src": "2245:1:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "2236:11:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "nodeType": "VariableDeclarationStatement",
+                        "src": "2212:35:91"
+                      },
+                      {
+                        "expression": {
+                          "id": 33067,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "baseExpression": {
+                              "id": 33060,
+                              "name": "packets",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33031,
+                              "src": "2261:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                                "typeString": "struct InboundPacket memory[] memory"
+                              }
+                            },
+                            "id": 33062,
+                            "indexExpression": {
+                              "id": 33061,
+                              "name": "i",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33044,
+                              "src": "2269:1:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": true,
+                            "nodeType": "IndexAccess",
+                            "src": "2261:10:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                              "typeString": "struct InboundPacket memory"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "arguments": [
+                              {
+                                "id": 33065,
+                                "name": "packet",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33055,
+                                "src": "2295:6:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_bytes_calldata_ptr",
+                                  "typeString": "bytes calldata"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bytes_calldata_ptr",
+                                  "typeString": "bytes calldata"
+                                }
+                              ],
+                              "expression": {
+                                "id": 33063,
+                                "name": "PacketDecoder",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33082,
+                                "src": "2274:13:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_type$_t_contract$_PacketDecoder_$33082_$",
+                                  "typeString": "type(library PacketDecoder)"
+                                }
+                              },
+                              "id": 33064,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "memberLocation": "2288:6:91",
+                              "memberName": "decode",
+                              "nodeType": "MemberAccess",
+                              "referencedDeclaration": 33019,
+                              "src": "2274:20:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_struct$_InboundPacket_$32957_memory_ptr_$",
+                                "typeString": "function (bytes calldata) pure returns (struct InboundPacket memory)"
+                              }
+                            },
+                            "id": 33066,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "functionCall",
+                            "lValueRequested": false,
+                            "nameLocations": [],
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "2274:28:91",
+                            "tryCall": false,
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                              "typeString": "struct InboundPacket memory"
+                            }
+                          },
+                          "src": "2261:41:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                            "typeString": "struct InboundPacket memory"
+                          }
+                        },
+                        "id": 33068,
+                        "nodeType": "ExpressionStatement",
+                        "src": "2261:41:91"
+                      },
+                      {
+                        "expression": {
+                          "id": 33076,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "expression": {
+                              "baseExpression": {
+                                "id": 33069,
+                                "name": "packets",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33031,
+                                "src": "2412:7:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                                  "typeString": "struct InboundPacket memory[] memory"
+                                }
+                              },
+                              "id": 33071,
+                              "indexExpression": {
+                                "id": 33070,
+                                "name": "i",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33044,
+                                "src": "2420:1:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "nodeType": "IndexAccess",
+                              "src": "2412:10:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                                "typeString": "struct InboundPacket memory"
+                              }
+                            },
+                            "id": 33072,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": true,
+                            "memberLocation": "2423:5:91",
+                            "memberName": "value",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 32950,
+                            "src": "2412:16:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "baseExpression": {
+                              "id": 33073,
+                              "name": "_packetMsgValues",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33026,
+                              "src": "2431:16:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                                "typeString": "uint256[] memory"
+                              }
+                            },
+                            "id": 33075,
+                            "indexExpression": {
+                              "id": 33074,
+                              "name": "i",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33044,
+                              "src": "2448:1:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "nodeType": "IndexAccess",
+                            "src": "2431:19:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "src": "2412:38:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "id": 33077,
+                        "nodeType": "ExpressionStatement",
+                        "src": "2412:38:91"
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 33050,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 33047,
+                      "name": "i",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 33044,
+                      "src": "2172:1:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "expression": {
+                        "id": 33048,
+                        "name": "_packets",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 33023,
+                        "src": "2176:8:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                          "typeString": "bytes calldata[] calldata"
+                        }
+                      },
+                      "id": 33049,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2185:6:91",
+                      "memberName": "length",
+                      "nodeType": "MemberAccess",
+                      "src": "2176:15:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2172:19:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 33079,
+                  "initializationExpression": {
+                    "assignments": [
+                      33044
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 33044,
+                        "mutability": "mutable",
+                        "name": "i",
+                        "nameLocation": "2165:1:91",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 33079,
+                        "src": "2157:9:91",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 33043,
+                          "name": "uint256",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2157:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 33046,
+                    "initialValue": {
+                      "hexValue": "30",
+                      "id": 33045,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "2169:1:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "2157:13:91"
+                  },
+                  "isSimpleCounterLoop": true,
+                  "loopExpression": {
+                    "expression": {
+                      "id": 33052,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "2193:3:91",
+                      "subExpression": {
+                        "id": 33051,
+                        "name": "i",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 33044,
+                        "src": "2193:1:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 33053,
+                    "nodeType": "ExpressionStatement",
+                    "src": "2193:3:91"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "2152:309:91"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 33020,
+              "nodeType": "StructuredDocumentation",
+              "src": "1578:348:91",
+              "text": " @dev Decode multiple inbound packets from the given packet data and associated message values.\n @param _packets An array of packet data to decode.\n @param _packetMsgValues An array of associated message values for each packet.\n @return packets An array of InboundPacket structs representing the decoded packets."
+            },
+            "id": 33081,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "decode",
+            "nameLocation": "1940:6:91",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 33027,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 33023,
+                  "mutability": "mutable",
+                  "name": "_packets",
+                  "nameLocation": "1973:8:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33081,
+                  "src": "1956:25:91",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                    "typeString": "bytes[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 33021,
+                      "name": "bytes",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1956:5:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_storage_ptr",
+                        "typeString": "bytes"
+                      }
+                    },
+                    "id": 33022,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1956:7:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
+                      "typeString": "bytes[]"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 33026,
+                  "mutability": "mutable",
+                  "name": "_packetMsgValues",
+                  "nameLocation": "2008:16:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33081,
+                  "src": "1991:33:91",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 33024,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1991:7:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 33025,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1991:9:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1946:84:91"
+            },
+            "returnParameters": {
+              "id": 33032,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 33031,
+                  "mutability": "mutable",
+                  "name": "packets",
+                  "nameLocation": "2077:7:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33081,
+                  "src": "2054:30:91",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "struct InboundPacket[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 33029,
+                      "nodeType": "UserDefinedTypeName",
+                      "pathNode": {
+                        "id": 33028,
+                        "name": "InboundPacket",
+                        "nameLocations": [
+                          "2054:13:91"
+                        ],
+                        "nodeType": "IdentifierPath",
+                        "referencedDeclaration": 32957,
+                        "src": "2054:13:91"
+                      },
+                      "referencedDeclaration": 32957,
+                      "src": "2054:13:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_InboundPacket_$32957_storage_ptr",
+                        "typeString": "struct InboundPacket"
+                      }
+                    },
+                    "id": 33030,
+                    "nodeType": "ArrayTypeName",
+                    "src": "2054:15:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_storage_$dyn_storage_ptr",
+                      "typeString": "struct InboundPacket[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2053:32:91"
+            },
+            "scope": 33082,
+            "src": "1931:536:91",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 33083,
+        "src": "942:1527:91",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:2437:91"
+  },
+  "legacyAST": {
+    "absolutePath": "@layerzerolabs/oapp-evm/contracts/precrime/libs/Packet.sol",
+    "exportedSymbols": {
+      "InboundPacket": [
+        32957
+      ],
+      "Origin": [
+        29974
+      ],
+      "PacketDecoder": [
+        33082
+      ],
+      "PacketV1Codec": [
+        31259
+      ]
+    },
+    "id": 33083,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 32934,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:24:91"
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "file": "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol",
+        "id": 32936,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 33083,
+        "sourceUnit": 30137,
+        "src": "59:105:91",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32935,
+              "name": "Origin",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 29974,
+              "src": "68:6:91",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol",
+        "file": "@layerzerolabs/lz-evm-protocol-v2/contracts/messagelib/libs/PacketV1Codec.sol",
+        "id": 32938,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 33083,
+        "sourceUnit": 31260,
+        "src": "165:110:91",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 32937,
+              "name": "PacketV1Codec",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 31259,
+              "src": "174:13:91",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "canonicalName": "InboundPacket",
+        "documentation": {
+          "id": 32939,
+          "nodeType": "StructuredDocumentation",
+          "src": "277:106:91",
+          "text": " @title InboundPacket\n @dev Structure representing an inbound packet received by the contract."
+        },
+        "id": 32957,
+        "members": [
+          {
+            "constant": false,
+            "id": 32942,
+            "mutability": "mutable",
+            "name": "origin",
+            "nameLocation": "418:6:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "411:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+              "typeString": "struct Origin"
+            },
+            "typeName": {
+              "id": 32941,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 32940,
+                "name": "Origin",
+                "nameLocations": [
+                  "411:6:91"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 29974,
+                "src": "411:6:91"
+              },
+              "referencedDeclaration": 29974,
+              "src": "411:6:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Origin_$29974_storage_ptr",
+                "typeString": "struct Origin"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32944,
+            "mutability": "mutable",
+            "name": "dstEid",
+            "nameLocation": "474:6:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "467:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint32",
+              "typeString": "uint32"
+            },
+            "typeName": {
+              "id": 32943,
+              "name": "uint32",
+              "nodeType": "ElementaryTypeName",
+              "src": "467:6:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint32",
+                "typeString": "uint32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32946,
+            "mutability": "mutable",
+            "name": "receiver",
+            "nameLocation": "535:8:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "527:16:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 32945,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "527:7:91",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32948,
+            "mutability": "mutable",
+            "name": "guid",
+            "nameLocation": "593:4:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "585:12:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes32",
+              "typeString": "bytes32"
+            },
+            "typeName": {
+              "id": 32947,
+              "name": "bytes32",
+              "nodeType": "ElementaryTypeName",
+              "src": "585:7:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes32",
+                "typeString": "bytes32"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32950,
+            "mutability": "mutable",
+            "name": "value",
+            "nameLocation": "647:5:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "639:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 32949,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "639:7:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32952,
+            "mutability": "mutable",
+            "name": "executor",
+            "nameLocation": "694:8:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "686:16:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 32951,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "686:7:91",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32954,
+            "mutability": "mutable",
+            "name": "message",
+            "nameLocation": "750:7:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "744:13:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes_storage_ptr",
+              "typeString": "bytes"
+            },
+            "typeName": {
+              "id": 32953,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "744:5:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 32956,
+            "mutability": "mutable",
+            "name": "extraData",
+            "nameLocation": "803:9:91",
+            "nodeType": "VariableDeclaration",
+            "scope": 32957,
+            "src": "797:15:91",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes_storage_ptr",
+              "typeString": "bytes"
+            },
+            "typeName": {
+              "id": 32955,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "797:5:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "InboundPacket",
+        "nameLocation": "391:13:91",
+        "nodeType": "StructDefinition",
+        "scope": 33083,
+        "src": "384:476:91",
+        "visibility": "public"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "PacketDecoder",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "documentation": {
+          "id": 32958,
+          "nodeType": "StructuredDocumentation",
+          "src": "862:79:91",
+          "text": " @title PacketDecoder\n @dev Library for decoding LayerZero packets."
+        },
+        "fullyImplemented": true,
+        "id": 33082,
+        "linearizedBaseContracts": [
+          33082
+        ],
+        "name": "PacketDecoder",
+        "nameLocation": "950:13:91",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "global": false,
+            "id": 32961,
+            "libraryName": {
+              "id": 32959,
+              "name": "PacketV1Codec",
+              "nameLocations": [
+                "976:13:91"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 31259,
+              "src": "976:13:91"
+            },
+            "nodeType": "UsingForDirective",
+            "src": "970:30:91",
+            "typeName": {
+              "id": 32960,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "994:5:91",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            }
+          },
+          {
+            "body": {
+              "id": 33018,
+              "nodeType": "Block",
+              "src": "1307:265:91",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 32984,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 32970,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1317:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 32972,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1324:6:91",
+                      "memberName": "origin",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32942,
+                      "src": "1317:13:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Origin_$29974_memory_ptr",
+                        "typeString": "struct Origin memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "expression": {
+                              "id": 32974,
+                              "name": "_packet",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 32964,
+                              "src": "1340:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_calldata_ptr",
+                                "typeString": "bytes calldata"
+                              }
+                            },
+                            "id": 32975,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1348:6:91",
+                            "memberName": "srcEid",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 31119,
+                            "src": "1340:14:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_uint32_$attached_to$_t_bytes_calldata_ptr_$",
+                              "typeString": "function (bytes calldata) pure returns (uint32)"
+                            }
+                          },
+                          "id": 32976,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1340:16:91",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          }
+                        },
+                        {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "expression": {
+                              "id": 32977,
+                              "name": "_packet",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 32964,
+                              "src": "1358:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_calldata_ptr",
+                                "typeString": "bytes calldata"
+                              }
+                            },
+                            "id": 32978,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1366:6:91",
+                            "memberName": "sender",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 31135,
+                            "src": "1358:14:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_bytes32_$attached_to$_t_bytes_calldata_ptr_$",
+                              "typeString": "function (bytes calldata) pure returns (bytes32)"
+                            }
+                          },
+                          "id": 32979,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1358:16:91",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          }
+                        },
+                        {
+                          "arguments": [],
+                          "expression": {
+                            "argumentTypes": [],
+                            "expression": {
+                              "id": 32980,
+                              "name": "_packet",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 32964,
+                              "src": "1376:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_calldata_ptr",
+                                "typeString": "bytes calldata"
+                              }
+                            },
+                            "id": 32981,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "1384:5:91",
+                            "memberName": "nonce",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 31100,
+                            "src": "1376:13:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_uint64_$attached_to$_t_bytes_calldata_ptr_$",
+                              "typeString": "function (bytes calldata) pure returns (uint64)"
+                            }
+                          },
+                          "id": 32982,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1376:15:91",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint64",
+                            "typeString": "uint64"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint32",
+                            "typeString": "uint32"
+                          },
+                          {
+                            "typeIdentifier": "t_bytes32",
+                            "typeString": "bytes32"
+                          },
+                          {
+                            "typeIdentifier": "t_uint64",
+                            "typeString": "uint64"
+                          }
+                        ],
+                        "id": 32973,
+                        "name": "Origin",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 29974,
+                        "src": "1333:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_struct$_Origin_$29974_storage_ptr_$",
+                          "typeString": "type(struct Origin storage pointer)"
+                        }
+                      },
+                      "id": 32983,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "structConstructorCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1333:59:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_Origin_$29974_memory_ptr",
+                        "typeString": "struct Origin memory"
+                      }
+                    },
+                    "src": "1317:75:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_Origin_$29974_memory_ptr",
+                      "typeString": "struct Origin memory"
+                    }
+                  },
+                  "id": 32985,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1317:75:91"
+                },
+                {
+                  "expression": {
+                    "id": 32992,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 32986,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1402:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 32988,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1409:6:91",
+                      "memberName": "dstEid",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32944,
+                      "src": "1402:13:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint32",
+                        "typeString": "uint32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 32989,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1418:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 32990,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1426:6:91",
+                        "memberName": "dstEid",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31168,
+                        "src": "1418:14:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_uint32_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (uint32)"
+                        }
+                      },
+                      "id": 32991,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1418:16:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint32",
+                        "typeString": "uint32"
+                      }
+                    },
+                    "src": "1402:32:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint32",
+                      "typeString": "uint32"
+                    }
+                  },
+                  "id": 32993,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1402:32:91"
+                },
+                {
+                  "expression": {
+                    "id": 33000,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 32994,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1444:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 32996,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1451:8:91",
+                      "memberName": "receiver",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32946,
+                      "src": "1444:15:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 32997,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1462:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 32998,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1470:11:91",
+                        "memberName": "receiverB20",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31198,
+                        "src": "1462:19:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_address_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (address)"
+                        }
+                      },
+                      "id": 32999,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1462:21:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_address",
+                        "typeString": "address"
+                      }
+                    },
+                    "src": "1444:39:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "id": 33001,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1444:39:91"
+                },
+                {
+                  "expression": {
+                    "id": 33008,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 33002,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1493:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 33004,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1500:4:91",
+                      "memberName": "guid",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32948,
+                      "src": "1493:11:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 33005,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1507:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 33006,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1515:4:91",
+                        "memberName": "guid",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31214,
+                        "src": "1507:12:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_bytes32_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (bytes32)"
+                        }
+                      },
+                      "id": 33007,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1507:14:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "1493:28:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    }
+                  },
+                  "id": 33009,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1493:28:91"
+                },
+                {
+                  "expression": {
+                    "id": 33016,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "expression": {
+                        "id": 33010,
+                        "name": "packet",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 32968,
+                        "src": "1531:6:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                          "typeString": "struct InboundPacket memory"
+                        }
+                      },
+                      "id": 33012,
+                      "isConstant": false,
+                      "isLValue": true,
+                      "isPure": false,
+                      "lValueRequested": true,
+                      "memberLocation": "1538:7:91",
+                      "memberName": "message",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 32954,
+                      "src": "1531:14:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_memory_ptr",
+                        "typeString": "bytes memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [],
+                      "expression": {
+                        "argumentTypes": [],
+                        "expression": {
+                          "id": 33013,
+                          "name": "_packet",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 32964,
+                          "src": "1548:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "id": 33014,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "memberLocation": "1556:7:91",
+                        "memberName": "message",
+                        "nodeType": "MemberAccess",
+                        "referencedDeclaration": 31229,
+                        "src": "1548:15:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_bytes_calldata_ptr_$attached_to$_t_bytes_calldata_ptr_$",
+                          "typeString": "function (bytes calldata) pure returns (bytes calldata)"
+                        }
+                      },
+                      "id": 33015,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1548:17:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_calldata_ptr",
+                        "typeString": "bytes calldata"
+                      }
+                    },
+                    "src": "1531:34:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_memory_ptr",
+                      "typeString": "bytes memory"
+                    }
+                  },
+                  "id": 33017,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1531:34:91"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 32962,
+              "nodeType": "StructuredDocumentation",
+              "src": "1006:204:91",
+              "text": " @dev Decode an inbound packet from the given packet data.\n @param _packet The packet data to decode.\n @return packet An InboundPacket struct representing the decoded packet."
+            },
+            "id": 33019,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "decode",
+            "nameLocation": "1224:6:91",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32965,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32964,
+                  "mutability": "mutable",
+                  "name": "_packet",
+                  "nameLocation": "1246:7:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33019,
+                  "src": "1231:22:91",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bytes_calldata_ptr",
+                    "typeString": "bytes"
+                  },
+                  "typeName": {
+                    "id": 32963,
+                    "name": "bytes",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1231:5:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bytes_storage_ptr",
+                      "typeString": "bytes"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1230:24:91"
+            },
+            "returnParameters": {
+              "id": 32969,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 32968,
+                  "mutability": "mutable",
+                  "name": "packet",
+                  "nameLocation": "1299:6:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33019,
+                  "src": "1278:27:91",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                    "typeString": "struct InboundPacket"
+                  },
+                  "typeName": {
+                    "id": 32967,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 32966,
+                      "name": "InboundPacket",
+                      "nameLocations": [
+                        "1278:13:91"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 32957,
+                      "src": "1278:13:91"
+                    },
+                    "referencedDeclaration": 32957,
+                    "src": "1278:13:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_struct$_InboundPacket_$32957_storage_ptr",
+                      "typeString": "struct InboundPacket"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1277:29:91"
+            },
+            "scope": 33082,
+            "src": "1215:357:91",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 33080,
+              "nodeType": "Block",
+              "src": "2086:381:91",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 33041,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 33033,
+                      "name": "packets",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 33031,
+                      "src": "2096:7:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                        "typeString": "struct InboundPacket memory[] memory"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "arguments": [
+                        {
+                          "expression": {
+                            "id": 33038,
+                            "name": "_packets",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 33023,
+                            "src": "2126:8:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                              "typeString": "bytes calldata[] calldata"
+                            }
+                          },
+                          "id": 33039,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "2135:6:91",
+                          "memberName": "length",
+                          "nodeType": "MemberAccess",
+                          "src": "2126:15:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        ],
+                        "id": 33037,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "NewExpression",
+                        "src": "2106:19:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_objectcreation_pure$_t_uint256_$returns$_t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr_$",
+                          "typeString": "function (uint256) pure returns (struct InboundPacket memory[] memory)"
+                        },
+                        "typeName": {
+                          "baseType": {
+                            "id": 33035,
+                            "nodeType": "UserDefinedTypeName",
+                            "pathNode": {
+                              "id": 33034,
+                              "name": "InboundPacket",
+                              "nameLocations": [
+                                "2110:13:91"
+                              ],
+                              "nodeType": "IdentifierPath",
+                              "referencedDeclaration": 32957,
+                              "src": "2110:13:91"
+                            },
+                            "referencedDeclaration": 32957,
+                            "src": "2110:13:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_InboundPacket_$32957_storage_ptr",
+                              "typeString": "struct InboundPacket"
+                            }
+                          },
+                          "id": 33036,
+                          "nodeType": "ArrayTypeName",
+                          "src": "2110:15:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_storage_$dyn_storage_ptr",
+                            "typeString": "struct InboundPacket[]"
+                          }
+                        }
+                      },
+                      "id": 33040,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "2106:36:91",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                        "typeString": "struct InboundPacket memory[] memory"
+                      }
+                    },
+                    "src": "2096:46:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                      "typeString": "struct InboundPacket memory[] memory"
+                    }
+                  },
+                  "id": 33042,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2096:46:91"
+                },
+                {
+                  "body": {
+                    "id": 33078,
+                    "nodeType": "Block",
+                    "src": "2198:263:91",
+                    "statements": [
+                      {
+                        "assignments": [
+                          33055
+                        ],
+                        "declarations": [
+                          {
+                            "constant": false,
+                            "id": 33055,
+                            "mutability": "mutable",
+                            "name": "packet",
+                            "nameLocation": "2227:6:91",
+                            "nodeType": "VariableDeclaration",
+                            "scope": 33078,
+                            "src": "2212:21:91",
+                            "stateVariable": false,
+                            "storageLocation": "calldata",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_bytes_calldata_ptr",
+                              "typeString": "bytes"
+                            },
+                            "typeName": {
+                              "id": 33054,
+                              "name": "bytes",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "2212:5:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_bytes_storage_ptr",
+                                "typeString": "bytes"
+                              }
+                            },
+                            "visibility": "internal"
+                          }
+                        ],
+                        "id": 33059,
+                        "initialValue": {
+                          "baseExpression": {
+                            "id": 33056,
+                            "name": "_packets",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 33023,
+                            "src": "2236:8:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                              "typeString": "bytes calldata[] calldata"
+                            }
+                          },
+                          "id": 33058,
+                          "indexExpression": {
+                            "id": 33057,
+                            "name": "i",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 33044,
+                            "src": "2245:1:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "IndexAccess",
+                          "src": "2236:11:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_calldata_ptr",
+                            "typeString": "bytes calldata"
+                          }
+                        },
+                        "nodeType": "VariableDeclarationStatement",
+                        "src": "2212:35:91"
+                      },
+                      {
+                        "expression": {
+                          "id": 33067,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "baseExpression": {
+                              "id": 33060,
+                              "name": "packets",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33031,
+                              "src": "2261:7:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                                "typeString": "struct InboundPacket memory[] memory"
+                              }
+                            },
+                            "id": 33062,
+                            "indexExpression": {
+                              "id": 33061,
+                              "name": "i",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33044,
+                              "src": "2269:1:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": true,
+                            "nodeType": "IndexAccess",
+                            "src": "2261:10:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                              "typeString": "struct InboundPacket memory"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "arguments": [
+                              {
+                                "id": 33065,
+                                "name": "packet",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33055,
+                                "src": "2295:6:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_bytes_calldata_ptr",
+                                  "typeString": "bytes calldata"
+                                }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [
+                                {
+                                  "typeIdentifier": "t_bytes_calldata_ptr",
+                                  "typeString": "bytes calldata"
+                                }
+                              ],
+                              "expression": {
+                                "id": 33063,
+                                "name": "PacketDecoder",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33082,
+                                "src": "2274:13:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_type$_t_contract$_PacketDecoder_$33082_$",
+                                  "typeString": "type(library PacketDecoder)"
+                                }
+                              },
+                              "id": 33064,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "memberLocation": "2288:6:91",
+                              "memberName": "decode",
+                              "nodeType": "MemberAccess",
+                              "referencedDeclaration": 33019,
+                              "src": "2274:20:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_function_internal_pure$_t_bytes_calldata_ptr_$returns$_t_struct$_InboundPacket_$32957_memory_ptr_$",
+                                "typeString": "function (bytes calldata) pure returns (struct InboundPacket memory)"
+                              }
+                            },
+                            "id": 33066,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "functionCall",
+                            "lValueRequested": false,
+                            "nameLocations": [],
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "2274:28:91",
+                            "tryCall": false,
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                              "typeString": "struct InboundPacket memory"
+                            }
+                          },
+                          "src": "2261:41:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                            "typeString": "struct InboundPacket memory"
+                          }
+                        },
+                        "id": 33068,
+                        "nodeType": "ExpressionStatement",
+                        "src": "2261:41:91"
+                      },
+                      {
+                        "expression": {
+                          "id": 33076,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "expression": {
+                              "baseExpression": {
+                                "id": 33069,
+                                "name": "packets",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33031,
+                                "src": "2412:7:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                                  "typeString": "struct InboundPacket memory[] memory"
+                                }
+                              },
+                              "id": 33071,
+                              "indexExpression": {
+                                "id": 33070,
+                                "name": "i",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 33044,
+                                "src": "2420:1:91",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_uint256",
+                                  "typeString": "uint256"
+                                }
+                              },
+                              "isConstant": false,
+                              "isLValue": true,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "nodeType": "IndexAccess",
+                              "src": "2412:10:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_struct$_InboundPacket_$32957_memory_ptr",
+                                "typeString": "struct InboundPacket memory"
+                              }
+                            },
+                            "id": 33072,
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": true,
+                            "memberLocation": "2423:5:91",
+                            "memberName": "value",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 32950,
+                            "src": "2412:16:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "baseExpression": {
+                              "id": 33073,
+                              "name": "_packetMsgValues",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33026,
+                              "src": "2431:16:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                                "typeString": "uint256[] memory"
+                              }
+                            },
+                            "id": 33075,
+                            "indexExpression": {
+                              "id": 33074,
+                              "name": "i",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 33044,
+                              "src": "2448:1:91",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_uint256",
+                                "typeString": "uint256"
+                              }
+                            },
+                            "isConstant": false,
+                            "isLValue": true,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "nodeType": "IndexAccess",
+                            "src": "2431:19:91",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_uint256",
+                              "typeString": "uint256"
+                            }
+                          },
+                          "src": "2412:38:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "id": 33077,
+                        "nodeType": "ExpressionStatement",
+                        "src": "2412:38:91"
+                      }
+                    ]
+                  },
+                  "condition": {
+                    "commonType": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    },
+                    "id": 33050,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "id": 33047,
+                      "name": "i",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 33044,
+                      "src": "2172:1:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "<",
+                    "rightExpression": {
+                      "expression": {
+                        "id": 33048,
+                        "name": "_packets",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 33023,
+                        "src": "2176:8:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                          "typeString": "bytes calldata[] calldata"
+                        }
+                      },
+                      "id": 33049,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2185:6:91",
+                      "memberName": "length",
+                      "nodeType": "MemberAccess",
+                      "src": "2176:15:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "2172:19:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "id": 33079,
+                  "initializationExpression": {
+                    "assignments": [
+                      33044
+                    ],
+                    "declarations": [
+                      {
+                        "constant": false,
+                        "id": 33044,
+                        "mutability": "mutable",
+                        "name": "i",
+                        "nameLocation": "2165:1:91",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 33079,
+                        "src": "2157:9:91",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        },
+                        "typeName": {
+                          "id": 33043,
+                          "name": "uint256",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2157:7:91",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_uint256",
+                            "typeString": "uint256"
+                          }
+                        },
+                        "visibility": "internal"
+                      }
+                    ],
+                    "id": 33046,
+                    "initialValue": {
+                      "hexValue": "30",
+                      "id": 33045,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "2169:1:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_rational_0_by_1",
+                        "typeString": "int_const 0"
+                      },
+                      "value": "0"
+                    },
+                    "nodeType": "VariableDeclarationStatement",
+                    "src": "2157:13:91"
+                  },
+                  "isSimpleCounterLoop": true,
+                  "loopExpression": {
+                    "expression": {
+                      "id": 33052,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "nodeType": "UnaryOperation",
+                      "operator": "++",
+                      "prefix": false,
+                      "src": "2193:3:91",
+                      "subExpression": {
+                        "id": 33051,
+                        "name": "i",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 33044,
+                        "src": "2193:1:91",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_uint256",
+                          "typeString": "uint256"
+                        }
+                      },
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 33053,
+                    "nodeType": "ExpressionStatement",
+                    "src": "2193:3:91"
+                  },
+                  "nodeType": "ForStatement",
+                  "src": "2152:309:91"
+                }
+              ]
+            },
+            "documentation": {
+              "id": 33020,
+              "nodeType": "StructuredDocumentation",
+              "src": "1578:348:91",
+              "text": " @dev Decode multiple inbound packets from the given packet data and associated message values.\n @param _packets An array of packet data to decode.\n @param _packetMsgValues An array of associated message values for each packet.\n @return packets An array of InboundPacket structs representing the decoded packets."
+            },
+            "id": 33081,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "decode",
+            "nameLocation": "1940:6:91",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 33027,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 33023,
+                  "mutability": "mutable",
+                  "name": "_packets",
+                  "nameLocation": "1973:8:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33081,
+                  "src": "1956:25:91",
+                  "stateVariable": false,
+                  "storageLocation": "calldata",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_bytes_calldata_ptr_$dyn_calldata_ptr",
+                    "typeString": "bytes[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 33021,
+                      "name": "bytes",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1956:5:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes_storage_ptr",
+                        "typeString": "bytes"
+                      }
+                    },
+                    "id": 33022,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1956:7:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_bytes_storage_$dyn_storage_ptr",
+                      "typeString": "bytes[]"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 33026,
+                  "mutability": "mutable",
+                  "name": "_packetMsgValues",
+                  "nameLocation": "2008:16:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33081,
+                  "src": "1991:33:91",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$dyn_memory_ptr",
+                    "typeString": "uint256[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 33024,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "1991:7:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "id": 33025,
+                    "nodeType": "ArrayTypeName",
+                    "src": "1991:9:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$dyn_storage_ptr",
+                      "typeString": "uint256[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1946:84:91"
+            },
+            "returnParameters": {
+              "id": 33032,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 33031,
+                  "mutability": "mutable",
+                  "name": "packets",
+                  "nameLocation": "2077:7:91",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 33081,
+                  "src": "2054:30:91",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "struct InboundPacket[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 33029,
+                      "nodeType": "UserDefinedTypeName",
+                      "pathNode": {
+                        "id": 33028,
+                        "name": "InboundPacket",
+                        "nameLocations": [
+                          "2054:13:91"
+                        ],
+                        "nodeType": "IdentifierPath",
+                        "referencedDeclaration": 32957,
+                        "src": "2054:13:91"
+                      },
+                      "referencedDeclaration": 32957,
+                      "src": "2054:13:91",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_InboundPacket_$32957_storage_ptr",
+                        "typeString": "struct InboundPacket"
+                      }
+                    },
+                    "id": 33030,
+                    "nodeType": "ArrayTypeName",
+                    "src": "2054:15:91",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_InboundPacket_$32957_storage_$dyn_storage_ptr",
+                      "typeString": "struct InboundPacket[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2053:32:91"
+            },
+            "scope": 33082,
+            "src": "1931:536:91",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "internal"
+          }
+        ],
+        "scope": 33083,
+        "src": "942:1527:91",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "33:2437:91"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.791Z"
+}

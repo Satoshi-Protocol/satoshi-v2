@@ -1,0 +1,1328 @@
+{
+  "contractName": "IMultiTroveGetter",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract ITroveManager",
+          "name": "troveManager",
+          "type": "address"
+        },
+        {
+          "internalType": "int256",
+          "name": "_startIdx",
+          "type": "int256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_count",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "price",
+          "type": "uint256"
+        }
+      ],
+      "name": "getMultipleSortedTroves",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "owner",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "debt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "coll",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "stake",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "snapshotCollateral",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "snapshotDebt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "nominalICR",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "currentICR",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "entireDebt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "entireColl",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "pendingDebtReward",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "pendingCollReward",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct CombinedTroveData[]",
+          "name": "_troves",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\nimport { ITroveManager } from \"../../interfaces/ITroveManager.sol\";\n\nstruct CombinedTroveData {\n    address owner;\n    uint256 debt;\n    uint256 coll;\n    uint256 stake;\n    uint256 snapshotCollateral;\n    uint256 snapshotDebt;\n    uint256 nominalICR;\n    uint256 currentICR;\n    uint256 entireDebt;\n    uint256 entireColl;\n    uint256 pendingDebtReward;\n    uint256 pendingCollReward;\n}\n\ninterface IMultiTroveGetter {\n    function getMultipleSortedTroves(\n        ITroveManager troveManager,\n        int256 _startIdx,\n        uint256 _count,\n        uint256 price\n    )\n        external\n        view\n        returns (CombinedTroveData[] memory _troves);\n}\n",
+  "sourcePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/helpers/interfaces/IMultiTroveGetter.sol",
+  "ast": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/helpers/interfaces/IMultiTroveGetter.sol",
+    "exportedSymbols": {
+      "CombinedTroveData": [
+        21561
+      ],
+      "IMultiTroveGetter": [
+        21578
+      ],
+      "ITroveManager": [
+        24691
+      ]
+    },
+    "id": 21579,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 21534,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:24:29"
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/ITroveManager.sol",
+        "file": "../../interfaces/ITroveManager.sol",
+        "id": 21536,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 21579,
+        "sourceUnit": 24767,
+        "src": "58:67:29",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 21535,
+              "name": "ITroveManager",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 24691,
+              "src": "67:13:29",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "canonicalName": "CombinedTroveData",
+        "id": 21561,
+        "members": [
+          {
+            "constant": false,
+            "id": 21538,
+            "mutability": "mutable",
+            "name": "owner",
+            "nameLocation": "166:5:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "158:13:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 21537,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "158:7:29",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21540,
+            "mutability": "mutable",
+            "name": "debt",
+            "nameLocation": "185:4:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "177:12:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21539,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "177:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21542,
+            "mutability": "mutable",
+            "name": "coll",
+            "nameLocation": "203:4:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "195:12:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21541,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "195:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21544,
+            "mutability": "mutable",
+            "name": "stake",
+            "nameLocation": "221:5:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "213:13:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21543,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "213:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21546,
+            "mutability": "mutable",
+            "name": "snapshotCollateral",
+            "nameLocation": "240:18:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "232:26:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21545,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "232:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21548,
+            "mutability": "mutable",
+            "name": "snapshotDebt",
+            "nameLocation": "272:12:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "264:20:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21547,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "264:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21550,
+            "mutability": "mutable",
+            "name": "nominalICR",
+            "nameLocation": "298:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "290:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21549,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "290:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21552,
+            "mutability": "mutable",
+            "name": "currentICR",
+            "nameLocation": "322:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "314:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21551,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "314:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21554,
+            "mutability": "mutable",
+            "name": "entireDebt",
+            "nameLocation": "346:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "338:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21553,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "338:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21556,
+            "mutability": "mutable",
+            "name": "entireColl",
+            "nameLocation": "370:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "362:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21555,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "362:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21558,
+            "mutability": "mutable",
+            "name": "pendingDebtReward",
+            "nameLocation": "394:17:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "386:25:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21557,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "386:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21560,
+            "mutability": "mutable",
+            "name": "pendingCollReward",
+            "nameLocation": "425:17:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "417:25:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21559,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "417:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "CombinedTroveData",
+        "nameLocation": "134:17:29",
+        "nodeType": "StructDefinition",
+        "scope": 21579,
+        "src": "127:318:29",
+        "visibility": "public"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IMultiTroveGetter",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 21578,
+        "linearizedBaseContracts": [
+          21578
+        ],
+        "name": "IMultiTroveGetter",
+        "nameLocation": "457:17:29",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "4d1b6fd6",
+            "id": 21577,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMultipleSortedTroves",
+            "nameLocation": "490:23:29",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 21571,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 21564,
+                  "mutability": "mutable",
+                  "name": "troveManager",
+                  "nameLocation": "537:12:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "523:26:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ITroveManager_$24691",
+                    "typeString": "contract ITroveManager"
+                  },
+                  "typeName": {
+                    "id": 21563,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 21562,
+                      "name": "ITroveManager",
+                      "nameLocations": [
+                        "523:13:29"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 24691,
+                      "src": "523:13:29"
+                    },
+                    "referencedDeclaration": 24691,
+                    "src": "523:13:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ITroveManager_$24691",
+                      "typeString": "contract ITroveManager"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 21566,
+                  "mutability": "mutable",
+                  "name": "_startIdx",
+                  "nameLocation": "566:9:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "559:16:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int256",
+                    "typeString": "int256"
+                  },
+                  "typeName": {
+                    "id": 21565,
+                    "name": "int256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "559:6:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_int256",
+                      "typeString": "int256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 21568,
+                  "mutability": "mutable",
+                  "name": "_count",
+                  "nameLocation": "593:6:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "585:14:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 21567,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "585:7:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 21570,
+                  "mutability": "mutable",
+                  "name": "price",
+                  "nameLocation": "617:5:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "609:13:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 21569,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "609:7:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "513:115:29"
+            },
+            "returnParameters": {
+              "id": 21576,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 21575,
+                  "mutability": "mutable",
+                  "name": "_troves",
+                  "nameLocation": "703:7:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "676:34:29",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_CombinedTroveData_$21561_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "struct CombinedTroveData[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 21573,
+                      "nodeType": "UserDefinedTypeName",
+                      "pathNode": {
+                        "id": 21572,
+                        "name": "CombinedTroveData",
+                        "nameLocations": [
+                          "676:17:29"
+                        ],
+                        "nodeType": "IdentifierPath",
+                        "referencedDeclaration": 21561,
+                        "src": "676:17:29"
+                      },
+                      "referencedDeclaration": 21561,
+                      "src": "676:17:29",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_CombinedTroveData_$21561_storage_ptr",
+                        "typeString": "struct CombinedTroveData"
+                      }
+                    },
+                    "id": 21574,
+                    "nodeType": "ArrayTypeName",
+                    "src": "676:19:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_CombinedTroveData_$21561_storage_$dyn_storage_ptr",
+                      "typeString": "struct CombinedTroveData[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "675:36:29"
+            },
+            "scope": 21578,
+            "src": "481:231:29",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 21579,
+        "src": "447:267:29",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:683:29"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/helpers/interfaces/IMultiTroveGetter.sol",
+    "exportedSymbols": {
+      "CombinedTroveData": [
+        21561
+      ],
+      "IMultiTroveGetter": [
+        21578
+      ],
+      "ITroveManager": [
+        24691
+      ]
+    },
+    "id": 21579,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 21534,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".20"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "32:24:29"
+      },
+      {
+        "absolutePath": "/Users/ashley/Documents/satoshi/satoshi-v2/src/core/interfaces/ITroveManager.sol",
+        "file": "../../interfaces/ITroveManager.sol",
+        "id": 21536,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 21579,
+        "sourceUnit": 24767,
+        "src": "58:67:29",
+        "symbolAliases": [
+          {
+            "foreign": {
+              "id": 21535,
+              "name": "ITroveManager",
+              "nodeType": "Identifier",
+              "overloadedDeclarations": [],
+              "referencedDeclaration": 24691,
+              "src": "67:13:29",
+              "typeDescriptions": {}
+            },
+            "nameLocation": "-1:-1:-1"
+          }
+        ],
+        "unitAlias": ""
+      },
+      {
+        "canonicalName": "CombinedTroveData",
+        "id": 21561,
+        "members": [
+          {
+            "constant": false,
+            "id": 21538,
+            "mutability": "mutable",
+            "name": "owner",
+            "nameLocation": "166:5:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "158:13:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 21537,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "158:7:29",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21540,
+            "mutability": "mutable",
+            "name": "debt",
+            "nameLocation": "185:4:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "177:12:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21539,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "177:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21542,
+            "mutability": "mutable",
+            "name": "coll",
+            "nameLocation": "203:4:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "195:12:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21541,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "195:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21544,
+            "mutability": "mutable",
+            "name": "stake",
+            "nameLocation": "221:5:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "213:13:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21543,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "213:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21546,
+            "mutability": "mutable",
+            "name": "snapshotCollateral",
+            "nameLocation": "240:18:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "232:26:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21545,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "232:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21548,
+            "mutability": "mutable",
+            "name": "snapshotDebt",
+            "nameLocation": "272:12:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "264:20:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21547,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "264:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21550,
+            "mutability": "mutable",
+            "name": "nominalICR",
+            "nameLocation": "298:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "290:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21549,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "290:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21552,
+            "mutability": "mutable",
+            "name": "currentICR",
+            "nameLocation": "322:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "314:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21551,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "314:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21554,
+            "mutability": "mutable",
+            "name": "entireDebt",
+            "nameLocation": "346:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "338:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21553,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "338:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21556,
+            "mutability": "mutable",
+            "name": "entireColl",
+            "nameLocation": "370:10:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "362:18:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21555,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "362:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21558,
+            "mutability": "mutable",
+            "name": "pendingDebtReward",
+            "nameLocation": "394:17:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "386:25:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21557,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "386:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 21560,
+            "mutability": "mutable",
+            "name": "pendingCollReward",
+            "nameLocation": "425:17:29",
+            "nodeType": "VariableDeclaration",
+            "scope": 21561,
+            "src": "417:25:29",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 21559,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "417:7:29",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "CombinedTroveData",
+        "nameLocation": "134:17:29",
+        "nodeType": "StructDefinition",
+        "scope": 21579,
+        "src": "127:318:29",
+        "visibility": "public"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IMultiTroveGetter",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 21578,
+        "linearizedBaseContracts": [
+          21578
+        ],
+        "name": "IMultiTroveGetter",
+        "nameLocation": "457:17:29",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "4d1b6fd6",
+            "id": 21577,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getMultipleSortedTroves",
+            "nameLocation": "490:23:29",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 21571,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 21564,
+                  "mutability": "mutable",
+                  "name": "troveManager",
+                  "nameLocation": "537:12:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "523:26:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_ITroveManager_$24691",
+                    "typeString": "contract ITroveManager"
+                  },
+                  "typeName": {
+                    "id": 21563,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 21562,
+                      "name": "ITroveManager",
+                      "nameLocations": [
+                        "523:13:29"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 24691,
+                      "src": "523:13:29"
+                    },
+                    "referencedDeclaration": 24691,
+                    "src": "523:13:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_ITroveManager_$24691",
+                      "typeString": "contract ITroveManager"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 21566,
+                  "mutability": "mutable",
+                  "name": "_startIdx",
+                  "nameLocation": "566:9:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "559:16:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_int256",
+                    "typeString": "int256"
+                  },
+                  "typeName": {
+                    "id": 21565,
+                    "name": "int256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "559:6:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_int256",
+                      "typeString": "int256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 21568,
+                  "mutability": "mutable",
+                  "name": "_count",
+                  "nameLocation": "593:6:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "585:14:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 21567,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "585:7:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 21570,
+                  "mutability": "mutable",
+                  "name": "price",
+                  "nameLocation": "617:5:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "609:13:29",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 21569,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "609:7:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "513:115:29"
+            },
+            "returnParameters": {
+              "id": 21576,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 21575,
+                  "mutability": "mutable",
+                  "name": "_troves",
+                  "nameLocation": "703:7:29",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 21577,
+                  "src": "676:34:29",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_struct$_CombinedTroveData_$21561_memory_ptr_$dyn_memory_ptr",
+                    "typeString": "struct CombinedTroveData[]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 21573,
+                      "nodeType": "UserDefinedTypeName",
+                      "pathNode": {
+                        "id": 21572,
+                        "name": "CombinedTroveData",
+                        "nameLocations": [
+                          "676:17:29"
+                        ],
+                        "nodeType": "IdentifierPath",
+                        "referencedDeclaration": 21561,
+                        "src": "676:17:29"
+                      },
+                      "referencedDeclaration": 21561,
+                      "src": "676:17:29",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_struct$_CombinedTroveData_$21561_storage_ptr",
+                        "typeString": "struct CombinedTroveData"
+                      }
+                    },
+                    "id": 21574,
+                    "nodeType": "ArrayTypeName",
+                    "src": "676:19:29",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_struct$_CombinedTroveData_$21561_storage_$dyn_storage_ptr",
+                      "typeString": "struct CombinedTroveData[]"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "675:36:29"
+            },
+            "scope": 21578,
+            "src": "481:231:29",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 21579,
+        "src": "447:267:29",
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "src": "32:683:29"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.22+commit.5ed3e10f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2026-04-14T07:11:27.767Z"
+}
