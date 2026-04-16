@@ -1,15 +1,14 @@
 require('dotenv').config();
 
 const COMMON_DEPLOY_SETUP = {
-    enabled: false,
+    enabled: true,
     // Keep empty to fallback to deployer account in migration.
     owner: '',
     guardian: '',
     feeReceiver: '',
-    wethAddress: '',
+    wethAddress: 'TNUC9Qb1rRpS5CbWLmNMxXBjyFoydXjWFR',
     // Empty means deploy DebtToken (without LZ endpoint).
-    lzEndpoint: '',
-
+    lzEndpoint: 'TAy9xwjYjBBN6kutzrZJaAZJHCAejjK1V9',
     // Reference: script/DeploySetupConfig.s.sol
     debtTokenName: 'Satoshi Stablecoin V2',
     debtTokenSymbol: 'satUSD',
@@ -86,7 +85,7 @@ const COMMON_DEPLOY_PRICE_FEED_CHAINLINK = {
 };
 
 const COMMON_SET_NYM_ASSET_CONFIG = {
-    enabled: true,
+    enabled: false,
     // If empty, read satoshiXApp from tron/deployments/<network>.deploysetup.json
     satoshiXApp: '',
     // Address of the asset to configure. Accepts T... / 41... / 0x... formats.
@@ -142,7 +141,13 @@ module.exports = {
             fullHost: process.env.TRON_FULL_HOST_MAINNET || process.env.TRON_FULL_HOST || 'https://api.trongrid.io',
             feeLimit: 5_000_000_000,
             userFeePercentage: 100,
-            deploySetup: { ...COMMON_DEPLOY_SETUP },
+            deploySetup: {
+                ...COMMON_DEPLOY_SETUP,
+                owner: 'TG566o3ZXWGXqzwN6xbpZV6kBdxSE83cu8',
+                guardian: 'TG566o3ZXWGXqzwN6xbpZV6kBdxSE83cu8',
+                feeReceiver: 'TG566o3ZXWGXqzwN6xbpZV6kBdxSE83cu8',
+                lzEndpoint: 'TAy9xwjYjBBN6kutzrZJaAZJHCAejjK1V9',
+            },
             deployInstance: { ...COMMON_DEPLOY_INSTANCE },
             deployPriceFeedChainlink: { ...COMMON_DEPLOY_PRICE_FEED_CHAINLINK },
             deployOracleMock: { ...COMMON_DEPLOY_ORACLE_MOCK },

@@ -115,6 +115,16 @@ async function addFacet(diamond, facetAddress, facetAbi, functionNames) {
 
 module.exports = function (deployer, network, fromOrAccounts) {
     return deployer.then(async () => {
+        // Inject TronGrid API key into existing providers (tronbox ignores headers config)
+        const _apiKey = process.env.TRON_PRO_API_KEY || '';
+        if (_apiKey) {
+            const h = { 'TRON-PRO-API-KEY': _apiKey };
+            for (const node of [tronWeb.fullNode, tronWeb.solidityNode, tronWeb.eventServer]) {
+                if (node && node.instance) Object.assign(node.instance.defaults.headers, h);
+                if (node) node.headers = h;
+            }
+        }
+
         const networkCfg = (deployConfig.networks || {})[network];
         if (!networkCfg) {
             throw new Error(`[tron] missing network config for "${network}" in tron/config/deployConfig.js`);
@@ -161,13 +171,20 @@ module.exports = function (deployer, network, fromOrAccounts) {
         console.log(`[tron] owner=${owner}`);
 
         const sortedTrovesImpl = await SortedTroves.new();
+        console.log('[tron] deployed SortedTroves impl:', toTronBase58Address(sortedTrovesImpl.address));
         const sortedTrovesBeacon = await UpgradeableBeacon.new(sortedTrovesImpl.address, owner);
+        console.log('[tron] deployed SortedTrovesBeacon:', toTronBase58Address(sortedTrovesBeacon.address));
         const troveManagerImpl = await TroveManager.new();
+        console.log('[tron] deployed TroveManager impl:', toTronBase58Address(troveManagerImpl.address));
         const troveManagerBeacon = await UpgradeableBeacon.new(troveManagerImpl.address, owner);
+        console.log('[tron] deployed TroveManagerBeacon:', toTronBase58Address(troveManagerBeacon.address));
         const initializer = await Initializer.new();
+        console.log('[tron] deployed Initializer:', toTronBase58Address(initializer.address));
         const satoshiXApp = await SatoshiXApp.new();
+        console.log('[tron] deployed SatoshiXApp:', toTronBase58Address(satoshiXApp.address));
 
         const coreFacet = await CoreFacet.new();
+        console.log('[tron] deployed CoreFacet:', toTronBase58Address(coreFacet.address));
         await addFacet(satoshiXApp, coreFacet.address, CoreFacet.abi, [
             'setFeeReceiver',
             'setRewardManager',
@@ -182,8 +199,10 @@ module.exports = function (deployer, network, fromOrAccounts) {
             'troveManagerBeacon',
             'communityIssuance',
         ]);
+        console.log('[tron] addFacet CoreFacet done');
 
         const borrowerOperationsFacet = await BorrowerOperationsFacet.new();
+        console.log('[tron] deployed BorrowerOperationsFacet:', toTronBase58Address(borrowerOperationsFacet.address));
         await addFacet(satoshiXApp, borrowerOperationsFacet.address, BorrowerOperationsFacet.abi, [
             'addColl',
             'adjustTrove',
@@ -205,8 +224,10 @@ module.exports = function (deployer, network, fromOrAccounts) {
             'withdrawDebt',
             'forceResetTM',
         ]);
+        console.log('[tron] addFacet BorrowerOperationsFacet done');
 
         const factoryFacet = await FactoryFacet.new();
+        console.log('[tron] deployed FactoryFacet:', toTronBase58Address(factoryFacet.address));
         await addFacet(satoshiXApp, factoryFacet.address, FactoryFacet.abi, [
             'deployNewInstance',
             'troveManagerCount',
@@ -214,23 +235,29 @@ module.exports = function (deployer, network, fromOrAccounts) {
             'setTMRewardRate',
             'maxTMRewardRate',
         ]);
+        console.log('[tron] addFacet FactoryFacet done');
 
         const liquidationFacet = await LiquidationFacet.new();
+        console.log('[tron] deployed LiquidationFacet:', toTronBase58Address(liquidationFacet.address));
         await addFacet(satoshiXApp, liquidationFacet.address, LiquidationFacet.abi, [
             'batchLiquidateTroves',
             'liquidate',
             'liquidateTroves',
         ]);
+        console.log('[tron] addFacet LiquidationFacet done');
 
         const priceFeedAggregatorFacet = await PriceFeedAggregatorFacet.new();
+        console.log('[tron] deployed PriceFeedAggregatorFacet:', toTronBase58Address(priceFeedAggregatorFacet.address));
         await addFacet(satoshiXApp, priceFeedAggregatorFacet.address, PriceFeedAggregatorFacet.abi, [
             'fetchPrice',
             'fetchPriceUnsafe',
             'setPriceFeed',
             'oracleRecords',
         ]);
+        console.log('[tron] addFacet PriceFeedAggregatorFacet done');
 
         const stabilityPoolFacet = await StabilityPoolFacet.new();
+        console.log('[tron] deployed StabilityPoolFacet:', toTronBase58Address(stabilityPoolFacet.address));
         await addFacet(satoshiXApp, stabilityPoolFacet.address, StabilityPoolFacet.abi, [
             'claimCollateralGains',
             'provideToSP',
@@ -258,8 +285,10 @@ module.exports = function (deployer, network, fromOrAccounts) {
             'P',
             'setRewardRate',
         ]);
+        console.log('[tron] addFacet StabilityPoolFacet done');
 
         const nexusYieldManagerFacet = await NexusYieldManagerFacet.new();
+        console.log('[tron] deployed NexusYieldManagerFacet:', toTronBase58Address(nexusYieldManagerFacet.address));
         await addFacet(satoshiXApp, nexusYieldManagerFacet.address, NexusYieldManagerFacet.abi, [
             'setAssetConfig',
             'sunsetAsset',
@@ -291,13 +320,18 @@ module.exports = function (deployer, network, fromOrAccounts) {
             'isAssetSupported',
             'getAssetConfig',
         ]);
+        console.log('[tron] addFacet NexusYieldManagerFacet done');
 
         const oshiTokenImpl = await OSHIToken.new();
+        console.log('[tron] deployed OSHIToken impl:', toTronBase58Address(oshiTokenImpl.address));
         const oshiToken = await deployProxy(OSHIToken, oshiTokenImpl.address, [owner]);
+        console.log('[tron] deployed OSHIToken proxy:', toTronBase58Address(oshiToken.address));
 
         const gasPool = await GasPool.new();
+        console.log('[tron] deployed GasPool:', toTronBase58Address(gasPool.address));
 
         const debtTokenImpl = lzEndpoint ? await DebtTokenWithLz.new(lzEndpoint) : await DebtToken.new();
+        console.log('[tron] deployed DebtToken impl:', toTronBase58Address(debtTokenImpl.address));
         const debtTokenArtifact = lzEndpoint ? DebtTokenWithLz : DebtToken;
         const debtToken = await deployProxy(debtTokenArtifact, debtTokenImpl.address, [
             debtTokenName,
@@ -307,6 +341,7 @@ module.exports = function (deployer, network, fromOrAccounts) {
             toTronBase58Address(owner),
             debtGasCompensation,
         ]);
+        console.log('[tron] deployed DebtToken proxy:', toTronBase58Address(debtToken.address));
         const debtTokenSatoshiXApp = toTronHexAddress(await debtToken.satoshiXApp());
         if (debtTokenSatoshiXApp.toLowerCase() !== satoshiXApp.address.toLowerCase()) {
             throw new Error(
@@ -316,13 +351,16 @@ module.exports = function (deployer, network, fromOrAccounts) {
         }
 
         const communityIssuanceImpl = await CommunityIssuance.new();
+        console.log('[tron] deployed CommunityIssuance impl:', toTronBase58Address(communityIssuanceImpl.address));
         const communityIssuance = await deployProxy(CommunityIssuance, communityIssuanceImpl.address, [
             owner,
             oshiToken.address,
             satoshiXApp.address,
         ]);
+        console.log('[tron] deployed CommunityIssuance proxy:', toTronBase58Address(communityIssuance.address));
 
         const rewardManagerImpl = await RewardManager.new();
+        console.log('[tron] deployed RewardManager impl:', toTronBase58Address(rewardManagerImpl.address));
         const rewardManager = await deployProxy(RewardManager, rewardManagerImpl.address, [
             owner,
             satoshiXApp.address,
@@ -330,32 +368,43 @@ module.exports = function (deployer, network, fromOrAccounts) {
             debtToken.address,
             oshiToken.address,
         ]);
+        console.log('[tron] deployed RewardManager proxy:', toTronBase58Address(rewardManager.address));
 
         const vaultManagerImpl = await VaultManager.new();
+        console.log('[tron] deployed VaultManager impl:', toTronBase58Address(vaultManagerImpl.address));
         const vaultManager = await deployProxy(VaultManager, vaultManagerImpl.address, [
             debtToken.address,
             satoshiXApp.address,
             owner,
         ]);
+        console.log('[tron] deployed VaultManager proxy:', toTronBase58Address(vaultManager.address));
 
         const peripheryImpl = await SatoshiPeriphery.new();
+        console.log('[tron] deployed SatoshiPeriphery impl:', toTronBase58Address(peripheryImpl.address));
         const satoshiPeriphery = await deployProxy(SatoshiPeriphery, peripheryImpl.address, [
             debtToken.address,
             satoshiXApp.address,
             owner,
         ]);
+        console.log('[tron] deployed SatoshiPeriphery proxy:', toTronBase58Address(satoshiPeriphery.address));
 
         const swapRouterImpl = await SwapRouter.new();
+        console.log('[tron] deployed SwapRouter impl:', toTronBase58Address(swapRouterImpl.address));
         const swapRouter = await deployProxy(SwapRouter, swapRouterImpl.address, [
             debtToken.address,
             satoshiXApp.address,
             owner,
         ]);
+        console.log('[tron] deployed SwapRouter proxy:', toTronBase58Address(swapRouter.address));
 
         const hintHelpers = await MultiCollateralHintHelpers.new(satoshiXApp.address);
+        console.log('[tron] deployed MultiCollateralHintHelpers:', toTronBase58Address(hintHelpers.address));
         const multiTroveGetter = await MultiTroveGetter.new();
+        console.log('[tron] deployed MultiTroveGetter:', toTronBase58Address(multiTroveGetter.address));
         const troveHelper = await TroveHelper.new();
+        console.log('[tron] deployed TroveHelper:', toTronBase58Address(troveHelper.address));
         const troveManagerGetter = await TroveManagerGetter.new(satoshiXApp.address);
+        console.log('[tron] deployed TroveManagerGetter:', toTronBase58Address(troveManagerGetter.address));
 
         const initSelector = tronWeb.sha3('init(bytes)').slice(0, 10);
         const initFacetCut = [[initializer.address, 0, [initSelector]]];
@@ -391,16 +440,22 @@ module.exports = function (deployer, network, fromOrAccounts) {
             rawInitData,
         ]);
         await satoshiXApp.diamondCut(initFacetCut, initializer.address, initCallData);
+        console.log('[tron] diamondCut init done');
 
         const canRunOwnerConfig = owner.toLowerCase() === deployerAddress.toLowerCase();
         if (canRunOwnerConfig) {
             await debtToken.rely(satoshiXApp.address);
+            console.log('[tron] debtToken.rely done');
             const coreAsDiamond = await CoreFacet.at(satoshiXApp.address);
             await coreAsDiamond.setRewardManager(rewardManager.address);
+            console.log('[tron] setRewardManager done');
             await communityIssuance.setAllocated([satoshiXApp.address], [spAllocation]);
+            console.log('[tron] setAllocated done');
             const spAsDiamond = await StabilityPoolFacet.at(satoshiXApp.address);
             await spAsDiamond.setClaimStartTime(spClaimStartTime);
+            console.log('[tron] setClaimStartTime done');
             await spAsDiamond.setSPRewardRate(spRewardRate);
+            console.log('[tron] setSPRewardRate done');
         } else {
             console.warn(
                 '[tron] owner != deployer, skipped owner-only config: rely, setRewardManager, setAllocated, setClaimStartTime, setSPRewardRate'

@@ -22,6 +22,16 @@ function sleep(ms) {
 
 module.exports = function (deployer, network, fromOrAccounts) {
     return deployer.then(async () => {
+        // Inject TronGrid API key into existing providers (tronbox ignores headers config)
+        const _apiKey = process.env.TRON_PRO_API_KEY || '';
+        if (_apiKey) {
+            const h = { 'TRON-PRO-API-KEY': _apiKey };
+            for (const node of [tronWeb.fullNode, tronWeb.solidityNode, tronWeb.eventServer]) {
+                if (node && node.instance) Object.assign(node.instance.defaults.headers, h);
+                if (node) node.headers = h;
+            }
+        }
+
         let step = 1;
         const done = (message) => {
             console.log(`[tron][step ${step}] ${message}`);
@@ -138,8 +148,13 @@ module.exports = function (deployer, network, fromOrAccounts) {
         const countBefore = Number((await factoryFacet.troveManagerCount()).toString());
         await priceFeedFacet.setPriceFeed(collateralAddress, priceFeedAddress, txOpts);
         done('setPriceFeed completed');
-        const oracleRecord = await priceFeedFacet.oracleRecords(collateralAddress);
-        const configuredOracle = toTronHexAddress(oracleRecord[0]);
+        let configuredOracle = '';
+        for (let i = 0; i < 8; i++) {
+            const oracleRecord = await priceFeedFacet.oracleRecords(collateralAddress);
+            configuredOracle = toTronHexAddress(oracleRecord[0]);
+            if (configuredOracle.toLowerCase() === priceFeedAddress.toLowerCase()) break;
+            await sleep(1500);
+        }
         if (configuredOracle.toLowerCase() !== priceFeedAddress.toLowerCase()) {
             throw new Error(
                 `[tron] setPriceFeed did not update oracleRecords. expected=${toTronBase58Address(priceFeedAddress)}, ` +

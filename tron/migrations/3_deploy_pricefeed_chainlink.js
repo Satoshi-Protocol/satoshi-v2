@@ -10,6 +10,16 @@ const normalizeOutputAddresses = (value) => addressUtils.normalizeOutputAddresse
 
 module.exports = function (deployer, network, fromOrAccounts) {
     return deployer.then(async () => {
+        // Inject TronGrid API key into existing providers (tronbox ignores headers config)
+        const _apiKey = process.env.TRON_PRO_API_KEY || '';
+        if (_apiKey) {
+            const h = { 'TRON-PRO-API-KEY': _apiKey };
+            for (const node of [tronWeb.fullNode, tronWeb.solidityNode, tronWeb.eventServer]) {
+                if (node && node.instance) Object.assign(node.instance.defaults.headers, h);
+                if (node) node.headers = h;
+            }
+        }
+
         const networkCfg = (deployConfig.networks || {})[network];
         if (!networkCfg) {
             throw new Error(`[tron] missing network config for "${network}" in tron/config/deployConfig.js`);

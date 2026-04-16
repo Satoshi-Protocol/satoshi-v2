@@ -42,6 +42,7 @@
     "tron:migrate:pricefeed:chainlink:nile": "node tron/scripts/prepareRemappings.js && tronbox migrate --f 3 --to 3 --network nile --config tronbox.js",
     "tron:migrate:pricefeed:chainlink:shasta": "node tron/scripts/prepareRemappings.js && tronbox migrate --f 3 --to 3 --network shasta --config tronbox.js",
     "tron:migrate:reset:nile": "node tron/scripts/prepareRemappings.js && tronbox migrate --reset --network nile --config tronbox.js",
+    "tron:migrate:complete:mainnet": "node tron/scripts/prepareRemappings.js && tronbox migrate --f 7 --to 7 --network mainnet --config tronbox.js",
     "tron:migrate:set-nym-asset-config:mainnet": "node tron/scripts/prepareRemappings.js && tronbox migrate --f 6 --to 6 --network mainnet --config tronbox.js",
     "tron:migrate:set-nym-asset-config:nile": "node tron/scripts/prepareRemappings.js && tronbox migrate --f 6 --to 6 --network nile --config tronbox.js",
     "tron:migrate:set-nym-asset-config:shasta": "node tron/scripts/prepareRemappings.js && tronbox migrate --f 6 --to 6 --network shasta --config tronbox.js",
@@ -49,8 +50,8 @@
     "tron:prepare": "node tron/scripts/prepareRemappings.js"
   },
   "resolutions": {
-    "ethers": "^5.7.2",
-    "hardhat-deploy": "^0.12.1"
+    "hardhat-deploy": "^0.12.1",
+    "tronweb/ethers": "^6.13.5"
   },
   "dependencies": {
     "@babel/core": "^7.23.9",
@@ -93,7 +94,7 @@
     "prettier": "^3.2.5",
     "solhint": "^4.1.1",
     "solidity-bytes-utils": "^0.8.2",
-    "tronbox": "^2.7.31",
+    "tronbox": "4.5.0",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2",
     "typescript": "^5.4.4"
@@ -103,12 +104,10 @@
   },
   "pnpm": {
     "overrides": {
-      "ethers": "^5.7.2",
       "hardhat-deploy": "^0.12.1"
     }
   },
   "overrides": {
-    "ethers": "^5.7.2",
     "hardhat-deploy": "^0.12.1"
   }
 }
