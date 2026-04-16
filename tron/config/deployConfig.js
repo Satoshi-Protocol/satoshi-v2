@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const COMMON_DEPLOY_SETUP = {
-    enabled: true,
+    enabled: false,
     // Keep empty to fallback to deployer account in migration.
     owner: '',
     guardian: '',
@@ -25,7 +25,7 @@ const COMMON_DEPLOY_SETUP = {
 };
 
 const COMMON_DEPLOY_INSTANCE = {
-    enabled: false,
+    enabled: true,
     // If empty, read from tron/deployments/<network>.deploysetup.json
     satoshiXApp: '',
     rewardManager: '',
@@ -33,16 +33,16 @@ const COMMON_DEPLOY_INSTANCE = {
     communityIssuance: '',
 
     // Required when enabled=true
-    collateralAddress: 'TYcwYsfpYsa8jtQ2GzacVLpCB3AQuxyySe',
-    priceFeedAddress: 'TZHim86dG3vmETDjwZ893Qie1snm1Km8e3',
+    collateralAddress: 'THb4CqiFdwNHsWsQCs4JhzwjMWys4aqCbF',
+    priceFeedAddress: 'TULgECtZmcufyCVfcP1j2FP6EeNQd8DzAr',
 
     // Reference: script/DeployInstanceConfig.sol
-    MCR: '1700000000000000000',
+    MCR: '1100000000000000000',
     minuteDecayFactor: '999037758833783500',
-    redemptionFeeFloor: '5000000000000000',
-    maxRedemptionFee: '50000000000000000',
-    borrowingFeeFloor: '5000000000000000',
-    maxBorrowingFee: '50000000000000000',
+    redemptionFeeFloor: '5000000000000000', // 0.5%
+    maxRedemptionFee: '50000000000000000', // 5%
+    borrowingFeeFloor: '5000000000000000', // 0.5%
+    maxBorrowingFee: '50000000000000000', // 5%
     interestRateInBps: '0',
     maxDebt: '1000000000000000000000000000',
     rewardRate: '0',
@@ -77,9 +77,9 @@ const COMMON_DEPLOY_ERC20_MOCK = {
 const COMMON_DEPLOY_PRICE_FEED_CHAINLINK = {
     enabled: false,
     // Chainlink AggregatorV3 source. Accepts T... / 41... / 0x... formats.
-    sourceAddress: 'TJR9eco3cKMt4avk7naok9TbKMxY51izZM',
+    sourceAddress: 'TBcCSYgSTMQccxgoR7Ct6hTsCm5qdErRyf',
     // Must be > 120. Reference: script/priceFeed/DeployPriceFeedChainlink.s.sol
-    maxTimeThreshold: '86700',
+    maxTimeThreshold: '86600',
     // Optional post-deploy validation calls (fetchPrice/fetchPriceUnsafe/decimals).
     validateAfterDeploy: true,
 };

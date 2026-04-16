@@ -36,7 +36,7 @@ module.exports = function (deployer, network, fromOrAccounts) {
             throw new Error('[tron] deployPriceFeedChainlink.sourceAddress is required.');
         }
 
-        const maxTimeThreshold = String(cfg.maxTimeThreshold || '86700');
+        const maxTimeThreshold = String(cfg.maxTimeThreshold || '86600');
         if (BigInt(maxTimeThreshold) <= 120n) {
             throw new Error('[tron] deployPriceFeedChainlink.maxTimeThreshold must be > 120.');
         }
