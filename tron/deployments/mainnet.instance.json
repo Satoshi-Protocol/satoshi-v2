@@ -1,0 +1,26 @@
+{
+  "network": "mainnet",
+  "satoshiXApp": "TCtcuDNLwMEVokEj3Hg8ZoQaN8vcPFvk18",
+  "collateral": "THb4CqiFdwNHsWsQCs4JhzwjMWys4aqCbF",
+  "priceFeed": "TULgECtZmcufyCVfcP1j2FP6EeNQd8DzAr",
+  "troveManager": "TEDkv6WkDS9HftmMADQeih43YSPLe6STvP",
+  "sortedTroves": "TVL2QvTyPLbMYZEfovtp8ZvPfq1xuXJCKN",
+  "rewardManager": "TTUjLMfciicMkLTRtwUhqSMvmijwUzZL7u",
+  "communityIssuance": "TUCxhx33L3WXUvWA2d3njnuBJmmBEyTEeP",
+  "vaultManager": "TMSZqGKzPG72VSsS1sdX1gRdxhxQxGXe83",
+  "params": {
+    "minuteDecayFactor": "999037758833783500",
+    "redemptionFeeFloor": "5000000000000000",
+    "maxRedemptionFee": "50000000000000000",
+    "borrowingFeeFloor": "5000000000000000",
+    "maxBorrowingFee": "50000000000000000",
+    "interestRateInBps": "0",
+    "maxDebt": "1000000000000000000000000000",
+    "MCR": "1100000000000000000",
+    "rewardRate": "0",
+    "OSHIAllocation": "0",
+    "claimStartTime": "4294967295"
+  },
+  "retainPercentage": "0",
+  "refillPercentage": "0"
+}

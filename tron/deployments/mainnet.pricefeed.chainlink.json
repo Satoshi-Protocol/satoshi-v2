@@ -1,0 +1,15 @@
+{
+  "network": "mainnet",
+  "deployer": "TG566o3ZXWGXqzwN6xbpZV6kBdxSE83cu8",
+  "priceFeedChainlink": "TULgECtZmcufyCVfcP1j2FP6EeNQd8DzAr",
+  "source": "TBcCSYgSTMQccxgoR7Ct6hTsCm5qdErRyf",
+  "maxTimeThreshold": "86600",
+  "decimals": 8,
+  "fetchedPrice": "236033500000",
+  "validateAfterDeploy": true,
+  "validationOk": true,
+  "validationWarning": "",
+  "unsafePrice": "",
+  "updatedAt": 0,
+  "ageSec": -1
+}
