@@ -30,7 +30,7 @@ contract PriceFeedAggregatorFacet is IPriceFeedAggregatorFacet, AccessControlInt
 
     // Public functions -------------------------------------------------------------------------------------------------
 
-    function fetchPrice(IERC20 _token) public returns (uint256) {
+    function fetchPrice(IERC20 _token) public view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         OracleRecord memory oracle = s.oracleRecords[_token];
 

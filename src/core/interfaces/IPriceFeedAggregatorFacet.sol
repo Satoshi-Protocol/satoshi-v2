@@ -35,7 +35,7 @@ interface IPriceFeedAggregatorFacet {
      * @param _token The ERC20 token for which the price is to be fetched.
      * @return The price of the token in the smallest unit.
      */
-    function fetchPrice(IERC20 _token) external returns (uint256);
+    function fetchPrice(IERC20 _token) external view returns (uint256);
 
     /**
      * @notice Fetches the price of a given token without safety checks.

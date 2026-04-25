@@ -2,5 +2,5 @@
 pragma solidity ^0.8.20;
 
 interface IDIAOracleV2 {
-    function getValue(string memory) external returns (uint128, uint128);
+    function getValue(string memory) external view returns (uint128, uint128);
 }
