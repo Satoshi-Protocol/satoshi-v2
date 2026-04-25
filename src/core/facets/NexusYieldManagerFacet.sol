@@ -705,7 +705,7 @@ contract NexusYieldManagerFacet is INexusYieldManagerFacet, AccessControlInterna
     // @notice Returns the debtTokenMinted-weighted average rate of all supported assets.
     // @dev Skips sunset assets and assets with zero debtTokenMinted.
     //      Reverts with NoActiveAssets when no asset has any weight.
-    function getWeightedAssetRate() external returns (uint256) {
+    function getWeightedAssetRate() external view returns (uint256) {
         AppStorage.Layout storage s = AppStorage.layout();
         uint256 totalWeight;
         uint256 weightedSum;

@@ -45,7 +45,7 @@ contract PriceFeedWstBTCWithDIAOracle is IPriceFeed, Ownable {
         emit MaxTimeThresholdUpdated(_maxTimeThreshold);
     }
 
-    function fetchPrice() external returns (uint256) {
+    function fetchPrice() external view returns (uint256) {
         (uint128 price, uint128 lastUpdated) = _source.getValue(_key);
         if (price == 0) revert InvalidPriceUInt128(price);
         if (block.timestamp - uint256(lastUpdated) > maxTimeThreshold) {
@@ -56,7 +56,7 @@ contract PriceFeedWstBTCWithDIAOracle is IPriceFeed, Ownable {
         return wstBtcPrice;
     }
 
-    function fetchPriceUnsafe() external returns (uint256, uint256) {
+    function fetchPriceUnsafe() external view returns (uint256, uint256) {
         (uint128 price, uint128 lastUpdated) = _source.getValue(_key);
         if (price == 0) revert InvalidPriceUInt128(price);
 

@@ -25,9 +25,9 @@ interface IPriceFeed {
     event PriceIDUpdated(bytes32 newPriceID);
     event ConfigSet(SourceConfig sources);
 
-    function fetchPrice() external returns (uint256);
+    function fetchPrice() external view returns (uint256);
 
-    function fetchPriceUnsafe() external returns (uint256, uint256);
+    function fetchPriceUnsafe() external view returns (uint256, uint256);
 
     function decimals() external view returns (uint8);
 
